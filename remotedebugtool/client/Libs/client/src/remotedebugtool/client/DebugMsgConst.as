@@ -11,7 +11,8 @@ package remotedebugtool.client
 		{
 			
 		}
-		public static const GetAllDebugView:String="GetAllDebugView";
+		public static const GetAllDebugView:String = "GetAllDebugView";
+		public static const UpdateNodeProps:String = "UpdateNodeProps";
 	}
 
 }

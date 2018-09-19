@@ -48,6 +48,27 @@ package remotedebugtool.client
 			walkTargetEX(Laya.stage, workChild, null, null);
 			return item;
 		}
+		public static function findNodeByCompId(compId:int, rootGid:int=-1):void
+		{
+			var root:Object;
+			if (rootGid)
+			{
+				root = findNodeByGid(rootGid);
+			}
+			if (!root) root = Laya.stage;
+			var item:Object;
+
+			function workChild(child:Object):void
+			{
+				_gidDic[child.compId] = child;
+				if (child.compId == compId)
+				{
+					item = child;
+				}
+			}
+			walkTargetEX(root, workChild, null, null);
+			return item;
+		}
 		public static function updateNodeProp(node:Object, props:Object):void
 		{
 			var key:String;

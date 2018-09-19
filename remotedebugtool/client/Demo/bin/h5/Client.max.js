@@ -10261,14 +10261,49 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		RemoteWorkUtils.findNodeByGid=function(gid){
+			if (RemoteWorkUtils._gidDic[gid])return RemoteWorkUtils._gidDic[gid];
 			var item;
 			function workChild (child){
+				RemoteWorkUtils._gidDic[child.$_GID]=child;
 				if (child.$_GID==gid){
 					item=child;
 				}
 			}
 			RemoteWorkUtils.walkTargetEX(Laya.stage,workChild,null,null);
 			return item;
+		}
+
+		RemoteWorkUtils.findNodeByCompId=function(compId,rootGid){
+			(rootGid===void 0)&& (rootGid=-1);
+			var root;
+			if (rootGid){
+				root=RemoteWorkUtils.findNodeByGid(rootGid);
+			}
+			if (!root)root=Laya.stage;
+			var item;
+			function workChild (child){
+				RemoteWorkUtils._gidDic[child.compId]=child;
+				if (child.compId==compId){
+					item=child;
+				}
+			}
+			RemoteWorkUtils.walkTargetEX(root,workChild,null,null);
+			return item;
+		}
+
+		RemoteWorkUtils.updateNodeProp=function(node,props){
+			var key;
+			for (key in props){
+				node[key]=props[key];
+			}
+		}
+
+		RemoteWorkUtils.updateNodePropByGid=function(gid,props){
+			var node;
+			node=RemoteWorkUtils.findNodeByGid(gid);
+			if (node){
+				RemoteWorkUtils.updateNodeProp(node,props);
+			}
 		}
 
 		RemoteWorkUtils.getAllTargetView=function(){
@@ -10284,6 +10319,7 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		RemoteWorkUtils.ViewSign="__$fileRefer";
+		RemoteWorkUtils._gidDic={};
 		return RemoteWorkUtils;
 	})()
 
