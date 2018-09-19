@@ -1,7 +1,10 @@
 package  
 {
+	import laya.utils.Handler;
 	import remotedebugtool.client.DebugClient;
+	import remotedebugtool.client.RemoteWorkUtils;
 	import remotedebugtool.client.StockSocket;
+	import view.TestView;
 	/**
 	 * ...
 	 * @author ww
@@ -14,8 +17,18 @@ package
 			Laya.init(1000, 900);
 			//test();
 			testDebugClient();
+			Laya.loader.load("res/atlas/comp.atlas", new Handler(this, initTestPage));
 		}
 		
+		
+		private function initTestPage():void
+		{
+			var tpg:TestView;
+			tpg = new TestView();
+			Laya.stage.addChild(tpg);
+			
+			trace(RemoteWorkUtils.getAllTargetView());
+		}
 		private var socket:StockSocket;
 		private function test():void
 		{

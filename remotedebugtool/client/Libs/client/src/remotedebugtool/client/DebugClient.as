@@ -6,7 +6,7 @@ package remotedebugtool.client
 	 */
 	public class DebugClient 
 	{
-		private var socket:StockSocket;
+		protected var socket:StockSocket;
 		public var channel:String = "debug";
 		public function DebugClient() 
 		{

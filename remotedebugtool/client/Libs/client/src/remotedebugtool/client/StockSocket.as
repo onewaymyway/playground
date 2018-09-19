@@ -90,6 +90,11 @@ package remotedebugtool.client {
 			dataO.data = obj;
 			sendJson(dataO);
 		}
+		
+		public function sendTypedToChannel(type:String, obj:Object):void
+		{
+			sendToChannel(MsgConst.createMsg(type,obj));
+		}
 		private function closeLater():void {
 			socket.close();
 			trace("after close");
