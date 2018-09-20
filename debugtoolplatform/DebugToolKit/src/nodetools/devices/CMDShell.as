@@ -88,5 +88,7 @@ package nodetools.devices
 		{
 			return iconv.decode(data, type);
 		}
+		
+		//public static function spawn(
 	}
 }

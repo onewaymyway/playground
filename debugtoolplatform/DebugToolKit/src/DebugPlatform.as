@@ -1,5 +1,6 @@
 package  
 {
+	import debugplatform.chrome.DebugChromeView;
 	import easyviews.EasyMain;
 	import electrontools.drags.SystemDragOverManager;
 	import electrontools.menus.ContextMenu;
@@ -20,10 +21,10 @@ package
 	 * ...
 	 * @author ww
 	 */
-	public class EasyDesk 
+	public class DebugPlatform 
 	{
 		
-		public function EasyDesk() 
+		public function DebugPlatform() 
 		{
 			Laya.init(800, 600);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
@@ -34,7 +35,6 @@ package
 			resList = [{"url":"res/atlas/comp.json","type":Loader.ATLAS}];
 			Laya.loader.load(resList, new Handler(this, test));
 		}
-		
 		private function init():void {
 			Device.Buffer = __JS__("Buffer");
 			Device.init();
@@ -60,12 +60,11 @@ package
 		private function test():void
 		{
 			trace("AppPath:",FileTools.appPath);
-			var mainView:EasyMain;
-			mainView = new EasyMain();
+			var mainView:DebugChromeView;
+			mainView = new DebugChromeView();
 			mainView.left = mainView.top = mainView.right = mainView.bottom = 10;
 			Laya.stage.addChild(mainView);
 		}
-		
 	}
 
 }

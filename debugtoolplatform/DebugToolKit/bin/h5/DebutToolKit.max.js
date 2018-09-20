@@ -401,51 +401,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*...
-	*@author ww
-	*/
-	//class EasyDesk
-	var EasyDesk=(function(){
-		function EasyDesk(){
-			Laya.init(800,600);
-			Laya.stage.scaleMode="full";
-			UIConfig.touchScrollEnable=false;
-			Styles.buttonLabelColors=["#ffffff","#32cc6b","#ff0000","#C0C0C0"];
-			this.init();
-			var resList;
-			resList=[{"url":"res/atlas/comp.json","type":"atlas"}];
-			Laya.loader.load(resList,new Handler(this,this.test));
-		}
-
-		__class(EasyDesk,'EasyDesk');
-		var __proto=EasyDesk.prototype;
-		__proto.init=function(){
-			Device.Buffer=Buffer;
-			Device.init();
-			SystemSetting.isCMDVer=true;
-			OSInfo.init();
-			FileTools.init2();
-			CMDShell.init();
-			PythonTools.PythonFolder=FileTools.getAppPath("pythontools")+"/";
-			Paths.tempPath=FileTools.getAppPath("tempdata")+"/";
-			Paths.dataPath=FileTools.getAppPath("data")+"/";
-			SystemDragOverManager.init();
-			ContextMenu.init();
-		}
-
-		__proto.test=function(){
-			console.log("AppPath:",FileTools.appPath);
-			var mainView;
-			mainView=new EasyMain();
-			mainView.left=mainView.top=mainView.right=mainView.bottom=10;
-			Laya.stage.addChild(mainView);
-		}
-
-		return EasyDesk;
-	})()
-
-
-	/**
 	*<code>EventDispatcher</code> 类是可调度事件的所有类的基类。
 	*/
 	//class laya.events.EventDispatcher
@@ -735,6 +690,51 @@ var Laya=window.Laya=(function(window,document){
 		Handler._pool=[];
 		Handler._gid=1;
 		return Handler;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class DebugPlatform
+	var DebugPlatform=(function(){
+		function DebugPlatform(){
+			Laya.init(800,600);
+			Laya.stage.scaleMode="full";
+			UIConfig.touchScrollEnable=false;
+			Styles.buttonLabelColors=["#ffffff","#32cc6b","#ff0000","#C0C0C0"];
+			this.init();
+			var resList;
+			resList=[{"url":"res/atlas/comp.json","type":"atlas"}];
+			Laya.loader.load(resList,new Handler(this,this.test));
+		}
+
+		__class(DebugPlatform,'DebugPlatform');
+		var __proto=DebugPlatform.prototype;
+		__proto.init=function(){
+			Device.Buffer=Buffer;
+			Device.init();
+			SystemSetting.isCMDVer=true;
+			OSInfo.init();
+			FileTools.init2();
+			CMDShell.init();
+			PythonTools.PythonFolder=FileTools.getAppPath("pythontools")+"/";
+			Paths.tempPath=FileTools.getAppPath("tempdata")+"/";
+			Paths.dataPath=FileTools.getAppPath("data")+"/";
+			SystemDragOverManager.init();
+			ContextMenu.init();
+		}
+
+		__proto.test=function(){
+			console.log("AppPath:",FileTools.appPath);
+			var mainView;
+			mainView=new DebugChromeView();
+			mainView.left=mainView.top=mainView.right=mainView.bottom=10;
+			Laya.stage.addChild(mainView);
+		}
+
+		return DebugPlatform;
 	})()
 
 
@@ -13409,6 +13409,561 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*<p> <code>Byte</code> 类提供用于优化读取、写入以及处理二进制数据的方法和属性。</p>
+	*<p><b>注意：</b> <code>Byte</code> 类适用于需要在字节层访问数据的高级开发人员。</p>
+	*/
+	//class laya.utils.Byte
+	var Byte=(function(){
+		function Byte(data){
+			this._xd_=true;
+			this._allocated_=8;
+			//this._d_=null;
+			//this._u8d_=null;
+			this._pos_=0;
+			this._length=0;
+			if (data){
+				this._u8d_=new Uint8Array(data);
+				this._d_=new DataView(this._u8d_.buffer);
+				this._length=this._d_.byteLength;
+				}else {
+				this.___resizeBuffer(this._allocated_);
+			}
+		}
+
+		__class(Byte,'laya.utils.Byte');
+		var __proto=Byte.prototype;
+		/**@private */
+		__proto.___resizeBuffer=function(len){
+			try {
+				var newByteView=new Uint8Array(len);
+				if (this._u8d_ !=null){
+					if (this._u8d_.length <=len)newByteView.set(this._u8d_);
+					else newByteView.set(this._u8d_.subarray(0,len));
+				}
+				this._u8d_=newByteView;
+				this._d_=new DataView(newByteView.buffer);
+				}catch (err){
+				throw "___resizeBuffer err:"+len;
+			}
+		}
+
+		/**
+		*<p>常用于解析固定格式的字节流。</p>
+		*<p>先从字节流的当前字节偏移位置处读取一个 <code>Uint16</code> 值，然后以此值为长度，读取此长度的字符串。</p>
+		*@return 读取的字符串。
+		*/
+		__proto.getString=function(){
+			return this.rUTF(this.getUint16());
+		}
+
+		/**
+		*从字节流中 <code>start</code> 参数指定的位置开始，读取 <code>len</code> 参数指定的字节数的数据，用于创建一个 <code>Float32Array</code> 对象并返回此对象。
+		*@param start 开始位置。
+		*@param len 需要读取的字节长度。如果要读取的长度超过可读取范围，则只返回可读范围内的值。
+		*@return 读取的 Float32Array 对象。
+		*/
+		__proto.getFloat32Array=function(start,len){
+			var end=start+len;
+			end=(end > this._length)? this._length :end;
+			var v=new Float32Array(this._d_.buffer.slice(start,end));
+			this._pos_=end;
+			return v;
+		}
+
+		/**
+		*从字节流中 <code>start</code> 参数指定的位置开始，读取 <code>len</code> 参数指定的字节数的数据，用于创建一个 <code>Uint8Array</code> 对象并返回此对象。
+		*@param start 开始位置。
+		*@param len 需要读取的字节长度。如果要读取的长度超过可读取范围，则只返回可读范围内的值。
+		*@return 读取的 Uint8Array 对象。
+		*/
+		__proto.getUint8Array=function(start,len){
+			var end=start+len;
+			end=(end > this._length)? this._length :end;
+			var v=new Uint8Array(this._d_.buffer.slice(start,end));
+			this._pos_=end;
+			return v;
+		}
+
+		/**
+		*从字节流中 <code>start</code> 参数指定的位置开始，读取 <code>len</code> 参数指定的字节数的数据，用于创建一个 <code>Int16Array</code> 对象并返回此对象。
+		*@param start 开始读取的字节偏移量位置。
+		*@param len 需要读取的字节长度。如果要读取的长度超过可读取范围，则只返回可读范围内的值。
+		*@return 读取的 Uint8Array 对象。
+		*/
+		__proto.getInt16Array=function(start,len){
+			var end=start+len;
+			end=(end > this._length)? this._length :end;
+			var v=new Int16Array(this._d_.buffer.slice(start,end));
+			this._pos_=end;
+			return v;
+		}
+
+		/**
+		*从字节流的当前字节偏移位置处读取一个 IEEE 754 单精度（32 位）浮点数。
+		*@return 单精度（32 位）浮点数。
+		*/
+		__proto.getFloat32=function(){
+			if (this._pos_+4 > this._length)throw "getFloat32 error - Out of bounds";
+			var v=this._d_.getFloat32(this._pos_,this._xd_);
+			this._pos_+=4;
+			return v;
+		}
+
+		/**
+		*从字节流的当前字节偏移量位置处读取一个 IEEE 754 双精度（64 位）浮点数。
+		*@return 双精度（64 位）浮点数。
+		*/
+		__proto.getFloat64=function(){
+			if (this._pos_+8 > this._length)throw "getFloat64 error - Out of bounds";
+			var v=this._d_.getFloat64(this._pos_,this._xd_);
+			this._pos_+=8;
+			return v;
+		}
+
+		/**
+		*在字节流的当前字节偏移量位置处写入一个 IEEE 754 单精度（32 位）浮点数。
+		*@param value 单精度（32 位）浮点数。
+		*/
+		__proto.writeFloat32=function(value){
+			this.ensureWrite(this._pos_+4);
+			this._d_.setFloat32(this._pos_,value,this._xd_);
+			this._pos_+=4;
+		}
+
+		/**
+		*在字节流的当前字节偏移量位置处写入一个 IEEE 754 双精度（64 位）浮点数。
+		*@param value 双精度（64 位）浮点数。
+		*/
+		__proto.writeFloat64=function(value){
+			this.ensureWrite(this._pos_+8);
+			this._d_.setFloat64(this._pos_,value,this._xd_);
+			this._pos_+=8;
+		}
+
+		/**
+		*从字节流的当前字节偏移量位置处读取一个 Int32 值。
+		*@return Int32 值。
+		*/
+		__proto.getInt32=function(){
+			if (this._pos_+4 > this._length)throw "getInt32 error - Out of bounds";
+			var float=this._d_.getInt32(this._pos_,this._xd_);
+			this._pos_+=4;
+			return float;
+		}
+
+		/**
+		*从字节流的当前字节偏移量位置处读取一个 Uint32 值。
+		*@return Uint32 值。
+		*/
+		__proto.getUint32=function(){
+			if (this._pos_+4 > this._length)throw "getUint32 error - Out of bounds";
+			var v=this._d_.getUint32(this._pos_,this._xd_);
+			this._pos_+=4;
+			return v;
+		}
+
+		/**
+		*在字节流的当前字节偏移量位置处写入指定的 Int32 值。
+		*@param value 需要写入的 Int32 值。
+		*/
+		__proto.writeInt32=function(value){
+			this.ensureWrite(this._pos_+4);
+			this._d_.setInt32(this._pos_,value,this._xd_);
+			this._pos_+=4;
+		}
+
+		/**
+		*在字节流的当前字节偏移量位置处写入 Uint32 值。
+		*@param value 需要写入的 Uint32 值。
+		*/
+		__proto.writeUint32=function(value){
+			this.ensureWrite(this._pos_+4);
+			this._d_.setUint32(this._pos_,value,this._xd_);
+			this._pos_+=4;
+		}
+
+		/**
+		*从字节流的当前字节偏移量位置处读取一个 Int16 值。
+		*@return Int16 值。
+		*/
+		__proto.getInt16=function(){
+			if (this._pos_+2 > this._length)throw "getInt16 error - Out of bounds";
+			var us=this._d_.getInt16(this._pos_,this._xd_);
+			this._pos_+=2;
+			return us;
+		}
+
+		/**
+		*从字节流的当前字节偏移量位置处读取一个 Uint16 值。
+		*@return Uint16 值。
+		*/
+		__proto.getUint16=function(){
+			if (this._pos_+2 > this._length)throw "getUint16 error - Out of bounds";
+			var us=this._d_.getUint16(this._pos_,this._xd_);
+			this._pos_+=2;
+			return us;
+		}
+
+		/**
+		*在字节流的当前字节偏移量位置处写入指定的 Uint16 值。
+		*@param value 需要写入的Uint16 值。
+		*/
+		__proto.writeUint16=function(value){
+			this.ensureWrite(this._pos_+2);
+			this._d_.setUint16(this._pos_,value,this._xd_);
+			this._pos_+=2;
+		}
+
+		/**
+		*在字节流的当前字节偏移量位置处写入指定的 Int16 值。
+		*@param value 需要写入的 Int16 值。
+		*/
+		__proto.writeInt16=function(value){
+			this.ensureWrite(this._pos_+2);
+			this._d_.setInt16(this._pos_,value,this._xd_);
+			this._pos_+=2;
+		}
+
+		/**
+		*从字节流的当前字节偏移量位置处读取一个 Uint8 值。
+		*@return Uint8 值。
+		*/
+		__proto.getUint8=function(){
+			if (this._pos_+1 > this._length)throw "getUint8 error - Out of bounds";
+			return this._d_.getUint8(this._pos_++);
+		}
+
+		/**
+		*在字节流的当前字节偏移量位置处写入指定的 Uint8 值。
+		*@param value 需要写入的 Uint8 值。
+		*/
+		__proto.writeUint8=function(value){
+			this.ensureWrite(this._pos_+1);
+			this._d_.setUint8(this._pos_,value);
+			this._pos_++;
+		}
+
+		/**
+		*@private
+		*从字节流的指定字节偏移量位置处读取一个 Uint8 值。
+		*@param pos 字节读取位置。
+		*@return Uint8 值。
+		*/
+		__proto._getUInt8=function(pos){
+			return this._d_.getUint8(pos);
+		}
+
+		/**
+		*@private
+		*从字节流的指定字节偏移量位置处读取一个 Uint16 值。
+		*@param pos 字节读取位置。
+		*@return Uint16 值。
+		*/
+		__proto._getUint16=function(pos){
+			return this._d_.getUint16(pos,this._xd_);
+		}
+
+		/**
+		*@private
+		*使用 getFloat32()读取6个值，用于创建并返回一个 Matrix 对象。
+		*@return Matrix 对象。
+		*/
+		__proto._getMatrix=function(){
+			var rst=new Matrix(this.getFloat32(),this.getFloat32(),this.getFloat32(),this.getFloat32(),this.getFloat32(),this.getFloat32());
+			return rst;
+		}
+
+		/**
+		*@private
+		*读取指定长度的 UTF 型字符串。
+		*@param len 需要读取的长度。
+		*@return 读取的字符串。
+		*/
+		__proto.rUTF=function(len){
+			var v="",max=this._pos_+len,c=0,c2=0,c3=0,f=String.fromCharCode;
+			var u=this._u8d_,i=0;
+			while (this._pos_ < max){
+				c=u[this._pos_++];
+				if (c < 0x80){
+					if (c !=0){
+						v+=f(c);
+					}
+					}else if (c < 0xE0){
+					v+=f(((c & 0x3F)<< 6)| (u[this._pos_++] & 0x7F));
+					}else if (c < 0xF0){
+					c2=u[this._pos_++];
+					v+=f(((c & 0x1F)<< 12)| ((c2 & 0x7F)<< 6)| (u[this._pos_++] & 0x7F));
+					}else {
+					c2=u[this._pos_++];
+					c3=u[this._pos_++];
+					v+=f(((c & 0x0F)<< 18)| ((c2 & 0x7F)<< 12)| ((c3 << 6)& 0x7F)| (u[this._pos_++] & 0x7F));
+				}
+				i++;
+			}
+			return v;
+		}
+
+		/**
+		*@private
+		*读取 <code>len</code> 参数指定的长度的字符串。
+		*@param len 要读取的字符串的长度。
+		*@return 指定长度的字符串。
+		*/
+		__proto.getCustomString=function(len){
+			var v="",ulen=0,c=0,c2=0,f=String.fromCharCode;
+			var u=this._u8d_,i=0;
+			while (len > 0){
+				c=u[this._pos_];
+				if (c < 0x80){
+					v+=f(c);
+					this._pos_++;
+					len--;
+					}else {
+					ulen=c-0x80;
+					this._pos_++;
+					len-=ulen;
+					while (ulen > 0){
+						c=u[this._pos_++];
+						c2=u[this._pos_++];
+						v+=f((c2 << 8)| c);
+						ulen--;
+					}
+				}
+			}
+			return v;
+		}
+
+		/**
+		*清除字节数组的内容，并将 length 和 pos 属性重置为 0。调用此方法将释放 Byte 实例占用的内存。
+		*/
+		__proto.clear=function(){
+			this._pos_=0;
+			this.length=0;
+		}
+
+		/**
+		*@private
+		*获取此对象的 ArrayBuffer 引用。
+		*@return
+		*/
+		__proto.__getBuffer=function(){
+			return this._d_.buffer;
+		}
+
+		/**
+		*<p>将 UTF-8 字符串写入字节流。类似于 writeUTF()方法，但 writeUTFBytes()不使用 16 位长度的字为字符串添加前缀。</p>
+		*<p>对应的读取方法为： getUTFBytes 。</p>
+		*@param value 要写入的字符串。
+		*/
+		__proto.writeUTFBytes=function(value){
+			value=value+"";
+			for (var i=0,sz=value.length;i < sz;i++){
+				var c=value.charCodeAt(i);
+				if (c <=0x7F){
+					this.writeByte(c);
+					}else if (c <=0x7FF){
+					this.ensureWrite(this._pos_+2);
+					this._u8d_.set([0xC0 | (c >> 6),0x80 | (c & 0x3F)],this._pos_);
+					this._pos_+=2;
+					}else if (c <=0xFFFF){
+					this.ensureWrite(this._pos_+3);
+					this._u8d_.set([0xE0 | (c >> 12),0x80 | ((c >> 6)& 0x3F),0x80 | (c & 0x3F)],this._pos_);
+					this._pos_+=3;
+					}else {
+					this.ensureWrite(this._pos_+4);
+					this._u8d_.set([0xF0 | (c >> 18),0x80 | ((c >> 12)& 0x3F),0x80 | ((c >> 6)& 0x3F),0x80 | (c & 0x3F)],this._pos_);
+					this._pos_+=4;
+				}
+			}
+		}
+
+		/**
+		*<p>将 UTF-8 字符串写入字节流。先写入以字节表示的 UTF-8 字符串长度（作为 16 位整数），然后写入表示字符串字符的字节。</p>
+		*<p>对应的读取方法为： getUTFString 。</p>
+		*@param value 要写入的字符串值。
+		*/
+		__proto.writeUTFString=function(value){
+			var tPos=this.pos;
+			this.writeUint16(1);
+			this.writeUTFBytes(value);
+			var dPos=this.pos-tPos-2;
+			if (dPos >=65536){
+				throw "writeUTFString byte len more than 65536";
+			}
+			this._d_.setUint16(tPos,dPos,this._xd_);
+		}
+
+		/**
+		*@private
+		*读取 UTF-8 字符串。
+		*@return 读取的字符串。
+		*/
+		__proto.readUTFString=function(){
+			return this.readUTFBytes(this.getUint16());
+		}
+
+		/**
+		*<p>从字节流中读取一个 UTF-8 字符串。假定字符串的前缀是一个无符号的短整型（以此字节表示要读取的长度）。</p>
+		*<p>对应的写入方法为： writeUTFString 。</p>
+		*@return 读取的字符串。
+		*/
+		__proto.getUTFString=function(){
+			return this.readUTFString();
+		}
+
+		/**
+		*@private
+		*读字符串，必须是 writeUTFBytes 方法写入的字符串。
+		*@param len 要读的buffer长度，默认将读取缓冲区全部数据。
+		*@return 读取的字符串。
+		*/
+		__proto.readUTFBytes=function(len){
+			(len===void 0)&& (len=-1);
+			if (len==0)return "";
+			var lastBytes=this.bytesAvailable;
+			if (len > lastBytes)throw "readUTFBytes error - Out of bounds";
+			len=len > 0 ? len :lastBytes;
+			return this.rUTF(len);
+		}
+
+		/**
+		*<p>从字节流中读取一个由 length 参数指定的长度的 UTF-8 字节序列，并返回一个字符串。</p>
+		*<p>一般读取的是由 writeUTFBytes 方法写入的字符串。</p>
+		*@param len 要读的buffer长度，默认将读取缓冲区全部数据。
+		*@return 读取的字符串。
+		*/
+		__proto.getUTFBytes=function(len){
+			(len===void 0)&& (len=-1);
+			return this.readUTFBytes(len);
+		}
+
+		/**
+		*<p>在字节流中写入一个字节。</p>
+		*<p>使用参数的低 8 位。忽略高 24 位。</p>
+		*@param value
+		*/
+		__proto.writeByte=function(value){
+			this.ensureWrite(this._pos_+1);
+			this._d_.setInt8(this._pos_,value);
+			this._pos_+=1;
+		}
+
+		/**
+		*@private
+		*从字节流中读取带符号的字节。
+		*/
+		__proto.readByte=function(){
+			if (this._pos_+1 > this._length)throw "readByte error - Out of bounds";
+			return this._d_.getInt8(this._pos_++);
+		}
+
+		/**
+		*<p>从字节流中读取带符号的字节。</p>
+		*<p>返回值的范围是从-128 到 127。</p>
+		*@return 介于-128 和 127 之间的整数。
+		*/
+		__proto.getByte=function(){
+			return this.readByte();
+		}
+
+		/**
+		*<p>保证该字节流的可用长度不小于 <code>lengthToEnsure</code> 参数指定的值。</p>
+		*@param lengthToEnsure 指定的长度。
+		*/
+		__proto.ensureWrite=function(lengthToEnsure){
+			if (this._length < lengthToEnsure)this._length=lengthToEnsure;
+			if (this._allocated_ < lengthToEnsure)this.length=lengthToEnsure;
+		}
+
+		/**
+		*<p>将指定 arraybuffer 对象中的以 offset 为起始偏移量， length 为长度的字节序列写入字节流。</p>
+		*<p>如果省略 length 参数，则使用默认长度 0，该方法将从 offset 开始写入整个缓冲区；如果还省略了 offset 参数，则写入整个缓冲区。</p>
+		*<p>如果 offset 或 length 小于0，本函数将抛出异常。</p>
+		*$NEXTBIG 由于没有判断length和arraybuffer的合法性，当开发者填写了错误的length值时，会导致写入多余的空白数据甚至内存溢出，为了避免影响开发者正在使用此方法的功能，下个重大版本会修复这些问题。
+		*@param arraybuffer 需要写入的 Arraybuffer 对象。
+		*@param offset Arraybuffer 对象的索引的偏移量（以字节为单位）
+		*@param length 从 Arraybuffer 对象写入到 Byte 对象的长度（以字节为单位）
+		*/
+		__proto.writeArrayBuffer=function(arraybuffer,offset,length){
+			(offset===void 0)&& (offset=0);
+			(length===void 0)&& (length=0);
+			if (offset < 0 || length < 0)throw "writeArrayBuffer error - Out of bounds";
+			if (length==0)length=arraybuffer.byteLength-offset;
+			this.ensureWrite(this._pos_+length);
+			var uint8array=new Uint8Array(arraybuffer);
+			this._u8d_.set(uint8array.subarray(offset,offset+length),this._pos_);
+			this._pos_+=length;
+		}
+
+		/**
+		*获取此对象的 ArrayBuffer 数据，数据只包含有效数据部分。
+		*/
+		__getset(0,__proto,'buffer',function(){
+			var rstBuffer=this._d_.buffer;
+			if (rstBuffer.byteLength==this.length)return rstBuffer;
+			return rstBuffer.slice(0,this.length);
+		});
+
+		/**
+		*<p> <code>Byte</code> 实例的字节序。取值为：<code>BIG_ENDIAN</code> 或 <code>BIG_ENDIAN</code> 。</p>
+		*<p>主机字节序，是 CPU 存放数据的两种不同顺序，包括小端字节序和大端字节序。通过 <code>getSystemEndian</code> 可以获取当前系统的字节序。</p>
+		*<p> <code>BIG_ENDIAN</code> ：大端字节序，地址低位存储值的高位，地址高位存储值的低位。有时也称之为网络字节序。<br/>
+		*<code>LITTLE_ENDIAN</code> ：小端字节序，地址低位存储值的低位，地址高位存储值的高位。</p>
+		*/
+		__getset(0,__proto,'endian',function(){
+			return this._xd_ ? "littleEndian" :"bigEndian";
+			},function(endianStr){
+			this._xd_=(endianStr=="littleEndian");
+		});
+
+		/**
+		*<p> <code>Byte</code> 对象的长度（以字节为单位）。</p>
+		*<p>如果将长度设置为大于当前长度的值，则用零填充字节数组的右侧；如果将长度设置为小于当前长度的值，将会截断该字节数组。</p>
+		*<p>如果要设置的长度大于当前已分配的内存空间的字节长度，则重新分配内存空间，大小为以下两者较大者：要设置的长度、当前已分配的长度的2倍，并将原有数据拷贝到新的内存空间中；如果要设置的长度小于当前已分配的内存空间的字节长度，也会重新分配内存空间，大小为要设置的长度，并将原有数据从头截断为要设置的长度存入新的内存空间中。</p>
+		*/
+		__getset(0,__proto,'length',function(){
+			return this._length;
+			},function(value){
+			if (this._allocated_ < value)
+				this.___resizeBuffer(this._allocated_=Math.floor(Math.max(value,this._allocated_ *2)));
+			else if (this._allocated_ > value)
+			this.___resizeBuffer(this._allocated_=value);
+			this._length=value;
+		});
+
+		/**
+		*移动或返回 Byte 对象的读写指针的当前位置（以字节为单位）。下一次调用读取方法时将在此位置开始读取，或者下一次调用写入方法时将在此位置开始写入。
+		*/
+		__getset(0,__proto,'pos',function(){
+			return this._pos_;
+			},function(value){
+			this._pos_=value;
+		});
+
+		/**
+		*可从字节流的当前位置到末尾读取的数据的字节数。
+		*/
+		__getset(0,__proto,'bytesAvailable',function(){
+			return this._length-this._pos_;
+		});
+
+		Byte.getSystemEndian=function(){
+			if (!Byte._sysEndian){
+				var buffer=new ArrayBuffer(2);
+				new DataView(buffer).setInt16(0,256,true);
+				Byte._sysEndian=(new Int16Array(buffer))[0]===256 ? "littleEndian" :"bigEndian";
+			}
+			return Byte._sysEndian;
+		}
+
+		Byte.BIG_ENDIAN="bigEndian";
+		Byte.LITTLE_ENDIAN="littleEndian";
+		Byte._sysEndian=null;
+		return Byte;
+	})()
+
+
+	/**
 	*@private
 	*对象缓存统一管理类
 	*/
@@ -15719,6 +16274,98 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*...
+	*@author ww
+	*/
+	//class chromedebug.ChromeSocket extends laya.events.EventDispatcher
+	var ChromeSocket=(function(_super){
+		function ChromeSocket(){
+			this.socket=null;
+			this.userName=null;
+			this.md5Pwd=null;
+			this.isLogined=false;
+			this._serverStr=null;
+			this.channel=null;
+			this.autoOpenUrl="http://baidu.com";
+			this.msgID=0;
+			ChromeSocket.__super.call(this);
+			this.socket=new Socket("127.0.0.1",0,Byte);
+			this.socket.disableInput=true;
+			this.socket.on("open",this,this.onConnect);
+			this.socket.on("message",this,this.onMessage);
+			this.socket.on("error",this,this.onErr);
+			this.socket.on("close",this,this.onClose);
+		}
+
+		__class(ChromeSocket,'chromedebug.ChromeSocket',_super);
+		var __proto=ChromeSocket.prototype;
+		__proto.connectByTargetO=function(targetO){
+			var targetPath;
+			targetPath=targetO["webSocketDebuggerUrl"];
+			this.connect(targetPath);
+		}
+
+		__proto.connect=function(serverStr){
+			this._serverStr=serverStr;
+			this.socket.connectByUrl(serverStr);
+		}
+
+		__proto.onConnect=function(){
+			console.log('socket connect');
+			if (this.autoOpenUrl){
+				var openO;
+				openO={};
+				openO.id=1;
+				openO.method="Page.navigate";
+				openO.params={url:this.autoOpenUrl };
+				this.sendJson(openO);
+			}
+		}
+
+		__proto.onMessage=function(msg){
+			console.log('socket onMessage');
+			console.log("Msg:"+msg);
+			var dataO;
+			debugger;
+		}
+
+		__proto.send=function(msg){
+			this.msgID++;
+			msg=msg+this.msgID;
+			console.log("try send:"+msg);
+			this.socket.send(msg);
+		}
+
+		__proto.sendJson=function(obj){
+			if (!obj)
+				return;
+			this.socket.send(JSON.stringify(obj));
+		}
+
+		__proto.closeLater=function(){
+			this.socket.close();
+			console.log("after close");
+		}
+
+		__proto.onErr=function(e){
+			console.log('socket onErr',e);
+		}
+
+		__proto.onClose=function(){
+			console.log('socket onClose');
+		}
+
+		ChromeSocket.DataFromServer="DataFromServer";
+		ChromeSocket.Logined="Logined";
+		ChromeSocket.OnServerMsg="OnServerMsg";
+		ChromeSocket.Welcome="welcome";
+		ChromeSocket.OnJoinedChannel="OnJoinedChannel";
+		ChromeSocket.OnChannelMsg="OnChannelMsg";
+		return ChromeSocket;
+	})(EventDispatcher)
+
+
+	/**
 	*<code>Node</code> 类是可放在显示列表中的所有对象的基类。该显示列表管理 Laya 运行时中显示的所有对象。使用 Node 类排列显示列表中的显示对象。Node 对象可以有子显示对象。
 	*/
 	//class laya.display.Node extends laya.events.EventDispatcher
@@ -17894,6 +18541,231 @@ var Laya=window.Laya=(function(window,document){
 		Loader._startIndex=0;
 		Loader.imgCache={};
 		return Loader;
+	})(EventDispatcher)
+
+
+	/**
+	*<p> <code>Socket</code> 封装了 HTML5 WebSocket ，允许服务器端与客户端进行全双工（full-duplex）的实时通信，并且允许跨域通信。在建立连接后，服务器和 Browser/Client Agent 都能主动的向对方发送或接收文本和二进制数据。</p>
+	*<p>要使用 <code>Socket</code> 类的方法，请先使用构造函数 <code>new Socket</code> 创建一个 <code>Socket</code> 对象。 <code>Socket</code> 以异步方式传输和接收数据。</p>
+	*/
+	//class laya.net.Socket extends laya.events.EventDispatcher
+	var Socket=(function(_super){
+		function Socket(host,port,byteClass){
+			this._endian=null;
+			this._stamp=NaN;
+			this._socket=null;
+			this._connected=false;
+			this._addInputPosition=0;
+			this._input=null;
+			this._output=null;
+			this.timeout=0;
+			this.objectEncoding=0;
+			this.disableInput=false;
+			this._byteClass=null;
+			this.protocols=[];
+			(port===void 0)&& (port=0);
+			Socket.__super.call(this);
+			this._byteClass=byteClass ? byteClass :Byte;
+			this.endian="bigEndian";
+			this.timeout=20000;
+			this._addInputPosition=0;
+			if (host && port > 0 && port < 65535)
+				this.connect(host,port);
+		}
+
+		__class(Socket,'laya.net.Socket',_super);
+		var __proto=Socket.prototype;
+		/**
+		*<p>连接到指定的主机和端口。</p>
+		*<p>连接成功派发 Event.OPEN 事件；连接失败派发 Event.ERROR 事件；连接被关闭派发 Event.CLOSE 事件；接收到数据派发 Event.MESSAGE 事件； 除了 Event.MESSAGE 事件参数为数据内容，其他事件参数都是原生的 HTML DOM Event 对象。</p>
+		*@param host 服务器地址。
+		*@param port 服务器端口。
+		*/
+		__proto.connect=function(host,port){
+			var url="ws://"+host+":"+port;
+			this.connectByUrl(url);
+		}
+
+		/**
+		*<p>连接到指定的服务端 WebSocket URL。 URL 类似 ws://yourdomain:port。</p>
+		*<p>连接成功派发 Event.OPEN 事件；连接失败派发 Event.ERROR 事件；连接被关闭派发 Event.CLOSE 事件；接收到数据派发 Event.MESSAGE 事件； 除了 Event.MESSAGE 事件参数为数据内容，其他事件参数都是原生的 HTML DOM Event 对象。</p>
+		*@param url 要连接的服务端 WebSocket URL。 URL 类似 ws://yourdomain:port。
+		*/
+		__proto.connectByUrl=function(url){
+			var _$this=this;
+			if (this._socket !=null)
+				this.close();
+			this._socket && this.cleanSocket();
+			if (!this.protocols || this.protocols.length==0){
+				this._socket=new Browser.window.WebSocket(url);
+				}else {
+				this._socket=new Browser.window.WebSocket(url,this.protocols);
+			}
+			this._socket.binaryType="arraybuffer";
+			this._output=new this._byteClass();
+			this._output.endian=this.endian;
+			this._input=new this._byteClass();
+			this._input.endian=this.endian;
+			this._addInputPosition=0;
+			this._socket.onopen=function (e){
+				_$this._onOpen(e);
+			};
+			this._socket.onmessage=function (msg){
+				_$this._onMessage(msg);
+			};
+			this._socket.onclose=function (e){
+				_$this._onClose(e);
+			};
+			this._socket.onerror=function (e){
+				_$this._onError(e);
+			};
+		}
+
+		/**
+		*清理socket。
+		*/
+		__proto.cleanSocket=function(){
+			try {
+				this._socket.close();
+			}catch (e){}
+			this._connected=false;
+			this._socket.onopen=null;
+			this._socket.onmessage=null;
+			this._socket.onclose=null;
+			this._socket.onerror=null;
+			this._socket=null;
+		}
+
+		/**
+		*关闭连接。
+		*/
+		__proto.close=function(){
+			if (this._socket !=null){
+				try {
+					this._socket.close();
+				}catch (e){}
+			}
+		}
+
+		/**
+		*@private
+		*连接建立成功 。
+		*/
+		__proto._onOpen=function(e){
+			this._connected=true;
+			this.event("open",e);
+		}
+
+		/**
+		*@private
+		*接收到数据处理方法。
+		*@param msg 数据。
+		*/
+		__proto._onMessage=function(msg){
+			if (!msg || !msg.data)return;
+			var data=msg.data;
+			if (this.disableInput && data){
+				this.event("message",data);
+				return;
+			}
+			if (this._input.length > 0 && this._input.bytesAvailable < 1){
+				this._input.clear();
+				this._addInputPosition=0;
+			};
+			var pre=this._input.pos;
+			!this._addInputPosition && (this._addInputPosition=0);
+			this._input.pos=this._addInputPosition;
+			if (data){
+				if ((typeof data=='string')){
+					this._input.writeUTFBytes(data);
+					}else {
+					this._input.writeArrayBuffer(data);
+				}
+				this._addInputPosition=this._input.pos;
+				this._input.pos=pre;
+			}
+			this.event("message",data);
+		}
+
+		/**
+		*@private
+		*连接被关闭处理方法。
+		*/
+		__proto._onClose=function(e){
+			this._connected=false;
+			this.event("close",e)
+		}
+
+		/**
+		*@private
+		*出现异常处理方法。
+		*/
+		__proto._onError=function(e){
+			this.event("error",e)
+		}
+
+		/**
+		*发送数据到服务器。
+		*@param data 需要发送的数据，可以是String或者ArrayBuffer。
+		*/
+		__proto.send=function(data){
+			this._socket.send(data);
+		}
+
+		/**
+		*发送缓冲区中的数据到服务器。
+		*/
+		__proto.flush=function(){
+			if (this._output && this._output.length > 0){
+				var evt;
+				try {
+					this._socket && this._socket.send(this._output.__getBuffer().slice(0,this._output.length));
+					}catch (e){
+					evt=e;
+				}
+				this._output.endian=this.endian;
+				this._output.clear();
+				if (evt)this.event("error",evt);
+			}
+		}
+
+		/**
+		*缓存的服务端发来的数据。
+		*/
+		__getset(0,__proto,'input',function(){
+			return this._input;
+		});
+
+		/**
+		*表示需要发送至服务端的缓冲区中的数据。
+		*/
+		__getset(0,__proto,'output',function(){
+			return this._output;
+		});
+
+		/**
+		*表示此 Socket 对象目前是否已连接。
+		*/
+		__getset(0,__proto,'connected',function(){
+			return this._connected;
+		});
+
+		/**
+		*<p>主机字节序，是 CPU 存放数据的两种不同顺序，包括小端字节序和大端字节序。</p>
+		*<p> LITTLE_ENDIAN ：小端字节序，地址低位存储值的低位，地址高位存储值的高位。</p>
+		*<p> BIG_ENDIAN ：大端字节序，地址低位存储值的高位，地址高位存储值的低位。</p>
+		*/
+		__getset(0,__proto,'endian',function(){
+			return this._endian;
+			},function(value){
+			this._endian=value;
+			if (this._input !=null)this._input.endian=value;
+			if (this._output !=null)this._output.endian=value;
+		});
+
+		Socket.LITTLE_ENDIAN="littleEndian";
+		Socket.BIG_ENDIAN="bigEndian";
+		return Socket;
 	})(EventDispatcher)
 
 
@@ -34275,6 +35147,103 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
+	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
+	*
+	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
+	*package
+	*{
+		*import laya.ui.HSlider;
+		*import laya.ui.VSlider;
+		*import laya.utils.Handler;
+		*public class VSlider_Example
+		*{
+			*private var vSlider:VSlider;
+			*public function VSlider_Example()
+			*{
+				*Laya.init(640,800);//设置游戏画布宽高。
+				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
+				*}
+			*private function onLoadComplete():void
+			*{
+				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+				*vSlider.min=0;//设置 vSlider 最低位置值。
+				*vSlider.max=10;//设置 vSlider 最高位置值。
+				*vSlider.value=2;//设置 vSlider 当前位置值。
+				*vSlider.tick=1;//设置 vSlider 刻度值。
+				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
+				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+				*}
+			*private function onChange(value:Number):void
+			*{
+				*trace("滑块的位置： value="+value);
+				*}
+			*}
+		*}
+	*@example
+	*Laya.init(640,800);//设置游戏画布宽高
+	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
+	*var vSlider;
+	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
+	*function onLoadComplete(){
+		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+		*vSlider.min=0;//设置 vSlider 最低位置值。
+		*vSlider.max=10;//设置 vSlider 最高位置值。
+		*vSlider.value=2;//设置 vSlider 当前位置值。
+		*vSlider.tick=1;//设置 vSlider 刻度值。
+		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
+		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+		*}
+	*function onChange(value){
+		*console.log("滑块的位置： value="+value);
+		*}
+	*@example
+	*import HSlider=laya.ui.HSlider;
+	*import VSlider=laya.ui.VSlider;
+	*import Handler=laya.utils.Handler;
+	*class VSlider_Example {
+		*private vSlider:VSlider;
+		*constructor(){
+			*Laya.init(640,800);//设置游戏画布宽高。
+			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
+			*}
+		*private onLoadComplete():void {
+			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+			*this.vSlider.min=0;//设置 vSlider 最低位置值。
+			*this.vSlider.max=10;//设置 vSlider 最高位置值。
+			*this.vSlider.value=2;//设置 vSlider 当前位置值。
+			*this.vSlider.tick=1;//设置 vSlider 刻度值。
+			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
+			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
+			*}
+		*private onChange(value:number):void {
+			*console.log("滑块的位置： value="+value);
+			*}
+		*}
+	*@see laya.ui.Slider
+	*/
+	//class laya.ui.VSlider extends laya.ui.Slider
+	var VSlider=(function(_super){
+		function VSlider(){VSlider.__super.call(this);;
+		};
+
+		__class(VSlider,'laya.ui.VSlider',_super);
+		return VSlider;
+	})(Slider)
+
+
+	/**
 	*<code>TextInput</code> 类用于创建显示对象以显示和输入文本。
 	*
 	*@example <caption>以下示例代码，创建了一个 <code>TextInput</code> 实例。</caption>
@@ -34595,103 +35564,6 @@ var Laya=window.Laya=(function(window,document){
 
 		return TextInput;
 	})(Label)
-
-
-	/**
-	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
-	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
-	*
-	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
-	*package
-	*{
-		*import laya.ui.HSlider;
-		*import laya.ui.VSlider;
-		*import laya.utils.Handler;
-		*public class VSlider_Example
-		*{
-			*private var vSlider:VSlider;
-			*public function VSlider_Example()
-			*{
-				*Laya.init(640,800);//设置游戏画布宽高。
-				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
-				*}
-			*private function onLoadComplete():void
-			*{
-				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-				*vSlider.min=0;//设置 vSlider 最低位置值。
-				*vSlider.max=10;//设置 vSlider 最高位置值。
-				*vSlider.value=2;//设置 vSlider 当前位置值。
-				*vSlider.tick=1;//设置 vSlider 刻度值。
-				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
-				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-				*}
-			*private function onChange(value:Number):void
-			*{
-				*trace("滑块的位置： value="+value);
-				*}
-			*}
-		*}
-	*@example
-	*Laya.init(640,800);//设置游戏画布宽高
-	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
-	*var vSlider;
-	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
-	*function onLoadComplete(){
-		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-		*vSlider.min=0;//设置 vSlider 最低位置值。
-		*vSlider.max=10;//设置 vSlider 最高位置值。
-		*vSlider.value=2;//设置 vSlider 当前位置值。
-		*vSlider.tick=1;//设置 vSlider 刻度值。
-		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
-		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-		*}
-	*function onChange(value){
-		*console.log("滑块的位置： value="+value);
-		*}
-	*@example
-	*import HSlider=laya.ui.HSlider;
-	*import VSlider=laya.ui.VSlider;
-	*import Handler=laya.utils.Handler;
-	*class VSlider_Example {
-		*private vSlider:VSlider;
-		*constructor(){
-			*Laya.init(640,800);//设置游戏画布宽高。
-			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
-			*}
-		*private onLoadComplete():void {
-			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-			*this.vSlider.min=0;//设置 vSlider 最低位置值。
-			*this.vSlider.max=10;//设置 vSlider 最高位置值。
-			*this.vSlider.value=2;//设置 vSlider 当前位置值。
-			*this.vSlider.tick=1;//设置 vSlider 刻度值。
-			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
-			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
-			*}
-		*private onChange(value:number):void {
-			*console.log("滑块的位置： value="+value);
-			*}
-		*}
-	*@see laya.ui.Slider
-	*/
-	//class laya.ui.VSlider extends laya.ui.Slider
-	var VSlider=(function(_super){
-		function VSlider(){VSlider.__super.call(this);;
-		};
-
-		__class(VSlider,'laya.ui.VSlider',_super);
-		return VSlider;
-	})(Slider)
 
 
 	/**
@@ -35183,6 +36055,25 @@ var Laya=window.Laya=(function(window,document){
 	})(FrameAnimation)
 
 
+	//class ui.debugplatform.chrome.DebugChromeViewUI extends laya.ui.View
+	var DebugChromeViewUI=(function(_super){
+		function DebugChromeViewUI(){
+			this.startBtn=null;
+			DebugChromeViewUI.__super.call(this);
+		}
+
+		__class(DebugChromeViewUI,'ui.debugplatform.chrome.DebugChromeViewUI',_super);
+		var __proto=DebugChromeViewUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(DebugChromeViewUI.uiView);
+		}
+
+		DebugChromeViewUI.uiView={"type":"View","props":{"width":400,"height":300},"child":[{"type":"Button","props":{"y":7,"x":320,"var":"startBtn","skin":"comp/button.png","label":"启动"}}]};
+		return DebugChromeViewUI;
+	})(View)
+
+
 	//class ui.easyviews.EasyMainUI extends laya.ui.View
 	var EasyMainUI=(function(_super){
 		function EasyMainUI(){
@@ -35225,7 +36116,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(FoldersViewUI.uiView);
 		}
 
-		FoldersViewUI.uiView={"type":"View","props":{"width":445,"height":400},"child":[{"type":"Button","props":{"y":12,"x":20,"var":"freshBtn","skin":"comp/button.png","label":"刷新"}},{"type":"Button","props":{"y":12,"x":261,"var":"saveBtn","skin":"comp/button.png","label":"保存"}},{"type":"Button","props":{"y":13,"x":95,"var":"closeSameBtn","skin":"comp/button.png","label":"关闭重复"}},{"type":"Tree","props":{"x":24,"width":414,"var":"folderTree","top":60,"scrollBarSkin":"comp/vscroll.png","bottom":10},"child":[{"type":"Box","props":{"right":0,"renderType":"render","left":0},"child":[{"type":"Label","props":{"width":98,"text":"label","name":"label","height":21,"color":"#d2201d"}}]}]},{"type":"Button","props":{"y":13,"x":181,"var":"closeAllBtn","skin":"comp/button.png","label":"全部关闭"}},{"type":"Button","props":{"y":12,"x":336,"var":"recoverBtn","skin":"comp/button.png","label":"恢复"}}]};
+		FoldersViewUI.uiView={"type":"View","props":{"width":445,"height":400},"child":[{"type":"Button","props":{"y":12,"x":20,"var":"freshBtn","skin":"comp/button.png","label":"刷新"}},{"type":"Button","props":{"y":12,"x":261,"var":"saveBtn","skin":"comp/button.png","label":"保存"}},{"type":"Button","props":{"y":13,"x":95,"var":"closeSameBtn","skin":"comp/button.png","label":"关闭重复"}},{"type":"Tree","props":{"x":24,"width":414,"var":"folderTree","top":60,"scrollBarSkin":"comp/vscroll.png","bottom":10},"child":[{"type":"Box","props":{"right":0,"renderType":"render","left":0},"child":[{"type":"Label","props":{"width":98,"text":"label","styleSkin":"comp/label.png","name":"label","height":21,"color":"#d2201d"}}]}]},{"type":"Button","props":{"y":13,"x":181,"var":"closeAllBtn","skin":"comp/button.png","label":"全部关闭"}},{"type":"Button","props":{"y":12,"x":336,"var":"recoverBtn","skin":"comp/button.png","label":"恢复"}}]};
 		return FoldersViewUI;
 	})(View)
 
@@ -35250,7 +36141,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(ManagerViewUI.uiView);
 		}
 
-		ManagerViewUI.uiView={"type":"View","props":{"width":445,"height":400},"child":[{"type":"List","props":{"x":21,"width":126,"var":"typeList","vScrollBarSkin":"comp/vscroll.png","top":60,"scrollBarSkin":"comp/vscroll.png","repeatX":1,"height":290,"bottom":50},"child":[{"type":"Box","props":{"renderType":"render"},"child":[{"type":"Label","props":{"width":98,"text":"label","name":"label","height":21,"color":"#d2201d"}}]}]},{"type":"List","props":{"x":188,"width":344,"var":"folderList","vScrollBarSkin":"comp/vscroll.png","top":62,"scrollBarSkin":"comp/vscroll.png","repeatX":1,"bottom":40},"child":[{"type":"Box","props":{"right":0,"renderType":"render","left":0},"child":[{"type":"Label","props":{"width":98,"text":"label","name":"label","height":21,"color":"#d2201d"}}]}]},{"type":"Button","props":{"y":10,"x":21,"var":"freshBtn","skin":"comp/button.png","label":"刷新"}},{"type":"Button","props":{"x":125,"var":"addBtn","skin":"comp/button.png","label":"添加","bottom":5}},{"type":"Button","props":{"y":10,"x":99,"var":"saveBtn","skin":"comp/button.png","label":"保存"}},{"type":"TextInput","props":{"x":2,"width":114,"var":"typeInput","skin":"comp/input_22.png","height":22,"color":"#e7c8c8","bottom":5}},{"type":"Label","props":{"y":38,"x":24,"width":97,"text":"Types","height":19,"color":"#3e70bb"}},{"type":"Label","props":{"y":37,"x":188,"width":97,"var":"foldersTitle","text":"Folders","height":19,"color":"#3e70bb"}}]};
+		ManagerViewUI.uiView={"type":"View","props":{"width":445,"height":400},"child":[{"type":"List","props":{"x":21,"width":126,"var":"typeList","vScrollBarSkin":"comp/vscroll.png","top":60,"scrollBarSkin":"comp/vscroll.png","repeatX":1,"height":290,"bottom":50},"child":[{"type":"Box","props":{"renderType":"render"},"child":[{"type":"Label","props":{"width":98,"text":"label","styleSkin":"comp/label.png","name":"label","height":21,"color":"#d2201d"}}]}]},{"type":"List","props":{"x":188,"width":344,"var":"folderList","vScrollBarSkin":"comp/vscroll.png","top":62,"scrollBarSkin":"comp/vscroll.png","repeatX":1,"bottom":40},"child":[{"type":"Box","props":{"right":0,"renderType":"render","left":0},"child":[{"type":"Label","props":{"width":98,"text":"label","styleSkin":"comp/label.png","name":"label","height":21,"color":"#d2201d"}}]}]},{"type":"Button","props":{"y":10,"x":21,"var":"freshBtn","skin":"comp/button.png","label":"刷新"}},{"type":"Button","props":{"x":125,"var":"addBtn","skin":"comp/button.png","label":"添加","bottom":5}},{"type":"Button","props":{"y":10,"x":99,"var":"saveBtn","skin":"comp/button.png","label":"保存"}},{"type":"TextInput","props":{"x":2,"width":114,"var":"typeInput","skin":"comp/input_22.png","height":22,"color":"#e7c8c8","bottom":5}},{"type":"Label","props":{"y":38,"x":24,"width":97,"text":"Types","styleSkin":"comp/label.png","height":19,"color":"#3e70bb"}},{"type":"Label","props":{"y":37,"x":188,"width":97,"var":"foldersTitle","text":"Folders","styleSkin":"comp/label.png","height":19,"color":"#3e70bb"}}]};
 		return ManagerViewUI;
 	})(View)
 
@@ -36331,6 +37222,50 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class debugplatform.chrome.DebugChromeView extends ui.debugplatform.chrome.DebugChromeViewUI
+	var DebugChromeView=(function(_super){
+		function DebugChromeView(){
+			this._chromeSocket=null;
+			DebugChromeView.__super.call(this);
+			this.startBtn.on("click",this,this.onStartBtn);
+		}
+
+		__class(DebugChromeView,'debugplatform.chrome.DebugChromeView',_super);
+		var __proto=DebugChromeView.prototype;
+		__proto.onStartBtn=function(){
+			if (this._chromeSocket)this._chromeSocket.closeLater();
+			var cmdStr;
+			cmdStr='"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe" --remote-debugging-port=9222 --user-data-dir=D:/chrome/datatemp';
+			CMDShell.execute(cmdStr);
+			Laya.timer.once(2000,this,this.checkingDebugTarget);
+		}
+
+		__proto.checkingDebugTarget=function(){
+			Laya.loader.load("http://127.0.0.1:9222/json?v="+Math.random(),new Handler(this,this.onLoaded),null,"json");
+		}
+
+		__proto.onLoaded=function(dataO){
+			if (!dataO){
+				Laya.timer.once(1000,this,this.checkingDebugTarget);
+				}else{
+				this.onTargetFind(dataO);
+			}
+		}
+
+		__proto.onTargetFind=function(targets){
+			debugger;
+			this._chromeSocket=new ChromeSocket();
+			this._chromeSocket.connectByTargetO(targets[0]);
+		}
+
+		return DebugChromeView;
+	})(DebugChromeViewUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class easyviews.EasyMain extends ui.easyviews.EasyMainUI
 	var EasyMain=(function(_super){
 		function EasyMain(){
@@ -36882,6 +37817,26 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class laya.debug.view.nodeInfo.nodetree.NodeTreeSetting extends laya.debug.ui.debugui.NodeTreeSettingUI
+	var NodeTreeSetting=(function(_super){
+		function NodeTreeSetting(){
+			NodeTreeSetting.__super.call(this);
+			Base64AtlasManager.replaceRes(NodeTreeSettingUI.uiView);
+			this.createView(NodeTreeSettingUI.uiView);
+		}
+
+		__class(NodeTreeSetting,'laya.debug.view.nodeInfo.nodetree.NodeTreeSetting',_super);
+		var __proto=NodeTreeSetting.prototype;
+		//inits();
+		__proto.createChildren=function(){}
+		return NodeTreeSetting;
+	})(NodeTreeSettingUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class laya.debug.view.nodeInfo.nodetree.NodeTree extends laya.debug.ui.debugui.NodeTreeUI
 	var NodeTree=(function(_super){
 		function NodeTree(){
@@ -37125,26 +38080,6 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class laya.debug.view.nodeInfo.nodetree.NodeTreeSetting extends laya.debug.ui.debugui.NodeTreeSettingUI
-	var NodeTreeSetting=(function(_super){
-		function NodeTreeSetting(){
-			NodeTreeSetting.__super.call(this);
-			Base64AtlasManager.replaceRes(NodeTreeSettingUI.uiView);
-			this.createView(NodeTreeSettingUI.uiView);
-		}
-
-		__class(NodeTreeSetting,'laya.debug.view.nodeInfo.nodetree.NodeTreeSetting',_super);
-		var __proto=NodeTreeSetting.prototype;
-		//inits();
-		__proto.createChildren=function(){}
-		return NodeTreeSetting;
-	})(NodeTreeSettingUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
 	//class laya.debug.view.nodeInfo.nodetree.ObjectCreate extends laya.debug.ui.debugui.ObjectCreateUI
 	var ObjectCreate=(function(_super){
 		function ObjectCreate(){
@@ -37295,17 +38230,17 @@ var Laya=window.Laya=(function(window,document){
 	})(ToolBarUI)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,Render,View,Browser,Timer,GraphicAnimation,LocalStorage]);
-	new EasyDesk();
+	Laya.__init([EventDispatcher,LoaderManager,Browser,Render,View,Timer,GraphicAnimation,LocalStorage]);
+	new DebugPlatform();
 
 })(window,document,Laya);
 
 
 /*
-1 file:///D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/nodetools/devices/FileManager.as (225):warning:XMLElement This variable is not defined.
-2 file:///D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
-3 file:///D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
-4 file:///D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
-5 file:///D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/electrontools/menus/ContextMenu.as (85):warning:Sys.lang This variable is not defined.
-6 file:///D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/electrontools/menus/ContextMenu.as (149):warning:SystemSetting.isCMDVer This variable is not defined.
+1 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileManager.as (225):warning:XMLElement This variable is not defined.
+2 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
+3 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+4 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+5 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/menus/ContextMenu.as (85):warning:Sys.lang This variable is not defined.
+6 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/menus/ContextMenu.as (149):warning:SystemSetting.isCMDVer This variable is not defined.
 */
