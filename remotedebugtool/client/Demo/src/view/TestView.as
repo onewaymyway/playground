@@ -2,7 +2,7 @@ package view {
 	import laya.events.Event;
 	import laya.ui.Box;
 	import laya.ui.Label;
-	import ui.test.TestPageUI;
+	import remotedebugtool.ui.test.TestPageUI;
 	
 	public class TestView extends TestPageUI {
 		

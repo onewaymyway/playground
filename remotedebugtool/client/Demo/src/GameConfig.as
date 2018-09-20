@@ -1,5 +1,5 @@
 package {
-      import ui.test.TestPageUI;	
+      import remotedebugtool.ui.remotedebugtool.EditorViewItemUI;	
 	/**
 	 * 游戏初始化配置
 	 */
@@ -10,7 +10,7 @@ package {
 		public static var screenMode:String = "none";
 		public static var alignV:String = "top";
 		public static var alignH:String = "left";
-		public static var startScene:* = TestPageUI;
+		public static var startScene:* = EditorViewItemUI;
 		public static var sceneRoot:String = "";
 		public static var debug:Boolean = false;
 		public static var stat:Boolean = false;

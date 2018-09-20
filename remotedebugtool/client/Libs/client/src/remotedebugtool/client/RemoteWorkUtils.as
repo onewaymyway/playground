@@ -48,7 +48,7 @@ package remotedebugtool.client
 			walkTargetEX(Laya.stage, workChild, null, null);
 			return item;
 		}
-		public static function findNodeByCompId(compId:int, rootGid:int=-1):void
+		public static function findNodeByCompId(compId:int, rootGid:int=-1):*
 		{
 			var root:Object;
 			if (rootGid)
@@ -94,7 +94,12 @@ package remotedebugtool.client
 			{
 				if (child[ViewSign])
 				{
-					viewList.push([child[ViewSign],child.$_GID]);
+					var obj:Object;
+					obj = { };
+					obj.path = child[ViewSign];
+					obj.gid = child.$_GID;
+					obj.compId = child.compId;
+					viewList.push(obj);
 				}
 			}
 			walkTargetEX(Laya.stage, workChild, null, null);
