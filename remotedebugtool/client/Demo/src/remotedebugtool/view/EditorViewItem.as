@@ -19,7 +19,7 @@ package remotedebugtool.view
 		{
 			tDataO = dataO;
 			debugger;
-			label.text = dataO[0];
+			label.text = dataO.path;
 			if (label.text.length > 20)
 			{
 				label.text = label.text.substr(label.text.length-20);

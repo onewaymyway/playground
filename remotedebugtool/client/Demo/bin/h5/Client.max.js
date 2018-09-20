@@ -13578,7 +13578,6 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.onJoinedChannel=function(){
 			console.log("onJoinedChannel");
-			debugger;
 			this.socket.sendToChannel({"hihi":"debug" });
 			this.event("OnReady");
 		}
@@ -16336,7 +16335,6 @@ var Laya=window.Laya=(function(window,document){
 					this.socket.sendTypedToChannel("GetAllDebugView",RemoteWorkUtils.getAllTargetView());
 					break ;
 				case "UpdateNodeProps":
-					debugger;
 					this.updateNodeProps(dataO.data);
 					break ;
 				}
@@ -28368,7 +28366,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.initByData=function(dataO){
 			this.tDataO=dataO;
 			debugger;
-			this.label.text=dataO[0];
+			this.label.text=dataO.path;
 			if (this.label.text.length > 20){
 				this.label.text=this.label.text.substr(this.label.text.length-20);
 			}
