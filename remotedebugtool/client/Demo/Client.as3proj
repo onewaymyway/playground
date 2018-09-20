@@ -19,6 +19,7 @@
     <class path="libs\laya\src" />
     <class path="..\Libs\client\src" />
     <class path="..\Libs\common\src" />
+    <class path="..\Libs\chrome\src" />
   </classpaths>
   <!-- Build options -->
   <build>
