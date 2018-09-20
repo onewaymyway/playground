@@ -48,14 +48,16 @@ package chromedebug {
 			trace('socket connect');
 			if (autoOpenUrl)
 			{
-				var openO:Object;
-				openO = { };
-				openO.id = 1;
-				openO.method = "Page.navigate";
-				openO.params = { url:autoOpenUrl };
-				sendJson(openO);
+				sendCmd("Page.enable");
+
+				sendCmd("Page.navigate",{ url:autoOpenUrl });
 			}
 
+		}
+		
+		public function sendCmd(method:String, params:Object=null):void
+		{
+			sendJson(ChromeMsg.createCmd(method,params));
 		}
 		
 		private function onMessage(msg:String):void {
