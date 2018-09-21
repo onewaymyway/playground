@@ -28,7 +28,16 @@ package
 		
 		private function onLoaded(dataO:Object):void
 		{
-			debugger;
+			if (!dataO)
+			{
+			}else
+			{
+				
+			}
+		}
+		private function onTargetFind(dataO:Object):void
+		{
+			
 		}
 	}
 
