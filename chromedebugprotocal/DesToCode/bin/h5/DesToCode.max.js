@@ -589,6 +589,34 @@ var Laya=window.Laya=(function(window,document){
 			return importStrs.join("\n");
 		}
 
+		CodeCreateTool.createDocStr=function(funO,paramTpl){
+			(paramTpl===void 0)&& (paramTpl="{#@name#} {#type#} {#@doc#}");
+			var docStrs;
+			docStrs=[];
+			docStrs.push("	/**");
+			docStrs.push("	 * "+funO.name);
+			if (funO.des){
+				docStrs.push("	 * "+funO.des);
+			}
+			if (funO.description){
+				docStrs.push("	 * "+funO.description);
+			};
+			var params;
+			params=funO.params;
+			if (params && params.length > 0){
+				var i=0,len=0;
+				len=params.length;
+				var paramO;
+				for (i=0;i < len;i++){
+					paramO=params[i];
+					docStrs.push("	 * @param "+CodeCreateTool.createExportCode(paramTpl,paramO));
+				}
+			}
+			docStrs.push("	 * @return "+funO["return"]||"");
+			docStrs.push("	 */");
+			return docStrs.join("\n");
+		}
+
 		return CodeCreateTool;
 	})()
 
@@ -696,6 +724,84 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class code.ProtocolClassCreater
+	var ProtocolClassCreater=(function(){
+		function ProtocolClassCreater(){}
+		__class(ProtocolClassCreater,'code.ProtocolClassCreater');
+		ProtocolClassCreater.init=function(){
+			ProtocolClassCreater.clzTpl=FileManager.readTxtFile(NodeJSTools.getPathByRelatviePath("data/protocoltpl/domain.tpl"));
+			ProtocolClassCreater.methodTpl=FileManager.readTxtFile(NodeJSTools.getPathByRelatviePath("data/protocoltpl/method.tpl"));
+			ProtocolClassCreater.exportPath=NodeJSTools.getPathByRelatviePath("out/debugprotocol");
+		}
+
+		ProtocolClassCreater.create=function(dataO){
+			ProtocolClassCreater.domainName=dataO.domain;
+			var cmds;
+			cmds=dataO.commands||[];
+			var events;
+			events=dataO.events || [];
+			var domainO;
+			domainO={};
+			domainO.name=ProtocolClassCreater.domainName;
+			domainO.imports="";
+			domainO.doc="";
+			domainO["extends"]="";
+			domainO["package"]="debugprotocol."+ProtocolClassCreater.domainName;
+			domainO["methods"]=CodeCreateTool.addPreToStr(ProtocolClassCreater.createMethods(cmds),"  	");
+			domainO["events"]=CodeCreateTool.addPreToStr(ProtocolClassCreater.createMethods(events),"  	");
+			domainO["dependencies"]="";
+			if (dataO.dependencies){
+				domainO["dependencies"]=dataO["dependencies"].join(",");
+			};
+			var codeStr;
+			codeStr=CodeCreateTool.createExportCode(ProtocolClassCreater.clzTpl,domainO);
+			var codePath;
+			codePath=FileManager.getPath(ProtocolClassCreater.exportPath,ProtocolClassCreater.domainName+".as");
+			FileManager.createTxtFile(codePath,codeStr);
+		}
+
+		ProtocolClassCreater.createMethods=function(cmds){
+			var cmdStrs;
+			cmdStrs=[];
+			var i=0,len=0;
+			len=cmds.length;
+			for (i=0;i < len;i++){
+				cmdStrs.push(ProtocolClassCreater.createMethodCode(cmds[i]));
+			}
+			return cmdStrs.join("\n");
+		}
+
+		ProtocolClassCreater.createMethodCode=function(dataO){
+			var methodO;
+			methodO={};
+			methodO.name=dataO.name;
+			methodO.domain=ProtocolClassCreater.domainName;
+			var docO;
+			docO={};
+			docO.name=dataO.name;
+			docO.params=dataO.parameters;
+			docO["return"]="";
+			docO.description=dataO.description;
+			if (dataO.returns&&dataO.returns[0]){
+				docO["return"]=CodeCreateTool.createExportCode(ProtocolClassCreater.ParamTpl,dataO.returns[0]);
+			}
+			methodO.doc=CodeCreateTool.createDocStr(docO,ProtocolClassCreater.ParamTpl);
+			return CodeCreateTool.createExportCode(ProtocolClassCreater.methodTpl,methodO);
+		}
+
+		ProtocolClassCreater.clzTpl=null
+		ProtocolClassCreater.methodTpl=null
+		ProtocolClassCreater.exportPath=null
+		ProtocolClassCreater.domainName=null
+		ProtocolClassCreater.ParamTpl="{#@name#}:{#@type#} optional:{#@optional#} {#@description#}";
+		return ProtocolClassCreater;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class DesToCode
 	var DesToCode=(function(){
 		function DesToCode(){
@@ -714,40 +820,21 @@ var Laya=window.Laya=(function(window,document){
 			var myPath;
 			myPath=NodeJSTools.getMyPath();
 			this.outPath=FileManager.getPath(myPath,"out/");
-			FunctionCreater.init();
-			ClassCreater.init();
-			ClassCreater.exportPath=NodeJSTools.getPathByRelatviePath("out/tf/class/src");
-			FunctionCreater.exportPath=NodeJSTools.getPathByRelatviePath("out/tf/method/src");
-			ClassManager.addClz("Promise");
-			ClassManager.addClzPath(NodeJSTools.getPathByRelatviePath("out/tf/add/src"));
+			ProtocolClassCreater.init();
+			ProtocolClassCreater.exportPath=NodeJSTools.getPathByRelatviePath("out/debugprotocol");
 			var configPath;
-			configPath=FileManager.getPath(myPath,"data/tensorflowDes.json");
+			configPath=FileManager.getPath(myPath,"data/protocol.json");
 			var configData;
 			configData=FileManager.readJSONFile(configPath);
-			ClassManager.setClassList(configData.classList);
-			this.createFunctionList(configData.functionList);
-			this.createClassList(configData.classList);
-			ClassManager.traceFailDic();
+			this.createDomainList(configData.domains);
 		}
 
-		__proto.createClassList=function(clsList){
+		__proto.createDomainList=function(clsList){
 			var i=0,len=0;
 			len=clsList.length;
 			for (i=0;i < len;i++){
-				ClassCreater.createClassO(clsList[i]);
+				ProtocolClassCreater.create(clsList[i]);
 			}
-		}
-
-		__proto.createFunctionList=function(funList){
-			var i=0,len=0;
-			len=funList.length;
-			for (i=0;i < len;i++){
-				this.createFunO(funList[i]);
-			}
-		}
-
-		__proto.createFunO=function(funO){
-			FunctionCreater.createFunO(funO);
 		}
 
 		return DesToCode;
@@ -17666,6 +17753,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 /*
-1 file:///D:/machinelearning/TensorflowAS.git/trunk/TensorflowDoc/DesToCode/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
-2 file:///D:/machinelearning/TensorflowAS.git/trunk/TensorflowDoc/DesToCode/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+1 file:///D:/codes/playground.git/trunk/chromedebugprotocal/DesToCode/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+2 file:///D:/codes/playground.git/trunk/chromedebugprotocal/DesToCode/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 */

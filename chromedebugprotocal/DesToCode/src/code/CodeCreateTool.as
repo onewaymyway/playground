@@ -56,6 +56,41 @@ package code
 			}
 			return importStrs.join("\n");
 		}
+		
+		public static function createDocStr(funO:Object,paramTpl:String="{#@name#} {#type#} {#@doc#}"):void
+		{
+			var docStrs:Array;
+			docStrs = [];
+			docStrs.push("	/**");
+			docStrs.push("	 * " + funO.name);
+			if (funO.des)
+			{
+				docStrs.push("	 * " + funO.des);
+			}
+			if (funO.description)
+			{
+				docStrs.push("	 * " + funO.description);
+			}
+			
+			var params:Array;
+			params = funO.params;
+			if (params && params.length > 0)
+			{
+				var i:int, len:int;
+				len = params.length;
+				var paramO:Object;
+				for (i = 0; i < len; i++) {
+					paramO = params[i];
+					docStrs.push("	 * @param " +createExportCode(paramTpl,paramO));
+				}
+			}
+			
+
+			docStrs.push("	 * @return "+funO["return"]||"");
+			
+			docStrs.push("	 */");
+			return docStrs.join("\n");
+		}
 	}
 
 }
