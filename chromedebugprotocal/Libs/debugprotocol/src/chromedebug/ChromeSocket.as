@@ -15,10 +15,6 @@ package chromedebug {
 		public var md5Pwd:String;
 		public var isLogined:Boolean;
 		private var _serverStr:String;
-		public static const OnServerMsg:String = "OnServerMsg";
-		public static const Welcome:String = "welcome";
-		public static const OnJoinedChannel:String = "OnJoinedChannel";
-		public static const OnChannelMsg:String = "OnChannelMsg";
 		
 		public var channel:String;
 		public function ChromeSocket() {
@@ -48,11 +44,8 @@ package chromedebug {
 			trace('socket connect');
 			if (autoOpenUrl)
 			{
-				//sendCmd(Page.enable);
 				Page.enable();
 				Page.navigate({ url:autoOpenUrl });
-
-				//sendCmd(Page.navigate,{ url:autoOpenUrl });
 			}
 
 		}
@@ -91,17 +84,6 @@ package chromedebug {
 				delete _resolveDic[tMethodId];
 			}
 
-		}
-		
-		
-		
-		private var msgID:int = 0;
-		
-		private function send(msg:String):void {
-			msgID++;
-			msg = msg + msgID;
-			trace("try send:" + msg);
-			socket.send(msg);
 		}
 		
 		public function sendJson(obj:Object):void {
