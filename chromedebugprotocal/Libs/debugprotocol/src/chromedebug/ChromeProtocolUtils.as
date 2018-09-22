@@ -15,7 +15,6 @@ package chromedebug
 		
 		public static function getEnableableDomains():Array
 		{
-			debugger;
 			var tar:*;
 			tar = Browser.window.debugprotocol;
 			var rst:Array;
