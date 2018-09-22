@@ -73,7 +73,7 @@ package chromedebug {
 			trace("Msg:" + msg);
 			var dataO:Object;
 			dataO = JSON.parse(msg);
-			trace("MsgO:" + dataO);
+			trace("MsgO:" , dataO);
 			
 			var tMethodId:int;
 			tMethodId = dataO.id;
@@ -89,6 +89,7 @@ package chromedebug {
 		public function sendJson(obj:Object):void {
 			if (!obj)
 				return;
+			trace("SendJson:",obj);
 			socket.send(JSON.stringify(obj));
 		}
 		
