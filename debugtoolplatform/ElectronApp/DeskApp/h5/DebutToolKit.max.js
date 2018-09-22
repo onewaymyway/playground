@@ -16304,6 +16304,38 @@ var Laya=window.Laya=(function(window,document){
 	})()
 
 
+	/**
+	*...
+	*@author ww
+	*/
+	//class chromedebug.ChromeProtocolUtils
+	var ChromeProtocolUtils=(function(){
+		function ChromeProtocolUtils(){}
+		__class(ChromeProtocolUtils,'chromedebug.ChromeProtocolUtils');
+		ChromeProtocolUtils.getEnableableDomains=function(){
+			debugger;
+			var tar;
+			tar=Browser.window.debugprotocol;
+			var rst;
+			rst=[];
+			var domain;
+			var domainO;
+			for (/*no*/this.key in tar){
+				domain=tar[/*no*/this.key];
+				if (domain.enable){
+					domainO={};
+					domainO.name=/*no*/this.key;
+					domainO.clz=domain;
+					rst.push(domainO);
+				}
+			}
+			return rst;
+		}
+
+		return ChromeProtocolUtils;
+	})()
+
+
 	//class debugprotocol.Debugger
 	var Debugger=(function(){
 		function Debugger(){}
@@ -20106,7 +20138,6 @@ var Laya=window.Laya=(function(window,document){
 			this.channel=null;
 			this.autoOpenUrl="http://baidu.com";
 			this._resolveDic={};
-			this.msgID=0;
 			ChromeSocket.__super.call(this);
 			this.socket=new Socket("127.0.0.1",0,Byte);
 			this.socket.disableInput=true;
@@ -20138,7 +20169,6 @@ var Laya=window.Laya=(function(window,document){
 			}
 		}
 
-		//sendCmd(Page.navigate,{url:autoOpenUrl });
 		__proto.sendCmd=function(method,params){
 			this.sendJson(ChromeMsg.createCmd(method,params));
 		}
@@ -20158,6 +20188,7 @@ var Laya=window.Laya=(function(window,document){
 			console.log("Msg:"+msg);
 			var dataO;
 			dataO=JSON.parse(msg);
+			console.log("MsgO:" ,dataO);
 			var tMethodId=0;
 			tMethodId=dataO.id;
 			if (tMethodId && this._resolveDic[tMethodId]){
@@ -20167,16 +20198,10 @@ var Laya=window.Laya=(function(window,document){
 			}
 		}
 
-		__proto.send=function(msg){
-			this.msgID++;
-			msg=msg+this.msgID;
-			console.log("try send:"+msg);
-			this.socket.send(msg);
-		}
-
 		__proto.sendJson=function(obj){
 			if (!obj)
 				return;
+			console.log("SendJson:",obj);
 			this.socket.send(JSON.stringify(obj));
 		}
 
@@ -20193,12 +20218,6 @@ var Laya=window.Laya=(function(window,document){
 			console.log('socket onClose');
 		}
 
-		ChromeSocket.DataFromServer="DataFromServer";
-		ChromeSocket.Logined="Logined";
-		ChromeSocket.OnServerMsg="OnServerMsg";
-		ChromeSocket.Welcome="welcome";
-		ChromeSocket.OnJoinedChannel="OnJoinedChannel";
-		ChromeSocket.OnChannelMsg="OnChannelMsg";
 		return ChromeSocket;
 	})(EventDispatcher)
 
@@ -36979,18 +36998,40 @@ var Laya=window.Laya=(function(window,document){
 	var DebugChromeViewUI=(function(_super){
 		function DebugChromeViewUI(){
 			this.startBtn=null;
+			this.domainList=null;
 			DebugChromeViewUI.__super.call(this);
 		}
 
 		__class(DebugChromeViewUI,'ui.debugplatform.chrome.DebugChromeViewUI',_super);
 		var __proto=DebugChromeViewUI.prototype;
 		__proto.createChildren=function(){
+			View.regComponent("debugplatform.chrome.DomainListItem",DomainListItem);
 			laya.ui.Component.prototype.createChildren.call(this);
 			this.createView(DebugChromeViewUI.uiView);
 		}
 
-		DebugChromeViewUI.uiView={"type":"View","props":{"width":400,"height":300},"child":[{"type":"Button","props":{"y":7,"x":320,"var":"startBtn","skin":"comp/button.png","label":"启动"}}]};
+		DebugChromeViewUI.uiView={"type":"View","props":{"width":400,"height":300},"child":[{"type":"Button","props":{"y":7,"x":320,"var":"startBtn","skin":"comp/button.png","label":"启动"}},{"type":"List","props":{"x":17,"width":126,"var":"domainList","vScrollBarSkin":"comp/vscroll.png","top":20,"scrollBarSkin":"comp/vscroll.png","repeatX":1,"bottom":20},"child":[{"type":"DomainListItem","props":{"y":0,"x":0,"runtime":"debugplatform.chrome.DomainListItem","renderType":"render","name":"render"}}]}]};
 		return DebugChromeViewUI;
+	})(View)
+
+
+	//class ui.debugplatform.chrome.DomainListItemUI extends laya.ui.View
+	var DomainListItemUI=(function(_super){
+		function DomainListItemUI(){
+			this.label=null;
+			this.debugCheck=null;
+			DomainListItemUI.__super.call(this);
+		}
+
+		__class(DomainListItemUI,'ui.debugplatform.chrome.DomainListItemUI',_super);
+		var __proto=DomainListItemUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(DomainListItemUI.uiView);
+		}
+
+		DomainListItemUI.uiView={"type":"View","props":{"width":134,"height":25},"child":[{"type":"Box","props":{"y":1,"right":0,"left":0,"height":24},"child":[{"type":"Clip","props":{"y":0,"x":0,"width":196,"skin":"comp/clip_selectBox.png","right":0,"name":"selectBox","left":0,"height":24,"clipY":2}},{"type":"Label","props":{"y":1,"var":"label","text":"label","right":0,"padding":"4,0,0,0","left":0,"height":22,"color":"#d8d8d8"}},{"type":"CheckBox","props":{"y":5,"width":51,"var":"debugCheck","skin":"comp/checkbox.png","right":0,"label":"调试","height":15}}]}]};
+		return DomainListItemUI;
 	})(View)
 
 
@@ -38146,12 +38187,23 @@ var Laya=window.Laya=(function(window,document){
 	var DebugChromeView=(function(_super){
 		function DebugChromeView(){
 			this._chromeSocket=null;
+			this._isDebugViewDic={};
 			DebugChromeView.__super.call(this);
 			this.startBtn.on("click",this,this.onStartBtn);
+			this.domainList.array=[];
+			this.domainList.renderHandler=new Handler(this,this.listRenderHandler);
+			this.domainList.array=ChromeProtocolUtils.getEnableableDomains();
 		}
 
 		__class(DebugChromeView,'debugplatform.chrome.DebugChromeView',_super);
 		var __proto=DebugChromeView.prototype;
+		__proto.listRenderHandler=function(cell,index){
+			var dataO;
+			dataO=cell.dataSource;
+			cell.isDebugDic=this._isDebugViewDic;
+			cell.initByData(dataO);
+		}
+
 		__proto.onStartBtn=function(){
 			if (this._chromeSocket)this._chromeSocket.closeLater();
 			var cmdStr;
@@ -38173,13 +38225,54 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.onTargetFind=function(targets){
-			debugger;
 			this._chromeSocket=new ChromeSocket();
 			this._chromeSocket.connectByTargetO(targets[0]);
 		}
 
 		return DebugChromeView;
 	})(DebugChromeViewUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class debugplatform.chrome.DomainListItem extends ui.debugplatform.chrome.DomainListItemUI
+	var DomainListItem=(function(_super){
+		function DomainListItem(){
+			this.tDataO=null;
+			this.filePath=null;
+			this.isDebugDic=null;
+			this._isSettingValue=false;
+			DomainListItem.__super.call(this);
+			this.on("doubleclick",this,this.onDoubleClick);
+			this.debugCheck.on("change",this,this.onDebugCheckChange);
+		}
+
+		__class(DomainListItem,'debugplatform.chrome.DomainListItem',_super);
+		var __proto=DomainListItem.prototype;
+		__proto.onDebugCheckChange=function(){
+			if(this._isSettingValue)return;
+			this.isDebugDic[this.filePath]=this.debugCheck.selected;
+			if (this.debugCheck.selected){
+				this.tDataO.clz.enable();
+				}else{
+				this.tDataO.clz.disable();
+			}
+		}
+
+		__proto.initByData=function(dataO){
+			this._isSettingValue=true;
+			this.tDataO=dataO;
+			this.filePath=dataO.name;
+			this.label.text=this.filePath;
+			this.debugCheck.selected=this.isDebugDic[this.filePath]?true:false;
+			this._isSettingValue=false;
+		}
+
+		__proto.onDoubleClick=function(){}
+		return DomainListItem;
+	})(DomainListItemUI)
 
 
 	/**
@@ -38592,6 +38685,25 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
+	var FindNodeSmall=(function(_super){
+		function FindNodeSmall(){
+			FindNodeSmall.__super.call(this);
+			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
+			this.createView(FindNodeSmallUI.uiView);
+		}
+
+		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
+		var __proto=FindNodeSmall.prototype;
+		__proto.createChildren=function(){}
+		return FindNodeSmall;
+	})(FindNodeSmallUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class laya.debug.view.nodeInfo.nodetree.FindNode extends laya.debug.ui.debugui.FindNodeUI
 	var FindNode=(function(_super){
 		function FindNode(){
@@ -38608,25 +38720,6 @@ var Laya=window.Laya=(function(window,document){
 
 		return FindNode;
 	})(FindNodeUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
-	var FindNodeSmall=(function(_super){
-		function FindNodeSmall(){
-			FindNodeSmall.__super.call(this);
-			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
-			this.createView(FindNodeSmallUI.uiView);
-		}
-
-		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
-		var __proto=FindNodeSmall.prototype;
-		__proto.createChildren=function(){}
-		return FindNodeSmall;
-	})(FindNodeSmallUI)
 
 
 	/**
@@ -39150,7 +39243,7 @@ var Laya=window.Laya=(function(window,document){
 	})(ToolBarUI)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,Render,View,Timer,GraphicAnimation,LocalStorage,Browser]);
+	Laya.__init([EventDispatcher,LoaderManager,Browser,Render,View,Timer,GraphicAnimation,LocalStorage]);
 	new DebugPlatform();
 
 })(window,document,Laya);
@@ -39161,6 +39254,9 @@ var Laya=window.Laya=(function(window,document){
 2 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
 3 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 4 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
-5 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/menus/ContextMenu.as (85):warning:Sys.lang This variable is not defined.
-6 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/menus/ContextMenu.as (149):warning:SystemSetting.isCMDVer This variable is not defined.
+5 file:///D:/codes/playground.git/trunk/chromedebugprotocal/Libs/debugprotocol/src/chromedebug/ChromeProtocolUtils.as (24):warning:key This variable is not defined.
+6 file:///D:/codes/playground.git/trunk/chromedebugprotocal/Libs/debugprotocol/src/chromedebug/ChromeProtocolUtils.as (26):warning:key This variable is not defined.
+7 file:///D:/codes/playground.git/trunk/chromedebugprotocal/Libs/debugprotocol/src/chromedebug/ChromeProtocolUtils.as (30):warning:key This variable is not defined.
+8 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/menus/ContextMenu.as (85):warning:Sys.lang This variable is not defined.
+9 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/menus/ContextMenu.as (149):warning:SystemSetting.isCMDVer This variable is not defined.
 */
