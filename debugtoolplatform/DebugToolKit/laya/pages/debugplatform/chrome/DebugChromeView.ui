@@ -1,8 +1,8 @@
 {
     "x":0,
     "type":"View",
-    "selectedBox":1,
-    "selecteID":2,
+    "selectedBox":3,
+    "selecteID":6,
     "props":{"width":400,"sceneColor":"#000000","height":300},
     "nodeParent":-1,
     "label":"View",
@@ -24,6 +24,33 @@
             "compId":2,
             "child":[
                 ]
+        },
+        {
+            "x":15,
+            "type":"List",
+            "props":{"x":17,"width":126,"var":"domainList","vScrollBarSkin":"comp/vscroll.png","top":20,"scrollBarSkin":"comp/vscroll.png","repeatX":1,"bottom":20},
+            "nodeParent":1,
+            "label":"List(domainList)",
+            "isOpen":true,
+            "isDirectory":true,
+            "isAniNode":true,
+            "hasChild":true,
+            "compId":3,
+            "child":[
+                {
+                    "x":30,
+                    "type":"UIView",
+                    "source":"debugplatform/chrome/DomainListItem.ui",
+                    "props":{"y":0,"x":0,"runtime":"debugplatform.chrome.DomainListItem","renderType":"render","name":"render"},
+                    "nodeParent":3,
+                    "label":"UIView(render)",
+                    "isDirectory":false,
+                    "isAniNode":false,
+                    "hasChild":false,
+                    "compId":6,
+                    "child":[
+                        ]
+                }]
         }],
     "animations":[
         {

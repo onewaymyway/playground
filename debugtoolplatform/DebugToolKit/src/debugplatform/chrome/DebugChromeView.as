@@ -1,5 +1,6 @@
 package debugplatform.chrome 
 {
+	import chromedebug.ChromeProtocolUtils;
 	import chromedebug.ChromeSocket;
 	import laya.events.Event;
 	import laya.net.Loader;
@@ -17,8 +18,19 @@ package debugplatform.chrome
 		public function DebugChromeView() 
 		{
 			startBtn.on(Event.CLICK, this, onStartBtn);
+			domainList.array = [];
+			domainList.renderHandler = new Handler(this, listRenderHandler);
+			domainList.array = ChromeProtocolUtils.getEnableableDomains();
 		}
 		
+		private var _isDebugViewDic:Object = { };
+		private function listRenderHandler(cell:DomainListItem, index:int ):void
+		{
+			var dataO:Object;
+			dataO = cell.dataSource;
+			cell.isDebugDic=_isDebugViewDic;
+			cell.initByData(dataO);
+		}
 		
 		private function onStartBtn():void
 		{
@@ -47,7 +59,6 @@ package debugplatform.chrome
 		}
 		private function onTargetFind(targets:Array):void
 		{
-			debugger;
 			_chromeSocket = new ChromeSocket();
 			_chromeSocket.connectByTargetO(targets[0]);
 		}
