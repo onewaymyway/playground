@@ -829,6 +829,25 @@ var Laya=window.Laya=(function(window,document){
 			var configData;
 			configData=FileManager.readJSONFile(configPath);
 			this.createDomainList(configData.domains);
+			this.createAllRefer(configData.domains);
+		}
+
+		__proto.createAllRefer=function(clsList){
+			var tpl=FileManager.readTxtFile(NodeJSTools.getPathByRelatviePath("data/protocoltpl/all.tpl"));
+			var exportPath=NodeJSTools.getPathByRelatviePath("out/debugprotocol/All.as");
+			var i=0,len=0;
+			len=clsList.length;
+			var names;
+			names=[];
+			for (i=0;i < len;i++){
+				names.push(clsList[i].domain);
+			};
+			var dataO;
+			dataO={};
+			dataO.refers=names.join(",");
+			var codeStr;
+			codeStr=CodeCreateTool.createExportCode(tpl,dataO);
+			FileManager.createTxtFile(exportPath,codeStr);
 		}
 
 		__proto.createDomainList=function(clsList){

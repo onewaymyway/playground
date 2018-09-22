@@ -21,6 +21,8 @@ package chromedebug
 			rst = [];
 			var domain:*;
 			var domainO:Object;
+			var key:String;
+			debugger;
 			for (key in tar)
 			{
 				domain = tar[key];
@@ -32,6 +34,7 @@ package chromedebug
 					rst.push(domainO);
 				}
 			}
+			trace("EnableDomains:",rst);
 			return rst;
 		}
 	}

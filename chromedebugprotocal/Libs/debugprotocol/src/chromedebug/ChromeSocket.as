@@ -1,4 +1,5 @@
 package chromedebug {
+	import debugprotocol.All;
 	import debugprotocol.Page;
 	import laya.events.Event;
 	import laya.events.EventDispatcher;
@@ -18,6 +19,7 @@ package chromedebug {
 		
 		public var channel:String;
 		public function ChromeSocket() {
+			All;
 			socket = new Socket("127.0.0.1", 0, Byte);
 			socket.disableInput = true;
 			
