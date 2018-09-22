@@ -16313,26 +16313,390 @@ var Laya=window.Laya=(function(window,document){
 		function ChromeProtocolUtils(){}
 		__class(ChromeProtocolUtils,'chromedebug.ChromeProtocolUtils');
 		ChromeProtocolUtils.getEnableableDomains=function(){
-			debugger;
 			var tar;
 			tar=Browser.window.debugprotocol;
 			var rst;
 			rst=[];
 			var domain;
 			var domainO;
-			for (/*no*/this.key in tar){
-				domain=tar[/*no*/this.key];
+			var key;
+			debugger;
+			for (key in tar){
+				domain=tar[key];
 				if (domain.enable){
 					domainO={};
-					domainO.name=/*no*/this.key;
+					domainO.name=key;
 					domainO.clz=domain;
 					rst.push(domainO);
 				}
 			}
+			console.log("EnableDomains:",rst);
 			return rst;
 		}
 
 		return ChromeProtocolUtils;
+	})()
+
+
+	//class debugprotocol.Accessibility
+	var Accessibility=(function(){
+		function Accessibility(){}
+		__class(Accessibility,'debugprotocol.Accessibility');
+		Accessibility.getPartialAXTree=function(paramO){
+			return ChromeMsg.callCmd("Accessibility.getPartialAXTree",paramO);
+		}
+
+		Accessibility.getFullAXTree=function(paramO){
+			return ChromeMsg.callCmd("Accessibility.getFullAXTree",paramO);
+		}
+
+		__static(Accessibility,
+		['DependDomains',function(){return this.DependDomains=[DOM];}
+		]);
+		return Accessibility;
+	})()
+
+
+	//class debugprotocol.All
+	var All=(function(){
+		function All(){}
+		__class(All,'debugprotocol.All');
+		__static(All,
+		['refers',function(){return this.refers=[Accessibility,Animation$1,ApplicationCache,Audits,Browser$1,CSS,CacheStorage,DOM,DOMDebugger,DOMSnapshot,DOMStorage,Database,DeviceOrientation,Emulation,HeadlessExperimental,IO,IndexedDB,Input$1,Inspector,LayerTree,Log$1,Memory,Network,Overlay,Page,Performance,Security,ServiceWorker,Storage,SystemInfo,Target,Tethering,Tracing,Testing,Console,Debugger,HeapProfiler,Profiler,Runtime,Schema];}
+		]);
+		return All;
+	})()
+
+
+	//class debugprotocol.Animation
+	var Animation$1=(function(){
+		function Animation(){}
+		__class(Animation,'debugprotocol.Animation',null,'Animation$1');
+		Animation.disable=function(paramO){
+			return ChromeMsg.callCmd("Animation.disable",paramO);
+		}
+
+		Animation.enable=function(paramO){
+			return ChromeMsg.callCmd("Animation.enable",paramO);
+		}
+
+		Animation.getCurrentTime=function(paramO){
+			return ChromeMsg.callCmd("Animation.getCurrentTime",paramO);
+		}
+
+		Animation.getPlaybackRate=function(paramO){
+			return ChromeMsg.callCmd("Animation.getPlaybackRate",paramO);
+		}
+
+		Animation.releaseAnimations=function(paramO){
+			return ChromeMsg.callCmd("Animation.releaseAnimations",paramO);
+		}
+
+		Animation.resolveAnimation=function(paramO){
+			return ChromeMsg.callCmd("Animation.resolveAnimation",paramO);
+		}
+
+		Animation.seekAnimations=function(paramO){
+			return ChromeMsg.callCmd("Animation.seekAnimations",paramO);
+		}
+
+		Animation.setPaused=function(paramO){
+			return ChromeMsg.callCmd("Animation.setPaused",paramO);
+		}
+
+		Animation.setPlaybackRate=function(paramO){
+			return ChromeMsg.callCmd("Animation.setPlaybackRate",paramO);
+		}
+
+		Animation.setTiming=function(paramO){
+			return ChromeMsg.callCmd("Animation.setTiming",paramO);
+		}
+
+		Animation.animationCanceled="Animation.animationCanceled";
+		Animation.animationCreated="Animation.animationCreated";
+		Animation.animationStarted="Animation.animationStarted";
+		__static(Animation,
+		['DependDomains',function(){return this.DependDomains=[Runtime,DOM];}
+		]);
+		return Animation;
+	})()
+
+
+	//class debugprotocol.ApplicationCache
+	var ApplicationCache=(function(){
+		function ApplicationCache(){}
+		__class(ApplicationCache,'debugprotocol.ApplicationCache');
+		ApplicationCache.enable=function(paramO){
+			return ChromeMsg.callCmd("ApplicationCache.enable",paramO);
+		}
+
+		ApplicationCache.getApplicationCacheForFrame=function(paramO){
+			return ChromeMsg.callCmd("ApplicationCache.getApplicationCacheForFrame",paramO);
+		}
+
+		ApplicationCache.getFramesWithManifests=function(paramO){
+			return ChromeMsg.callCmd("ApplicationCache.getFramesWithManifests",paramO);
+		}
+
+		ApplicationCache.getManifestForFrame=function(paramO){
+			return ChromeMsg.callCmd("ApplicationCache.getManifestForFrame",paramO);
+		}
+
+		ApplicationCache.DependDomains=[];
+		ApplicationCache.applicationCacheStatusUpdated="ApplicationCache.applicationCacheStatusUpdated";
+		ApplicationCache.networkStateUpdated="ApplicationCache.networkStateUpdated";
+		return ApplicationCache;
+	})()
+
+
+	//class debugprotocol.Audits
+	var Audits=(function(){
+		function Audits(){}
+		__class(Audits,'debugprotocol.Audits');
+		Audits.getEncodedResponse=function(paramO){
+			return ChromeMsg.callCmd("Audits.getEncodedResponse",paramO);
+		}
+
+		__static(Audits,
+		['DependDomains',function(){return this.DependDomains=[Network];}
+		]);
+		return Audits;
+	})()
+
+
+	//class debugprotocol.Browser
+	var Browser$1=(function(){
+		function Browser(){}
+		__class(Browser,'debugprotocol.Browser',null,'Browser$1');
+		Browser.grantPermissions=function(paramO){
+			return ChromeMsg.callCmd("Browser.grantPermissions",paramO);
+		}
+
+		Browser.resetPermissions=function(paramO){
+			return ChromeMsg.callCmd("Browser.resetPermissions",paramO);
+		}
+
+		Browser.close=function(paramO){
+			return ChromeMsg.callCmd("Browser.close",paramO);
+		}
+
+		Browser.crash=function(paramO){
+			return ChromeMsg.callCmd("Browser.crash",paramO);
+		}
+
+		Browser.getVersion=function(paramO){
+			return ChromeMsg.callCmd("Browser.getVersion",paramO);
+		}
+
+		Browser.getBrowserCommandLine=function(paramO){
+			return ChromeMsg.callCmd("Browser.getBrowserCommandLine",paramO);
+		}
+
+		Browser.getHistograms=function(paramO){
+			return ChromeMsg.callCmd("Browser.getHistograms",paramO);
+		}
+
+		Browser.getHistogram=function(paramO){
+			return ChromeMsg.callCmd("Browser.getHistogram",paramO);
+		}
+
+		Browser.getWindowBounds=function(paramO){
+			return ChromeMsg.callCmd("Browser.getWindowBounds",paramO);
+		}
+
+		Browser.getWindowForTarget=function(paramO){
+			return ChromeMsg.callCmd("Browser.getWindowForTarget",paramO);
+		}
+
+		Browser.setWindowBounds=function(paramO){
+			return ChromeMsg.callCmd("Browser.setWindowBounds",paramO);
+		}
+
+		Browser.DependDomains=[];
+		return Browser;
+	})()
+
+
+	//class debugprotocol.CacheStorage
+	var CacheStorage=(function(){
+		function CacheStorage(){}
+		__class(CacheStorage,'debugprotocol.CacheStorage');
+		CacheStorage.deleteCache=function(paramO){
+			return ChromeMsg.callCmd("CacheStorage.deleteCache",paramO);
+		}
+
+		CacheStorage.deleteEntry=function(paramO){
+			return ChromeMsg.callCmd("CacheStorage.deleteEntry",paramO);
+		}
+
+		CacheStorage.requestCacheNames=function(paramO){
+			return ChromeMsg.callCmd("CacheStorage.requestCacheNames",paramO);
+		}
+
+		CacheStorage.requestCachedResponse=function(paramO){
+			return ChromeMsg.callCmd("CacheStorage.requestCachedResponse",paramO);
+		}
+
+		CacheStorage.requestEntries=function(paramO){
+			return ChromeMsg.callCmd("CacheStorage.requestEntries",paramO);
+		}
+
+		CacheStorage.DependDomains=[];
+		return CacheStorage;
+	})()
+
+
+	//class debugprotocol.Console
+	var Console=(function(){
+		function Console(){}
+		__class(Console,'debugprotocol.Console');
+		Console.clearMessages=function(paramO){
+			return ChromeMsg.callCmd("Console.clearMessages",paramO);
+		}
+
+		Console.disable=function(paramO){
+			return ChromeMsg.callCmd("Console.disable",paramO);
+		}
+
+		Console.enable=function(paramO){
+			return ChromeMsg.callCmd("Console.enable",paramO);
+		}
+
+		Console.messageAdded="Console.messageAdded";
+		__static(Console,
+		['DependDomains',function(){return this.DependDomains=[Runtime];}
+		]);
+		return Console;
+	})()
+
+
+	//class debugprotocol.CSS
+	var CSS=(function(){
+		function CSS(){}
+		__class(CSS,'debugprotocol.CSS');
+		CSS.addRule=function(paramO){
+			return ChromeMsg.callCmd("CSS.addRule",paramO);
+		}
+
+		CSS.collectClassNames=function(paramO){
+			return ChromeMsg.callCmd("CSS.collectClassNames",paramO);
+		}
+
+		CSS.createStyleSheet=function(paramO){
+			return ChromeMsg.callCmd("CSS.createStyleSheet",paramO);
+		}
+
+		CSS.disable=function(paramO){
+			return ChromeMsg.callCmd("CSS.disable",paramO);
+		}
+
+		CSS.enable=function(paramO){
+			return ChromeMsg.callCmd("CSS.enable",paramO);
+		}
+
+		CSS.forcePseudoState=function(paramO){
+			return ChromeMsg.callCmd("CSS.forcePseudoState",paramO);
+		}
+
+		CSS.getBackgroundColors=function(paramO){
+			return ChromeMsg.callCmd("CSS.getBackgroundColors",paramO);
+		}
+
+		CSS.getComputedStyleForNode=function(paramO){
+			return ChromeMsg.callCmd("CSS.getComputedStyleForNode",paramO);
+		}
+
+		CSS.getInlineStylesForNode=function(paramO){
+			return ChromeMsg.callCmd("CSS.getInlineStylesForNode",paramO);
+		}
+
+		CSS.getMatchedStylesForNode=function(paramO){
+			return ChromeMsg.callCmd("CSS.getMatchedStylesForNode",paramO);
+		}
+
+		CSS.getMediaQueries=function(paramO){
+			return ChromeMsg.callCmd("CSS.getMediaQueries",paramO);
+		}
+
+		CSS.getPlatformFontsForNode=function(paramO){
+			return ChromeMsg.callCmd("CSS.getPlatformFontsForNode",paramO);
+		}
+
+		CSS.getStyleSheetText=function(paramO){
+			return ChromeMsg.callCmd("CSS.getStyleSheetText",paramO);
+		}
+
+		CSS.setEffectivePropertyValueForNode=function(paramO){
+			return ChromeMsg.callCmd("CSS.setEffectivePropertyValueForNode",paramO);
+		}
+
+		CSS.setKeyframeKey=function(paramO){
+			return ChromeMsg.callCmd("CSS.setKeyframeKey",paramO);
+		}
+
+		CSS.setMediaText=function(paramO){
+			return ChromeMsg.callCmd("CSS.setMediaText",paramO);
+		}
+
+		CSS.setRuleSelector=function(paramO){
+			return ChromeMsg.callCmd("CSS.setRuleSelector",paramO);
+		}
+
+		CSS.setStyleSheetText=function(paramO){
+			return ChromeMsg.callCmd("CSS.setStyleSheetText",paramO);
+		}
+
+		CSS.setStyleTexts=function(paramO){
+			return ChromeMsg.callCmd("CSS.setStyleTexts",paramO);
+		}
+
+		CSS.startRuleUsageTracking=function(paramO){
+			return ChromeMsg.callCmd("CSS.startRuleUsageTracking",paramO);
+		}
+
+		CSS.stopRuleUsageTracking=function(paramO){
+			return ChromeMsg.callCmd("CSS.stopRuleUsageTracking",paramO);
+		}
+
+		CSS.takeCoverageDelta=function(paramO){
+			return ChromeMsg.callCmd("CSS.takeCoverageDelta",paramO);
+		}
+
+		CSS.fontsUpdated="CSS.fontsUpdated";
+		CSS.mediaQueryResultChanged="CSS.mediaQueryResultChanged";
+		CSS.styleSheetAdded="CSS.styleSheetAdded";
+		CSS.styleSheetChanged="CSS.styleSheetChanged";
+		CSS.styleSheetRemoved="CSS.styleSheetRemoved";
+		__static(CSS,
+		['DependDomains',function(){return this.DependDomains=[DOM];}
+		]);
+		return CSS;
+	})()
+
+
+	//class debugprotocol.Database
+	var Database=(function(){
+		function Database(){}
+		__class(Database,'debugprotocol.Database');
+		Database.disable=function(paramO){
+			return ChromeMsg.callCmd("Database.disable",paramO);
+		}
+
+		Database.enable=function(paramO){
+			return ChromeMsg.callCmd("Database.enable",paramO);
+		}
+
+		Database.executeSQL=function(paramO){
+			return ChromeMsg.callCmd("Database.executeSQL",paramO);
+		}
+
+		Database.getDatabaseTableNames=function(paramO){
+			return ChromeMsg.callCmd("Database.getDatabaseTableNames",paramO);
+		}
+
+		Database.DependDomains=[];
+		Database.addDatabase="Database.addDatabase";
+		return Database;
 	})()
 
 
@@ -16465,6 +16829,23 @@ var Laya=window.Laya=(function(window,document){
 		['DependDomains',function(){return this.DependDomains=[Runtime];}
 		]);
 		return Debugger;
+	})()
+
+
+	//class debugprotocol.DeviceOrientation
+	var DeviceOrientation=(function(){
+		function DeviceOrientation(){}
+		__class(DeviceOrientation,'debugprotocol.DeviceOrientation');
+		DeviceOrientation.clearDeviceOrientationOverride=function(paramO){
+			return ChromeMsg.callCmd("DeviceOrientation.clearDeviceOrientationOverride",paramO);
+		}
+
+		DeviceOrientation.setDeviceOrientationOverride=function(paramO){
+			return ChromeMsg.callCmd("DeviceOrientation.setDeviceOrientationOverride",paramO);
+		}
+
+		DeviceOrientation.DependDomains=[];
+		return DeviceOrientation;
 	})()
 
 
@@ -16657,6 +17038,342 @@ var Laya=window.Laya=(function(window,document){
 	})()
 
 
+	//class debugprotocol.DOMDebugger
+	var DOMDebugger=(function(){
+		function DOMDebugger(){}
+		__class(DOMDebugger,'debugprotocol.DOMDebugger');
+		DOMDebugger.getEventListeners=function(paramO){
+			return ChromeMsg.callCmd("DOMDebugger.getEventListeners",paramO);
+		}
+
+		DOMDebugger.removeDOMBreakpoint=function(paramO){
+			return ChromeMsg.callCmd("DOMDebugger.removeDOMBreakpoint",paramO);
+		}
+
+		DOMDebugger.removeEventListenerBreakpoint=function(paramO){
+			return ChromeMsg.callCmd("DOMDebugger.removeEventListenerBreakpoint",paramO);
+		}
+
+		DOMDebugger.removeInstrumentationBreakpoint=function(paramO){
+			return ChromeMsg.callCmd("DOMDebugger.removeInstrumentationBreakpoint",paramO);
+		}
+
+		DOMDebugger.removeXHRBreakpoint=function(paramO){
+			return ChromeMsg.callCmd("DOMDebugger.removeXHRBreakpoint",paramO);
+		}
+
+		DOMDebugger.setDOMBreakpoint=function(paramO){
+			return ChromeMsg.callCmd("DOMDebugger.setDOMBreakpoint",paramO);
+		}
+
+		DOMDebugger.setEventListenerBreakpoint=function(paramO){
+			return ChromeMsg.callCmd("DOMDebugger.setEventListenerBreakpoint",paramO);
+		}
+
+		DOMDebugger.setInstrumentationBreakpoint=function(paramO){
+			return ChromeMsg.callCmd("DOMDebugger.setInstrumentationBreakpoint",paramO);
+		}
+
+		DOMDebugger.setXHRBreakpoint=function(paramO){
+			return ChromeMsg.callCmd("DOMDebugger.setXHRBreakpoint",paramO);
+		}
+
+		__static(DOMDebugger,
+		['DependDomains',function(){return this.DependDomains=[DOM,Debugger,Runtime];}
+		]);
+		return DOMDebugger;
+	})()
+
+
+	//class debugprotocol.DOMSnapshot
+	var DOMSnapshot=(function(){
+		function DOMSnapshot(){}
+		__class(DOMSnapshot,'debugprotocol.DOMSnapshot');
+		DOMSnapshot.disable=function(paramO){
+			return ChromeMsg.callCmd("DOMSnapshot.disable",paramO);
+		}
+
+		DOMSnapshot.enable=function(paramO){
+			return ChromeMsg.callCmd("DOMSnapshot.enable",paramO);
+		}
+
+		DOMSnapshot.getSnapshot=function(paramO){
+			return ChromeMsg.callCmd("DOMSnapshot.getSnapshot",paramO);
+		}
+
+		DOMSnapshot.captureSnapshot=function(paramO){
+			return ChromeMsg.callCmd("DOMSnapshot.captureSnapshot",paramO);
+		}
+
+		__static(DOMSnapshot,
+		['DependDomains',function(){return this.DependDomains=[CSS,DOM,DOMDebugger,Page];}
+		]);
+		return DOMSnapshot;
+	})()
+
+
+	//class debugprotocol.DOMStorage
+	var DOMStorage=(function(){
+		function DOMStorage(){}
+		__class(DOMStorage,'debugprotocol.DOMStorage');
+		DOMStorage.clear=function(paramO){
+			return ChromeMsg.callCmd("DOMStorage.clear",paramO);
+		}
+
+		DOMStorage.disable=function(paramO){
+			return ChromeMsg.callCmd("DOMStorage.disable",paramO);
+		}
+
+		DOMStorage.enable=function(paramO){
+			return ChromeMsg.callCmd("DOMStorage.enable",paramO);
+		}
+
+		DOMStorage.getDOMStorageItems=function(paramO){
+			return ChromeMsg.callCmd("DOMStorage.getDOMStorageItems",paramO);
+		}
+
+		DOMStorage.removeDOMStorageItem=function(paramO){
+			return ChromeMsg.callCmd("DOMStorage.removeDOMStorageItem",paramO);
+		}
+
+		DOMStorage.setDOMStorageItem=function(paramO){
+			return ChromeMsg.callCmd("DOMStorage.setDOMStorageItem",paramO);
+		}
+
+		DOMStorage.DependDomains=[];
+		DOMStorage.domStorageItemAdded="DOMStorage.domStorageItemAdded";
+		DOMStorage.domStorageItemRemoved="DOMStorage.domStorageItemRemoved";
+		DOMStorage.domStorageItemUpdated="DOMStorage.domStorageItemUpdated";
+		DOMStorage.domStorageItemsCleared="DOMStorage.domStorageItemsCleared";
+		return DOMStorage;
+	})()
+
+
+	//class debugprotocol.Emulation
+	var Emulation=(function(){
+		function Emulation(){}
+		__class(Emulation,'debugprotocol.Emulation');
+		Emulation.canEmulate=function(paramO){
+			return ChromeMsg.callCmd("Emulation.canEmulate",paramO);
+		}
+
+		Emulation.clearDeviceMetricsOverride=function(paramO){
+			return ChromeMsg.callCmd("Emulation.clearDeviceMetricsOverride",paramO);
+		}
+
+		Emulation.clearGeolocationOverride=function(paramO){
+			return ChromeMsg.callCmd("Emulation.clearGeolocationOverride",paramO);
+		}
+
+		Emulation.resetPageScaleFactor=function(paramO){
+			return ChromeMsg.callCmd("Emulation.resetPageScaleFactor",paramO);
+		}
+
+		Emulation.setFocusEmulationEnabled=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setFocusEmulationEnabled",paramO);
+		}
+
+		Emulation.setCPUThrottlingRate=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setCPUThrottlingRate",paramO);
+		}
+
+		Emulation.setDefaultBackgroundColorOverride=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setDefaultBackgroundColorOverride",paramO);
+		}
+
+		Emulation.setDeviceMetricsOverride=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setDeviceMetricsOverride",paramO);
+		}
+
+		Emulation.setScrollbarsHidden=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setScrollbarsHidden",paramO);
+		}
+
+		Emulation.setDocumentCookieDisabled=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setDocumentCookieDisabled",paramO);
+		}
+
+		Emulation.setEmitTouchEventsForMouse=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setEmitTouchEventsForMouse",paramO);
+		}
+
+		Emulation.setEmulatedMedia=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setEmulatedMedia",paramO);
+		}
+
+		Emulation.setGeolocationOverride=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setGeolocationOverride",paramO);
+		}
+
+		Emulation.setNavigatorOverrides=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setNavigatorOverrides",paramO);
+		}
+
+		Emulation.setPageScaleFactor=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setPageScaleFactor",paramO);
+		}
+
+		Emulation.setScriptExecutionDisabled=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setScriptExecutionDisabled",paramO);
+		}
+
+		Emulation.setTouchEmulationEnabled=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setTouchEmulationEnabled",paramO);
+		}
+
+		Emulation.setVirtualTimePolicy=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setVirtualTimePolicy",paramO);
+		}
+
+		Emulation.setVisibleSize=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setVisibleSize",paramO);
+		}
+
+		Emulation.setUserAgentOverride=function(paramO){
+			return ChromeMsg.callCmd("Emulation.setUserAgentOverride",paramO);
+		}
+
+		Emulation.virtualTimeAdvanced="Emulation.virtualTimeAdvanced";
+		Emulation.virtualTimeBudgetExpired="Emulation.virtualTimeBudgetExpired";
+		Emulation.virtualTimePaused="Emulation.virtualTimePaused";
+		__static(Emulation,
+		['DependDomains',function(){return this.DependDomains=[DOM,Page,Runtime];}
+		]);
+		return Emulation;
+	})()
+
+
+	//class debugprotocol.HeadlessExperimental
+	var HeadlessExperimental=(function(){
+		function HeadlessExperimental(){}
+		__class(HeadlessExperimental,'debugprotocol.HeadlessExperimental');
+		HeadlessExperimental.beginFrame=function(paramO){
+			return ChromeMsg.callCmd("HeadlessExperimental.beginFrame",paramO);
+		}
+
+		HeadlessExperimental.disable=function(paramO){
+			return ChromeMsg.callCmd("HeadlessExperimental.disable",paramO);
+		}
+
+		HeadlessExperimental.enable=function(paramO){
+			return ChromeMsg.callCmd("HeadlessExperimental.enable",paramO);
+		}
+
+		HeadlessExperimental.needsBeginFramesChanged="HeadlessExperimental.needsBeginFramesChanged";
+		__static(HeadlessExperimental,
+		['DependDomains',function(){return this.DependDomains=[Page,Runtime];}
+		]);
+		return HeadlessExperimental;
+	})()
+
+
+	//class debugprotocol.HeapProfiler
+	var HeapProfiler=(function(){
+		function HeapProfiler(){}
+		__class(HeapProfiler,'debugprotocol.HeapProfiler');
+		HeapProfiler.addInspectedHeapObject=function(paramO){
+			return ChromeMsg.callCmd("HeapProfiler.addInspectedHeapObject",paramO);
+		}
+
+		HeapProfiler.collectGarbage=function(paramO){
+			return ChromeMsg.callCmd("HeapProfiler.collectGarbage",paramO);
+		}
+
+		HeapProfiler.disable=function(paramO){
+			return ChromeMsg.callCmd("HeapProfiler.disable",paramO);
+		}
+
+		HeapProfiler.enable=function(paramO){
+			return ChromeMsg.callCmd("HeapProfiler.enable",paramO);
+		}
+
+		HeapProfiler.getHeapObjectId=function(paramO){
+			return ChromeMsg.callCmd("HeapProfiler.getHeapObjectId",paramO);
+		}
+
+		HeapProfiler.getObjectByHeapObjectId=function(paramO){
+			return ChromeMsg.callCmd("HeapProfiler.getObjectByHeapObjectId",paramO);
+		}
+
+		HeapProfiler.getSamplingProfile=function(paramO){
+			return ChromeMsg.callCmd("HeapProfiler.getSamplingProfile",paramO);
+		}
+
+		HeapProfiler.startSampling=function(paramO){
+			return ChromeMsg.callCmd("HeapProfiler.startSampling",paramO);
+		}
+
+		HeapProfiler.startTrackingHeapObjects=function(paramO){
+			return ChromeMsg.callCmd("HeapProfiler.startTrackingHeapObjects",paramO);
+		}
+
+		HeapProfiler.stopSampling=function(paramO){
+			return ChromeMsg.callCmd("HeapProfiler.stopSampling",paramO);
+		}
+
+		HeapProfiler.stopTrackingHeapObjects=function(paramO){
+			return ChromeMsg.callCmd("HeapProfiler.stopTrackingHeapObjects",paramO);
+		}
+
+		HeapProfiler.takeHeapSnapshot=function(paramO){
+			return ChromeMsg.callCmd("HeapProfiler.takeHeapSnapshot",paramO);
+		}
+
+		HeapProfiler.addHeapSnapshotChunk="HeapProfiler.addHeapSnapshotChunk";
+		HeapProfiler.heapStatsUpdate="HeapProfiler.heapStatsUpdate";
+		HeapProfiler.lastSeenObjectId="HeapProfiler.lastSeenObjectId";
+		HeapProfiler.reportHeapSnapshotProgress="HeapProfiler.reportHeapSnapshotProgress";
+		HeapProfiler.resetProfiles="HeapProfiler.resetProfiles";
+		__static(HeapProfiler,
+		['DependDomains',function(){return this.DependDomains=[Runtime];}
+		]);
+		return HeapProfiler;
+	})()
+
+
+	//class debugprotocol.IndexedDB
+	var IndexedDB=(function(){
+		function IndexedDB(){}
+		__class(IndexedDB,'debugprotocol.IndexedDB');
+		IndexedDB.clearObjectStore=function(paramO){
+			return ChromeMsg.callCmd("IndexedDB.clearObjectStore",paramO);
+		}
+
+		IndexedDB.deleteDatabase=function(paramO){
+			return ChromeMsg.callCmd("IndexedDB.deleteDatabase",paramO);
+		}
+
+		IndexedDB.deleteObjectStoreEntries=function(paramO){
+			return ChromeMsg.callCmd("IndexedDB.deleteObjectStoreEntries",paramO);
+		}
+
+		IndexedDB.disable=function(paramO){
+			return ChromeMsg.callCmd("IndexedDB.disable",paramO);
+		}
+
+		IndexedDB.enable=function(paramO){
+			return ChromeMsg.callCmd("IndexedDB.enable",paramO);
+		}
+
+		IndexedDB.requestData=function(paramO){
+			return ChromeMsg.callCmd("IndexedDB.requestData",paramO);
+		}
+
+		IndexedDB.requestDatabase=function(paramO){
+			return ChromeMsg.callCmd("IndexedDB.requestDatabase",paramO);
+		}
+
+		IndexedDB.requestDatabaseNames=function(paramO){
+			return ChromeMsg.callCmd("IndexedDB.requestDatabaseNames",paramO);
+		}
+
+		__static(IndexedDB,
+		['DependDomains',function(){return this.DependDomains=[Runtime];}
+		]);
+		return IndexedDB;
+	})()
+
+
 	//class debugprotocol.Input
 	var Input$1=(function(){
 		function Input(){}
@@ -16699,6 +17416,173 @@ var Laya=window.Laya=(function(window,document){
 
 		Input.DependDomains=[];
 		return Input;
+	})()
+
+
+	//class debugprotocol.Inspector
+	var Inspector=(function(){
+		function Inspector(){}
+		__class(Inspector,'debugprotocol.Inspector');
+		Inspector.disable=function(paramO){
+			return ChromeMsg.callCmd("Inspector.disable",paramO);
+		}
+
+		Inspector.enable=function(paramO){
+			return ChromeMsg.callCmd("Inspector.enable",paramO);
+		}
+
+		Inspector.DependDomains=[];
+		Inspector.detached="Inspector.detached";
+		Inspector.targetCrashed="Inspector.targetCrashed";
+		Inspector.targetReloadedAfterCrash="Inspector.targetReloadedAfterCrash";
+		return Inspector;
+	})()
+
+
+	//class debugprotocol.IO
+	var IO=(function(){
+		function IO(){}
+		__class(IO,'debugprotocol.IO');
+		IO.close=function(paramO){
+			return ChromeMsg.callCmd("IO.close",paramO);
+		}
+
+		IO.read=function(paramO){
+			return ChromeMsg.callCmd("IO.read",paramO);
+		}
+
+		IO.resolveBlob=function(paramO){
+			return ChromeMsg.callCmd("IO.resolveBlob",paramO);
+		}
+
+		IO.DependDomains=[];
+		return IO;
+	})()
+
+
+	//class debugprotocol.LayerTree
+	var LayerTree=(function(){
+		function LayerTree(){}
+		__class(LayerTree,'debugprotocol.LayerTree');
+		LayerTree.compositingReasons=function(paramO){
+			return ChromeMsg.callCmd("LayerTree.compositingReasons",paramO);
+		}
+
+		LayerTree.disable=function(paramO){
+			return ChromeMsg.callCmd("LayerTree.disable",paramO);
+		}
+
+		LayerTree.enable=function(paramO){
+			return ChromeMsg.callCmd("LayerTree.enable",paramO);
+		}
+
+		LayerTree.loadSnapshot=function(paramO){
+			return ChromeMsg.callCmd("LayerTree.loadSnapshot",paramO);
+		}
+
+		LayerTree.makeSnapshot=function(paramO){
+			return ChromeMsg.callCmd("LayerTree.makeSnapshot",paramO);
+		}
+
+		LayerTree.profileSnapshot=function(paramO){
+			return ChromeMsg.callCmd("LayerTree.profileSnapshot",paramO);
+		}
+
+		LayerTree.releaseSnapshot=function(paramO){
+			return ChromeMsg.callCmd("LayerTree.releaseSnapshot",paramO);
+		}
+
+		LayerTree.replaySnapshot=function(paramO){
+			return ChromeMsg.callCmd("LayerTree.replaySnapshot",paramO);
+		}
+
+		LayerTree.snapshotCommandLog=function(paramO){
+			return ChromeMsg.callCmd("LayerTree.snapshotCommandLog",paramO);
+		}
+
+		LayerTree.layerPainted="LayerTree.layerPainted";
+		LayerTree.layerTreeDidChange="LayerTree.layerTreeDidChange";
+		__static(LayerTree,
+		['DependDomains',function(){return this.DependDomains=[DOM];}
+		]);
+		return LayerTree;
+	})()
+
+
+	//class debugprotocol.Log
+	var Log$1=(function(){
+		function Log(){}
+		__class(Log,'debugprotocol.Log',null,'Log$1');
+		Log.clear=function(paramO){
+			return ChromeMsg.callCmd("Log.clear",paramO);
+		}
+
+		Log.disable=function(paramO){
+			return ChromeMsg.callCmd("Log.disable",paramO);
+		}
+
+		Log.enable=function(paramO){
+			return ChromeMsg.callCmd("Log.enable",paramO);
+		}
+
+		Log.startViolationsReport=function(paramO){
+			return ChromeMsg.callCmd("Log.startViolationsReport",paramO);
+		}
+
+		Log.stopViolationsReport=function(paramO){
+			return ChromeMsg.callCmd("Log.stopViolationsReport",paramO);
+		}
+
+		Log.entryAdded="Log.entryAdded";
+		__static(Log,
+		['DependDomains',function(){return this.DependDomains=[Runtime,Network];}
+		]);
+		return Log;
+	})()
+
+
+	//class debugprotocol.Memory
+	var Memory=(function(){
+		function Memory(){}
+		__class(Memory,'debugprotocol.Memory');
+		Memory.getDOMCounters=function(paramO){
+			return ChromeMsg.callCmd("Memory.getDOMCounters",paramO);
+		}
+
+		Memory.prepareForLeakDetection=function(paramO){
+			return ChromeMsg.callCmd("Memory.prepareForLeakDetection",paramO);
+		}
+
+		Memory.setPressureNotificationsSuppressed=function(paramO){
+			return ChromeMsg.callCmd("Memory.setPressureNotificationsSuppressed",paramO);
+		}
+
+		Memory.simulatePressureNotification=function(paramO){
+			return ChromeMsg.callCmd("Memory.simulatePressureNotification",paramO);
+		}
+
+		Memory.startSampling=function(paramO){
+			return ChromeMsg.callCmd("Memory.startSampling",paramO);
+		}
+
+		Memory.stopSampling=function(paramO){
+			return ChromeMsg.callCmd("Memory.stopSampling",paramO);
+		}
+
+		Memory.getAllTimeSamplingProfile=function(paramO){
+			return ChromeMsg.callCmd("Memory.getAllTimeSamplingProfile",paramO);
+		}
+
+		Memory.getBrowserSamplingProfile=function(paramO){
+			return ChromeMsg.callCmd("Memory.getBrowserSamplingProfile",paramO);
+		}
+
+		Memory.getSamplingProfile=function(paramO){
+			return ChromeMsg.callCmd("Memory.getSamplingProfile",paramO);
+		}
+
+		Memory.DependDomains=[];
+		return Memory;
 	})()
 
 
@@ -16839,6 +17723,84 @@ var Laya=window.Laya=(function(window,document){
 		['DependDomains',function(){return this.DependDomains=[Debugger,Runtime,Security];}
 		]);
 		return Network;
+	})()
+
+
+	//class debugprotocol.Overlay
+	var Overlay=(function(){
+		function Overlay(){}
+		__class(Overlay,'debugprotocol.Overlay');
+		Overlay.disable=function(paramO){
+			return ChromeMsg.callCmd("Overlay.disable",paramO);
+		}
+
+		Overlay.enable=function(paramO){
+			return ChromeMsg.callCmd("Overlay.enable",paramO);
+		}
+
+		Overlay.getHighlightObjectForTest=function(paramO){
+			return ChromeMsg.callCmd("Overlay.getHighlightObjectForTest",paramO);
+		}
+
+		Overlay.hideHighlight=function(paramO){
+			return ChromeMsg.callCmd("Overlay.hideHighlight",paramO);
+		}
+
+		Overlay.highlightFrame=function(paramO){
+			return ChromeMsg.callCmd("Overlay.highlightFrame",paramO);
+		}
+
+		Overlay.highlightNode=function(paramO){
+			return ChromeMsg.callCmd("Overlay.highlightNode",paramO);
+		}
+
+		Overlay.highlightQuad=function(paramO){
+			return ChromeMsg.callCmd("Overlay.highlightQuad",paramO);
+		}
+
+		Overlay.highlightRect=function(paramO){
+			return ChromeMsg.callCmd("Overlay.highlightRect",paramO);
+		}
+
+		Overlay.setInspectMode=function(paramO){
+			return ChromeMsg.callCmd("Overlay.setInspectMode",paramO);
+		}
+
+		Overlay.setPausedInDebuggerMessage=function(paramO){
+			return ChromeMsg.callCmd("Overlay.setPausedInDebuggerMessage",paramO);
+		}
+
+		Overlay.setShowDebugBorders=function(paramO){
+			return ChromeMsg.callCmd("Overlay.setShowDebugBorders",paramO);
+		}
+
+		Overlay.setShowFPSCounter=function(paramO){
+			return ChromeMsg.callCmd("Overlay.setShowFPSCounter",paramO);
+		}
+
+		Overlay.setShowPaintRects=function(paramO){
+			return ChromeMsg.callCmd("Overlay.setShowPaintRects",paramO);
+		}
+
+		Overlay.setShowScrollBottleneckRects=function(paramO){
+			return ChromeMsg.callCmd("Overlay.setShowScrollBottleneckRects",paramO);
+		}
+
+		Overlay.setShowViewportSizeOnResize=function(paramO){
+			return ChromeMsg.callCmd("Overlay.setShowViewportSizeOnResize",paramO);
+		}
+
+		Overlay.setSuspended=function(paramO){
+			return ChromeMsg.callCmd("Overlay.setSuspended",paramO);
+		}
+
+		Overlay.inspectNodeRequested="Overlay.inspectNodeRequested";
+		Overlay.nodeHighlightRequested="Overlay.nodeHighlightRequested";
+		Overlay.screenshotRequested="Overlay.screenshotRequested";
+		__static(Overlay,
+		['DependDomains',function(){return this.DependDomains=[DOM,Page,Runtime];}
+		]);
+		return Overlay;
 	})()
 
 
@@ -17069,6 +18031,89 @@ var Laya=window.Laya=(function(window,document){
 	})()
 
 
+	//class debugprotocol.Performance
+	var Performance=(function(){
+		function Performance(){}
+		__class(Performance,'debugprotocol.Performance');
+		Performance.disable=function(paramO){
+			return ChromeMsg.callCmd("Performance.disable",paramO);
+		}
+
+		Performance.enable=function(paramO){
+			return ChromeMsg.callCmd("Performance.enable",paramO);
+		}
+
+		Performance.getMetrics=function(paramO){
+			return ChromeMsg.callCmd("Performance.getMetrics",paramO);
+		}
+
+		Performance.DependDomains=[];
+		Performance.metrics="Performance.metrics";
+		return Performance;
+	})()
+
+
+	//class debugprotocol.Profiler
+	var Profiler=(function(){
+		function Profiler(){}
+		__class(Profiler,'debugprotocol.Profiler');
+		Profiler.disable=function(paramO){
+			return ChromeMsg.callCmd("Profiler.disable",paramO);
+		}
+
+		Profiler.enable=function(paramO){
+			return ChromeMsg.callCmd("Profiler.enable",paramO);
+		}
+
+		Profiler.getBestEffortCoverage=function(paramO){
+			return ChromeMsg.callCmd("Profiler.getBestEffortCoverage",paramO);
+		}
+
+		Profiler.setSamplingInterval=function(paramO){
+			return ChromeMsg.callCmd("Profiler.setSamplingInterval",paramO);
+		}
+
+		Profiler.start=function(paramO){
+			return ChromeMsg.callCmd("Profiler.start",paramO);
+		}
+
+		Profiler.startPreciseCoverage=function(paramO){
+			return ChromeMsg.callCmd("Profiler.startPreciseCoverage",paramO);
+		}
+
+		Profiler.startTypeProfile=function(paramO){
+			return ChromeMsg.callCmd("Profiler.startTypeProfile",paramO);
+		}
+
+		Profiler.stop=function(paramO){
+			return ChromeMsg.callCmd("Profiler.stop",paramO);
+		}
+
+		Profiler.stopPreciseCoverage=function(paramO){
+			return ChromeMsg.callCmd("Profiler.stopPreciseCoverage",paramO);
+		}
+
+		Profiler.stopTypeProfile=function(paramO){
+			return ChromeMsg.callCmd("Profiler.stopTypeProfile",paramO);
+		}
+
+		Profiler.takePreciseCoverage=function(paramO){
+			return ChromeMsg.callCmd("Profiler.takePreciseCoverage",paramO);
+		}
+
+		Profiler.takeTypeProfile=function(paramO){
+			return ChromeMsg.callCmd("Profiler.takeTypeProfile",paramO);
+		}
+
+		Profiler.consoleProfileFinished="Profiler.consoleProfileFinished";
+		Profiler.consoleProfileStarted="Profiler.consoleProfileStarted";
+		__static(Profiler,
+		['DependDomains',function(){return this.DependDomains=[Runtime,Debugger];}
+		]);
+		return Profiler;
+	})()
+
+
 	//class debugprotocol.Runtime
 	var Runtime=(function(){
 		function Runtime(){}
@@ -17174,6 +18219,19 @@ var Laya=window.Laya=(function(window,document){
 	})()
 
 
+	//class debugprotocol.Schema
+	var Schema=(function(){
+		function Schema(){}
+		__class(Schema,'debugprotocol.Schema');
+		Schema.getDomains=function(paramO){
+			return ChromeMsg.callCmd("Schema.getDomains",paramO);
+		}
+
+		Schema.DependDomains=[];
+		return Schema;
+	})()
+
+
 	//class debugprotocol.Security
 	var Security=(function(){
 		function Security(){}
@@ -17202,6 +18260,263 @@ var Laya=window.Laya=(function(window,document){
 		Security.certificateError="Security.certificateError";
 		Security.securityStateChanged="Security.securityStateChanged";
 		return Security;
+	})()
+
+
+	//class debugprotocol.ServiceWorker
+	var ServiceWorker=(function(){
+		function ServiceWorker(){}
+		__class(ServiceWorker,'debugprotocol.ServiceWorker');
+		ServiceWorker.deliverPushMessage=function(paramO){
+			return ChromeMsg.callCmd("ServiceWorker.deliverPushMessage",paramO);
+		}
+
+		ServiceWorker.disable=function(paramO){
+			return ChromeMsg.callCmd("ServiceWorker.disable",paramO);
+		}
+
+		ServiceWorker.dispatchSyncEvent=function(paramO){
+			return ChromeMsg.callCmd("ServiceWorker.dispatchSyncEvent",paramO);
+		}
+
+		ServiceWorker.enable=function(paramO){
+			return ChromeMsg.callCmd("ServiceWorker.enable",paramO);
+		}
+
+		ServiceWorker.inspectWorker=function(paramO){
+			return ChromeMsg.callCmd("ServiceWorker.inspectWorker",paramO);
+		}
+
+		ServiceWorker.setForceUpdateOnPageLoad=function(paramO){
+			return ChromeMsg.callCmd("ServiceWorker.setForceUpdateOnPageLoad",paramO);
+		}
+
+		ServiceWorker.skipWaiting=function(paramO){
+			return ChromeMsg.callCmd("ServiceWorker.skipWaiting",paramO);
+		}
+
+		ServiceWorker.startWorker=function(paramO){
+			return ChromeMsg.callCmd("ServiceWorker.startWorker",paramO);
+		}
+
+		ServiceWorker.stopAllWorkers=function(paramO){
+			return ChromeMsg.callCmd("ServiceWorker.stopAllWorkers",paramO);
+		}
+
+		ServiceWorker.stopWorker=function(paramO){
+			return ChromeMsg.callCmd("ServiceWorker.stopWorker",paramO);
+		}
+
+		ServiceWorker.unregister=function(paramO){
+			return ChromeMsg.callCmd("ServiceWorker.unregister",paramO);
+		}
+
+		ServiceWorker.updateRegistration=function(paramO){
+			return ChromeMsg.callCmd("ServiceWorker.updateRegistration",paramO);
+		}
+
+		ServiceWorker.DependDomains=[];
+		ServiceWorker.workerErrorReported="ServiceWorker.workerErrorReported";
+		ServiceWorker.workerRegistrationUpdated="ServiceWorker.workerRegistrationUpdated";
+		ServiceWorker.workerVersionUpdated="ServiceWorker.workerVersionUpdated";
+		return ServiceWorker;
+	})()
+
+
+	//class debugprotocol.Storage
+	var Storage=(function(){
+		function Storage(){}
+		__class(Storage,'debugprotocol.Storage');
+		Storage.clearDataForOrigin=function(paramO){
+			return ChromeMsg.callCmd("Storage.clearDataForOrigin",paramO);
+		}
+
+		Storage.getUsageAndQuota=function(paramO){
+			return ChromeMsg.callCmd("Storage.getUsageAndQuota",paramO);
+		}
+
+		Storage.trackCacheStorageForOrigin=function(paramO){
+			return ChromeMsg.callCmd("Storage.trackCacheStorageForOrigin",paramO);
+		}
+
+		Storage.trackIndexedDBForOrigin=function(paramO){
+			return ChromeMsg.callCmd("Storage.trackIndexedDBForOrigin",paramO);
+		}
+
+		Storage.untrackCacheStorageForOrigin=function(paramO){
+			return ChromeMsg.callCmd("Storage.untrackCacheStorageForOrigin",paramO);
+		}
+
+		Storage.untrackIndexedDBForOrigin=function(paramO){
+			return ChromeMsg.callCmd("Storage.untrackIndexedDBForOrigin",paramO);
+		}
+
+		Storage.DependDomains=[];
+		Storage.cacheStorageContentUpdated="Storage.cacheStorageContentUpdated";
+		Storage.cacheStorageListUpdated="Storage.cacheStorageListUpdated";
+		Storage.indexedDBContentUpdated="Storage.indexedDBContentUpdated";
+		Storage.indexedDBListUpdated="Storage.indexedDBListUpdated";
+		return Storage;
+	})()
+
+
+	//class debugprotocol.SystemInfo
+	var SystemInfo=(function(){
+		function SystemInfo(){}
+		__class(SystemInfo,'debugprotocol.SystemInfo');
+		SystemInfo.getInfo=function(paramO){
+			return ChromeMsg.callCmd("SystemInfo.getInfo",paramO);
+		}
+
+		SystemInfo.DependDomains=[];
+		return SystemInfo;
+	})()
+
+
+	//class debugprotocol.Target
+	var Target=(function(){
+		function Target(){}
+		__class(Target,'debugprotocol.Target');
+		Target.activateTarget=function(paramO){
+			return ChromeMsg.callCmd("Target.activateTarget",paramO);
+		}
+
+		Target.attachToTarget=function(paramO){
+			return ChromeMsg.callCmd("Target.attachToTarget",paramO);
+		}
+
+		Target.attachToBrowserTarget=function(paramO){
+			return ChromeMsg.callCmd("Target.attachToBrowserTarget",paramO);
+		}
+
+		Target.closeTarget=function(paramO){
+			return ChromeMsg.callCmd("Target.closeTarget",paramO);
+		}
+
+		Target.exposeDevToolsProtocol=function(paramO){
+			return ChromeMsg.callCmd("Target.exposeDevToolsProtocol",paramO);
+		}
+
+		Target.createBrowserContext=function(paramO){
+			return ChromeMsg.callCmd("Target.createBrowserContext",paramO);
+		}
+
+		Target.getBrowserContexts=function(paramO){
+			return ChromeMsg.callCmd("Target.getBrowserContexts",paramO);
+		}
+
+		Target.createTarget=function(paramO){
+			return ChromeMsg.callCmd("Target.createTarget",paramO);
+		}
+
+		Target.detachFromTarget=function(paramO){
+			return ChromeMsg.callCmd("Target.detachFromTarget",paramO);
+		}
+
+		Target.disposeBrowserContext=function(paramO){
+			return ChromeMsg.callCmd("Target.disposeBrowserContext",paramO);
+		}
+
+		Target.getTargetInfo=function(paramO){
+			return ChromeMsg.callCmd("Target.getTargetInfo",paramO);
+		}
+
+		Target.getTargets=function(paramO){
+			return ChromeMsg.callCmd("Target.getTargets",paramO);
+		}
+
+		Target.sendMessageToTarget=function(paramO){
+			return ChromeMsg.callCmd("Target.sendMessageToTarget",paramO);
+		}
+
+		Target.setAutoAttach=function(paramO){
+			return ChromeMsg.callCmd("Target.setAutoAttach",paramO);
+		}
+
+		Target.setDiscoverTargets=function(paramO){
+			return ChromeMsg.callCmd("Target.setDiscoverTargets",paramO);
+		}
+
+		Target.setRemoteLocations=function(paramO){
+			return ChromeMsg.callCmd("Target.setRemoteLocations",paramO);
+		}
+
+		Target.DependDomains=[];
+		Target.attachedToTarget="Target.attachedToTarget";
+		Target.detachedFromTarget="Target.detachedFromTarget";
+		Target.receivedMessageFromTarget="Target.receivedMessageFromTarget";
+		Target.targetCreated="Target.targetCreated";
+		Target.targetDestroyed="Target.targetDestroyed";
+		Target.targetCrashed="Target.targetCrashed";
+		Target.targetInfoChanged="Target.targetInfoChanged";
+		return Target;
+	})()
+
+
+	//class debugprotocol.Testing
+	var Testing=(function(){
+		function Testing(){}
+		__class(Testing,'debugprotocol.Testing');
+		Testing.generateTestReport=function(paramO){
+			return ChromeMsg.callCmd("Testing.generateTestReport",paramO);
+		}
+
+		__static(Testing,
+		['DependDomains',function(){return this.DependDomains=[Page];}
+		]);
+		return Testing;
+	})()
+
+
+	//class debugprotocol.Tethering
+	var Tethering=(function(){
+		function Tethering(){}
+		__class(Tethering,'debugprotocol.Tethering');
+		Tethering.bind=function(paramO){
+			return ChromeMsg.callCmd("Tethering.bind",paramO);
+		}
+
+		Tethering.unbind=function(paramO){
+			return ChromeMsg.callCmd("Tethering.unbind",paramO);
+		}
+
+		Tethering.DependDomains=[];
+		Tethering.accepted="Tethering.accepted";
+		return Tethering;
+	})()
+
+
+	//class debugprotocol.Tracing
+	var Tracing=(function(){
+		function Tracing(){}
+		__class(Tracing,'debugprotocol.Tracing');
+		Tracing.end=function(paramO){
+			return ChromeMsg.callCmd("Tracing.end",paramO);
+		}
+
+		Tracing.getCategories=function(paramO){
+			return ChromeMsg.callCmd("Tracing.getCategories",paramO);
+		}
+
+		Tracing.recordClockSyncMarker=function(paramO){
+			return ChromeMsg.callCmd("Tracing.recordClockSyncMarker",paramO);
+		}
+
+		Tracing.requestMemoryDump=function(paramO){
+			return ChromeMsg.callCmd("Tracing.requestMemoryDump",paramO);
+		}
+
+		Tracing.start=function(paramO){
+			return ChromeMsg.callCmd("Tracing.start",paramO);
+		}
+
+		Tracing.bufferUsage="Tracing.bufferUsage";
+		Tracing.dataCollected="Tracing.dataCollected";
+		Tracing.tracingComplete="Tracing.tracingComplete";
+		__static(Tracing,
+		['DependDomains',function(){return this.DependDomains=[IO];}
+		]);
+		return Tracing;
 	})()
 
 
@@ -20139,6 +21454,7 @@ var Laya=window.Laya=(function(window,document){
 			this.autoOpenUrl="http://baidu.com";
 			this._resolveDic={};
 			ChromeSocket.__super.call(this);
+			All;
 			this.socket=new Socket("127.0.0.1",0,Byte);
 			this.socket.disableInput=true;
 			this.socket.on("open",this,this.onConnect);
@@ -33398,122 +34714,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*<code>CheckBox</code> 组件显示一个小方框，该方框内可以有选中标记。
-	*<code>CheckBox</code> 组件还可以显示可选的文本标签，默认该标签位于 CheckBox 右侧。
-	*<p><code>CheckBox</code> 使用 <code>dataSource</code>赋值时的的默认属性是：<code>selected</code>。</p>
-	*
-	*@example <caption>以下示例代码，创建了一个 <code>CheckBox</code> 实例。</caption>
-	*package
-	*{
-		*import laya.ui.CheckBox;
-		*import laya.utils.Handler;
-		*public class CheckBox_Example
-		*{
-			*public function CheckBox_Example()
-			*{
-				*Laya.init(640,800);//设置游戏画布宽高。
-				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-				*Laya.loader.load("resource/ui/check.png",Handler.create(this,onLoadComplete));//加载资源。
-				*}
-			*private function onLoadComplete():void
-			*{
-				*trace("资源加载完成！");
-				*var checkBox:CheckBox=new CheckBox("resource/ui/check.png","这个是一个CheckBox组件。");//创建一个 CheckBox 类的实例对象 checkBox ,传入它的皮肤skin和标签label。
-				*checkBox.x=100;//设置 checkBox 对象的属性 x 的值，用于控制 checkBox 对象的显示位置。
-				*checkBox.y=100;//设置 checkBox 对象的属性 y 的值，用于控制 checkBox 对象的显示位置。
-				*checkBox.clickHandler=new Handler(this,onClick,[checkBox]);//设置 checkBox 的点击事件处理器。
-				*Laya.stage.addChild(checkBox);//将此 checkBox 对象添加到显示列表。
-				*}
-			*private function onClick(checkBox:CheckBox):void
-			*{
-				*trace("输出选中状态: checkBox.selected = "+checkBox.selected);
-				*}
-			*}
-		*}
-	*@example
-	*Laya.init(640,800);//设置游戏画布宽高
-	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
-	*Laya.loader.load("resource/ui/check.png",laya.utils.Handler.create(this,loadComplete));//加载资源
-	*function loadComplete()
-	*{
-		*console.log("资源加载完成！");
-		*var checkBox:laya.ui.CheckBox=new laya.ui.CheckBox("resource/ui/check.png","这个是一个CheckBox组件。");//创建一个 CheckBox 类的类的实例对象 checkBox ,传入它的皮肤skin和标签label。
-		*checkBox.x=100;//设置 checkBox 对象的属性 x 的值，用于控制 checkBox 对象的显示位置。
-		*checkBox.y=100;//设置 checkBox 对象的属性 y 的值，用于控制 checkBox 对象的显示位置。
-		*checkBox.clickHandler=new laya.utils.Handler(this,this.onClick,[checkBox],false);//设置 checkBox 的点击事件处理器。
-		*Laya.stage.addChild(checkBox);//将此 checkBox 对象添加到显示列表。
-		*}
-	*function onClick(checkBox)
-	*{
-		*console.log("checkBox.selected = ",checkBox.selected);
-		*}
-	*@example
-	*import CheckBox=laya.ui.CheckBox;
-	*import Handler=laya.utils.Handler;
-	*class CheckBox_Example{
-		*constructor()
-		*{
-			*Laya.init(640,800);
-			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-			*Laya.loader.load("resource/ui/check.png",Handler.create(this,this.onLoadComplete));//加载资源。
-			*}
-		*private onLoadComplete()
-		*{
-			*var checkBox:CheckBox=new CheckBox("resource/ui/check.png","这个是一个CheckBox组件。");//创建一个 CheckBox 类的实例对象 checkBox ,传入它的皮肤skin和标签label。
-			*checkBox.x=100;//设置 checkBox 对象的属性 x 的值，用于控制 checkBox 对象的显示位置。
-			*checkBox.y=100;//设置 checkBox 对象的属性 y 的值，用于控制 checkBox 对象的显示位置。
-			*checkBox.clickHandler=new Handler(this,this.onClick,[checkBox]);//设置 checkBox 的点击事件处理器。
-			*Laya.stage.addChild(checkBox);//将此 checkBox 对象添加到显示列表。
-			*}
-		*private onClick(checkBox:CheckBox):void
-		*{
-			*console.log("输出选中状态: checkBox.selected = "+checkBox.selected);
-			*}
-		*}
-	*/
-	//class laya.ui.CheckBox extends laya.ui.Button
-	var CheckBox=(function(_super){
-		/**
-		*创建一个新的 <code>CheckBox</code> 组件实例。
-		*@param skin 皮肤资源地址。
-		*@param label 文本标签的内容。
-		*/
-		function CheckBox(skin,label){
-			(label===void 0)&& (label="");
-			CheckBox.__super.call(this,skin,label);
-		}
-
-		__class(CheckBox,'laya.ui.CheckBox',_super);
-		var __proto=CheckBox.prototype;
-		/**@inheritDoc */
-		__proto.preinitialize=function(){
-			laya.ui.Component.prototype.preinitialize.call(this);
-			this.toggle=true;
-			this._autoSize=false;
-		}
-
-		/**@inheritDoc */
-		__proto.initialize=function(){
-			_super.prototype.initialize.call(this);
-			this.createText();
-			this._text.align="left";
-			this._text.valign="top";
-			this._text.width=0;
-		}
-
-		/**@inheritDoc */
-		__getset(0,__proto,'dataSource',_super.prototype._$get_dataSource,function(value){
-			this._dataSource=value;
-			if ((typeof value=='boolean'))this.selected=value;
-			else if ((typeof value=='string'))this.selected=value==="true";
-			else _super.prototype._$set_dataSource.call(this,value);
-		});
-
-		return CheckBox;
-	})(Button)
-
-
-	/**
 	*<code>Group</code> 是一个可以自动布局的项集合控件。
 	*<p> <code>Group</code> 的默认项对象为 <code>Button</code> 类实例。
 	*<code>Group</code> 是 <code>Tab</code> 和 <code>RadioGroup</code> 的基类。</p>
@@ -33931,6 +35131,122 @@ var Laya=window.Laya=(function(window,document){
 
 		return UIGroup;
 	})(Box)
+
+
+	/**
+	*<code>CheckBox</code> 组件显示一个小方框，该方框内可以有选中标记。
+	*<code>CheckBox</code> 组件还可以显示可选的文本标签，默认该标签位于 CheckBox 右侧。
+	*<p><code>CheckBox</code> 使用 <code>dataSource</code>赋值时的的默认属性是：<code>selected</code>。</p>
+	*
+	*@example <caption>以下示例代码，创建了一个 <code>CheckBox</code> 实例。</caption>
+	*package
+	*{
+		*import laya.ui.CheckBox;
+		*import laya.utils.Handler;
+		*public class CheckBox_Example
+		*{
+			*public function CheckBox_Example()
+			*{
+				*Laya.init(640,800);//设置游戏画布宽高。
+				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+				*Laya.loader.load("resource/ui/check.png",Handler.create(this,onLoadComplete));//加载资源。
+				*}
+			*private function onLoadComplete():void
+			*{
+				*trace("资源加载完成！");
+				*var checkBox:CheckBox=new CheckBox("resource/ui/check.png","这个是一个CheckBox组件。");//创建一个 CheckBox 类的实例对象 checkBox ,传入它的皮肤skin和标签label。
+				*checkBox.x=100;//设置 checkBox 对象的属性 x 的值，用于控制 checkBox 对象的显示位置。
+				*checkBox.y=100;//设置 checkBox 对象的属性 y 的值，用于控制 checkBox 对象的显示位置。
+				*checkBox.clickHandler=new Handler(this,onClick,[checkBox]);//设置 checkBox 的点击事件处理器。
+				*Laya.stage.addChild(checkBox);//将此 checkBox 对象添加到显示列表。
+				*}
+			*private function onClick(checkBox:CheckBox):void
+			*{
+				*trace("输出选中状态: checkBox.selected = "+checkBox.selected);
+				*}
+			*}
+		*}
+	*@example
+	*Laya.init(640,800);//设置游戏画布宽高
+	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
+	*Laya.loader.load("resource/ui/check.png",laya.utils.Handler.create(this,loadComplete));//加载资源
+	*function loadComplete()
+	*{
+		*console.log("资源加载完成！");
+		*var checkBox:laya.ui.CheckBox=new laya.ui.CheckBox("resource/ui/check.png","这个是一个CheckBox组件。");//创建一个 CheckBox 类的类的实例对象 checkBox ,传入它的皮肤skin和标签label。
+		*checkBox.x=100;//设置 checkBox 对象的属性 x 的值，用于控制 checkBox 对象的显示位置。
+		*checkBox.y=100;//设置 checkBox 对象的属性 y 的值，用于控制 checkBox 对象的显示位置。
+		*checkBox.clickHandler=new laya.utils.Handler(this,this.onClick,[checkBox],false);//设置 checkBox 的点击事件处理器。
+		*Laya.stage.addChild(checkBox);//将此 checkBox 对象添加到显示列表。
+		*}
+	*function onClick(checkBox)
+	*{
+		*console.log("checkBox.selected = ",checkBox.selected);
+		*}
+	*@example
+	*import CheckBox=laya.ui.CheckBox;
+	*import Handler=laya.utils.Handler;
+	*class CheckBox_Example{
+		*constructor()
+		*{
+			*Laya.init(640,800);
+			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+			*Laya.loader.load("resource/ui/check.png",Handler.create(this,this.onLoadComplete));//加载资源。
+			*}
+		*private onLoadComplete()
+		*{
+			*var checkBox:CheckBox=new CheckBox("resource/ui/check.png","这个是一个CheckBox组件。");//创建一个 CheckBox 类的实例对象 checkBox ,传入它的皮肤skin和标签label。
+			*checkBox.x=100;//设置 checkBox 对象的属性 x 的值，用于控制 checkBox 对象的显示位置。
+			*checkBox.y=100;//设置 checkBox 对象的属性 y 的值，用于控制 checkBox 对象的显示位置。
+			*checkBox.clickHandler=new Handler(this,this.onClick,[checkBox]);//设置 checkBox 的点击事件处理器。
+			*Laya.stage.addChild(checkBox);//将此 checkBox 对象添加到显示列表。
+			*}
+		*private onClick(checkBox:CheckBox):void
+		*{
+			*console.log("输出选中状态: checkBox.selected = "+checkBox.selected);
+			*}
+		*}
+	*/
+	//class laya.ui.CheckBox extends laya.ui.Button
+	var CheckBox=(function(_super){
+		/**
+		*创建一个新的 <code>CheckBox</code> 组件实例。
+		*@param skin 皮肤资源地址。
+		*@param label 文本标签的内容。
+		*/
+		function CheckBox(skin,label){
+			(label===void 0)&& (label="");
+			CheckBox.__super.call(this,skin,label);
+		}
+
+		__class(CheckBox,'laya.ui.CheckBox',_super);
+		var __proto=CheckBox.prototype;
+		/**@inheritDoc */
+		__proto.preinitialize=function(){
+			laya.ui.Component.prototype.preinitialize.call(this);
+			this.toggle=true;
+			this._autoSize=false;
+		}
+
+		/**@inheritDoc */
+		__proto.initialize=function(){
+			_super.prototype.initialize.call(this);
+			this.createText();
+			this._text.align="left";
+			this._text.valign="top";
+			this._text.width=0;
+		}
+
+		/**@inheritDoc */
+		__getset(0,__proto,'dataSource',_super.prototype._$get_dataSource,function(value){
+			this._dataSource=value;
+			if ((typeof value=='boolean'))this.selected=value;
+			else if ((typeof value=='string'))this.selected=value==="true";
+			else _super.prototype._$set_dataSource.call(this,value);
+		});
+
+		return CheckBox;
+	})(Button)
 
 
 	/**
@@ -36086,103 +37402,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
-	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
-	*
-	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
-	*package
-	*{
-		*import laya.ui.HSlider;
-		*import laya.ui.VSlider;
-		*import laya.utils.Handler;
-		*public class VSlider_Example
-		*{
-			*private var vSlider:VSlider;
-			*public function VSlider_Example()
-			*{
-				*Laya.init(640,800);//设置游戏画布宽高。
-				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
-				*}
-			*private function onLoadComplete():void
-			*{
-				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-				*vSlider.min=0;//设置 vSlider 最低位置值。
-				*vSlider.max=10;//设置 vSlider 最高位置值。
-				*vSlider.value=2;//设置 vSlider 当前位置值。
-				*vSlider.tick=1;//设置 vSlider 刻度值。
-				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
-				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-				*}
-			*private function onChange(value:Number):void
-			*{
-				*trace("滑块的位置： value="+value);
-				*}
-			*}
-		*}
-	*@example
-	*Laya.init(640,800);//设置游戏画布宽高
-	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
-	*var vSlider;
-	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
-	*function onLoadComplete(){
-		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-		*vSlider.min=0;//设置 vSlider 最低位置值。
-		*vSlider.max=10;//设置 vSlider 最高位置值。
-		*vSlider.value=2;//设置 vSlider 当前位置值。
-		*vSlider.tick=1;//设置 vSlider 刻度值。
-		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
-		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-		*}
-	*function onChange(value){
-		*console.log("滑块的位置： value="+value);
-		*}
-	*@example
-	*import HSlider=laya.ui.HSlider;
-	*import VSlider=laya.ui.VSlider;
-	*import Handler=laya.utils.Handler;
-	*class VSlider_Example {
-		*private vSlider:VSlider;
-		*constructor(){
-			*Laya.init(640,800);//设置游戏画布宽高。
-			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
-			*}
-		*private onLoadComplete():void {
-			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-			*this.vSlider.min=0;//设置 vSlider 最低位置值。
-			*this.vSlider.max=10;//设置 vSlider 最高位置值。
-			*this.vSlider.value=2;//设置 vSlider 当前位置值。
-			*this.vSlider.tick=1;//设置 vSlider 刻度值。
-			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
-			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
-			*}
-		*private onChange(value:number):void {
-			*console.log("滑块的位置： value="+value);
-			*}
-		*}
-	*@see laya.ui.Slider
-	*/
-	//class laya.ui.VSlider extends laya.ui.Slider
-	var VSlider=(function(_super){
-		function VSlider(){VSlider.__super.call(this);;
-		};
-
-		__class(VSlider,'laya.ui.VSlider',_super);
-		return VSlider;
-	})(Slider)
-
-
-	/**
 	*<code>TextInput</code> 类用于创建显示对象以显示和输入文本。
 	*
 	*@example <caption>以下示例代码，创建了一个 <code>TextInput</code> 实例。</caption>
@@ -36503,6 +37722,103 @@ var Laya=window.Laya=(function(window,document){
 
 		return TextInput;
 	})(Label)
+
+
+	/**
+	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
+	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
+	*
+	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
+	*package
+	*{
+		*import laya.ui.HSlider;
+		*import laya.ui.VSlider;
+		*import laya.utils.Handler;
+		*public class VSlider_Example
+		*{
+			*private var vSlider:VSlider;
+			*public function VSlider_Example()
+			*{
+				*Laya.init(640,800);//设置游戏画布宽高。
+				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
+				*}
+			*private function onLoadComplete():void
+			*{
+				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+				*vSlider.min=0;//设置 vSlider 最低位置值。
+				*vSlider.max=10;//设置 vSlider 最高位置值。
+				*vSlider.value=2;//设置 vSlider 当前位置值。
+				*vSlider.tick=1;//设置 vSlider 刻度值。
+				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
+				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+				*}
+			*private function onChange(value:Number):void
+			*{
+				*trace("滑块的位置： value="+value);
+				*}
+			*}
+		*}
+	*@example
+	*Laya.init(640,800);//设置游戏画布宽高
+	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
+	*var vSlider;
+	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
+	*function onLoadComplete(){
+		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+		*vSlider.min=0;//设置 vSlider 最低位置值。
+		*vSlider.max=10;//设置 vSlider 最高位置值。
+		*vSlider.value=2;//设置 vSlider 当前位置值。
+		*vSlider.tick=1;//设置 vSlider 刻度值。
+		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
+		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+		*}
+	*function onChange(value){
+		*console.log("滑块的位置： value="+value);
+		*}
+	*@example
+	*import HSlider=laya.ui.HSlider;
+	*import VSlider=laya.ui.VSlider;
+	*import Handler=laya.utils.Handler;
+	*class VSlider_Example {
+		*private vSlider:VSlider;
+		*constructor(){
+			*Laya.init(640,800);//设置游戏画布宽高。
+			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
+			*}
+		*private onLoadComplete():void {
+			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+			*this.vSlider.min=0;//设置 vSlider 最低位置值。
+			*this.vSlider.max=10;//设置 vSlider 最高位置值。
+			*this.vSlider.value=2;//设置 vSlider 当前位置值。
+			*this.vSlider.tick=1;//设置 vSlider 刻度值。
+			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
+			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
+			*}
+		*private onChange(value:number):void {
+			*console.log("滑块的位置： value="+value);
+			*}
+		*}
+	*@see laya.ui.Slider
+	*/
+	//class laya.ui.VSlider extends laya.ui.Slider
+	var VSlider=(function(_super){
+		function VSlider(){VSlider.__super.call(this);;
+		};
+
+		__class(VSlider,'laya.ui.VSlider',_super);
+		return VSlider;
+	})(Slider)
 
 
 	/**
@@ -38685,25 +40001,6 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
-	var FindNodeSmall=(function(_super){
-		function FindNodeSmall(){
-			FindNodeSmall.__super.call(this);
-			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
-			this.createView(FindNodeSmallUI.uiView);
-		}
-
-		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
-		var __proto=FindNodeSmall.prototype;
-		__proto.createChildren=function(){}
-		return FindNodeSmall;
-	})(FindNodeSmallUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
 	//class laya.debug.view.nodeInfo.nodetree.FindNode extends laya.debug.ui.debugui.FindNodeUI
 	var FindNode=(function(_super){
 		function FindNode(){
@@ -38720,6 +40017,25 @@ var Laya=window.Laya=(function(window,document){
 
 		return FindNode;
 	})(FindNodeUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
+	var FindNodeSmall=(function(_super){
+		function FindNodeSmall(){
+			FindNodeSmall.__super.call(this);
+			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
+			this.createView(FindNodeSmallUI.uiView);
+		}
+
+		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
+		var __proto=FindNodeSmall.prototype;
+		__proto.createChildren=function(){}
+		return FindNodeSmall;
+	})(FindNodeSmallUI)
 
 
 	/**
@@ -39254,9 +40570,6 @@ var Laya=window.Laya=(function(window,document){
 2 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
 3 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 4 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
-5 file:///D:/codes/playground.git/trunk/chromedebugprotocal/Libs/debugprotocol/src/chromedebug/ChromeProtocolUtils.as (24):warning:key This variable is not defined.
-6 file:///D:/codes/playground.git/trunk/chromedebugprotocal/Libs/debugprotocol/src/chromedebug/ChromeProtocolUtils.as (26):warning:key This variable is not defined.
-7 file:///D:/codes/playground.git/trunk/chromedebugprotocal/Libs/debugprotocol/src/chromedebug/ChromeProtocolUtils.as (30):warning:key This variable is not defined.
-8 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/menus/ContextMenu.as (85):warning:Sys.lang This variable is not defined.
-9 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/menus/ContextMenu.as (149):warning:SystemSetting.isCMDVer This variable is not defined.
+5 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/menus/ContextMenu.as (85):warning:Sys.lang This variable is not defined.
+6 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/menus/ContextMenu.as (149):warning:SystemSetting.isCMDVer This variable is not defined.
 */
