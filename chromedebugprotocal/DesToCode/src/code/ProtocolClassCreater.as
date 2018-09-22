@@ -10,6 +10,7 @@ package code
 	{
 		private static var clzTpl:String;
 		private static var methodTpl:String;
+		private static var eventTpl:String;
 		public static var exportPath:String;
 		public function ProtocolClassCreater() 
 		{
@@ -19,6 +20,7 @@ package code
 		{
 			clzTpl = FileManager.readTxtFile(NodeJSTools.getPathByRelatviePath("data/protocoltpl/domain.tpl"));
 			methodTpl = FileManager.readTxtFile(NodeJSTools.getPathByRelatviePath("data/protocoltpl/method.tpl"));
+			eventTpl = FileManager.readTxtFile(NodeJSTools.getPathByRelatviePath("data/protocoltpl/event.tpl"));
 			exportPath = NodeJSTools.getPathByRelatviePath("out/debugprotocol");
 		}
 		public static var domainName:String;
@@ -39,8 +41,8 @@ package code
 			domainO.doc = "";
 			domainO["extends"] = "";
 			domainO["package"] = "debugprotocol";
-			domainO["methods"] = CodeCreateTool.addPreToStr(createMethods(cmds), "  	");
-			domainO["events"] = CodeCreateTool.addPreToStr(createMethods(events), "  	");
+			domainO["methods"] = CodeCreateTool.addPreToStr(createMethods(cmds,methodTpl), "  	");
+			domainO["events"] = CodeCreateTool.addPreToStr(createMethods(events,eventTpl), "  	");
 			domainO["dependencies"] = "";
 			if (dataO.dependencies)
 			{
@@ -55,7 +57,7 @@ package code
 			FileManager.createTxtFile(codePath, codeStr);
 		}
 		
-		private static function createMethods(cmds:Array):String
+		private static function createMethods(cmds:Array,tpl:String):String
 		{
 			var cmdStrs:Array;
 			cmdStrs = [];
@@ -63,13 +65,13 @@ package code
 			len = cmds.length;
 			for (i = 0; i < len; i++)
 			{
-				cmdStrs.push(createMethodCode(cmds[i]));
+				cmdStrs.push(createMethodCode(cmds[i],tpl));
 			}
 			return cmdStrs.join("\n");
 		}
 		
 		public static var ParamTpl:String = "{#@name#}:{#@type#} optional:{#@optional#} {#@description#}";
-		private static function createMethodCode(dataO:Object):String
+		private static function createMethodCode(dataO:Object,tpl:String):String
 		{
 			var methodO:Object;
 			methodO = { };
@@ -88,7 +90,7 @@ package code
 			}
 			methodO.doc = CodeCreateTool.createDocStr(docO, ParamTpl);
 			
-			return CodeCreateTool.createExportCode(methodTpl, methodO);
+			return CodeCreateTool.createExportCode(tpl, methodO);
 			
 		}
 	}

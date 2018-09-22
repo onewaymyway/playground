@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -45,51 +46,69 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const domStorageItemsCleared:String = "DOMStorage.domStorageItemsCleared";
-  	
   		/**
   		 * clear
   		 * @param storageId:{#@type#} optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const clear:String = "DOMStorage.clear";
-  	
+  		 */	
+  		public static function clear(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOMStorage.clear", paramO);
+  		}
+  		
   		/**
   		 * disable
   		 * Disables storage tracking, prevents storage events from being sent to the client.
   		 * @return 
-  		 */
-  		public static const disable:String = "DOMStorage.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOMStorage.disable", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * Enables storage tracking, storage events will now be delivered to the client.
   		 * @return 
-  		 */
-  		public static const enable:String = "DOMStorage.enable";
-  	
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOMStorage.enable", paramO);
+  		}
+  		
   		/**
   		 * getDOMStorageItems
   		 * @param storageId:{#@type#} optional:{#@optional#} {#@description#}
   		 * @return entries:array optional:{#@optional#} {#@description#}
-  		 */
-  		public static const getDOMStorageItems:String = "DOMStorage.getDOMStorageItems";
-  	
+  		 */	
+  		public static function getDOMStorageItems(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOMStorage.getDOMStorageItems", paramO);
+  		}
+  		
   		/**
   		 * removeDOMStorageItem
   		 * @param storageId:{#@type#} optional:{#@optional#} {#@description#}
   		 * @param key:string optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const removeDOMStorageItem:String = "DOMStorage.removeDOMStorageItem";
-  	
+  		 */	
+  		public static function removeDOMStorageItem(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOMStorage.removeDOMStorageItem", paramO);
+  		}
+  		
   		/**
   		 * setDOMStorageItem
   		 * @param storageId:{#@type#} optional:{#@optional#} {#@description#}
   		 * @param key:string optional:{#@optional#} {#@description#}
   		 * @param value:string optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const setDOMStorageItem:String = "DOMStorage.setDOMStorageItem";
+  		 */	
+  		public static function setDOMStorageItem(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOMStorage.setDOMStorageItem", paramO);
+  		}
+  		
 	}
 
 }

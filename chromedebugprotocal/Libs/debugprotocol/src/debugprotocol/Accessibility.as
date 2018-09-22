@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -12,7 +13,6 @@ package debugprotocol
 		}
 		public static const DependDomains:Array=[DOM];
   	
-  	
   		/**
   		 * getPartialAXTree
   		 * Fetches the accessibility node and partial accessibility tree for this DOM node, if it exists.
@@ -22,15 +22,22 @@ package debugprotocol
   		 * @param fetchRelatives:boolean optional:true Whether to fetch this nodes ancestors, siblings and children. Defaults to true.
   		 * @return nodes:array optional:{#@optional#} The `Accessibility.AXNode` for this DOM node, if it exists, plus its ancestors, siblings and
   	children, if requested.
-  		 */
-  		public static const getPartialAXTree:String = "Accessibility.getPartialAXTree";
-  	
+  		 */	
+  		public static function getPartialAXTree(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Accessibility.getPartialAXTree", paramO);
+  		}
+  		
   		/**
   		 * getFullAXTree
   		 * Fetches the entire accessibility tree
   		 * @return nodes:array optional:{#@optional#} {#@description#}
-  		 */
-  		public static const getFullAXTree:String = "Accessibility.getFullAXTree";
+  		 */	
+  		public static function getFullAXTree(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Accessibility.getFullAXTree", paramO);
+  		}
+  		
 	}
 
 }

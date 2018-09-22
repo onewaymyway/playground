@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -19,28 +20,37 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const messageAdded:String = "Console.messageAdded";
-  	
   		/**
   		 * clearMessages
   		 * Does nothing.
   		 * @return 
-  		 */
-  		public static const clearMessages:String = "Console.clearMessages";
-  	
+  		 */	
+  		public static function clearMessages(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Console.clearMessages", paramO);
+  		}
+  		
   		/**
   		 * disable
   		 * Disables console domain, prevents further console messages from being reported to the client.
   		 * @return 
-  		 */
-  		public static const disable:String = "Console.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Console.disable", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * Enables console domain, sends the messages collected so far to the client by means of the
   	`messageAdded` notification.
   		 * @return 
-  		 */
-  		public static const enable:String = "Console.enable";
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Console.enable", paramO);
+  		}
+  		
 	}
 
 }

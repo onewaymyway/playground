@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -54,90 +55,126 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const resetProfiles:String = "HeapProfiler.resetProfiles";
-  	
   		/**
   		 * addInspectedHeapObject
   		 * Enables console to refer to the node with given id via $x (see Command Line API for more details
   	$x functions).
   		 * @param heapObjectId:{#@type#} optional:{#@optional#} Heap snapshot object id to be accessible by means of $x command line API.
   		 * @return 
-  		 */
-  		public static const addInspectedHeapObject:String = "HeapProfiler.addInspectedHeapObject";
-  	
+  		 */	
+  		public static function addInspectedHeapObject(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeapProfiler.addInspectedHeapObject", paramO);
+  		}
+  		
   		/**
   		 * collectGarbage
   		 * @return 
-  		 */
-  		public static const collectGarbage:String = "HeapProfiler.collectGarbage";
-  	
+  		 */	
+  		public static function collectGarbage(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeapProfiler.collectGarbage", paramO);
+  		}
+  		
   		/**
   		 * disable
   		 * @return 
-  		 */
-  		public static const disable:String = "HeapProfiler.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeapProfiler.disable", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * @return 
-  		 */
-  		public static const enable:String = "HeapProfiler.enable";
-  	
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeapProfiler.enable", paramO);
+  		}
+  		
   		/**
   		 * getHeapObjectId
   		 * @param objectId:{#@type#} optional:{#@optional#} Identifier of the object to get heap object id for.
   		 * @return heapSnapshotObjectId:{#@type#} optional:{#@optional#} Id of the heap snapshot object corresponding to the passed remote object id.
-  		 */
-  		public static const getHeapObjectId:String = "HeapProfiler.getHeapObjectId";
-  	
+  		 */	
+  		public static function getHeapObjectId(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeapProfiler.getHeapObjectId", paramO);
+  		}
+  		
   		/**
   		 * getObjectByHeapObjectId
   		 * @param objectId:{#@type#} optional:{#@optional#} {#@description#}
   		 * @param objectGroup:string optional:true Symbolic group name that can be used to release multiple objects.
   		 * @return result:{#@type#} optional:{#@optional#} Evaluation result.
-  		 */
-  		public static const getObjectByHeapObjectId:String = "HeapProfiler.getObjectByHeapObjectId";
-  	
+  		 */	
+  		public static function getObjectByHeapObjectId(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeapProfiler.getObjectByHeapObjectId", paramO);
+  		}
+  		
   		/**
   		 * getSamplingProfile
   		 * @return profile:{#@type#} optional:{#@optional#} Return the sampling profile being collected.
-  		 */
-  		public static const getSamplingProfile:String = "HeapProfiler.getSamplingProfile";
-  	
+  		 */	
+  		public static function getSamplingProfile(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeapProfiler.getSamplingProfile", paramO);
+  		}
+  		
   		/**
   		 * startSampling
   		 * @param samplingInterval:number optional:true Average sample interval in bytes. Poisson distribution is used for the intervals. The
   	default value is 32768 bytes.
   		 * @return 
-  		 */
-  		public static const startSampling:String = "HeapProfiler.startSampling";
-  	
+  		 */	
+  		public static function startSampling(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeapProfiler.startSampling", paramO);
+  		}
+  		
   		/**
   		 * startTrackingHeapObjects
   		 * @param trackAllocations:boolean optional:true {#@description#}
   		 * @return 
-  		 */
-  		public static const startTrackingHeapObjects:String = "HeapProfiler.startTrackingHeapObjects";
-  	
+  		 */	
+  		public static function startTrackingHeapObjects(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeapProfiler.startTrackingHeapObjects", paramO);
+  		}
+  		
   		/**
   		 * stopSampling
   		 * @return profile:{#@type#} optional:{#@optional#} Recorded sampling heap profile.
-  		 */
-  		public static const stopSampling:String = "HeapProfiler.stopSampling";
-  	
+  		 */	
+  		public static function stopSampling(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeapProfiler.stopSampling", paramO);
+  		}
+  		
   		/**
   		 * stopTrackingHeapObjects
   		 * @param reportProgress:boolean optional:true If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken
   	when the tracking is stopped.
   		 * @return 
-  		 */
-  		public static const stopTrackingHeapObjects:String = "HeapProfiler.stopTrackingHeapObjects";
-  	
+  		 */	
+  		public static function stopTrackingHeapObjects(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeapProfiler.stopTrackingHeapObjects", paramO);
+  		}
+  		
   		/**
   		 * takeHeapSnapshot
   		 * @param reportProgress:boolean optional:true If true 'reportHeapSnapshotProgress' events will be generated while snapshot is being taken.
   		 * @return 
-  		 */
-  		public static const takeHeapSnapshot:String = "HeapProfiler.takeHeapSnapshot";
+  		 */	
+  		public static function takeHeapSnapshot(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeapProfiler.takeHeapSnapshot", paramO);
+  		}
+  		
 	}
 
 }

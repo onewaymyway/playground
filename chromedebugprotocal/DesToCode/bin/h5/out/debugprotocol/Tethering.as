@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -20,22 +21,28 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const accepted:String = "Tethering.accepted";
-  	
   		/**
   		 * bind
   		 * Request browser port binding.
   		 * @param port:integer optional:{#@optional#} Port number to bind.
   		 * @return 
-  		 */
-  		public static const bind:String = "Tethering.bind";
-  	
+  		 */	
+  		public static function bind(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Tethering.bind", paramO);
+  		}
+  		
   		/**
   		 * unbind
   		 * Request browser port unbinding.
   		 * @param port:integer optional:{#@optional#} Port number to unbind.
   		 * @return 
-  		 */
-  		public static const unbind:String = "Tethering.unbind";
+  		 */	
+  		public static function unbind(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Tethering.unbind", paramO);
+  		}
+  		
 	}
 
 }

@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -19,7 +20,6 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const needsBeginFramesChanged:String = "HeadlessExperimental.needsBeginFramesChanged";
-  	
   		/**
   		 * beginFrame
   		 * Sends a BeginFrame to the target and returns when the frame was completed. Optionally captures a
@@ -38,22 +38,32 @@ package debugprotocol
   	during renderer initialization. In such a case, no screenshot data will be returned.
   		 * @return hasDamage:boolean optional:{#@optional#} Whether the BeginFrame resulted in damage and, thus, a new frame was committed to the
   	display. Reported for diagnostic uses, may be removed in the future.
-  		 */
-  		public static const beginFrame:String = "HeadlessExperimental.beginFrame";
-  	
+  		 */	
+  		public static function beginFrame(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeadlessExperimental.beginFrame", paramO);
+  		}
+  		
   		/**
   		 * disable
   		 * Disables headless events for the target.
   		 * @return 
-  		 */
-  		public static const disable:String = "HeadlessExperimental.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeadlessExperimental.disable", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * Enables headless events for the target.
   		 * @return 
-  		 */
-  		public static const enable:String = "HeadlessExperimental.enable";
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("HeadlessExperimental.enable", paramO);
+  		}
+  		
 	}
 
 }

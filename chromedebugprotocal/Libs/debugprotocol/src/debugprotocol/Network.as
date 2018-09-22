@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -213,42 +214,56 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const webSocketWillSendHandshakeRequest:String = "Network.webSocketWillSendHandshakeRequest";
-  	
   		/**
   		 * canClearBrowserCache
   		 * Tells whether clearing browser cache is supported.
   		 * @return result:boolean optional:{#@optional#} True if browser cache can be cleared.
-  		 */
-  		public static const canClearBrowserCache:String = "Network.canClearBrowserCache";
-  	
+  		 */	
+  		public static function canClearBrowserCache(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.canClearBrowserCache", paramO);
+  		}
+  		
   		/**
   		 * canClearBrowserCookies
   		 * Tells whether clearing browser cookies is supported.
   		 * @return result:boolean optional:{#@optional#} True if browser cookies can be cleared.
-  		 */
-  		public static const canClearBrowserCookies:String = "Network.canClearBrowserCookies";
-  	
+  		 */	
+  		public static function canClearBrowserCookies(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.canClearBrowserCookies", paramO);
+  		}
+  		
   		/**
   		 * canEmulateNetworkConditions
   		 * Tells whether emulation of network conditions is supported.
   		 * @return result:boolean optional:{#@optional#} True if emulation of network conditions is supported.
-  		 */
-  		public static const canEmulateNetworkConditions:String = "Network.canEmulateNetworkConditions";
-  	
+  		 */	
+  		public static function canEmulateNetworkConditions(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.canEmulateNetworkConditions", paramO);
+  		}
+  		
   		/**
   		 * clearBrowserCache
   		 * Clears browser cache.
   		 * @return 
-  		 */
-  		public static const clearBrowserCache:String = "Network.clearBrowserCache";
-  	
+  		 */	
+  		public static function clearBrowserCache(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.clearBrowserCache", paramO);
+  		}
+  		
   		/**
   		 * clearBrowserCookies
   		 * Clears browser cookies.
   		 * @return 
-  		 */
-  		public static const clearBrowserCookies:String = "Network.clearBrowserCookies";
-  	
+  		 */	
+  		public static function clearBrowserCookies(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.clearBrowserCookies", paramO);
+  		}
+  		
   		/**
   		 * continueInterceptedRequest
   		 * Response to Network.requestIntercepted which either modifies the request to continue with any
@@ -270,9 +285,12 @@ package debugprotocol
   	authChallenge.
   		 * @param authChallengeResponse:{#@type#} optional:true Response to a requestIntercepted with an authChallenge. Must not be set otherwise.
   		 * @return 
-  		 */
-  		public static const continueInterceptedRequest:String = "Network.continueInterceptedRequest";
-  	
+  		 */	
+  		public static function continueInterceptedRequest(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.continueInterceptedRequest", paramO);
+  		}
+  		
   		/**
   		 * deleteCookies
   		 * Deletes browser cookies with matching name and url or domain/path pair.
@@ -282,16 +300,22 @@ package debugprotocol
   		 * @param domain:string optional:true If specified, deletes only cookies with the exact domain.
   		 * @param path:string optional:true If specified, deletes only cookies with the exact path.
   		 * @return 
-  		 */
-  		public static const deleteCookies:String = "Network.deleteCookies";
-  	
+  		 */	
+  		public static function deleteCookies(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.deleteCookies", paramO);
+  		}
+  		
   		/**
   		 * disable
   		 * Disables network tracking, prevents network events from being sent to the client.
   		 * @return 
-  		 */
-  		public static const disable:String = "Network.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.disable", paramO);
+  		}
+  		
   		/**
   		 * emulateNetworkConditions
   		 * Activates emulation of network conditions.
@@ -301,9 +325,12 @@ package debugprotocol
   		 * @param uploadThroughput:number optional:{#@optional#} Maximal aggregated upload throughput (bytes/sec).  -1 disables upload throttling.
   		 * @param connectionType:{#@type#} optional:true Connection type if known.
   		 * @return 
-  		 */
-  		public static const emulateNetworkConditions:String = "Network.emulateNetworkConditions";
-  	
+  		 */	
+  		public static function emulateNetworkConditions(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.emulateNetworkConditions", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * Enables network tracking, network events will now be delivered to the client.
@@ -311,58 +338,79 @@ package debugprotocol
   		 * @param maxResourceBufferSize:integer optional:true Per-resource buffer size in bytes to use when preserving network payloads (XHRs, etc).
   		 * @param maxPostDataSize:integer optional:true Longest post body size (in bytes) that would be included in requestWillBeSent notification
   		 * @return 
-  		 */
-  		public static const enable:String = "Network.enable";
-  	
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.enable", paramO);
+  		}
+  		
   		/**
   		 * getAllCookies
   		 * Returns all browser cookies. Depending on the backend support, will return detailed cookie
   	information in the `cookies` field.
   		 * @return cookies:array optional:{#@optional#} Array of cookie objects.
-  		 */
-  		public static const getAllCookies:String = "Network.getAllCookies";
-  	
+  		 */	
+  		public static function getAllCookies(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.getAllCookies", paramO);
+  		}
+  		
   		/**
   		 * getCertificate
   		 * Returns the DER-encoded certificate.
   		 * @param origin:string optional:{#@optional#} Origin to get certificate for.
   		 * @return tableNames:array optional:{#@optional#} {#@description#}
-  		 */
-  		public static const getCertificate:String = "Network.getCertificate";
-  	
+  		 */	
+  		public static function getCertificate(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.getCertificate", paramO);
+  		}
+  		
   		/**
   		 * getCookies
   		 * Returns all browser cookies for the current URL. Depending on the backend support, will return
   	detailed cookie information in the `cookies` field.
   		 * @param urls:array optional:true The list of URLs for which applicable cookies will be fetched
   		 * @return cookies:array optional:{#@optional#} Array of cookie objects.
-  		 */
-  		public static const getCookies:String = "Network.getCookies";
-  	
+  		 */	
+  		public static function getCookies(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.getCookies", paramO);
+  		}
+  		
   		/**
   		 * getResponseBody
   		 * Returns content served for the given request.
   		 * @param requestId:{#@type#} optional:{#@optional#} Identifier of the network request to get content for.
   		 * @return body:string optional:{#@optional#} Response body.
-  		 */
-  		public static const getResponseBody:String = "Network.getResponseBody";
-  	
+  		 */	
+  		public static function getResponseBody(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.getResponseBody", paramO);
+  		}
+  		
   		/**
   		 * getRequestPostData
   		 * Returns post data sent with the request. Returns an error when no data was sent with the request.
   		 * @param requestId:{#@type#} optional:{#@optional#} Identifier of the network request to get content for.
   		 * @return postData:string optional:{#@optional#} Base64-encoded request body.
-  		 */
-  		public static const getRequestPostData:String = "Network.getRequestPostData";
-  	
+  		 */	
+  		public static function getRequestPostData(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.getRequestPostData", paramO);
+  		}
+  		
   		/**
   		 * getResponseBodyForInterception
   		 * Returns content served for the given currently intercepted request.
   		 * @param interceptionId:{#@type#} optional:{#@optional#} Identifier for the intercepted request to get body for.
   		 * @return body:string optional:{#@optional#} Response body.
-  		 */
-  		public static const getResponseBodyForInterception:String = "Network.getResponseBodyForInterception";
-  	
+  		 */	
+  		public static function getResponseBodyForInterception(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.getResponseBodyForInterception", paramO);
+  		}
+  		
   		/**
   		 * takeResponseBodyForInterceptionAsStream
   		 * Returns a handle to the stream representing the response body. Note that after this command,
@@ -371,9 +419,12 @@ package debugprotocol
   	is specified.
   		 * @param interceptionId:{#@type#} optional:{#@optional#} {#@description#}
   		 * @return stream:{#@type#} optional:{#@optional#} {#@description#}
-  		 */
-  		public static const takeResponseBodyForInterceptionAsStream:String = "Network.takeResponseBodyForInterceptionAsStream";
-  	
+  		 */	
+  		public static function takeResponseBodyForInterceptionAsStream(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.takeResponseBodyForInterceptionAsStream", paramO);
+  		}
+  		
   		/**
   		 * replayXHR
   		 * This method sends a new XMLHttpRequest which is identical to the original one. The following
@@ -381,9 +432,12 @@ package debugprotocol
   	attribute, user, password.
   		 * @param requestId:{#@type#} optional:{#@optional#} Identifier of XHR to replay.
   		 * @return 
-  		 */
-  		public static const replayXHR:String = "Network.replayXHR";
-  	
+  		 */	
+  		public static function replayXHR(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.replayXHR", paramO);
+  		}
+  		
   		/**
   		 * searchInResponseBody
   		 * Searches for given string in response content.
@@ -392,33 +446,45 @@ package debugprotocol
   		 * @param caseSensitive:boolean optional:true If true, search is case sensitive.
   		 * @param isRegex:boolean optional:true If true, treats string parameter as regex.
   		 * @return result:array optional:{#@optional#} List of search matches.
-  		 */
-  		public static const searchInResponseBody:String = "Network.searchInResponseBody";
-  	
+  		 */	
+  		public static function searchInResponseBody(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.searchInResponseBody", paramO);
+  		}
+  		
   		/**
   		 * setBlockedURLs
   		 * Blocks URLs from loading.
   		 * @param urls:array optional:{#@optional#} URL patterns to block. Wildcards ('*') are allowed.
   		 * @return 
-  		 */
-  		public static const setBlockedURLs:String = "Network.setBlockedURLs";
-  	
+  		 */	
+  		public static function setBlockedURLs(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.setBlockedURLs", paramO);
+  		}
+  		
   		/**
   		 * setBypassServiceWorker
   		 * Toggles ignoring of service worker for each request.
   		 * @param bypass:boolean optional:{#@optional#} Bypass service worker and load from network.
   		 * @return 
-  		 */
-  		public static const setBypassServiceWorker:String = "Network.setBypassServiceWorker";
-  	
+  		 */	
+  		public static function setBypassServiceWorker(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.setBypassServiceWorker", paramO);
+  		}
+  		
   		/**
   		 * setCacheDisabled
   		 * Toggles ignoring cache for each request. If `true`, cache will not be used.
   		 * @param cacheDisabled:boolean optional:{#@optional#} Cache disabled state.
   		 * @return 
-  		 */
-  		public static const setCacheDisabled:String = "Network.setCacheDisabled";
-  	
+  		 */	
+  		public static function setCacheDisabled(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.setCacheDisabled", paramO);
+  		}
+  		
   		/**
   		 * setCookie
   		 * Sets a cookie with the given cookie data; may overwrite equivalent cookies if they exist.
@@ -433,43 +499,58 @@ package debugprotocol
   		 * @param sameSite:{#@type#} optional:true Cookie SameSite type.
   		 * @param expires:{#@type#} optional:true Cookie expiration date, session cookie if not set
   		 * @return success:boolean optional:{#@optional#} True if successfully set cookie.
-  		 */
-  		public static const setCookie:String = "Network.setCookie";
-  	
+  		 */	
+  		public static function setCookie(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.setCookie", paramO);
+  		}
+  		
   		/**
   		 * setCookies
   		 * Sets given cookies.
   		 * @param cookies:array optional:{#@optional#} Cookies to be set.
   		 * @return 
-  		 */
-  		public static const setCookies:String = "Network.setCookies";
-  	
+  		 */	
+  		public static function setCookies(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.setCookies", paramO);
+  		}
+  		
   		/**
   		 * setDataSizeLimitsForTest
   		 * For testing.
   		 * @param maxTotalSize:integer optional:{#@optional#} Maximum total buffer size.
   		 * @param maxResourceSize:integer optional:{#@optional#} Maximum per-resource size.
   		 * @return 
-  		 */
-  		public static const setDataSizeLimitsForTest:String = "Network.setDataSizeLimitsForTest";
-  	
+  		 */	
+  		public static function setDataSizeLimitsForTest(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.setDataSizeLimitsForTest", paramO);
+  		}
+  		
   		/**
   		 * setExtraHTTPHeaders
   		 * Specifies whether to always send extra HTTP headers with the requests from this page.
   		 * @param headers:{#@type#} optional:{#@optional#} Map with extra HTTP headers.
   		 * @return 
-  		 */
-  		public static const setExtraHTTPHeaders:String = "Network.setExtraHTTPHeaders";
-  	
+  		 */	
+  		public static function setExtraHTTPHeaders(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.setExtraHTTPHeaders", paramO);
+  		}
+  		
   		/**
   		 * setRequestInterception
   		 * Sets the requests to intercept that match a the provided patterns and optionally resource types.
   		 * @param patterns:array optional:{#@optional#} Requests matching any of these patterns will be forwarded and wait for the corresponding
   	continueInterceptedRequest call.
   		 * @return 
-  		 */
-  		public static const setRequestInterception:String = "Network.setRequestInterception";
-  	
+  		 */	
+  		public static function setRequestInterception(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.setRequestInterception", paramO);
+  		}
+  		
   		/**
   		 * setUserAgentOverride
   		 * Allows overriding user agent with the given string.
@@ -477,8 +558,12 @@ package debugprotocol
   		 * @param acceptLanguage:string optional:true Browser langugage to emulate.
   		 * @param platform:string optional:true The platform navigator.platform should return.
   		 * @return 
-  		 */
-  		public static const setUserAgentOverride:String = "Network.setUserAgentOverride";
+  		 */	
+  		public static function setUserAgentOverride(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Network.setUserAgentOverride", paramO);
+  		}
+  		
 	}
 
 }

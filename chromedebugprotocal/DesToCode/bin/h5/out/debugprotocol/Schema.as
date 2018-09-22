@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -12,13 +13,16 @@ package debugprotocol
 		}
 		public static const DependDomains:Array=[];
   	
-  	
   		/**
   		 * getDomains
   		 * Returns supported domains.
   		 * @return domains:array optional:{#@optional#} List of supported domains.
-  		 */
-  		public static const getDomains:String = "Schema.getDomains";
+  		 */	
+  		public static function getDomains(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Schema.getDomains", paramO);
+  		}
+  		
 	}
 
 }

@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -36,36 +37,47 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const screenshotRequested:String = "Overlay.screenshotRequested";
-  	
   		/**
   		 * disable
   		 * Disables domain notifications.
   		 * @return 
-  		 */
-  		public static const disable:String = "Overlay.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.disable", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * Enables domain notifications.
   		 * @return 
-  		 */
-  		public static const enable:String = "Overlay.enable";
-  	
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.enable", paramO);
+  		}
+  		
   		/**
   		 * getHighlightObjectForTest
   		 * For testing.
   		 * @param nodeId:{#@type#} optional:{#@optional#} Id of the node to get highlight object for.
   		 * @return highlight:object optional:{#@optional#} Highlight data for the node.
-  		 */
-  		public static const getHighlightObjectForTest:String = "Overlay.getHighlightObjectForTest";
-  	
+  		 */	
+  		public static function getHighlightObjectForTest(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.getHighlightObjectForTest", paramO);
+  		}
+  		
   		/**
   		 * hideHighlight
   		 * Hides any highlight.
   		 * @return 
-  		 */
-  		public static const hideHighlight:String = "Overlay.hideHighlight";
-  	
+  		 */	
+  		public static function hideHighlight(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.hideHighlight", paramO);
+  		}
+  		
   		/**
   		 * highlightFrame
   		 * Highlights owner element of the frame with given id.
@@ -73,9 +85,12 @@ package debugprotocol
   		 * @param contentColor:{#@type#} optional:true The content box highlight fill color (default: transparent).
   		 * @param contentOutlineColor:{#@type#} optional:true The content box highlight outline color (default: transparent).
   		 * @return 
-  		 */
-  		public static const highlightFrame:String = "Overlay.highlightFrame";
-  	
+  		 */	
+  		public static function highlightFrame(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.highlightFrame", paramO);
+  		}
+  		
   		/**
   		 * highlightNode
   		 * Highlights DOM node with given id or with the given JavaScript object wrapper. Either nodeId or
@@ -85,9 +100,12 @@ package debugprotocol
   		 * @param backendNodeId:{#@type#} optional:true Identifier of the backend node to highlight.
   		 * @param objectId:{#@type#} optional:true JavaScript object id of the node to be highlighted.
   		 * @return 
-  		 */
-  		public static const highlightNode:String = "Overlay.highlightNode";
-  	
+  		 */	
+  		public static function highlightNode(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.highlightNode", paramO);
+  		}
+  		
   		/**
   		 * highlightQuad
   		 * Highlights given quad. Coordinates are absolute with respect to the main frame viewport.
@@ -95,9 +113,12 @@ package debugprotocol
   		 * @param color:{#@type#} optional:true The highlight fill color (default: transparent).
   		 * @param outlineColor:{#@type#} optional:true The highlight outline color (default: transparent).
   		 * @return 
-  		 */
-  		public static const highlightQuad:String = "Overlay.highlightQuad";
-  	
+  		 */	
+  		public static function highlightQuad(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.highlightQuad", paramO);
+  		}
+  		
   		/**
   		 * highlightRect
   		 * Highlights given rectangle. Coordinates are absolute with respect to the main frame viewport.
@@ -108,9 +129,12 @@ package debugprotocol
   		 * @param color:{#@type#} optional:true The highlight fill color (default: transparent).
   		 * @param outlineColor:{#@type#} optional:true The highlight outline color (default: transparent).
   		 * @return 
-  		 */
-  		public static const highlightRect:String = "Overlay.highlightRect";
-  	
+  		 */	
+  		public static function highlightRect(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.highlightRect", paramO);
+  		}
+  		
   		/**
   		 * setInspectMode
   		 * Enters the 'inspect' mode. In this mode, elements that user is hovering over are highlighted.
@@ -119,62 +143,87 @@ package debugprotocol
   		 * @param highlightConfig:{#@type#} optional:true A descriptor for the highlight appearance of hovered-over nodes. May be omitted if `enabled
   	== false`.
   		 * @return 
-  		 */
-  		public static const setInspectMode:String = "Overlay.setInspectMode";
-  	
+  		 */	
+  		public static function setInspectMode(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.setInspectMode", paramO);
+  		}
+  		
   		/**
   		 * setPausedInDebuggerMessage
   		 * @param message:string optional:true The message to display, also triggers resume and step over controls.
   		 * @return 
-  		 */
-  		public static const setPausedInDebuggerMessage:String = "Overlay.setPausedInDebuggerMessage";
-  	
+  		 */	
+  		public static function setPausedInDebuggerMessage(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.setPausedInDebuggerMessage", paramO);
+  		}
+  		
   		/**
   		 * setShowDebugBorders
   		 * Requests that backend shows debug borders on layers
   		 * @param show:boolean optional:{#@optional#} True for showing debug borders
   		 * @return 
-  		 */
-  		public static const setShowDebugBorders:String = "Overlay.setShowDebugBorders";
-  	
+  		 */	
+  		public static function setShowDebugBorders(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.setShowDebugBorders", paramO);
+  		}
+  		
   		/**
   		 * setShowFPSCounter
   		 * Requests that backend shows the FPS counter
   		 * @param show:boolean optional:{#@optional#} True for showing the FPS counter
   		 * @return 
-  		 */
-  		public static const setShowFPSCounter:String = "Overlay.setShowFPSCounter";
-  	
+  		 */	
+  		public static function setShowFPSCounter(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.setShowFPSCounter", paramO);
+  		}
+  		
   		/**
   		 * setShowPaintRects
   		 * Requests that backend shows paint rectangles
   		 * @param result:boolean optional:{#@optional#} True for showing paint rectangles
   		 * @return 
-  		 */
-  		public static const setShowPaintRects:String = "Overlay.setShowPaintRects";
-  	
+  		 */	
+  		public static function setShowPaintRects(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.setShowPaintRects", paramO);
+  		}
+  		
   		/**
   		 * setShowScrollBottleneckRects
   		 * Requests that backend shows scroll bottleneck rects
   		 * @param show:boolean optional:{#@optional#} True for showing scroll bottleneck rects
   		 * @return 
-  		 */
-  		public static const setShowScrollBottleneckRects:String = "Overlay.setShowScrollBottleneckRects";
-  	
+  		 */	
+  		public static function setShowScrollBottleneckRects(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.setShowScrollBottleneckRects", paramO);
+  		}
+  		
   		/**
   		 * setShowViewportSizeOnResize
   		 * Paints viewport size upon main frame resize.
   		 * @param show:boolean optional:{#@optional#} Whether to paint size or not.
   		 * @return 
-  		 */
-  		public static const setShowViewportSizeOnResize:String = "Overlay.setShowViewportSizeOnResize";
-  	
+  		 */	
+  		public static function setShowViewportSizeOnResize(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.setShowViewportSizeOnResize", paramO);
+  		}
+  		
   		/**
   		 * setSuspended
   		 * @param suspended:boolean optional:{#@optional#} Whether overlay should be suspended and not consume any resources until resumed.
   		 * @return 
-  		 */
-  		public static const setSuspended:String = "Overlay.setSuspended";
+  		 */	
+  		public static function setSuspended(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Overlay.setSuspended", paramO);
+  		}
+  		
 	}
 
 }

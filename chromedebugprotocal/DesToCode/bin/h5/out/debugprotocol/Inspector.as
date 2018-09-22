@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -33,20 +34,26 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const targetReloadedAfterCrash:String = "Inspector.targetReloadedAfterCrash";
-  	
   		/**
   		 * disable
   		 * Disables inspector domain notifications.
   		 * @return 
-  		 */
-  		public static const disable:String = "Inspector.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Inspector.disable", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * Enables inspector domain notifications.
   		 * @return 
-  		 */
-  		public static const enable:String = "Inspector.enable";
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Inspector.enable", paramO);
+  		}
+  		
 	}
 
 }

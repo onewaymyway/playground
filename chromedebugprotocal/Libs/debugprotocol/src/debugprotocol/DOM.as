@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -137,15 +138,17 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const shadowRootPushed:String = "DOM.shadowRootPushed";
-  	
   		/**
   		 * collectClassNamesFromSubtree
   		 * Collects class names for the node with given id and all of it's child nodes.
   		 * @param nodeId:{#@type#} optional:{#@optional#} Id of the node to collect class names.
   		 * @return classNames:array optional:{#@optional#} Class name list.
-  		 */
-  		public static const collectClassNamesFromSubtree:String = "DOM.collectClassNamesFromSubtree";
-  	
+  		 */	
+  		public static function collectClassNamesFromSubtree(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.collectClassNamesFromSubtree", paramO);
+  		}
+  		
   		/**
   		 * copyTo
   		 * Creates a deep copy of the specified node and places it into the target container before the
@@ -155,9 +158,12 @@ package debugprotocol
   		 * @param insertBeforeNodeId:{#@type#} optional:true Drop the copy before this node (if absent, the copy becomes the last child of
   	`targetNodeId`).
   		 * @return nodeId:{#@type#} optional:{#@optional#} Id of the node clone.
-  		 */
-  		public static const copyTo:String = "DOM.copyTo";
-  	
+  		 */	
+  		public static function copyTo(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.copyTo", paramO);
+  		}
+  		
   		/**
   		 * describeNode
   		 * Describes node given its id, does not require domain to be enabled. Does not start tracking any
@@ -170,32 +176,44 @@ package debugprotocol
   		 * @param pierce:boolean optional:true Whether or not iframes and shadow roots should be traversed when returning the subtree
   	(default is false).
   		 * @return node:{#@type#} optional:{#@optional#} Node description.
-  		 */
-  		public static const describeNode:String = "DOM.describeNode";
-  	
+  		 */	
+  		public static function describeNode(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.describeNode", paramO);
+  		}
+  		
   		/**
   		 * disable
   		 * Disables DOM agent for the given page.
   		 * @return 
-  		 */
-  		public static const disable:String = "DOM.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.disable", paramO);
+  		}
+  		
   		/**
   		 * discardSearchResults
   		 * Discards search results from the session with the given id. `getSearchResults` should no longer
   	be called for that search.
   		 * @param searchId:string optional:{#@optional#} Unique search session identifier.
   		 * @return 
-  		 */
-  		public static const discardSearchResults:String = "DOM.discardSearchResults";
-  	
+  		 */	
+  		public static function discardSearchResults(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.discardSearchResults", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * Enables DOM agent for the given page.
   		 * @return 
-  		 */
-  		public static const enable:String = "DOM.enable";
-  	
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.enable", paramO);
+  		}
+  		
   		/**
   		 * focus
   		 * Focuses the given element.
@@ -203,17 +221,23 @@ package debugprotocol
   		 * @param backendNodeId:{#@type#} optional:true Identifier of the backend node.
   		 * @param objectId:{#@type#} optional:true JavaScript object id of the node wrapper.
   		 * @return 
-  		 */
-  		public static const focus:String = "DOM.focus";
-  	
+  		 */	
+  		public static function focus(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.focus", paramO);
+  		}
+  		
   		/**
   		 * getAttributes
   		 * Returns attributes for the specified node.
   		 * @param nodeId:{#@type#} optional:{#@optional#} Id of the node to retrieve attibutes for.
   		 * @return attributes:array optional:{#@optional#} An interleaved array of node attribute names and values.
-  		 */
-  		public static const getAttributes:String = "DOM.getAttributes";
-  	
+  		 */	
+  		public static function getAttributes(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.getAttributes", paramO);
+  		}
+  		
   		/**
   		 * getBoxModel
   		 * Returns boxes for the given node.
@@ -221,9 +245,12 @@ package debugprotocol
   		 * @param backendNodeId:{#@type#} optional:true Identifier of the backend node.
   		 * @param objectId:{#@type#} optional:true JavaScript object id of the node wrapper.
   		 * @return model:{#@type#} optional:{#@optional#} Box model for the node.
-  		 */
-  		public static const getBoxModel:String = "DOM.getBoxModel";
-  	
+  		 */	
+  		public static function getBoxModel(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.getBoxModel", paramO);
+  		}
+  		
   		/**
   		 * getContentQuads
   		 * Returns quads that describe node position on the page. This method
@@ -232,9 +259,12 @@ package debugprotocol
   		 * @param backendNodeId:{#@type#} optional:true Identifier of the backend node.
   		 * @param objectId:{#@type#} optional:true JavaScript object id of the node wrapper.
   		 * @return quads:array optional:{#@optional#} Quads that describe node layout relative to viewport.
-  		 */
-  		public static const getContentQuads:String = "DOM.getContentQuads";
-  	
+  		 */	
+  		public static function getContentQuads(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.getContentQuads", paramO);
+  		}
+  		
   		/**
   		 * getDocument
   		 * Returns the root DOM node (and optionally the subtree) to the caller.
@@ -243,9 +273,12 @@ package debugprotocol
   		 * @param pierce:boolean optional:true Whether or not iframes and shadow roots should be traversed when returning the subtree
   	(default is false).
   		 * @return root:{#@type#} optional:{#@optional#} Resulting node.
-  		 */
-  		public static const getDocument:String = "DOM.getDocument";
-  	
+  		 */	
+  		public static function getDocument(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.getDocument", paramO);
+  		}
+  		
   		/**
   		 * getFlattenedDocument
   		 * Returns the root DOM node (and optionally the subtree) to the caller.
@@ -254,9 +287,12 @@ package debugprotocol
   		 * @param pierce:boolean optional:true Whether or not iframes and shadow roots should be traversed when returning the subtree
   	(default is false).
   		 * @return nodes:array optional:{#@optional#} Resulting node.
-  		 */
-  		public static const getFlattenedDocument:String = "DOM.getFlattenedDocument";
-  	
+  		 */	
+  		public static function getFlattenedDocument(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.getFlattenedDocument", paramO);
+  		}
+  		
   		/**
   		 * getNodeForLocation
   		 * Returns node id at given location.
@@ -264,9 +300,12 @@ package debugprotocol
   		 * @param y:integer optional:{#@optional#} Y coordinate.
   		 * @param includeUserAgentShadowDOM:boolean optional:true False to skip to the nearest non-UA shadow root ancestor (default: false).
   		 * @return nodeId:{#@type#} optional:{#@optional#} Id of the node at given coordinates.
-  		 */
-  		public static const getNodeForLocation:String = "DOM.getNodeForLocation";
-  	
+  		 */	
+  		public static function getNodeForLocation(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.getNodeForLocation", paramO);
+  		}
+  		
   		/**
   		 * getOuterHTML
   		 * Returns node's HTML markup.
@@ -274,17 +313,23 @@ package debugprotocol
   		 * @param backendNodeId:{#@type#} optional:true Identifier of the backend node.
   		 * @param objectId:{#@type#} optional:true JavaScript object id of the node wrapper.
   		 * @return outerHTML:string optional:{#@optional#} Outer HTML markup.
-  		 */
-  		public static const getOuterHTML:String = "DOM.getOuterHTML";
-  	
+  		 */	
+  		public static function getOuterHTML(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.getOuterHTML", paramO);
+  		}
+  		
   		/**
   		 * getRelayoutBoundary
   		 * Returns the id of the nearest ancestor that is a relayout boundary.
   		 * @param nodeId:{#@type#} optional:{#@optional#} Id of the node.
   		 * @return nodeId:{#@type#} optional:{#@optional#} Relayout boundary node id for the given node.
-  		 */
-  		public static const getRelayoutBoundary:String = "DOM.getRelayoutBoundary";
-  	
+  		 */	
+  		public static function getRelayoutBoundary(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.getRelayoutBoundary", paramO);
+  		}
+  		
   		/**
   		 * getSearchResults
   		 * Returns search results from given `fromIndex` to given `toIndex` from the search with the given
@@ -293,37 +338,52 @@ package debugprotocol
   		 * @param fromIndex:integer optional:{#@optional#} Start index of the search result to be returned.
   		 * @param toIndex:integer optional:{#@optional#} End index of the search result to be returned.
   		 * @return nodeIds:array optional:{#@optional#} Ids of the search result nodes.
-  		 */
-  		public static const getSearchResults:String = "DOM.getSearchResults";
-  	
+  		 */	
+  		public static function getSearchResults(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.getSearchResults", paramO);
+  		}
+  		
   		/**
   		 * hideHighlight
   		 * Hides any highlight.
   		 * @return 
-  		 */
-  		public static const hideHighlight:String = "DOM.hideHighlight";
-  	
+  		 */	
+  		public static function hideHighlight(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.hideHighlight", paramO);
+  		}
+  		
   		/**
   		 * highlightNode
   		 * Highlights DOM node.
   		 * @return 
-  		 */
-  		public static const highlightNode:String = "DOM.highlightNode";
-  	
+  		 */	
+  		public static function highlightNode(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.highlightNode", paramO);
+  		}
+  		
   		/**
   		 * highlightRect
   		 * Highlights given rectangle.
   		 * @return 
-  		 */
-  		public static const highlightRect:String = "DOM.highlightRect";
-  	
+  		 */	
+  		public static function highlightRect(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.highlightRect", paramO);
+  		}
+  		
   		/**
   		 * markUndoableState
   		 * Marks last undoable state.
   		 * @return 
-  		 */
-  		public static const markUndoableState:String = "DOM.markUndoableState";
-  	
+  		 */	
+  		public static function markUndoableState(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.markUndoableState", paramO);
+  		}
+  		
   		/**
   		 * moveTo
   		 * Moves node into the new container, places it before the given anchor.
@@ -332,9 +392,12 @@ package debugprotocol
   		 * @param insertBeforeNodeId:{#@type#} optional:true Drop node before this one (if absent, the moved node becomes the last child of
   	`targetNodeId`).
   		 * @return nodeId:{#@type#} optional:{#@optional#} New id of the moved node.
-  		 */
-  		public static const moveTo:String = "DOM.moveTo";
-  	
+  		 */	
+  		public static function moveTo(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.moveTo", paramO);
+  		}
+  		
   		/**
   		 * performSearch
   		 * Searches for a given string in the DOM tree. Use `getSearchResults` to access search results or
@@ -342,68 +405,92 @@ package debugprotocol
   		 * @param query:string optional:{#@optional#} Plain text or query selector or XPath search query.
   		 * @param includeUserAgentShadowDOM:boolean optional:true True to search in user agent shadow DOM.
   		 * @return searchId:string optional:{#@optional#} Unique search session identifier.
-  		 */
-  		public static const performSearch:String = "DOM.performSearch";
-  	
+  		 */	
+  		public static function performSearch(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.performSearch", paramO);
+  		}
+  		
   		/**
   		 * pushNodeByPathToFrontend
   		 * Requests that the node is sent to the caller given its path. // FIXME, use XPath
   		 * @param path:string optional:{#@optional#} Path to node in the proprietary format.
   		 * @return nodeId:{#@type#} optional:{#@optional#} Id of the node for given path.
-  		 */
-  		public static const pushNodeByPathToFrontend:String = "DOM.pushNodeByPathToFrontend";
-  	
+  		 */	
+  		public static function pushNodeByPathToFrontend(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.pushNodeByPathToFrontend", paramO);
+  		}
+  		
   		/**
   		 * pushNodesByBackendIdsToFrontend
   		 * Requests that a batch of nodes is sent to the caller given their backend node ids.
   		 * @param backendNodeIds:array optional:{#@optional#} The array of backend node ids.
   		 * @return nodeIds:array optional:{#@optional#} The array of ids of pushed nodes that correspond to the backend ids specified in
   	backendNodeIds.
-  		 */
-  		public static const pushNodesByBackendIdsToFrontend:String = "DOM.pushNodesByBackendIdsToFrontend";
-  	
+  		 */	
+  		public static function pushNodesByBackendIdsToFrontend(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.pushNodesByBackendIdsToFrontend", paramO);
+  		}
+  		
   		/**
   		 * querySelector
   		 * Executes `querySelector` on a given node.
   		 * @param nodeId:{#@type#} optional:{#@optional#} Id of the node to query upon.
   		 * @param selector:string optional:{#@optional#} Selector string.
   		 * @return nodeId:{#@type#} optional:{#@optional#} Query selector result.
-  		 */
-  		public static const querySelector:String = "DOM.querySelector";
-  	
+  		 */	
+  		public static function querySelector(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.querySelector", paramO);
+  		}
+  		
   		/**
   		 * querySelectorAll
   		 * Executes `querySelectorAll` on a given node.
   		 * @param nodeId:{#@type#} optional:{#@optional#} Id of the node to query upon.
   		 * @param selector:string optional:{#@optional#} Selector string.
   		 * @return nodeIds:array optional:{#@optional#} Query selector result.
-  		 */
-  		public static const querySelectorAll:String = "DOM.querySelectorAll";
-  	
+  		 */	
+  		public static function querySelectorAll(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.querySelectorAll", paramO);
+  		}
+  		
   		/**
   		 * redo
   		 * Re-does the last undone action.
   		 * @return 
-  		 */
-  		public static const redo:String = "DOM.redo";
-  	
+  		 */	
+  		public static function redo(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.redo", paramO);
+  		}
+  		
   		/**
   		 * removeAttribute
   		 * Removes attribute with given name from an element with given id.
   		 * @param nodeId:{#@type#} optional:{#@optional#} Id of the element to remove attribute from.
   		 * @param name:string optional:{#@optional#} Name of the attribute to remove.
   		 * @return 
-  		 */
-  		public static const removeAttribute:String = "DOM.removeAttribute";
-  	
+  		 */	
+  		public static function removeAttribute(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.removeAttribute", paramO);
+  		}
+  		
   		/**
   		 * removeNode
   		 * Removes node with given id.
   		 * @param nodeId:{#@type#} optional:{#@optional#} Id of the node to remove.
   		 * @return 
-  		 */
-  		public static const removeNode:String = "DOM.removeNode";
-  	
+  		 */	
+  		public static function removeNode(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.removeNode", paramO);
+  		}
+  		
   		/**
   		 * requestChildNodes
   		 * Requests that children of the node with given id are returned to the caller in form of
@@ -415,9 +502,12 @@ package debugprotocol
   		 * @param pierce:boolean optional:true Whether or not iframes and shadow roots should be traversed when returning the sub-tree
   	(default is false).
   		 * @return 
-  		 */
-  		public static const requestChildNodes:String = "DOM.requestChildNodes";
-  	
+  		 */	
+  		public static function requestChildNodes(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.requestChildNodes", paramO);
+  		}
+  		
   		/**
   		 * requestNode
   		 * Requests that the node is sent to the caller given the JavaScript node object reference. All
@@ -425,9 +515,12 @@ package debugprotocol
   	`setChildNodes` notifications.
   		 * @param objectId:{#@type#} optional:{#@optional#} JavaScript object id to convert into node.
   		 * @return nodeId:{#@type#} optional:{#@optional#} Node id for given object.
-  		 */
-  		public static const requestNode:String = "DOM.requestNode";
-  	
+  		 */	
+  		public static function requestNode(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.requestNode", paramO);
+  		}
+  		
   		/**
   		 * resolveNode
   		 * Resolves the JavaScript node object for a given NodeId or BackendNodeId.
@@ -435,9 +528,12 @@ package debugprotocol
   		 * @param backendNodeId:{#@type#} optional:true Backend identifier of the node to resolve.
   		 * @param objectGroup:string optional:true Symbolic group name that can be used to release multiple objects.
   		 * @return object:{#@type#} optional:{#@optional#} JavaScript object wrapper for given node.
-  		 */
-  		public static const resolveNode:String = "DOM.resolveNode";
-  	
+  		 */	
+  		public static function resolveNode(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.resolveNode", paramO);
+  		}
+  		
   		/**
   		 * setAttributeValue
   		 * Sets attribute for an element with given id.
@@ -445,9 +541,12 @@ package debugprotocol
   		 * @param name:string optional:{#@optional#} Attribute name.
   		 * @param value:string optional:{#@optional#} Attribute value.
   		 * @return 
-  		 */
-  		public static const setAttributeValue:String = "DOM.setAttributeValue";
-  	
+  		 */	
+  		public static function setAttributeValue(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.setAttributeValue", paramO);
+  		}
+  		
   		/**
   		 * setAttributesAsText
   		 * Sets attributes on element with given id. This method is useful when user edits some existing
@@ -457,9 +556,12 @@ package debugprotocol
   		 * @param name:string optional:true Attribute name to replace with new attributes derived from text in case text parsed
   	successfully.
   		 * @return 
-  		 */
-  		public static const setAttributesAsText:String = "DOM.setAttributesAsText";
-  	
+  		 */	
+  		public static function setAttributesAsText(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.setAttributesAsText", paramO);
+  		}
+  		
   		/**
   		 * setFileInputFiles
   		 * Sets files for the given file input element.
@@ -468,59 +570,81 @@ package debugprotocol
   		 * @param backendNodeId:{#@type#} optional:true Identifier of the backend node.
   		 * @param objectId:{#@type#} optional:true JavaScript object id of the node wrapper.
   		 * @return 
-  		 */
-  		public static const setFileInputFiles:String = "DOM.setFileInputFiles";
-  	
+  		 */	
+  		public static function setFileInputFiles(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.setFileInputFiles", paramO);
+  		}
+  		
   		/**
   		 * setInspectedNode
   		 * Enables console to refer to the node with given id via $x (see Command Line API for more details
   	$x functions).
   		 * @param nodeId:{#@type#} optional:{#@optional#} DOM node id to be accessible by means of $x command line API.
   		 * @return 
-  		 */
-  		public static const setInspectedNode:String = "DOM.setInspectedNode";
-  	
+  		 */	
+  		public static function setInspectedNode(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.setInspectedNode", paramO);
+  		}
+  		
   		/**
   		 * setNodeName
   		 * Sets node name for a node with given id.
   		 * @param nodeId:{#@type#} optional:{#@optional#} Id of the node to set name for.
   		 * @param name:string optional:{#@optional#} New node's name.
   		 * @return nodeId:{#@type#} optional:{#@optional#} New node's id.
-  		 */
-  		public static const setNodeName:String = "DOM.setNodeName";
-  	
+  		 */	
+  		public static function setNodeName(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.setNodeName", paramO);
+  		}
+  		
   		/**
   		 * setNodeValue
   		 * Sets node value for a node with given id.
   		 * @param nodeId:{#@type#} optional:{#@optional#} Id of the node to set value for.
   		 * @param value:string optional:{#@optional#} New node's value.
   		 * @return 
-  		 */
-  		public static const setNodeValue:String = "DOM.setNodeValue";
-  	
+  		 */	
+  		public static function setNodeValue(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.setNodeValue", paramO);
+  		}
+  		
   		/**
   		 * setOuterHTML
   		 * Sets node HTML markup, returns new node id.
   		 * @param nodeId:{#@type#} optional:{#@optional#} Id of the node to set markup for.
   		 * @param outerHTML:string optional:{#@optional#} Outer HTML markup to set.
   		 * @return 
-  		 */
-  		public static const setOuterHTML:String = "DOM.setOuterHTML";
-  	
+  		 */	
+  		public static function setOuterHTML(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.setOuterHTML", paramO);
+  		}
+  		
   		/**
   		 * undo
   		 * Undoes the last performed action.
   		 * @return 
-  		 */
-  		public static const undo:String = "DOM.undo";
-  	
+  		 */	
+  		public static function undo(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.undo", paramO);
+  		}
+  		
   		/**
   		 * getFrameOwner
   		 * Returns iframe node that owns iframe with the given domain.
   		 * @param frameId:{#@type#} optional:{#@optional#} {#@description#}
   		 * @return nodeId:{#@type#} optional:{#@optional#} {#@description#}
-  		 */
-  		public static const getFrameOwner:String = "DOM.getFrameOwner";
+  		 */	
+  		public static function getFrameOwner(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DOM.getFrameOwner", paramO);
+  		}
+  		
 	}
 
 }

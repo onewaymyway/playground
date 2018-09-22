@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -12,14 +13,16 @@ package debugprotocol
 		}
 		public static const DependDomains:Array=[];
   	
-  	
   		/**
   		 * clearDeviceOrientationOverride
   		 * Clears the overridden Device Orientation.
   		 * @return 
-  		 */
-  		public static const clearDeviceOrientationOverride:String = "DeviceOrientation.clearDeviceOrientationOverride";
-  	
+  		 */	
+  		public static function clearDeviceOrientationOverride(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DeviceOrientation.clearDeviceOrientationOverride", paramO);
+  		}
+  		
   		/**
   		 * setDeviceOrientationOverride
   		 * Overrides the Device Orientation.
@@ -27,8 +30,12 @@ package debugprotocol
   		 * @param beta:number optional:{#@optional#} Mock beta
   		 * @param gamma:number optional:{#@optional#} Mock gamma
   		 * @return 
-  		 */
-  		public static const setDeviceOrientationOverride:String = "DeviceOrientation.setDeviceOrientationOverride";
+  		 */	
+  		public static function setDeviceOrientationOverride(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("DeviceOrientation.setDeviceOrientationOverride", paramO);
+  		}
+  		
 	}
 
 }

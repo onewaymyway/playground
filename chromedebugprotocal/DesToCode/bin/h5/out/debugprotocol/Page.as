@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -192,30 +193,38 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const compilationCacheProduced:String = "Page.compilationCacheProduced";
-  	
   		/**
   		 * addScriptToEvaluateOnLoad
   		 * Deprecated, please use addScriptToEvaluateOnNewDocument instead.
   		 * @param scriptSource:string optional:{#@optional#} {#@description#}
   		 * @return identifier:{#@type#} optional:{#@optional#} Identifier of the added script.
-  		 */
-  		public static const addScriptToEvaluateOnLoad:String = "Page.addScriptToEvaluateOnLoad";
-  	
+  		 */	
+  		public static function addScriptToEvaluateOnLoad(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.addScriptToEvaluateOnLoad", paramO);
+  		}
+  		
   		/**
   		 * addScriptToEvaluateOnNewDocument
   		 * Evaluates given script in every frame upon creation (before loading frame's scripts).
   		 * @param source:string optional:{#@optional#} {#@description#}
   		 * @return identifier:{#@type#} optional:{#@optional#} Identifier of the added script.
-  		 */
-  		public static const addScriptToEvaluateOnNewDocument:String = "Page.addScriptToEvaluateOnNewDocument";
-  	
+  		 */	
+  		public static function addScriptToEvaluateOnNewDocument(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.addScriptToEvaluateOnNewDocument", paramO);
+  		}
+  		
   		/**
   		 * bringToFront
   		 * Brings page to front (activates tab).
   		 * @return 
-  		 */
-  		public static const bringToFront:String = "Page.bringToFront";
-  	
+  		 */	
+  		public static function bringToFront(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.bringToFront", paramO);
+  		}
+  		
   		/**
   		 * captureScreenshot
   		 * Capture page screenshot.
@@ -224,30 +233,42 @@ package debugprotocol
   		 * @param clip:{#@type#} optional:true Capture the screenshot of a given region only.
   		 * @param fromSurface:boolean optional:true Capture the screenshot from the surface, rather than the view. Defaults to true.
   		 * @return data:string optional:{#@optional#} Base64-encoded image data.
-  		 */
-  		public static const captureScreenshot:String = "Page.captureScreenshot";
-  	
+  		 */	
+  		public static function captureScreenshot(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.captureScreenshot", paramO);
+  		}
+  		
   		/**
   		 * clearDeviceMetricsOverride
   		 * Clears the overriden device metrics.
   		 * @return 
-  		 */
-  		public static const clearDeviceMetricsOverride:String = "Page.clearDeviceMetricsOverride";
-  	
+  		 */	
+  		public static function clearDeviceMetricsOverride(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.clearDeviceMetricsOverride", paramO);
+  		}
+  		
   		/**
   		 * clearDeviceOrientationOverride
   		 * Clears the overridden Device Orientation.
   		 * @return 
-  		 */
-  		public static const clearDeviceOrientationOverride:String = "Page.clearDeviceOrientationOverride";
-  	
+  		 */	
+  		public static function clearDeviceOrientationOverride(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.clearDeviceOrientationOverride", paramO);
+  		}
+  		
   		/**
   		 * clearGeolocationOverride
   		 * Clears the overriden Geolocation Position and Error.
   		 * @return 
-  		 */
-  		public static const clearGeolocationOverride:String = "Page.clearGeolocationOverride";
-  	
+  		 */	
+  		public static function clearGeolocationOverride(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.clearGeolocationOverride", paramO);
+  		}
+  		
   		/**
   		 * createIsolatedWorld
   		 * Creates an isolated world for the given frame.
@@ -256,83 +277,116 @@ package debugprotocol
   		 * @param grantUniveralAccess:boolean optional:true Whether or not universal access should be granted to the isolated world. This is a powerful
   	option, use with caution.
   		 * @return executionContextId:{#@type#} optional:{#@optional#} Execution context of the isolated world.
-  		 */
-  		public static const createIsolatedWorld:String = "Page.createIsolatedWorld";
-  	
+  		 */	
+  		public static function createIsolatedWorld(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.createIsolatedWorld", paramO);
+  		}
+  		
   		/**
   		 * deleteCookie
   		 * Deletes browser cookie with given name, domain and path.
   		 * @param cookieName:string optional:{#@optional#} Name of the cookie to remove.
   		 * @param url:string optional:{#@optional#} URL to match cooke domain and path.
   		 * @return 
-  		 */
-  		public static const deleteCookie:String = "Page.deleteCookie";
-  	
+  		 */	
+  		public static function deleteCookie(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.deleteCookie", paramO);
+  		}
+  		
   		/**
   		 * disable
   		 * Disables page domain notifications.
   		 * @return 
-  		 */
-  		public static const disable:String = "Page.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.disable", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * Enables page domain notifications.
   		 * @return 
-  		 */
-  		public static const enable:String = "Page.enable";
-  	
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.enable", paramO);
+  		}
+  		
   		/**
   		 * getAppManifest
   		 * @return url:string optional:{#@optional#} Manifest location.
-  		 */
-  		public static const getAppManifest:String = "Page.getAppManifest";
-  	
+  		 */	
+  		public static function getAppManifest(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.getAppManifest", paramO);
+  		}
+  		
   		/**
   		 * getCookies
   		 * Returns all browser cookies. Depending on the backend support, will return detailed cookie
   	information in the `cookies` field.
   		 * @return cookies:array optional:{#@optional#} Array of cookie objects.
-  		 */
-  		public static const getCookies:String = "Page.getCookies";
-  	
+  		 */	
+  		public static function getCookies(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.getCookies", paramO);
+  		}
+  		
   		/**
   		 * getFrameTree
   		 * Returns present frame tree structure.
   		 * @return frameTree:{#@type#} optional:{#@optional#} Present frame tree structure.
-  		 */
-  		public static const getFrameTree:String = "Page.getFrameTree";
-  	
+  		 */	
+  		public static function getFrameTree(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.getFrameTree", paramO);
+  		}
+  		
   		/**
   		 * getLayoutMetrics
   		 * Returns metrics relating to the layouting of the page, such as viewport bounds/scale.
   		 * @return layoutViewport:{#@type#} optional:{#@optional#} Metrics relating to the layout viewport.
-  		 */
-  		public static const getLayoutMetrics:String = "Page.getLayoutMetrics";
-  	
+  		 */	
+  		public static function getLayoutMetrics(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.getLayoutMetrics", paramO);
+  		}
+  		
   		/**
   		 * getNavigationHistory
   		 * Returns navigation history for the current page.
   		 * @return currentIndex:integer optional:{#@optional#} Index of the current navigation history entry.
-  		 */
-  		public static const getNavigationHistory:String = "Page.getNavigationHistory";
-  	
+  		 */	
+  		public static function getNavigationHistory(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.getNavigationHistory", paramO);
+  		}
+  		
   		/**
   		 * getResourceContent
   		 * Returns content of the given resource.
   		 * @param frameId:{#@type#} optional:{#@optional#} Frame id to get resource for.
   		 * @param url:string optional:{#@optional#} URL of the resource to get content for.
   		 * @return content:string optional:{#@optional#} Resource content.
-  		 */
-  		public static const getResourceContent:String = "Page.getResourceContent";
-  	
+  		 */	
+  		public static function getResourceContent(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.getResourceContent", paramO);
+  		}
+  		
   		/**
   		 * getResourceTree
   		 * Returns present frame / resource tree structure.
   		 * @return frameTree:{#@type#} optional:{#@optional#} Present frame / resource tree structure.
-  		 */
-  		public static const getResourceTree:String = "Page.getResourceTree";
-  	
+  		 */	
+  		public static function getResourceTree(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.getResourceTree", paramO);
+  		}
+  		
   		/**
   		 * handleJavaScriptDialog
   		 * Accepts or dismisses a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload).
@@ -340,9 +394,12 @@ package debugprotocol
   		 * @param promptText:string optional:true The text to enter into the dialog prompt before accepting. Used only if this is a prompt
   	dialog.
   		 * @return 
-  		 */
-  		public static const handleJavaScriptDialog:String = "Page.handleJavaScriptDialog";
-  	
+  		 */	
+  		public static function handleJavaScriptDialog(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.handleJavaScriptDialog", paramO);
+  		}
+  		
   		/**
   		 * navigate
   		 * Navigates current page to the given URL.
@@ -351,17 +408,23 @@ package debugprotocol
   		 * @param transitionType:{#@type#} optional:true Intended transition type.
   		 * @param frameId:{#@type#} optional:true Frame id to navigate, if not specified navigates the top frame.
   		 * @return frameId:{#@type#} optional:{#@optional#} Frame id that has navigated (or failed to navigate)
-  		 */
-  		public static const navigate:String = "Page.navigate";
-  	
+  		 */	
+  		public static function navigate(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.navigate", paramO);
+  		}
+  		
   		/**
   		 * navigateToHistoryEntry
   		 * Navigates current page to the given history entry.
   		 * @param entryId:integer optional:{#@optional#} Unique id of the entry to navigate to.
   		 * @return 
-  		 */
-  		public static const navigateToHistoryEntry:String = "Page.navigateToHistoryEntry";
-  	
+  		 */	
+  		public static function navigateToHistoryEntry(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.navigateToHistoryEntry", paramO);
+  		}
+  		
   		/**
   		 * printToPDF
   		 * Print page as PDF.
@@ -392,9 +455,12 @@ package debugprotocol
   		 * @param preferCSSPageSize:boolean optional:true Whether or not to prefer page size as defined by css. Defaults to false,
   	in which case the content will be scaled to fit the paper size.
   		 * @return data:string optional:{#@optional#} Base64-encoded pdf data.
-  		 */
-  		public static const printToPDF:String = "Page.printToPDF";
-  	
+  		 */	
+  		public static function printToPDF(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.printToPDF", paramO);
+  		}
+  		
   		/**
   		 * reload
   		 * Reloads given page optionally ignoring the cache.
@@ -402,39 +468,54 @@ package debugprotocol
   		 * @param scriptToEvaluateOnLoad:string optional:true If set, the script will be injected into all frames of the inspected page after reload.
   	Argument will be ignored if reloading dataURL origin.
   		 * @return 
-  		 */
-  		public static const reload:String = "Page.reload";
-  	
+  		 */	
+  		public static function reload(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.reload", paramO);
+  		}
+  		
   		/**
   		 * removeScriptToEvaluateOnLoad
   		 * Deprecated, please use removeScriptToEvaluateOnNewDocument instead.
   		 * @param identifier:{#@type#} optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const removeScriptToEvaluateOnLoad:String = "Page.removeScriptToEvaluateOnLoad";
-  	
+  		 */	
+  		public static function removeScriptToEvaluateOnLoad(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.removeScriptToEvaluateOnLoad", paramO);
+  		}
+  		
   		/**
   		 * removeScriptToEvaluateOnNewDocument
   		 * Removes given script from the list.
   		 * @param identifier:{#@type#} optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const removeScriptToEvaluateOnNewDocument:String = "Page.removeScriptToEvaluateOnNewDocument";
-  	
+  		 */	
+  		public static function removeScriptToEvaluateOnNewDocument(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.removeScriptToEvaluateOnNewDocument", paramO);
+  		}
+  		
   		/**
   		 * requestAppBanner
   		 * @return 
-  		 */
-  		public static const requestAppBanner:String = "Page.requestAppBanner";
-  	
+  		 */	
+  		public static function requestAppBanner(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.requestAppBanner", paramO);
+  		}
+  		
   		/**
   		 * screencastFrameAck
   		 * Acknowledges that a screencast frame has been received by the frontend.
   		 * @param sessionId:integer optional:{#@optional#} Frame number.
   		 * @return 
-  		 */
-  		public static const screencastFrameAck:String = "Page.screencastFrameAck";
-  	
+  		 */	
+  		public static function screencastFrameAck(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.screencastFrameAck", paramO);
+  		}
+  		
   		/**
   		 * searchInResource
   		 * Searches for given string in resource content.
@@ -444,25 +525,34 @@ package debugprotocol
   		 * @param caseSensitive:boolean optional:true If true, search is case sensitive.
   		 * @param isRegex:boolean optional:true If true, treats string parameter as regex.
   		 * @return result:array optional:{#@optional#} List of search matches.
-  		 */
-  		public static const searchInResource:String = "Page.searchInResource";
-  	
+  		 */	
+  		public static function searchInResource(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.searchInResource", paramO);
+  		}
+  		
   		/**
   		 * setAdBlockingEnabled
   		 * Enable Chrome's experimental ad filter on all sites.
   		 * @param enabled:boolean optional:{#@optional#} Whether to block ads.
   		 * @return 
-  		 */
-  		public static const setAdBlockingEnabled:String = "Page.setAdBlockingEnabled";
-  	
+  		 */	
+  		public static function setAdBlockingEnabled(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.setAdBlockingEnabled", paramO);
+  		}
+  		
   		/**
   		 * setBypassCSP
   		 * Enable page Content Security Policy by-passing.
   		 * @param enabled:boolean optional:{#@optional#} Whether to bypass page CSP.
   		 * @return 
-  		 */
-  		public static const setBypassCSP:String = "Page.setBypassCSP";
-  	
+  		 */	
+  		public static function setBypassCSP(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.setBypassCSP", paramO);
+  		}
+  		
   		/**
   		 * setDeviceMetricsOverride
   		 * Overrides the values of device screen dimensions (window.screen.width, window.screen.height,
@@ -482,9 +572,12 @@ package debugprotocol
   		 * @param screenOrientation:{#@type#} optional:true Screen orientation override.
   		 * @param viewport:{#@type#} optional:true The viewport dimensions and scale. If not set, the override is cleared.
   		 * @return 
-  		 */
-  		public static const setDeviceMetricsOverride:String = "Page.setDeviceMetricsOverride";
-  	
+  		 */	
+  		public static function setDeviceMetricsOverride(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.setDeviceMetricsOverride", paramO);
+  		}
+  		
   		/**
   		 * setDeviceOrientationOverride
   		 * Overrides the Device Orientation.
@@ -492,34 +585,46 @@ package debugprotocol
   		 * @param beta:number optional:{#@optional#} Mock beta
   		 * @param gamma:number optional:{#@optional#} Mock gamma
   		 * @return 
-  		 */
-  		public static const setDeviceOrientationOverride:String = "Page.setDeviceOrientationOverride";
-  	
+  		 */	
+  		public static function setDeviceOrientationOverride(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.setDeviceOrientationOverride", paramO);
+  		}
+  		
   		/**
   		 * setFontFamilies
   		 * Set generic font families.
   		 * @param fontFamilies:{#@type#} optional:{#@optional#} Specifies font families to set. If a font family is not specified, it won't be changed.
   		 * @return 
-  		 */
-  		public static const setFontFamilies:String = "Page.setFontFamilies";
-  	
+  		 */	
+  		public static function setFontFamilies(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.setFontFamilies", paramO);
+  		}
+  		
   		/**
   		 * setFontSizes
   		 * Set default font sizes.
   		 * @param fontSizes:{#@type#} optional:{#@optional#} Specifies font sizes to set. If a font size is not specified, it won't be changed.
   		 * @return 
-  		 */
-  		public static const setFontSizes:String = "Page.setFontSizes";
-  	
+  		 */	
+  		public static function setFontSizes(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.setFontSizes", paramO);
+  		}
+  		
   		/**
   		 * setDocumentContent
   		 * Sets given markup as the document's HTML.
   		 * @param frameId:{#@type#} optional:{#@optional#} Frame id to set HTML for.
   		 * @param html:string optional:{#@optional#} HTML content to set.
   		 * @return 
-  		 */
-  		public static const setDocumentContent:String = "Page.setDocumentContent";
-  	
+  		 */	
+  		public static function setDocumentContent(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.setDocumentContent", paramO);
+  		}
+  		
   		/**
   		 * setDownloadBehavior
   		 * Set the behavior when downloading a file.
@@ -527,9 +632,12 @@ package debugprotocol
   	available (otherwise deny).
   		 * @param downloadPath:string optional:true The default path to save downloaded files to. This is requred if behavior is set to 'allow'
   		 * @return 
-  		 */
-  		public static const setDownloadBehavior:String = "Page.setDownloadBehavior";
-  	
+  		 */	
+  		public static function setDownloadBehavior(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.setDownloadBehavior", paramO);
+  		}
+  		
   		/**
   		 * setGeolocationOverride
   		 * Overrides the Geolocation Position or Error. Omitting any of the parameters emulates position
@@ -538,26 +646,35 @@ package debugprotocol
   		 * @param longitude:number optional:true Mock longitude
   		 * @param accuracy:number optional:true Mock accuracy
   		 * @return 
-  		 */
-  		public static const setGeolocationOverride:String = "Page.setGeolocationOverride";
-  	
+  		 */	
+  		public static function setGeolocationOverride(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.setGeolocationOverride", paramO);
+  		}
+  		
   		/**
   		 * setLifecycleEventsEnabled
   		 * Controls whether page will emit lifecycle events.
   		 * @param enabled:boolean optional:{#@optional#} If true, starts emitting lifecycle events.
   		 * @return 
-  		 */
-  		public static const setLifecycleEventsEnabled:String = "Page.setLifecycleEventsEnabled";
-  	
+  		 */	
+  		public static function setLifecycleEventsEnabled(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.setLifecycleEventsEnabled", paramO);
+  		}
+  		
   		/**
   		 * setTouchEmulationEnabled
   		 * Toggles mouse event-based touch event emulation.
   		 * @param enabled:boolean optional:{#@optional#} Whether the touch event emulation should be enabled.
   		 * @param configuration:string optional:true Touch/gesture events configuration. Default: current platform.
   		 * @return 
-  		 */
-  		public static const setTouchEmulationEnabled:String = "Page.setTouchEmulationEnabled";
-  	
+  		 */	
+  		public static function setTouchEmulationEnabled(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.setTouchEmulationEnabled", paramO);
+  		}
+  		
   		/**
   		 * startScreencast
   		 * Starts sending each frame using the `screencastFrame` event.
@@ -567,30 +684,42 @@ package debugprotocol
   		 * @param maxHeight:integer optional:true Maximum screenshot height.
   		 * @param everyNthFrame:integer optional:true Send every n-th frame.
   		 * @return 
-  		 */
-  		public static const startScreencast:String = "Page.startScreencast";
-  	
+  		 */	
+  		public static function startScreencast(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.startScreencast", paramO);
+  		}
+  		
   		/**
   		 * stopLoading
   		 * Force the page stop all navigations and pending resource fetches.
   		 * @return 
-  		 */
-  		public static const stopLoading:String = "Page.stopLoading";
-  	
+  		 */	
+  		public static function stopLoading(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.stopLoading", paramO);
+  		}
+  		
   		/**
   		 * crash
   		 * Crashes renderer on the IO thread, generates minidumps.
   		 * @return 
-  		 */
-  		public static const crash:String = "Page.crash";
-  	
+  		 */	
+  		public static function crash(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.crash", paramO);
+  		}
+  		
   		/**
   		 * close
   		 * Tries to close page, running its beforeunload hooks, if any.
   		 * @return 
-  		 */
-  		public static const close:String = "Page.close";
-  	
+  		 */	
+  		public static function close(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.close", paramO);
+  		}
+  		
   		/**
   		 * setWebLifecycleState
   		 * Tries to update the web lifecycle state of the page.
@@ -598,24 +727,33 @@ package debugprotocol
   	https://github.com/WICG/web-lifecycle/
   		 * @param state:string optional:{#@optional#} Target lifecycle state
   		 * @return 
-  		 */
-  		public static const setWebLifecycleState:String = "Page.setWebLifecycleState";
-  	
+  		 */	
+  		public static function setWebLifecycleState(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.setWebLifecycleState", paramO);
+  		}
+  		
   		/**
   		 * stopScreencast
   		 * Stops sending each frame in the `screencastFrame`.
   		 * @return 
-  		 */
-  		public static const stopScreencast:String = "Page.stopScreencast";
-  	
+  		 */	
+  		public static function stopScreencast(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.stopScreencast", paramO);
+  		}
+  		
   		/**
   		 * setProduceCompilationCache
   		 * Forces compilation cache to be generated for every subresource script.
   		 * @param enabled:boolean optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const setProduceCompilationCache:String = "Page.setProduceCompilationCache";
-  	
+  		 */	
+  		public static function setProduceCompilationCache(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.setProduceCompilationCache", paramO);
+  		}
+  		
   		/**
   		 * addCompilationCache
   		 * Seeds compilation cache for given url. Compilation cache does not survive
@@ -623,24 +761,34 @@ package debugprotocol
   		 * @param url:string optional:{#@optional#} {#@description#}
   		 * @param data:string optional:{#@optional#} Base64-encoded data
   		 * @return 
-  		 */
-  		public static const addCompilationCache:String = "Page.addCompilationCache";
-  	
+  		 */	
+  		public static function addCompilationCache(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.addCompilationCache", paramO);
+  		}
+  		
   		/**
   		 * clearCompilationCache
   		 * Clears seeded compilation cache.
   		 * @return 
-  		 */
-  		public static const clearCompilationCache:String = "Page.clearCompilationCache";
-  	
+  		 */	
+  		public static function clearCompilationCache(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.clearCompilationCache", paramO);
+  		}
+  		
   		/**
   		 * generateTestReport
   		 * Generates a report for testing.
   		 * @param message:string optional:{#@optional#} Message to be displayed in the report.
   		 * @param group:string optional:true Specifies the endpoint group to deliver the report to.
   		 * @return 
-  		 */
-  		public static const generateTestReport:String = "Page.generateTestReport";
+  		 */	
+  		public static function generateTestReport(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Page.generateTestReport", paramO);
+  		}
+  		
 	}
 
 }

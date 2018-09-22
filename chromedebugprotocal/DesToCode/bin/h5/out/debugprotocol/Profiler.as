@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -31,41 +32,55 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const consoleProfileStarted:String = "Profiler.consoleProfileStarted";
-  	
   		/**
   		 * disable
   		 * @return 
-  		 */
-  		public static const disable:String = "Profiler.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Profiler.disable", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * @return 
-  		 */
-  		public static const enable:String = "Profiler.enable";
-  	
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Profiler.enable", paramO);
+  		}
+  		
   		/**
   		 * getBestEffortCoverage
   		 * Collect coverage data for the current isolate. The coverage data may be incomplete due to
   	garbage collection.
   		 * @return result:array optional:{#@optional#} Coverage data for the current isolate.
-  		 */
-  		public static const getBestEffortCoverage:String = "Profiler.getBestEffortCoverage";
-  	
+  		 */	
+  		public static function getBestEffortCoverage(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Profiler.getBestEffortCoverage", paramO);
+  		}
+  		
   		/**
   		 * setSamplingInterval
   		 * Changes CPU profiler sampling interval. Must be called before CPU profiles recording started.
   		 * @param interval:integer optional:{#@optional#} New sampling interval in microseconds.
   		 * @return 
-  		 */
-  		public static const setSamplingInterval:String = "Profiler.setSamplingInterval";
-  	
+  		 */	
+  		public static function setSamplingInterval(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Profiler.setSamplingInterval", paramO);
+  		}
+  		
   		/**
   		 * start
   		 * @return 
-  		 */
-  		public static const start:String = "Profiler.start";
-  	
+  		 */	
+  		public static function start(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Profiler.start", paramO);
+  		}
+  		
   		/**
   		 * startPreciseCoverage
   		 * Enable precise code coverage. Coverage data for JavaScript executed before enabling precise code
@@ -74,51 +89,73 @@ package debugprotocol
   		 * @param callCount:boolean optional:true Collect accurate call counts beyond simple 'covered' or 'not covered'.
   		 * @param detailed:boolean optional:true Collect block-based coverage.
   		 * @return 
-  		 */
-  		public static const startPreciseCoverage:String = "Profiler.startPreciseCoverage";
-  	
+  		 */	
+  		public static function startPreciseCoverage(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Profiler.startPreciseCoverage", paramO);
+  		}
+  		
   		/**
   		 * startTypeProfile
   		 * Enable type profile.
   		 * @return 
-  		 */
-  		public static const startTypeProfile:String = "Profiler.startTypeProfile";
-  	
+  		 */	
+  		public static function startTypeProfile(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Profiler.startTypeProfile", paramO);
+  		}
+  		
   		/**
   		 * stop
   		 * @return profile:{#@type#} optional:{#@optional#} Recorded profile.
-  		 */
-  		public static const stop:String = "Profiler.stop";
-  	
+  		 */	
+  		public static function stop(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Profiler.stop", paramO);
+  		}
+  		
   		/**
   		 * stopPreciseCoverage
   		 * Disable precise code coverage. Disabling releases unnecessary execution count records and allows
   	executing optimized code.
   		 * @return 
-  		 */
-  		public static const stopPreciseCoverage:String = "Profiler.stopPreciseCoverage";
-  	
+  		 */	
+  		public static function stopPreciseCoverage(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Profiler.stopPreciseCoverage", paramO);
+  		}
+  		
   		/**
   		 * stopTypeProfile
   		 * Disable type profile. Disabling releases type profile data collected so far.
   		 * @return 
-  		 */
-  		public static const stopTypeProfile:String = "Profiler.stopTypeProfile";
-  	
+  		 */	
+  		public static function stopTypeProfile(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Profiler.stopTypeProfile", paramO);
+  		}
+  		
   		/**
   		 * takePreciseCoverage
   		 * Collect coverage data for the current isolate, and resets execution counters. Precise code
   	coverage needs to have started.
   		 * @return result:array optional:{#@optional#} Coverage data for the current isolate.
-  		 */
-  		public static const takePreciseCoverage:String = "Profiler.takePreciseCoverage";
-  	
+  		 */	
+  		public static function takePreciseCoverage(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Profiler.takePreciseCoverage", paramO);
+  		}
+  		
   		/**
   		 * takeTypeProfile
   		 * Collect type profile.
   		 * @return result:array optional:{#@optional#} Type profile for all scripts since startTypeProfile() was turned on.
-  		 */
-  		public static const takeTypeProfile:String = "Profiler.takeTypeProfile";
+  		 */	
+  		public static function takeTypeProfile(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Profiler.takeTypeProfile", paramO);
+  		}
+  		
 	}
 
 }

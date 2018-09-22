@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -11,7 +12,6 @@ package debugprotocol
 			
 		}
 		public static const DependDomains:Array=[];
-  	
   	
   		/**
   		 * dispatchKeyEvent
@@ -36,18 +36,24 @@ package debugprotocol
   		 * @param location:integer optional:true Whether the event was from the left or right side of the keyboard. 1=Left, 2=Right (default:
   	0).
   		 * @return 
-  		 */
-  		public static const dispatchKeyEvent:String = "Input.dispatchKeyEvent";
-  	
+  		 */	
+  		public static function dispatchKeyEvent(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Input.dispatchKeyEvent", paramO);
+  		}
+  		
   		/**
   		 * insertText
   		 * This method emulates inserting text that doesn't come from a key press,
   	for example an emoji keyboard or an IME.
   		 * @param text:string optional:{#@optional#} The text to insert.
   		 * @return 
-  		 */
-  		public static const insertText:String = "Input.insertText";
-  	
+  		 */	
+  		public static function insertText(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Input.insertText", paramO);
+  		}
+  		
   		/**
   		 * dispatchMouseEvent
   		 * Dispatches a mouse event to the page.
@@ -63,9 +69,12 @@ package debugprotocol
   		 * @param deltaX:number optional:true X delta in CSS pixels for mouse wheel event (default: 0).
   		 * @param deltaY:number optional:true Y delta in CSS pixels for mouse wheel event (default: 0).
   		 * @return 
-  		 */
-  		public static const dispatchMouseEvent:String = "Input.dispatchMouseEvent";
-  	
+  		 */	
+  		public static function dispatchMouseEvent(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Input.dispatchMouseEvent", paramO);
+  		}
+  		
   		/**
   		 * dispatchTouchEvent
   		 * Dispatches a touch event to the page.
@@ -78,9 +87,12 @@ package debugprotocol
   	(default: 0).
   		 * @param timestamp:{#@type#} optional:true Time at which the event occurred.
   		 * @return 
-  		 */
-  		public static const dispatchTouchEvent:String = "Input.dispatchTouchEvent";
-  	
+  		 */	
+  		public static function dispatchTouchEvent(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Input.dispatchTouchEvent", paramO);
+  		}
+  		
   		/**
   		 * emulateTouchFromMouseEvent
   		 * Emulates touch event from the mouse event parameters.
@@ -95,17 +107,23 @@ package debugprotocol
   	(default: 0).
   		 * @param clickCount:integer optional:true Number of times the mouse button was clicked (default: 0).
   		 * @return 
-  		 */
-  		public static const emulateTouchFromMouseEvent:String = "Input.emulateTouchFromMouseEvent";
-  	
+  		 */	
+  		public static function emulateTouchFromMouseEvent(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Input.emulateTouchFromMouseEvent", paramO);
+  		}
+  		
   		/**
   		 * setIgnoreInputEvents
   		 * Ignores input events (useful while auditing page).
   		 * @param ignore:boolean optional:{#@optional#} Ignores input events processing when set to true.
   		 * @return 
-  		 */
-  		public static const setIgnoreInputEvents:String = "Input.setIgnoreInputEvents";
-  	
+  		 */	
+  		public static function setIgnoreInputEvents(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Input.setIgnoreInputEvents", paramO);
+  		}
+  		
   		/**
   		 * synthesizePinchGesture
   		 * Synthesizes a pinch gesture over a time period by issuing appropriate touch events.
@@ -116,9 +134,12 @@ package debugprotocol
   		 * @param gestureSourceType:{#@type#} optional:true Which type of input events to be generated (default: 'default', which queries the platform
   	for the preferred input type).
   		 * @return 
-  		 */
-  		public static const synthesizePinchGesture:String = "Input.synthesizePinchGesture";
-  	
+  		 */	
+  		public static function synthesizePinchGesture(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Input.synthesizePinchGesture", paramO);
+  		}
+  		
   		/**
   		 * synthesizeScrollGesture
   		 * Synthesizes a scroll gesture over a time period by issuing appropriate touch events.
@@ -138,9 +159,12 @@ package debugprotocol
   		 * @param repeatDelayMs:integer optional:true The number of milliseconds delay between each repeat. (default: 250).
   		 * @param interactionMarkerName:string optional:true The name of the interaction markers to generate, if not empty (default: "").
   		 * @return 
-  		 */
-  		public static const synthesizeScrollGesture:String = "Input.synthesizeScrollGesture";
-  	
+  		 */	
+  		public static function synthesizeScrollGesture(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Input.synthesizeScrollGesture", paramO);
+  		}
+  		
   		/**
   		 * synthesizeTapGesture
   		 * Synthesizes a tap gesture over a time period by issuing appropriate touch events.
@@ -151,8 +175,12 @@ package debugprotocol
   		 * @param gestureSourceType:{#@type#} optional:true Which type of input events to be generated (default: 'default', which queries the platform
   	for the preferred input type).
   		 * @return 
-  		 */
-  		public static const synthesizeTapGesture:String = "Input.synthesizeTapGesture";
+  		 */	
+  		public static function synthesizeTapGesture(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Input.synthesizeTapGesture", paramO);
+  		}
+  		
 	}
 
 }

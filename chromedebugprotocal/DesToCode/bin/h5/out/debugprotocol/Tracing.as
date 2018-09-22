@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -41,36 +42,47 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const tracingComplete:String = "Tracing.tracingComplete";
-  	
   		/**
   		 * end
   		 * Stop trace events collection.
   		 * @return 
-  		 */
-  		public static const end:String = "Tracing.end";
-  	
+  		 */	
+  		public static function end(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Tracing.end", paramO);
+  		}
+  		
   		/**
   		 * getCategories
   		 * Gets supported tracing categories.
   		 * @return categories:array optional:{#@optional#} A list of supported tracing categories.
-  		 */
-  		public static const getCategories:String = "Tracing.getCategories";
-  	
+  		 */	
+  		public static function getCategories(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Tracing.getCategories", paramO);
+  		}
+  		
   		/**
   		 * recordClockSyncMarker
   		 * Record a clock sync marker in the trace.
   		 * @param syncId:string optional:{#@optional#} The ID of this clock sync marker
   		 * @return 
-  		 */
-  		public static const recordClockSyncMarker:String = "Tracing.recordClockSyncMarker";
-  	
+  		 */	
+  		public static function recordClockSyncMarker(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Tracing.recordClockSyncMarker", paramO);
+  		}
+  		
   		/**
   		 * requestMemoryDump
   		 * Request a global memory dump.
   		 * @return dumpGuid:string optional:{#@optional#} GUID of the resulting global memory dump.
-  		 */
-  		public static const requestMemoryDump:String = "Tracing.requestMemoryDump";
-  	
+  		 */	
+  		public static function requestMemoryDump(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Tracing.requestMemoryDump", paramO);
+  		}
+  		
   		/**
   		 * start
   		 * Start trace events collection.
@@ -83,8 +95,12 @@ package debugprotocol
   	transfer mode (defaults to `none`)
   		 * @param traceConfig:{#@type#} optional:true {#@description#}
   		 * @return 
-  		 */
-  		public static const start:String = "Tracing.start";
+  		 */	
+  		public static function start(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Tracing.start", paramO);
+  		}
+  		
 	}
 
 }

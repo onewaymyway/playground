@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -77,39 +78,50 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const targetInfoChanged:String = "Target.targetInfoChanged";
-  	
   		/**
   		 * activateTarget
   		 * Activates (focuses) the target.
   		 * @param targetId:{#@type#} optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const activateTarget:String = "Target.activateTarget";
-  	
+  		 */	
+  		public static function activateTarget(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.activateTarget", paramO);
+  		}
+  		
   		/**
   		 * attachToTarget
   		 * Attaches to the target with given id.
   		 * @param targetId:{#@type#} optional:{#@optional#} {#@description#}
   		 * @param flatten:boolean optional:true Enables "flat" access to the session via specifying sessionId attribute in the commands.
   		 * @return sessionId:{#@type#} optional:{#@optional#} Id assigned to the session.
-  		 */
-  		public static const attachToTarget:String = "Target.attachToTarget";
-  	
+  		 */	
+  		public static function attachToTarget(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.attachToTarget", paramO);
+  		}
+  		
   		/**
   		 * attachToBrowserTarget
   		 * Attaches to the browser target, only uses flat sessionId mode.
   		 * @return sessionId:{#@type#} optional:{#@optional#} Id assigned to the session.
-  		 */
-  		public static const attachToBrowserTarget:String = "Target.attachToBrowserTarget";
-  	
+  		 */	
+  		public static function attachToBrowserTarget(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.attachToBrowserTarget", paramO);
+  		}
+  		
   		/**
   		 * closeTarget
   		 * Closes the target. If the target is a page that gets closed too.
   		 * @param targetId:{#@type#} optional:{#@optional#} {#@description#}
   		 * @return success:boolean optional:{#@optional#} {#@description#}
-  		 */
-  		public static const closeTarget:String = "Target.closeTarget";
-  	
+  		 */	
+  		public static function closeTarget(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.closeTarget", paramO);
+  		}
+  		
   		/**
   		 * exposeDevToolsProtocol
   		 * Inject object to the target's main frame that provides a communication
@@ -123,24 +135,33 @@ package debugprotocol
   		 * @param targetId:{#@type#} optional:{#@optional#} {#@description#}
   		 * @param bindingName:string optional:true Binding name, 'cdp' if not specified.
   		 * @return 
-  		 */
-  		public static const exposeDevToolsProtocol:String = "Target.exposeDevToolsProtocol";
-  	
+  		 */	
+  		public static function exposeDevToolsProtocol(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.exposeDevToolsProtocol", paramO);
+  		}
+  		
   		/**
   		 * createBrowserContext
   		 * Creates a new empty BrowserContext. Similar to an incognito profile but you can have more than
   	one.
   		 * @return browserContextId:{#@type#} optional:{#@optional#} The id of the context created.
-  		 */
-  		public static const createBrowserContext:String = "Target.createBrowserContext";
-  	
+  		 */	
+  		public static function createBrowserContext(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.createBrowserContext", paramO);
+  		}
+  		
   		/**
   		 * getBrowserContexts
   		 * Returns all browser contexts created with `Target.createBrowserContext` method.
   		 * @return browserContextIds:array optional:{#@optional#} An array of browser context ids.
-  		 */
-  		public static const getBrowserContexts:String = "Target.getBrowserContexts";
-  	
+  		 */	
+  		public static function getBrowserContexts(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.getBrowserContexts", paramO);
+  		}
+  		
   		/**
   		 * createTarget
   		 * Creates a new page.
@@ -151,42 +172,57 @@ package debugprotocol
   		 * @param enableBeginFrameControl:boolean optional:true Whether BeginFrames for this target will be controlled via DevTools (headless chrome only,
   	not supported on MacOS yet, false by default).
   		 * @return targetId:{#@type#} optional:{#@optional#} The id of the page opened.
-  		 */
-  		public static const createTarget:String = "Target.createTarget";
-  	
+  		 */	
+  		public static function createTarget(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.createTarget", paramO);
+  		}
+  		
   		/**
   		 * detachFromTarget
   		 * Detaches session with given id.
   		 * @param sessionId:{#@type#} optional:true Session to detach.
   		 * @param targetId:{#@type#} optional:true Deprecated.
   		 * @return 
-  		 */
-  		public static const detachFromTarget:String = "Target.detachFromTarget";
-  	
+  		 */	
+  		public static function detachFromTarget(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.detachFromTarget", paramO);
+  		}
+  		
   		/**
   		 * disposeBrowserContext
   		 * Deletes a BrowserContext. All the belonging pages will be closed without calling their
   	beforeunload hooks.
   		 * @param browserContextId:{#@type#} optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const disposeBrowserContext:String = "Target.disposeBrowserContext";
-  	
+  		 */	
+  		public static function disposeBrowserContext(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.disposeBrowserContext", paramO);
+  		}
+  		
   		/**
   		 * getTargetInfo
   		 * Returns information about a target.
   		 * @param targetId:{#@type#} optional:true {#@description#}
   		 * @return targetInfo:{#@type#} optional:{#@optional#} {#@description#}
-  		 */
-  		public static const getTargetInfo:String = "Target.getTargetInfo";
-  	
+  		 */	
+  		public static function getTargetInfo(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.getTargetInfo", paramO);
+  		}
+  		
   		/**
   		 * getTargets
   		 * Retrieves a list of available targets.
   		 * @return targetInfos:array optional:{#@optional#} The list of targets.
-  		 */
-  		public static const getTargets:String = "Target.getTargets";
-  	
+  		 */	
+  		public static function getTargets(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.getTargets", paramO);
+  		}
+  		
   		/**
   		 * sendMessageToTarget
   		 * Sends protocol message over session with given id.
@@ -194,9 +230,12 @@ package debugprotocol
   		 * @param sessionId:{#@type#} optional:true Identifier of the session.
   		 * @param targetId:{#@type#} optional:true Deprecated.
   		 * @return 
-  		 */
-  		public static const sendMessageToTarget:String = "Target.sendMessageToTarget";
-  	
+  		 */	
+  		public static function sendMessageToTarget(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.sendMessageToTarget", paramO);
+  		}
+  		
   		/**
   		 * setAutoAttach
   		 * Controls whether to automatically attach to new targets which are considered to be related to
@@ -207,26 +246,36 @@ package debugprotocol
   	to run paused targets.
   		 * @param flatten:boolean optional:true Enables "flat" access to the session via specifying sessionId attribute in the commands.
   		 * @return 
-  		 */
-  		public static const setAutoAttach:String = "Target.setAutoAttach";
-  	
+  		 */	
+  		public static function setAutoAttach(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.setAutoAttach", paramO);
+  		}
+  		
   		/**
   		 * setDiscoverTargets
   		 * Controls whether to discover available targets and notify via
   	`targetCreated/targetInfoChanged/targetDestroyed` events.
   		 * @param discover:boolean optional:{#@optional#} Whether to discover available targets.
   		 * @return 
-  		 */
-  		public static const setDiscoverTargets:String = "Target.setDiscoverTargets";
-  	
+  		 */	
+  		public static function setDiscoverTargets(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.setDiscoverTargets", paramO);
+  		}
+  		
   		/**
   		 * setRemoteLocations
   		 * Enables target discovery for the specified locations, when `setDiscoverTargets` was set to
   	`true`.
   		 * @param locations:array optional:{#@optional#} List of remote locations.
   		 * @return 
-  		 */
-  		public static const setRemoteLocations:String = "Target.setRemoteLocations";
+  		 */	
+  		public static function setRemoteLocations(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Target.setRemoteLocations", paramO);
+  		}
+  		
 	}
 
 }

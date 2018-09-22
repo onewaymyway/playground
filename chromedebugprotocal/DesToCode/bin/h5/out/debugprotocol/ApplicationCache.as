@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -27,38 +28,50 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const networkStateUpdated:String = "ApplicationCache.networkStateUpdated";
-  	
   		/**
   		 * enable
   		 * Enables application cache domain notifications.
   		 * @return 
-  		 */
-  		public static const enable:String = "ApplicationCache.enable";
-  	
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ApplicationCache.enable", paramO);
+  		}
+  		
   		/**
   		 * getApplicationCacheForFrame
   		 * Returns relevant application cache data for the document in given frame.
   		 * @param frameId:{#@type#} optional:{#@optional#} Identifier of the frame containing document whose application cache is retrieved.
   		 * @return applicationCache:{#@type#} optional:{#@optional#} Relevant application cache data for the document in given frame.
-  		 */
-  		public static const getApplicationCacheForFrame:String = "ApplicationCache.getApplicationCacheForFrame";
-  	
+  		 */	
+  		public static function getApplicationCacheForFrame(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ApplicationCache.getApplicationCacheForFrame", paramO);
+  		}
+  		
   		/**
   		 * getFramesWithManifests
   		 * Returns array of frame identifiers with manifest urls for each frame containing a document
   	associated with some application cache.
   		 * @return frameIds:array optional:{#@optional#} Array of frame identifiers with manifest urls for each frame containing a document
   	associated with some application cache.
-  		 */
-  		public static const getFramesWithManifests:String = "ApplicationCache.getFramesWithManifests";
-  	
+  		 */	
+  		public static function getFramesWithManifests(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ApplicationCache.getFramesWithManifests", paramO);
+  		}
+  		
   		/**
   		 * getManifestForFrame
   		 * Returns manifest URL for document in the given frame.
   		 * @param frameId:{#@type#} optional:{#@optional#} Identifier of the frame containing document whose manifest is retrieved.
   		 * @return manifestURL:string optional:{#@optional#} Manifest URL for document in the given frame.
-  		 */
-  		public static const getManifestForFrame:String = "ApplicationCache.getManifestForFrame";
+  		 */	
+  		public static function getManifestForFrame(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ApplicationCache.getManifestForFrame", paramO);
+  		}
+  		
 	}
 
 }

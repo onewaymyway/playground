@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -86,31 +87,39 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const scriptParsed:String = "Debugger.scriptParsed";
-  	
   		/**
   		 * continueToLocation
   		 * Continues execution until specific location is reached.
   		 * @param location:{#@type#} optional:{#@optional#} Location to continue to.
   		 * @param targetCallFrames:string optional:true {#@description#}
   		 * @return 
-  		 */
-  		public static const continueToLocation:String = "Debugger.continueToLocation";
-  	
+  		 */	
+  		public static function continueToLocation(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.continueToLocation", paramO);
+  		}
+  		
   		/**
   		 * disable
   		 * Disables debugger for given page.
   		 * @return 
-  		 */
-  		public static const disable:String = "Debugger.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.disable", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * Enables debugger for the given page. Clients should not assume that the debugging has been
   	enabled until the result for this command is received.
   		 * @return debuggerId:{#@type#} optional:{#@optional#} Unique identifier of the debugger.
-  		 */
-  		public static const enable:String = "Debugger.enable";
-  	
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.enable", paramO);
+  		}
+  		
   		/**
   		 * evaluateOnCallFrame
   		 * Evaluates expression on a given call frame.
@@ -127,9 +136,12 @@ package debugprotocol
   		 * @param throwOnSideEffect:boolean optional:true Whether to throw an exception if side effect cannot be ruled out during evaluation.
   		 * @param timeout:{#@type#} optional:true Terminate execution after timing out (number of milliseconds).
   		 * @return result:{#@type#} optional:{#@optional#} Object wrapper for the evaluation result.
-  		 */
-  		public static const evaluateOnCallFrame:String = "Debugger.evaluateOnCallFrame";
-  	
+  		 */	
+  		public static function evaluateOnCallFrame(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.evaluateOnCallFrame", paramO);
+  		}
+  		
   		/**
   		 * getPossibleBreakpoints
   		 * Returns possible locations for breakpoint. scriptId in start and end range locations should be
@@ -139,62 +151,86 @@ package debugprotocol
   	of scripts is used as end of range.
   		 * @param restrictToFunction:boolean optional:true Only consider locations which are in the same (non-nested) function as start.
   		 * @return locations:array optional:{#@optional#} List of the possible breakpoint locations.
-  		 */
-  		public static const getPossibleBreakpoints:String = "Debugger.getPossibleBreakpoints";
-  	
+  		 */	
+  		public static function getPossibleBreakpoints(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.getPossibleBreakpoints", paramO);
+  		}
+  		
   		/**
   		 * getScriptSource
   		 * Returns source for the script with given id.
   		 * @param scriptId:{#@type#} optional:{#@optional#} Id of the script to get source for.
   		 * @return scriptSource:string optional:{#@optional#} Script source.
-  		 */
-  		public static const getScriptSource:String = "Debugger.getScriptSource";
-  	
+  		 */	
+  		public static function getScriptSource(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.getScriptSource", paramO);
+  		}
+  		
   		/**
   		 * getStackTrace
   		 * Returns stack trace with given `stackTraceId`.
   		 * @param stackTraceId:{#@type#} optional:{#@optional#} {#@description#}
   		 * @return stackTrace:{#@type#} optional:{#@optional#} {#@description#}
-  		 */
-  		public static const getStackTrace:String = "Debugger.getStackTrace";
-  	
+  		 */	
+  		public static function getStackTrace(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.getStackTrace", paramO);
+  		}
+  		
   		/**
   		 * pause
   		 * Stops on the next JavaScript statement.
   		 * @return 
-  		 */
-  		public static const pause:String = "Debugger.pause";
-  	
+  		 */	
+  		public static function pause(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.pause", paramO);
+  		}
+  		
   		/**
   		 * pauseOnAsyncCall
   		 * @param parentStackTraceId:{#@type#} optional:{#@optional#} Debugger will pause when async call with given stack trace is started.
   		 * @return 
-  		 */
-  		public static const pauseOnAsyncCall:String = "Debugger.pauseOnAsyncCall";
-  	
+  		 */	
+  		public static function pauseOnAsyncCall(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.pauseOnAsyncCall", paramO);
+  		}
+  		
   		/**
   		 * removeBreakpoint
   		 * Removes JavaScript breakpoint.
   		 * @param breakpointId:{#@type#} optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const removeBreakpoint:String = "Debugger.removeBreakpoint";
-  	
+  		 */	
+  		public static function removeBreakpoint(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.removeBreakpoint", paramO);
+  		}
+  		
   		/**
   		 * restartFrame
   		 * Restarts particular call frame from the beginning.
   		 * @param callFrameId:{#@type#} optional:{#@optional#} Call frame identifier to evaluate on.
   		 * @return callFrames:array optional:{#@optional#} New stack trace.
-  		 */
-  		public static const restartFrame:String = "Debugger.restartFrame";
-  	
+  		 */	
+  		public static function restartFrame(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.restartFrame", paramO);
+  		}
+  		
   		/**
   		 * resume
   		 * Resumes JavaScript execution.
   		 * @return 
-  		 */
-  		public static const resume:String = "Debugger.resume";
-  	
+  		 */	
+  		public static function resume(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.resume", paramO);
+  		}
+  		
   		/**
   		 * scheduleStepIntoAsync
   		 * This method is deprecated - use Debugger.stepInto with breakOnAsyncCall and
@@ -202,9 +238,12 @@ package debugprotocol
   	before next pause. Returns success when async task is actually scheduled, returns error if no
   	task were scheduled or another scheduleStepIntoAsync was called.
   		 * @return 
-  		 */
-  		public static const scheduleStepIntoAsync:String = "Debugger.scheduleStepIntoAsync";
-  	
+  		 */	
+  		public static function scheduleStepIntoAsync(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.scheduleStepIntoAsync", paramO);
+  		}
+  		
   		/**
   		 * searchInContent
   		 * Searches for given string in script content.
@@ -213,18 +252,24 @@ package debugprotocol
   		 * @param caseSensitive:boolean optional:true If true, search is case sensitive.
   		 * @param isRegex:boolean optional:true If true, treats string parameter as regex.
   		 * @return result:array optional:{#@optional#} List of search matches.
-  		 */
-  		public static const searchInContent:String = "Debugger.searchInContent";
-  	
+  		 */	
+  		public static function searchInContent(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.searchInContent", paramO);
+  		}
+  		
   		/**
   		 * setAsyncCallStackDepth
   		 * Enables or disables async call stacks tracking.
   		 * @param maxDepth:integer optional:{#@optional#} Maximum depth of async call stacks. Setting to `0` will effectively disable collecting async
   	call stacks (default).
   		 * @return 
-  		 */
-  		public static const setAsyncCallStackDepth:String = "Debugger.setAsyncCallStackDepth";
-  	
+  		 */	
+  		public static function setAsyncCallStackDepth(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.setAsyncCallStackDepth", paramO);
+  		}
+  		
   		/**
   		 * setBlackboxPatterns
   		 * Replace previous blackbox patterns with passed ones. Forces backend to skip stepping/pausing in
@@ -232,9 +277,12 @@ package debugprotocol
   	performing 'step in' several times, finally resorting to 'step out' if unsuccessful.
   		 * @param patterns:array optional:{#@optional#} Array of regexps that will be used to check script url for blackbox state.
   		 * @return 
-  		 */
-  		public static const setBlackboxPatterns:String = "Debugger.setBlackboxPatterns";
-  	
+  		 */	
+  		public static function setBlackboxPatterns(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.setBlackboxPatterns", paramO);
+  		}
+  		
   		/**
   		 * setBlackboxedRanges
   		 * Makes backend skip steps in the script in blackboxed ranges. VM will try leave blacklisted
@@ -244,9 +292,12 @@ package debugprotocol
   		 * @param scriptId:{#@type#} optional:{#@optional#} Id of the script.
   		 * @param positions:array optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const setBlackboxedRanges:String = "Debugger.setBlackboxedRanges";
-  	
+  		 */	
+  		public static function setBlackboxedRanges(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.setBlackboxedRanges", paramO);
+  		}
+  		
   		/**
   		 * setBreakpoint
   		 * Sets JavaScript breakpoint at a given location.
@@ -254,9 +305,12 @@ package debugprotocol
   		 * @param condition:string optional:true Expression to use as a breakpoint condition. When specified, debugger will only stop on the
   	breakpoint if this expression evaluates to true.
   		 * @return breakpointId:{#@type#} optional:{#@optional#} Id of the created breakpoint for further reference.
-  		 */
-  		public static const setBreakpoint:String = "Debugger.setBreakpoint";
-  	
+  		 */	
+  		public static function setBreakpoint(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.setBreakpoint", paramO);
+  		}
+  		
   		/**
   		 * setBreakpointByUrl
   		 * Sets JavaScript breakpoint at given location specified either by URL or URL regex. Once this
@@ -272,9 +326,12 @@ package debugprotocol
   		 * @param condition:string optional:true Expression to use as a breakpoint condition. When specified, debugger will only stop on the
   	breakpoint if this expression evaluates to true.
   		 * @return breakpointId:{#@type#} optional:{#@optional#} Id of the created breakpoint for further reference.
-  		 */
-  		public static const setBreakpointByUrl:String = "Debugger.setBreakpointByUrl";
-  	
+  		 */	
+  		public static function setBreakpointByUrl(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.setBreakpointByUrl", paramO);
+  		}
+  		
   		/**
   		 * setBreakpointOnFunctionCall
   		 * Sets JavaScript breakpoint before each call to the given function.
@@ -284,34 +341,46 @@ package debugprotocol
   		 * @param condition:string optional:true Expression to use as a breakpoint condition. When specified, debugger will
   	stop on the breakpoint if this expression evaluates to true.
   		 * @return breakpointId:{#@type#} optional:{#@optional#} Id of the created breakpoint for further reference.
-  		 */
-  		public static const setBreakpointOnFunctionCall:String = "Debugger.setBreakpointOnFunctionCall";
-  	
+  		 */	
+  		public static function setBreakpointOnFunctionCall(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.setBreakpointOnFunctionCall", paramO);
+  		}
+  		
   		/**
   		 * setBreakpointsActive
   		 * Activates / deactivates all breakpoints on the page.
   		 * @param active:boolean optional:{#@optional#} New value for breakpoints active state.
   		 * @return 
-  		 */
-  		public static const setBreakpointsActive:String = "Debugger.setBreakpointsActive";
-  	
+  		 */	
+  		public static function setBreakpointsActive(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.setBreakpointsActive", paramO);
+  		}
+  		
   		/**
   		 * setPauseOnExceptions
   		 * Defines pause on exceptions state. Can be set to stop on all exceptions, uncaught exceptions or
   	no exceptions. Initial pause on exceptions state is `none`.
   		 * @param state:string optional:{#@optional#} Pause on exceptions mode.
   		 * @return 
-  		 */
-  		public static const setPauseOnExceptions:String = "Debugger.setPauseOnExceptions";
-  	
+  		 */	
+  		public static function setPauseOnExceptions(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.setPauseOnExceptions", paramO);
+  		}
+  		
   		/**
   		 * setReturnValue
   		 * Changes return value in top frame. Available only at return break position.
   		 * @param newValue:{#@type#} optional:{#@optional#} New return value.
   		 * @return 
-  		 */
-  		public static const setReturnValue:String = "Debugger.setReturnValue";
-  	
+  		 */	
+  		public static function setReturnValue(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.setReturnValue", paramO);
+  		}
+  		
   		/**
   		 * setScriptSource
   		 * Edits JavaScript source live.
@@ -320,17 +389,23 @@ package debugprotocol
   		 * @param dryRun:boolean optional:true If true the change will not actually be applied. Dry run may be used to get result
   	description without actually modifying the code.
   		 * @return callFrames:array optional:true New stack trace in case editing has happened while VM was stopped.
-  		 */
-  		public static const setScriptSource:String = "Debugger.setScriptSource";
-  	
+  		 */	
+  		public static function setScriptSource(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.setScriptSource", paramO);
+  		}
+  		
   		/**
   		 * setSkipAllPauses
   		 * Makes page not interrupt on any pauses (breakpoint, exception, dom exception etc).
   		 * @param skip:boolean optional:{#@optional#} New value for skip pauses state.
   		 * @return 
-  		 */
-  		public static const setSkipAllPauses:String = "Debugger.setSkipAllPauses";
-  	
+  		 */	
+  		public static function setSkipAllPauses(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.setSkipAllPauses", paramO);
+  		}
+  		
   		/**
   		 * setVariableValue
   		 * Changes value of variable in a callframe. Object-based scopes are not supported and must be
@@ -341,31 +416,44 @@ package debugprotocol
   		 * @param newValue:{#@type#} optional:{#@optional#} New variable value.
   		 * @param callFrameId:{#@type#} optional:{#@optional#} Id of callframe that holds variable.
   		 * @return 
-  		 */
-  		public static const setVariableValue:String = "Debugger.setVariableValue";
-  	
+  		 */	
+  		public static function setVariableValue(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.setVariableValue", paramO);
+  		}
+  		
   		/**
   		 * stepInto
   		 * Steps into the function call.
   		 * @param breakOnAsyncCall:boolean optional:true Debugger will issue additional Debugger.paused notification if any async task is scheduled
   	before next pause.
   		 * @return 
-  		 */
-  		public static const stepInto:String = "Debugger.stepInto";
-  	
+  		 */	
+  		public static function stepInto(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.stepInto", paramO);
+  		}
+  		
   		/**
   		 * stepOut
   		 * Steps out of the function call.
   		 * @return 
-  		 */
-  		public static const stepOut:String = "Debugger.stepOut";
-  	
+  		 */	
+  		public static function stepOut(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.stepOut", paramO);
+  		}
+  		
   		/**
   		 * stepOver
   		 * Steps over the statement.
   		 * @return 
-  		 */
-  		public static const stepOver:String = "Debugger.stepOver";
+  		 */	
+  		public static function stepOver(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Debugger.stepOver", paramO);
+  		}
+  		
 	}
 
 }

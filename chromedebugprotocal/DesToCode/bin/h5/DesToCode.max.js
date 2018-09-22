@@ -731,6 +731,7 @@ var Laya=window.Laya=(function(window,document){
 		ProtocolClassCreater.init=function(){
 			ProtocolClassCreater.clzTpl=FileManager.readTxtFile(NodeJSTools.getPathByRelatviePath("data/protocoltpl/domain.tpl"));
 			ProtocolClassCreater.methodTpl=FileManager.readTxtFile(NodeJSTools.getPathByRelatviePath("data/protocoltpl/method.tpl"));
+			ProtocolClassCreater.eventTpl=FileManager.readTxtFile(NodeJSTools.getPathByRelatviePath("data/protocoltpl/event.tpl"));
 			ProtocolClassCreater.exportPath=NodeJSTools.getPathByRelatviePath("out/debugprotocol");
 		}
 
@@ -747,8 +748,8 @@ var Laya=window.Laya=(function(window,document){
 			domainO.doc="";
 			domainO["extends"]="";
 			domainO["package"]="debugprotocol";
-			domainO["methods"]=CodeCreateTool.addPreToStr(ProtocolClassCreater.createMethods(cmds),"  	");
-			domainO["events"]=CodeCreateTool.addPreToStr(ProtocolClassCreater.createMethods(events),"  	");
+			domainO["methods"]=CodeCreateTool.addPreToStr(ProtocolClassCreater.createMethods(cmds,ProtocolClassCreater.methodTpl),"  	");
+			domainO["events"]=CodeCreateTool.addPreToStr(ProtocolClassCreater.createMethods(events,ProtocolClassCreater.eventTpl),"  	");
 			domainO["dependencies"]="";
 			if (dataO.dependencies){
 				domainO["dependencies"]=dataO["dependencies"].join(",");
@@ -760,18 +761,18 @@ var Laya=window.Laya=(function(window,document){
 			FileManager.createTxtFile(codePath,codeStr);
 		}
 
-		ProtocolClassCreater.createMethods=function(cmds){
+		ProtocolClassCreater.createMethods=function(cmds,tpl){
 			var cmdStrs;
 			cmdStrs=[];
 			var i=0,len=0;
 			len=cmds.length;
 			for (i=0;i < len;i++){
-				cmdStrs.push(ProtocolClassCreater.createMethodCode(cmds[i]));
+				cmdStrs.push(ProtocolClassCreater.createMethodCode(cmds[i],tpl));
 			}
 			return cmdStrs.join("\n");
 		}
 
-		ProtocolClassCreater.createMethodCode=function(dataO){
+		ProtocolClassCreater.createMethodCode=function(dataO,tpl){
 			var methodO;
 			methodO={};
 			methodO.name=dataO.name;
@@ -786,11 +787,12 @@ var Laya=window.Laya=(function(window,document){
 				docO["return"]=CodeCreateTool.createExportCode(ProtocolClassCreater.ParamTpl,dataO.returns[0]);
 			}
 			methodO.doc=CodeCreateTool.createDocStr(docO,ProtocolClassCreater.ParamTpl);
-			return CodeCreateTool.createExportCode(ProtocolClassCreater.methodTpl,methodO);
+			return CodeCreateTool.createExportCode(tpl,methodO);
 		}
 
 		ProtocolClassCreater.clzTpl=null
 		ProtocolClassCreater.methodTpl=null
+		ProtocolClassCreater.eventTpl=null
 		ProtocolClassCreater.exportPath=null
 		ProtocolClassCreater.domainName=null
 		ProtocolClassCreater.ParamTpl="{#@name#}:{#@type#} optional:{#@optional#} {#@description#}";

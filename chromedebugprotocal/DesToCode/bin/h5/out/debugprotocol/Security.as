@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -37,46 +38,61 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const securityStateChanged:String = "Security.securityStateChanged";
-  	
   		/**
   		 * disable
   		 * Disables tracking security state changes.
   		 * @return 
-  		 */
-  		public static const disable:String = "Security.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Security.disable", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * Enables tracking security state changes.
   		 * @return 
-  		 */
-  		public static const enable:String = "Security.enable";
-  	
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Security.enable", paramO);
+  		}
+  		
   		/**
   		 * setIgnoreCertificateErrors
   		 * Enable/disable whether all certificate errors should be ignored.
   		 * @param ignore:boolean optional:{#@optional#} If true, all certificate errors will be ignored.
   		 * @return 
-  		 */
-  		public static const setIgnoreCertificateErrors:String = "Security.setIgnoreCertificateErrors";
-  	
+  		 */	
+  		public static function setIgnoreCertificateErrors(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Security.setIgnoreCertificateErrors", paramO);
+  		}
+  		
   		/**
   		 * handleCertificateError
   		 * Handles a certificate error that fired a certificateError event.
   		 * @param eventId:integer optional:{#@optional#} The ID of the event.
   		 * @param action:{#@type#} optional:{#@optional#} The action to take on the certificate error.
   		 * @return 
-  		 */
-  		public static const handleCertificateError:String = "Security.handleCertificateError";
-  	
+  		 */	
+  		public static function handleCertificateError(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Security.handleCertificateError", paramO);
+  		}
+  		
   		/**
   		 * setOverrideCertificateErrors
   		 * Enable/disable overriding certificate errors. If enabled, all certificate error events need to
   	be handled by the DevTools client and should be answered with `handleCertificateError` commands.
   		 * @param override:boolean optional:{#@optional#} If true, certificate errors will be overridden.
   		 * @return 
-  		 */
-  		public static const setOverrideCertificateErrors:String = "Security.setOverrideCertificateErrors";
+  		 */	
+  		public static function setOverrideCertificateErrors(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Security.setOverrideCertificateErrors", paramO);
+  		}
+  		
 	}
 
 }

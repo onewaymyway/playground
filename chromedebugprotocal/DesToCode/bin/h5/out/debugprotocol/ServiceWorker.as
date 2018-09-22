@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -32,22 +33,27 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const workerVersionUpdated:String = "ServiceWorker.workerVersionUpdated";
-  	
   		/**
   		 * deliverPushMessage
   		 * @param origin:string optional:{#@optional#} {#@description#}
   		 * @param registrationId:string optional:{#@optional#} {#@description#}
   		 * @param data:string optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const deliverPushMessage:String = "ServiceWorker.deliverPushMessage";
-  	
+  		 */	
+  		public static function deliverPushMessage(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ServiceWorker.deliverPushMessage", paramO);
+  		}
+  		
   		/**
   		 * disable
   		 * @return 
-  		 */
-  		public static const disable:String = "ServiceWorker.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ServiceWorker.disable", paramO);
+  		}
+  		
   		/**
   		 * dispatchSyncEvent
   		 * @param origin:string optional:{#@optional#} {#@description#}
@@ -55,69 +61,100 @@ package debugprotocol
   		 * @param tag:string optional:{#@optional#} {#@description#}
   		 * @param lastChance:boolean optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const dispatchSyncEvent:String = "ServiceWorker.dispatchSyncEvent";
-  	
+  		 */	
+  		public static function dispatchSyncEvent(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ServiceWorker.dispatchSyncEvent", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * @return 
-  		 */
-  		public static const enable:String = "ServiceWorker.enable";
-  	
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ServiceWorker.enable", paramO);
+  		}
+  		
   		/**
   		 * inspectWorker
   		 * @param versionId:string optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const inspectWorker:String = "ServiceWorker.inspectWorker";
-  	
+  		 */	
+  		public static function inspectWorker(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ServiceWorker.inspectWorker", paramO);
+  		}
+  		
   		/**
   		 * setForceUpdateOnPageLoad
   		 * @param forceUpdateOnPageLoad:boolean optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const setForceUpdateOnPageLoad:String = "ServiceWorker.setForceUpdateOnPageLoad";
-  	
+  		 */	
+  		public static function setForceUpdateOnPageLoad(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ServiceWorker.setForceUpdateOnPageLoad", paramO);
+  		}
+  		
   		/**
   		 * skipWaiting
   		 * @param scopeURL:string optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const skipWaiting:String = "ServiceWorker.skipWaiting";
-  	
+  		 */	
+  		public static function skipWaiting(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ServiceWorker.skipWaiting", paramO);
+  		}
+  		
   		/**
   		 * startWorker
   		 * @param scopeURL:string optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const startWorker:String = "ServiceWorker.startWorker";
-  	
+  		 */	
+  		public static function startWorker(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ServiceWorker.startWorker", paramO);
+  		}
+  		
   		/**
   		 * stopAllWorkers
   		 * @return 
-  		 */
-  		public static const stopAllWorkers:String = "ServiceWorker.stopAllWorkers";
-  	
+  		 */	
+  		public static function stopAllWorkers(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ServiceWorker.stopAllWorkers", paramO);
+  		}
+  		
   		/**
   		 * stopWorker
   		 * @param versionId:string optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const stopWorker:String = "ServiceWorker.stopWorker";
-  	
+  		 */	
+  		public static function stopWorker(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ServiceWorker.stopWorker", paramO);
+  		}
+  		
   		/**
   		 * unregister
   		 * @param scopeURL:string optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const unregister:String = "ServiceWorker.unregister";
-  	
+  		 */	
+  		public static function unregister(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ServiceWorker.unregister", paramO);
+  		}
+  		
   		/**
   		 * updateRegistration
   		 * @param scopeURL:string optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const updateRegistration:String = "ServiceWorker.updateRegistration";
+  		 */	
+  		public static function updateRegistration(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("ServiceWorker.updateRegistration", paramO);
+  		}
+  		
 	}
 
 }

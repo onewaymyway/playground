@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -87,7 +88,6 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const inspectRequested:String = "Runtime.inspectRequested";
-  	
   		/**
   		 * awaitPromise
   		 * Add handler to promise with given promise object id.
@@ -95,9 +95,12 @@ package debugprotocol
   		 * @param returnByValue:boolean optional:true Whether the result is expected to be a JSON object that should be sent by value.
   		 * @param generatePreview:boolean optional:true Whether preview should be generated for the result.
   		 * @return result:{#@type#} optional:{#@optional#} Promise result. Will contain rejected value if promise was rejected.
-  		 */
-  		public static const awaitPromise:String = "Runtime.awaitPromise";
-  	
+  		 */	
+  		public static function awaitPromise(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.awaitPromise", paramO);
+  		}
+  		
   		/**
   		 * callFunctionOn
   		 * Calls function with given declaration on the given object. Object group of the result is
@@ -119,9 +122,12 @@ package debugprotocol
   		 * @param objectGroup:string optional:true Symbolic group name that can be used to release multiple objects. If objectGroup is not
   	specified and objectId is, objectGroup will be inherited from object.
   		 * @return result:{#@type#} optional:{#@optional#} Call result.
-  		 */
-  		public static const callFunctionOn:String = "Runtime.callFunctionOn";
-  	
+  		 */	
+  		public static function callFunctionOn(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.callFunctionOn", paramO);
+  		}
+  		
   		/**
   		 * compileScript
   		 * Compiles expression.
@@ -131,32 +137,44 @@ package debugprotocol
   		 * @param executionContextId:{#@type#} optional:true Specifies in which execution context to perform script run. If the parameter is omitted the
   	evaluation will be performed in the context of the inspected page.
   		 * @return scriptId:{#@type#} optional:true Id of the script.
-  		 */
-  		public static const compileScript:String = "Runtime.compileScript";
-  	
+  		 */	
+  		public static function compileScript(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.compileScript", paramO);
+  		}
+  		
   		/**
   		 * disable
   		 * Disables reporting of execution contexts creation.
   		 * @return 
-  		 */
-  		public static const disable:String = "Runtime.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.disable", paramO);
+  		}
+  		
   		/**
   		 * discardConsoleEntries
   		 * Discards collected exceptions and console API calls.
   		 * @return 
-  		 */
-  		public static const discardConsoleEntries:String = "Runtime.discardConsoleEntries";
-  	
+  		 */	
+  		public static function discardConsoleEntries(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.discardConsoleEntries", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * Enables reporting of execution contexts creation by means of `executionContextCreated` event.
   	When the reporting gets enabled the event will be sent immediately for each existing execution
   	context.
   		 * @return 
-  		 */
-  		public static const enable:String = "Runtime.enable";
-  	
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.enable", paramO);
+  		}
+  		
   		/**
   		 * evaluate
   		 * Evaluates expression on global object.
@@ -175,24 +193,33 @@ package debugprotocol
   		 * @param throwOnSideEffect:boolean optional:true Whether to throw an exception if side effect cannot be ruled out during evaluation.
   		 * @param timeout:{#@type#} optional:true Terminate execution after timing out (number of milliseconds).
   		 * @return result:{#@type#} optional:{#@optional#} Evaluation result.
-  		 */
-  		public static const evaluate:String = "Runtime.evaluate";
-  	
+  		 */	
+  		public static function evaluate(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.evaluate", paramO);
+  		}
+  		
   		/**
   		 * getIsolateId
   		 * Returns the isolate id.
   		 * @return id:string optional:{#@optional#} The isolate id.
-  		 */
-  		public static const getIsolateId:String = "Runtime.getIsolateId";
-  	
+  		 */	
+  		public static function getIsolateId(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.getIsolateId", paramO);
+  		}
+  		
   		/**
   		 * getHeapUsage
   		 * Returns the JavaScript heap usage.
   	It is the total usage of the corresponding isolate not scoped to a particular Runtime.
   		 * @return usedSize:number optional:{#@optional#} Used heap size in bytes.
-  		 */
-  		public static const getHeapUsage:String = "Runtime.getHeapUsage";
-  	
+  		 */	
+  		public static function getHeapUsage(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.getHeapUsage", paramO);
+  		}
+  		
   		/**
   		 * getProperties
   		 * Returns properties of a given object. Object group of the result is inherited from the target
@@ -204,48 +231,66 @@ package debugprotocol
   	returned either.
   		 * @param generatePreview:boolean optional:true Whether preview should be generated for the results.
   		 * @return result:array optional:{#@optional#} Object properties.
-  		 */
-  		public static const getProperties:String = "Runtime.getProperties";
-  	
+  		 */	
+  		public static function getProperties(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.getProperties", paramO);
+  		}
+  		
   		/**
   		 * globalLexicalScopeNames
   		 * Returns all let, const and class variables from global scope.
   		 * @param executionContextId:{#@type#} optional:true Specifies in which execution context to lookup global scope variables.
   		 * @return names:array optional:{#@optional#} {#@description#}
-  		 */
-  		public static const globalLexicalScopeNames:String = "Runtime.globalLexicalScopeNames";
-  	
+  		 */	
+  		public static function globalLexicalScopeNames(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.globalLexicalScopeNames", paramO);
+  		}
+  		
   		/**
   		 * queryObjects
   		 * @param prototypeObjectId:{#@type#} optional:{#@optional#} Identifier of the prototype to return objects for.
   		 * @param objectGroup:string optional:true Symbolic group name that can be used to release the results.
   		 * @return objects:{#@type#} optional:{#@optional#} Array with objects.
-  		 */
-  		public static const queryObjects:String = "Runtime.queryObjects";
-  	
+  		 */	
+  		public static function queryObjects(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.queryObjects", paramO);
+  		}
+  		
   		/**
   		 * releaseObject
   		 * Releases remote object with given id.
   		 * @param objectId:{#@type#} optional:{#@optional#} Identifier of the object to release.
   		 * @return 
-  		 */
-  		public static const releaseObject:String = "Runtime.releaseObject";
-  	
+  		 */	
+  		public static function releaseObject(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.releaseObject", paramO);
+  		}
+  		
   		/**
   		 * releaseObjectGroup
   		 * Releases all remote objects that belong to a given group.
   		 * @param objectGroup:string optional:{#@optional#} Symbolic object group name.
   		 * @return 
-  		 */
-  		public static const releaseObjectGroup:String = "Runtime.releaseObjectGroup";
-  	
+  		 */	
+  		public static function releaseObjectGroup(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.releaseObjectGroup", paramO);
+  		}
+  		
   		/**
   		 * runIfWaitingForDebugger
   		 * Tells inspected instance to run if it was waiting for debugger to attach.
   		 * @return 
-  		 */
-  		public static const runIfWaitingForDebugger:String = "Runtime.runIfWaitingForDebugger";
-  	
+  		 */	
+  		public static function runIfWaitingForDebugger(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.runIfWaitingForDebugger", paramO);
+  		}
+  		
   		/**
   		 * runScript
   		 * Runs script with given id in a given context.
@@ -261,40 +306,55 @@ package debugprotocol
   		 * @param awaitPromise:boolean optional:true Whether execution should `await` for resulting value and return once awaited promise is
   	resolved.
   		 * @return result:{#@type#} optional:{#@optional#} Run result.
-  		 */
-  		public static const runScript:String = "Runtime.runScript";
-  	
+  		 */	
+  		public static function runScript(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.runScript", paramO);
+  		}
+  		
   		/**
   		 * setAsyncCallStackDepth
   		 * Enables or disables async call stacks tracking.
   		 * @param maxDepth:integer optional:{#@optional#} Maximum depth of async call stacks. Setting to `0` will effectively disable collecting async
   	call stacks (default).
   		 * @return 
-  		 */
-  		public static const setAsyncCallStackDepth:String = "Runtime.setAsyncCallStackDepth";
-  	
+  		 */	
+  		public static function setAsyncCallStackDepth(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.setAsyncCallStackDepth", paramO);
+  		}
+  		
   		/**
   		 * setCustomObjectFormatterEnabled
   		 * @param enabled:boolean optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const setCustomObjectFormatterEnabled:String = "Runtime.setCustomObjectFormatterEnabled";
-  	
+  		 */	
+  		public static function setCustomObjectFormatterEnabled(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.setCustomObjectFormatterEnabled", paramO);
+  		}
+  		
   		/**
   		 * setMaxCallStackSizeToCapture
   		 * @param size:integer optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const setMaxCallStackSizeToCapture:String = "Runtime.setMaxCallStackSizeToCapture";
-  	
+  		 */	
+  		public static function setMaxCallStackSizeToCapture(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.setMaxCallStackSizeToCapture", paramO);
+  		}
+  		
   		/**
   		 * terminateExecution
   		 * Terminate current or next JavaScript execution.
   	Will cancel the termination when the outer-most script execution ends.
   		 * @return 
-  		 */
-  		public static const terminateExecution:String = "Runtime.terminateExecution";
-  	
+  		 */	
+  		public static function terminateExecution(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.terminateExecution", paramO);
+  		}
+  		
   		/**
   		 * addBinding
   		 * If executionContextId is empty, adds binding with the given name on the
@@ -308,17 +368,24 @@ package debugprotocol
   		 * @param name:string optional:{#@optional#} {#@description#}
   		 * @param executionContextId:{#@type#} optional:true {#@description#}
   		 * @return 
-  		 */
-  		public static const addBinding:String = "Runtime.addBinding";
-  	
+  		 */	
+  		public static function addBinding(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.addBinding", paramO);
+  		}
+  		
   		/**
   		 * removeBinding
   		 * This method does not remove binding function from global object but
   	unsubscribes current runtime agent from Runtime.bindingCalled notifications.
   		 * @param name:string optional:{#@optional#} {#@description#}
   		 * @return 
-  		 */
-  		public static const removeBinding:String = "Runtime.removeBinding";
+  		 */	
+  		public static function removeBinding(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Runtime.removeBinding", paramO);
+  		}
+  		
 	}
 
 }

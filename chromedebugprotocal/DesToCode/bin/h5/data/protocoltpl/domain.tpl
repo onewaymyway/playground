@@ -1,5 +1,6 @@
 package {#@package#} 
 {
+	import chromedebug.ChromeMsg;
 {#@imports#}
 
 {#@doc#}

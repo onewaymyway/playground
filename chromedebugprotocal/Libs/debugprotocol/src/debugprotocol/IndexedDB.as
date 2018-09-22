@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -12,7 +13,6 @@ package debugprotocol
 		}
 		public static const DependDomains:Array=[Runtime];
   	
-  	
   		/**
   		 * clearObjectStore
   		 * Clears all entries from an object store.
@@ -20,18 +20,24 @@ package debugprotocol
   		 * @param databaseName:string optional:{#@optional#} Database name.
   		 * @param objectStoreName:string optional:{#@optional#} Object store name.
   		 * @return 
-  		 */
-  		public static const clearObjectStore:String = "IndexedDB.clearObjectStore";
-  	
+  		 */	
+  		public static function clearObjectStore(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("IndexedDB.clearObjectStore", paramO);
+  		}
+  		
   		/**
   		 * deleteDatabase
   		 * Deletes a database.
   		 * @param securityOrigin:string optional:{#@optional#} Security origin.
   		 * @param databaseName:string optional:{#@optional#} Database name.
   		 * @return 
-  		 */
-  		public static const deleteDatabase:String = "IndexedDB.deleteDatabase";
-  	
+  		 */	
+  		public static function deleteDatabase(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("IndexedDB.deleteDatabase", paramO);
+  		}
+  		
   		/**
   		 * deleteObjectStoreEntries
   		 * Delete a range of entries from an object store
@@ -40,23 +46,32 @@ package debugprotocol
   		 * @param objectStoreName:string optional:{#@optional#} {#@description#}
   		 * @param keyRange:{#@type#} optional:{#@optional#} Range of entry keys to delete
   		 * @return 
-  		 */
-  		public static const deleteObjectStoreEntries:String = "IndexedDB.deleteObjectStoreEntries";
-  	
+  		 */	
+  		public static function deleteObjectStoreEntries(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("IndexedDB.deleteObjectStoreEntries", paramO);
+  		}
+  		
   		/**
   		 * disable
   		 * Disables events from backend.
   		 * @return 
-  		 */
-  		public static const disable:String = "IndexedDB.disable";
-  	
+  		 */	
+  		public static function disable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("IndexedDB.disable", paramO);
+  		}
+  		
   		/**
   		 * enable
   		 * Enables events from backend.
   		 * @return 
-  		 */
-  		public static const enable:String = "IndexedDB.enable";
-  	
+  		 */	
+  		public static function enable(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("IndexedDB.enable", paramO);
+  		}
+  		
   		/**
   		 * requestData
   		 * Requests data from object store or index.
@@ -68,25 +83,35 @@ package debugprotocol
   		 * @param pageSize:integer optional:{#@optional#} Number of records to fetch.
   		 * @param keyRange:{#@type#} optional:true Key range.
   		 * @return objectStoreDataEntries:array optional:{#@optional#} Array of object store data entries.
-  		 */
-  		public static const requestData:String = "IndexedDB.requestData";
-  	
+  		 */	
+  		public static function requestData(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("IndexedDB.requestData", paramO);
+  		}
+  		
   		/**
   		 * requestDatabase
   		 * Requests database with given name in given frame.
   		 * @param securityOrigin:string optional:{#@optional#} Security origin.
   		 * @param databaseName:string optional:{#@optional#} Database name.
   		 * @return databaseWithObjectStores:{#@type#} optional:{#@optional#} Database with an array of object stores.
-  		 */
-  		public static const requestDatabase:String = "IndexedDB.requestDatabase";
-  	
+  		 */	
+  		public static function requestDatabase(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("IndexedDB.requestDatabase", paramO);
+  		}
+  		
   		/**
   		 * requestDatabaseNames
   		 * Requests database names for given security origin.
   		 * @param securityOrigin:string optional:{#@optional#} Security origin.
   		 * @return databaseNames:array optional:{#@optional#} Database names for origin.
-  		 */
-  		public static const requestDatabaseNames:String = "IndexedDB.requestDatabaseNames";
+  		 */	
+  		public static function requestDatabaseNames(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("IndexedDB.requestDatabaseNames", paramO);
+  		}
+  		
 	}
 
 }

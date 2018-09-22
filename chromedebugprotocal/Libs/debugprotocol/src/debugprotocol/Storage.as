@@ -1,5 +1,6 @@
 package debugprotocol 
 {
+	import chromedebug.ChromeMsg;
 
 
 
@@ -46,55 +47,73 @@ package debugprotocol
   		 * @return 
   		 */
   		public static const indexedDBListUpdated:String = "Storage.indexedDBListUpdated";
-  	
   		/**
   		 * clearDataForOrigin
   		 * Clears storage for origin.
   		 * @param origin:string optional:{#@optional#} Security origin.
   		 * @param storageTypes:string optional:{#@optional#} Comma separated origin names.
   		 * @return 
-  		 */
-  		public static const clearDataForOrigin:String = "Storage.clearDataForOrigin";
-  	
+  		 */	
+  		public static function clearDataForOrigin(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Storage.clearDataForOrigin", paramO);
+  		}
+  		
   		/**
   		 * getUsageAndQuota
   		 * Returns usage and quota in bytes.
   		 * @param origin:string optional:{#@optional#} Security origin.
   		 * @return usage:number optional:{#@optional#} Storage usage (bytes).
-  		 */
-  		public static const getUsageAndQuota:String = "Storage.getUsageAndQuota";
-  	
+  		 */	
+  		public static function getUsageAndQuota(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Storage.getUsageAndQuota", paramO);
+  		}
+  		
   		/**
   		 * trackCacheStorageForOrigin
   		 * Registers origin to be notified when an update occurs to its cache storage list.
   		 * @param origin:string optional:{#@optional#} Security origin.
   		 * @return 
-  		 */
-  		public static const trackCacheStorageForOrigin:String = "Storage.trackCacheStorageForOrigin";
-  	
+  		 */	
+  		public static function trackCacheStorageForOrigin(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Storage.trackCacheStorageForOrigin", paramO);
+  		}
+  		
   		/**
   		 * trackIndexedDBForOrigin
   		 * Registers origin to be notified when an update occurs to its IndexedDB.
   		 * @param origin:string optional:{#@optional#} Security origin.
   		 * @return 
-  		 */
-  		public static const trackIndexedDBForOrigin:String = "Storage.trackIndexedDBForOrigin";
-  	
+  		 */	
+  		public static function trackIndexedDBForOrigin(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Storage.trackIndexedDBForOrigin", paramO);
+  		}
+  		
   		/**
   		 * untrackCacheStorageForOrigin
   		 * Unregisters origin from receiving notifications for cache storage.
   		 * @param origin:string optional:{#@optional#} Security origin.
   		 * @return 
-  		 */
-  		public static const untrackCacheStorageForOrigin:String = "Storage.untrackCacheStorageForOrigin";
-  	
+  		 */	
+  		public static function untrackCacheStorageForOrigin(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Storage.untrackCacheStorageForOrigin", paramO);
+  		}
+  		
   		/**
   		 * untrackIndexedDBForOrigin
   		 * Unregisters origin from receiving notifications for IndexedDB.
   		 * @param origin:string optional:{#@optional#} Security origin.
   		 * @return 
-  		 */
-  		public static const untrackIndexedDBForOrigin:String = "Storage.untrackIndexedDBForOrigin";
+  		 */	
+  		public static function untrackIndexedDBForOrigin(paramO:Object):Promise
+  		{
+  			return ChromeMsg.callCmd("Storage.untrackIndexedDBForOrigin", paramO);
+  		}
+  		
 	}
 
 }
