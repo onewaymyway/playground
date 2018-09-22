@@ -1,4 +1,4 @@
-package debugprotocol.DOMStorage 
+package debugprotocol 
 {
 
 

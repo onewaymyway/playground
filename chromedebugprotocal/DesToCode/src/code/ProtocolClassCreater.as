@@ -38,7 +38,7 @@ package code
 			domainO.imports = "";
 			domainO.doc = "";
 			domainO["extends"] = "";
-			domainO["package"] = "debugprotocol." + domainName;
+			domainO["package"] = "debugprotocol";
 			domainO["methods"] = CodeCreateTool.addPreToStr(createMethods(cmds), "  	");
 			domainO["events"] = CodeCreateTool.addPreToStr(createMethods(events), "  	");
 			domainO["dependencies"] = "";

@@ -1,4 +1,4 @@
-package debugprotocol.DOM 
+package debugprotocol 
 {
 
 

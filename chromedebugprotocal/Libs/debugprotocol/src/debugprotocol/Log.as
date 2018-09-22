@@ -1,4 +1,4 @@
-package debugprotocol.Log 
+package debugprotocol 
 {
 
 

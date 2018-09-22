@@ -1,4 +1,4 @@
-package debugprotocol.Memory 
+package debugprotocol 
 {
 
 

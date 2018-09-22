@@ -1,4 +1,4 @@
-package debugprotocol.DeviceOrientation 
+package debugprotocol 
 {
 
 

@@ -1,4 +1,4 @@
-package debugprotocol.Schema 
+package debugprotocol 
 {
 
 

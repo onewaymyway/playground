@@ -1,4 +1,4 @@
-package debugprotocol.Accessibility 
+package debugprotocol 
 {
 
 

@@ -1,4 +1,4 @@
-package debugprotocol.Network 
+package debugprotocol 
 {
 
 

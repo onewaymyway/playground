@@ -1,4 +1,4 @@
-package debugprotocol.Debugger 
+package debugprotocol 
 {
 
 

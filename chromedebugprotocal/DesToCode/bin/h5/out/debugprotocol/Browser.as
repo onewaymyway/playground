@@ -1,4 +1,4 @@
-package debugprotocol.Browser 
+package debugprotocol 
 {
 
 

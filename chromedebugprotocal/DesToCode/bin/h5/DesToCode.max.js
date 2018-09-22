@@ -746,7 +746,7 @@ var Laya=window.Laya=(function(window,document){
 			domainO.imports="";
 			domainO.doc="";
 			domainO["extends"]="";
-			domainO["package"]="debugprotocol."+ProtocolClassCreater.domainName;
+			domainO["package"]="debugprotocol";
 			domainO["methods"]=CodeCreateTool.addPreToStr(ProtocolClassCreater.createMethods(cmds),"  	");
 			domainO["events"]=CodeCreateTool.addPreToStr(ProtocolClassCreater.createMethods(events),"  	");
 			domainO["dependencies"]="";
