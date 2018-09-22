@@ -401,30 +401,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*...
-	*@author ww
-	*/
-	//class chromedebug.ChromeMsg
-	var ChromeMsg=(function(){
-		function ChromeMsg(){}
-		__class(ChromeMsg,'chromedebug.ChromeMsg');
-		ChromeMsg.createCmd=function(method,params){
-			var dataO;
-			dataO={};
-			dataO.id=ChromeMsg._msgID;
-			dataO.method=method;
-			if(params)
-				dataO.params=params;
-			ChromeMsg._msgID++;
-			return dataO;
-		}
-
-		ChromeMsg._msgID=1;
-		return ChromeMsg;
-	})()
-
-
-	/**
 	*<code>EventDispatcher</code> 类是可调度事件的所有类的基类。
 	*/
 	//class laya.events.EventDispatcher
@@ -16301,92 +16277,900 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class chromedebug.ChromeSocket extends laya.events.EventDispatcher
-	var ChromeSocket=(function(_super){
-		function ChromeSocket(){
-			this.socket=null;
-			this.userName=null;
-			this.md5Pwd=null;
-			this.isLogined=false;
-			this._serverStr=null;
-			this.channel=null;
-			this.autoOpenUrl="http://baidu.com";
-			this.msgID=0;
-			ChromeSocket.__super.call(this);
-			this.socket=new Socket("127.0.0.1",0,Byte);
-			this.socket.disableInput=true;
-			this.socket.on("open",this,this.onConnect);
-			this.socket.on("message",this,this.onMessage);
-			this.socket.on("error",this,this.onErr);
-			this.socket.on("close",this,this.onClose);
-		}
-
-		__class(ChromeSocket,'chromedebug.ChromeSocket',_super);
-		var __proto=ChromeSocket.prototype;
-		__proto.connectByTargetO=function(targetO){
-			var targetPath;
-			targetPath=targetO["webSocketDebuggerUrl"];
-			this.connect(targetPath);
-		}
-
-		__proto.connect=function(serverStr){
-			this._serverStr=serverStr;
-			this.socket.connectByUrl(serverStr);
-		}
-
-		__proto.onConnect=function(){
-			console.log('socket connect');
-			if (this.autoOpenUrl){
-				this.sendCmd("Page.enable");
-				this.sendCmd("Page.navigate",{url:this.autoOpenUrl });
-			}
-		}
-
-		__proto.sendCmd=function(method,params){
-			this.sendJson(ChromeMsg.createCmd(method,params));
-		}
-
-		__proto.onMessage=function(msg){
-			console.log('socket onMessage');
-			console.log("Msg:"+msg);
+	//class chromedebug.ChromeMsg
+	var ChromeMsg=(function(){
+		function ChromeMsg(){}
+		__class(ChromeMsg,'chromedebug.ChromeMsg');
+		ChromeMsg.createCmd=function(method,params){
 			var dataO;
-			debugger;
+			dataO={};
+			dataO.id=ChromeMsg._msgID;
+			dataO.method=method;
+			if(params)
+				dataO.params=params;
+			ChromeMsg._msgID++;
+			return dataO;
 		}
 
-		__proto.send=function(msg){
-			this.msgID++;
-			msg=msg+this.msgID;
-			console.log("try send:"+msg);
-			this.socket.send(msg);
+		ChromeMsg.callCmd=function(method,params){
+			var dataO;
+			dataO=ChromeMsg.createCmd(method,params);
+			return ChromeMsg.socket.sendCmdAndWaitReplay(dataO);
 		}
 
-		__proto.sendJson=function(obj){
-			if (!obj)
-				return;
-			this.socket.send(JSON.stringify(obj));
+		ChromeMsg._msgID=1;
+		ChromeMsg.socket=null
+		return ChromeMsg;
+	})()
+
+
+	//class debugprotocol.Debugger
+	var Debugger=(function(){
+		function Debugger(){}
+		__class(Debugger,'debugprotocol.Debugger');
+		Debugger.continueToLocation=function(paramO){
+			return ChromeMsg.callCmd("Debugger.continueToLocation",paramO);
 		}
 
-		__proto.closeLater=function(){
-			this.socket.close();
-			console.log("after close");
+		Debugger.disable=function(paramO){
+			return ChromeMsg.callCmd("Debugger.disable",paramO);
 		}
 
-		__proto.onErr=function(e){
-			console.log('socket onErr',e);
+		Debugger.enable=function(paramO){
+			return ChromeMsg.callCmd("Debugger.enable",paramO);
 		}
 
-		__proto.onClose=function(){
-			console.log('socket onClose');
+		Debugger.evaluateOnCallFrame=function(paramO){
+			return ChromeMsg.callCmd("Debugger.evaluateOnCallFrame",paramO);
 		}
 
-		ChromeSocket.DataFromServer="DataFromServer";
-		ChromeSocket.Logined="Logined";
-		ChromeSocket.OnServerMsg="OnServerMsg";
-		ChromeSocket.Welcome="welcome";
-		ChromeSocket.OnJoinedChannel="OnJoinedChannel";
-		ChromeSocket.OnChannelMsg="OnChannelMsg";
-		return ChromeSocket;
-	})(EventDispatcher)
+		Debugger.getPossibleBreakpoints=function(paramO){
+			return ChromeMsg.callCmd("Debugger.getPossibleBreakpoints",paramO);
+		}
+
+		Debugger.getScriptSource=function(paramO){
+			return ChromeMsg.callCmd("Debugger.getScriptSource",paramO);
+		}
+
+		Debugger.getStackTrace=function(paramO){
+			return ChromeMsg.callCmd("Debugger.getStackTrace",paramO);
+		}
+
+		Debugger.pause=function(paramO){
+			return ChromeMsg.callCmd("Debugger.pause",paramO);
+		}
+
+		Debugger.pauseOnAsyncCall=function(paramO){
+			return ChromeMsg.callCmd("Debugger.pauseOnAsyncCall",paramO);
+		}
+
+		Debugger.removeBreakpoint=function(paramO){
+			return ChromeMsg.callCmd("Debugger.removeBreakpoint",paramO);
+		}
+
+		Debugger.restartFrame=function(paramO){
+			return ChromeMsg.callCmd("Debugger.restartFrame",paramO);
+		}
+
+		Debugger.resume=function(paramO){
+			return ChromeMsg.callCmd("Debugger.resume",paramO);
+		}
+
+		Debugger.scheduleStepIntoAsync=function(paramO){
+			return ChromeMsg.callCmd("Debugger.scheduleStepIntoAsync",paramO);
+		}
+
+		Debugger.searchInContent=function(paramO){
+			return ChromeMsg.callCmd("Debugger.searchInContent",paramO);
+		}
+
+		Debugger.setAsyncCallStackDepth=function(paramO){
+			return ChromeMsg.callCmd("Debugger.setAsyncCallStackDepth",paramO);
+		}
+
+		Debugger.setBlackboxPatterns=function(paramO){
+			return ChromeMsg.callCmd("Debugger.setBlackboxPatterns",paramO);
+		}
+
+		Debugger.setBlackboxedRanges=function(paramO){
+			return ChromeMsg.callCmd("Debugger.setBlackboxedRanges",paramO);
+		}
+
+		Debugger.setBreakpoint=function(paramO){
+			return ChromeMsg.callCmd("Debugger.setBreakpoint",paramO);
+		}
+
+		Debugger.setBreakpointByUrl=function(paramO){
+			return ChromeMsg.callCmd("Debugger.setBreakpointByUrl",paramO);
+		}
+
+		Debugger.setBreakpointOnFunctionCall=function(paramO){
+			return ChromeMsg.callCmd("Debugger.setBreakpointOnFunctionCall",paramO);
+		}
+
+		Debugger.setBreakpointsActive=function(paramO){
+			return ChromeMsg.callCmd("Debugger.setBreakpointsActive",paramO);
+		}
+
+		Debugger.setPauseOnExceptions=function(paramO){
+			return ChromeMsg.callCmd("Debugger.setPauseOnExceptions",paramO);
+		}
+
+		Debugger.setReturnValue=function(paramO){
+			return ChromeMsg.callCmd("Debugger.setReturnValue",paramO);
+		}
+
+		Debugger.setScriptSource=function(paramO){
+			return ChromeMsg.callCmd("Debugger.setScriptSource",paramO);
+		}
+
+		Debugger.setSkipAllPauses=function(paramO){
+			return ChromeMsg.callCmd("Debugger.setSkipAllPauses",paramO);
+		}
+
+		Debugger.setVariableValue=function(paramO){
+			return ChromeMsg.callCmd("Debugger.setVariableValue",paramO);
+		}
+
+		Debugger.stepInto=function(paramO){
+			return ChromeMsg.callCmd("Debugger.stepInto",paramO);
+		}
+
+		Debugger.stepOut=function(paramO){
+			return ChromeMsg.callCmd("Debugger.stepOut",paramO);
+		}
+
+		Debugger.stepOver=function(paramO){
+			return ChromeMsg.callCmd("Debugger.stepOver",paramO);
+		}
+
+		Debugger.breakpointResolved="Debugger.breakpointResolved";
+		Debugger.paused="Debugger.paused";
+		Debugger.resumed="Debugger.resumed";
+		Debugger.scriptFailedToParse="Debugger.scriptFailedToParse";
+		Debugger.scriptParsed="Debugger.scriptParsed";
+		__static(Debugger,
+		['DependDomains',function(){return this.DependDomains=[Runtime];}
+		]);
+		return Debugger;
+	})()
+
+
+	//class debugprotocol.DOM
+	var DOM=(function(){
+		function DOM(){}
+		__class(DOM,'debugprotocol.DOM');
+		DOM.collectClassNamesFromSubtree=function(paramO){
+			return ChromeMsg.callCmd("DOM.collectClassNamesFromSubtree",paramO);
+		}
+
+		DOM.copyTo=function(paramO){
+			return ChromeMsg.callCmd("DOM.copyTo",paramO);
+		}
+
+		DOM.describeNode=function(paramO){
+			return ChromeMsg.callCmd("DOM.describeNode",paramO);
+		}
+
+		DOM.disable=function(paramO){
+			return ChromeMsg.callCmd("DOM.disable",paramO);
+		}
+
+		DOM.discardSearchResults=function(paramO){
+			return ChromeMsg.callCmd("DOM.discardSearchResults",paramO);
+		}
+
+		DOM.enable=function(paramO){
+			return ChromeMsg.callCmd("DOM.enable",paramO);
+		}
+
+		DOM.focus=function(paramO){
+			return ChromeMsg.callCmd("DOM.focus",paramO);
+		}
+
+		DOM.getAttributes=function(paramO){
+			return ChromeMsg.callCmd("DOM.getAttributes",paramO);
+		}
+
+		DOM.getBoxModel=function(paramO){
+			return ChromeMsg.callCmd("DOM.getBoxModel",paramO);
+		}
+
+		DOM.getContentQuads=function(paramO){
+			return ChromeMsg.callCmd("DOM.getContentQuads",paramO);
+		}
+
+		DOM.getDocument=function(paramO){
+			return ChromeMsg.callCmd("DOM.getDocument",paramO);
+		}
+
+		DOM.getFlattenedDocument=function(paramO){
+			return ChromeMsg.callCmd("DOM.getFlattenedDocument",paramO);
+		}
+
+		DOM.getNodeForLocation=function(paramO){
+			return ChromeMsg.callCmd("DOM.getNodeForLocation",paramO);
+		}
+
+		DOM.getOuterHTML=function(paramO){
+			return ChromeMsg.callCmd("DOM.getOuterHTML",paramO);
+		}
+
+		DOM.getRelayoutBoundary=function(paramO){
+			return ChromeMsg.callCmd("DOM.getRelayoutBoundary",paramO);
+		}
+
+		DOM.getSearchResults=function(paramO){
+			return ChromeMsg.callCmd("DOM.getSearchResults",paramO);
+		}
+
+		DOM.hideHighlight=function(paramO){
+			return ChromeMsg.callCmd("DOM.hideHighlight",paramO);
+		}
+
+		DOM.highlightNode=function(paramO){
+			return ChromeMsg.callCmd("DOM.highlightNode",paramO);
+		}
+
+		DOM.highlightRect=function(paramO){
+			return ChromeMsg.callCmd("DOM.highlightRect",paramO);
+		}
+
+		DOM.markUndoableState=function(paramO){
+			return ChromeMsg.callCmd("DOM.markUndoableState",paramO);
+		}
+
+		DOM.moveTo=function(paramO){
+			return ChromeMsg.callCmd("DOM.moveTo",paramO);
+		}
+
+		DOM.performSearch=function(paramO){
+			return ChromeMsg.callCmd("DOM.performSearch",paramO);
+		}
+
+		DOM.pushNodeByPathToFrontend=function(paramO){
+			return ChromeMsg.callCmd("DOM.pushNodeByPathToFrontend",paramO);
+		}
+
+		DOM.pushNodesByBackendIdsToFrontend=function(paramO){
+			return ChromeMsg.callCmd("DOM.pushNodesByBackendIdsToFrontend",paramO);
+		}
+
+		DOM.querySelector=function(paramO){
+			return ChromeMsg.callCmd("DOM.querySelector",paramO);
+		}
+
+		DOM.querySelectorAll=function(paramO){
+			return ChromeMsg.callCmd("DOM.querySelectorAll",paramO);
+		}
+
+		DOM.redo=function(paramO){
+			return ChromeMsg.callCmd("DOM.redo",paramO);
+		}
+
+		DOM.removeAttribute=function(paramO){
+			return ChromeMsg.callCmd("DOM.removeAttribute",paramO);
+		}
+
+		DOM.removeNode=function(paramO){
+			return ChromeMsg.callCmd("DOM.removeNode",paramO);
+		}
+
+		DOM.requestChildNodes=function(paramO){
+			return ChromeMsg.callCmd("DOM.requestChildNodes",paramO);
+		}
+
+		DOM.requestNode=function(paramO){
+			return ChromeMsg.callCmd("DOM.requestNode",paramO);
+		}
+
+		DOM.resolveNode=function(paramO){
+			return ChromeMsg.callCmd("DOM.resolveNode",paramO);
+		}
+
+		DOM.setAttributeValue=function(paramO){
+			return ChromeMsg.callCmd("DOM.setAttributeValue",paramO);
+		}
+
+		DOM.setAttributesAsText=function(paramO){
+			return ChromeMsg.callCmd("DOM.setAttributesAsText",paramO);
+		}
+
+		DOM.setFileInputFiles=function(paramO){
+			return ChromeMsg.callCmd("DOM.setFileInputFiles",paramO);
+		}
+
+		DOM.setInspectedNode=function(paramO){
+			return ChromeMsg.callCmd("DOM.setInspectedNode",paramO);
+		}
+
+		DOM.setNodeName=function(paramO){
+			return ChromeMsg.callCmd("DOM.setNodeName",paramO);
+		}
+
+		DOM.setNodeValue=function(paramO){
+			return ChromeMsg.callCmd("DOM.setNodeValue",paramO);
+		}
+
+		DOM.setOuterHTML=function(paramO){
+			return ChromeMsg.callCmd("DOM.setOuterHTML",paramO);
+		}
+
+		DOM.undo=function(paramO){
+			return ChromeMsg.callCmd("DOM.undo",paramO);
+		}
+
+		DOM.getFrameOwner=function(paramO){
+			return ChromeMsg.callCmd("DOM.getFrameOwner",paramO);
+		}
+
+		DOM.attributeModified="DOM.attributeModified";
+		DOM.attributeRemoved="DOM.attributeRemoved";
+		DOM.characterDataModified="DOM.characterDataModified";
+		DOM.childNodeCountUpdated="DOM.childNodeCountUpdated";
+		DOM.childNodeInserted="DOM.childNodeInserted";
+		DOM.childNodeRemoved="DOM.childNodeRemoved";
+		DOM.distributedNodesUpdated="DOM.distributedNodesUpdated";
+		DOM.documentUpdated="DOM.documentUpdated";
+		DOM.inlineStyleInvalidated="DOM.inlineStyleInvalidated";
+		DOM.pseudoElementAdded="DOM.pseudoElementAdded";
+		DOM.pseudoElementRemoved="DOM.pseudoElementRemoved";
+		DOM.setChildNodes="DOM.setChildNodes";
+		DOM.shadowRootPopped="DOM.shadowRootPopped";
+		DOM.shadowRootPushed="DOM.shadowRootPushed";
+		__static(DOM,
+		['DependDomains',function(){return this.DependDomains=[Runtime];}
+		]);
+		return DOM;
+	})()
+
+
+	//class debugprotocol.Input
+	var Input$1=(function(){
+		function Input(){}
+		__class(Input,'debugprotocol.Input',null,'Input$1');
+		Input.dispatchKeyEvent=function(paramO){
+			return ChromeMsg.callCmd("Input.dispatchKeyEvent",paramO);
+		}
+
+		Input.insertText=function(paramO){
+			return ChromeMsg.callCmd("Input.insertText",paramO);
+		}
+
+		Input.dispatchMouseEvent=function(paramO){
+			return ChromeMsg.callCmd("Input.dispatchMouseEvent",paramO);
+		}
+
+		Input.dispatchTouchEvent=function(paramO){
+			return ChromeMsg.callCmd("Input.dispatchTouchEvent",paramO);
+		}
+
+		Input.emulateTouchFromMouseEvent=function(paramO){
+			return ChromeMsg.callCmd("Input.emulateTouchFromMouseEvent",paramO);
+		}
+
+		Input.setIgnoreInputEvents=function(paramO){
+			return ChromeMsg.callCmd("Input.setIgnoreInputEvents",paramO);
+		}
+
+		Input.synthesizePinchGesture=function(paramO){
+			return ChromeMsg.callCmd("Input.synthesizePinchGesture",paramO);
+		}
+
+		Input.synthesizeScrollGesture=function(paramO){
+			return ChromeMsg.callCmd("Input.synthesizeScrollGesture",paramO);
+		}
+
+		Input.synthesizeTapGesture=function(paramO){
+			return ChromeMsg.callCmd("Input.synthesizeTapGesture",paramO);
+		}
+
+		Input.DependDomains=[];
+		return Input;
+	})()
+
+
+	//class debugprotocol.Network
+	var Network=(function(){
+		function Network(){}
+		__class(Network,'debugprotocol.Network');
+		Network.canClearBrowserCache=function(paramO){
+			return ChromeMsg.callCmd("Network.canClearBrowserCache",paramO);
+		}
+
+		Network.canClearBrowserCookies=function(paramO){
+			return ChromeMsg.callCmd("Network.canClearBrowserCookies",paramO);
+		}
+
+		Network.canEmulateNetworkConditions=function(paramO){
+			return ChromeMsg.callCmd("Network.canEmulateNetworkConditions",paramO);
+		}
+
+		Network.clearBrowserCache=function(paramO){
+			return ChromeMsg.callCmd("Network.clearBrowserCache",paramO);
+		}
+
+		Network.clearBrowserCookies=function(paramO){
+			return ChromeMsg.callCmd("Network.clearBrowserCookies",paramO);
+		}
+
+		Network.continueInterceptedRequest=function(paramO){
+			return ChromeMsg.callCmd("Network.continueInterceptedRequest",paramO);
+		}
+
+		Network.deleteCookies=function(paramO){
+			return ChromeMsg.callCmd("Network.deleteCookies",paramO);
+		}
+
+		Network.disable=function(paramO){
+			return ChromeMsg.callCmd("Network.disable",paramO);
+		}
+
+		Network.emulateNetworkConditions=function(paramO){
+			return ChromeMsg.callCmd("Network.emulateNetworkConditions",paramO);
+		}
+
+		Network.enable=function(paramO){
+			return ChromeMsg.callCmd("Network.enable",paramO);
+		}
+
+		Network.getAllCookies=function(paramO){
+			return ChromeMsg.callCmd("Network.getAllCookies",paramO);
+		}
+
+		Network.getCertificate=function(paramO){
+			return ChromeMsg.callCmd("Network.getCertificate",paramO);
+		}
+
+		Network.getCookies=function(paramO){
+			return ChromeMsg.callCmd("Network.getCookies",paramO);
+		}
+
+		Network.getResponseBody=function(paramO){
+			return ChromeMsg.callCmd("Network.getResponseBody",paramO);
+		}
+
+		Network.getRequestPostData=function(paramO){
+			return ChromeMsg.callCmd("Network.getRequestPostData",paramO);
+		}
+
+		Network.getResponseBodyForInterception=function(paramO){
+			return ChromeMsg.callCmd("Network.getResponseBodyForInterception",paramO);
+		}
+
+		Network.takeResponseBodyForInterceptionAsStream=function(paramO){
+			return ChromeMsg.callCmd("Network.takeResponseBodyForInterceptionAsStream",paramO);
+		}
+
+		Network.replayXHR=function(paramO){
+			return ChromeMsg.callCmd("Network.replayXHR",paramO);
+		}
+
+		Network.searchInResponseBody=function(paramO){
+			return ChromeMsg.callCmd("Network.searchInResponseBody",paramO);
+		}
+
+		Network.setBlockedURLs=function(paramO){
+			return ChromeMsg.callCmd("Network.setBlockedURLs",paramO);
+		}
+
+		Network.setBypassServiceWorker=function(paramO){
+			return ChromeMsg.callCmd("Network.setBypassServiceWorker",paramO);
+		}
+
+		Network.setCacheDisabled=function(paramO){
+			return ChromeMsg.callCmd("Network.setCacheDisabled",paramO);
+		}
+
+		Network.setCookie=function(paramO){
+			return ChromeMsg.callCmd("Network.setCookie",paramO);
+		}
+
+		Network.setCookies=function(paramO){
+			return ChromeMsg.callCmd("Network.setCookies",paramO);
+		}
+
+		Network.setDataSizeLimitsForTest=function(paramO){
+			return ChromeMsg.callCmd("Network.setDataSizeLimitsForTest",paramO);
+		}
+
+		Network.setExtraHTTPHeaders=function(paramO){
+			return ChromeMsg.callCmd("Network.setExtraHTTPHeaders",paramO);
+		}
+
+		Network.setRequestInterception=function(paramO){
+			return ChromeMsg.callCmd("Network.setRequestInterception",paramO);
+		}
+
+		Network.setUserAgentOverride=function(paramO){
+			return ChromeMsg.callCmd("Network.setUserAgentOverride",paramO);
+		}
+
+		Network.dataReceived="Network.dataReceived";
+		Network.eventSourceMessageReceived="Network.eventSourceMessageReceived";
+		Network.loadingFailed="Network.loadingFailed";
+		Network.loadingFinished="Network.loadingFinished";
+		Network.requestIntercepted="Network.requestIntercepted";
+		Network.requestServedFromCache="Network.requestServedFromCache";
+		Network.requestWillBeSent="Network.requestWillBeSent";
+		Network.resourceChangedPriority="Network.resourceChangedPriority";
+		Network.signedExchangeReceived="Network.signedExchangeReceived";
+		Network.responseReceived="Network.responseReceived";
+		Network.webSocketClosed="Network.webSocketClosed";
+		Network.webSocketCreated="Network.webSocketCreated";
+		Network.webSocketFrameError="Network.webSocketFrameError";
+		Network.webSocketFrameReceived="Network.webSocketFrameReceived";
+		Network.webSocketFrameSent="Network.webSocketFrameSent";
+		Network.webSocketHandshakeResponseReceived="Network.webSocketHandshakeResponseReceived";
+		Network.webSocketWillSendHandshakeRequest="Network.webSocketWillSendHandshakeRequest";
+		__static(Network,
+		['DependDomains',function(){return this.DependDomains=[Debugger,Runtime,Security];}
+		]);
+		return Network;
+	})()
+
+
+	//class debugprotocol.Page
+	var Page=(function(){
+		function Page(){}
+		__class(Page,'debugprotocol.Page');
+		Page.addScriptToEvaluateOnLoad=function(paramO){
+			return ChromeMsg.callCmd("Page.addScriptToEvaluateOnLoad",paramO);
+		}
+
+		Page.addScriptToEvaluateOnNewDocument=function(paramO){
+			return ChromeMsg.callCmd("Page.addScriptToEvaluateOnNewDocument",paramO);
+		}
+
+		Page.bringToFront=function(paramO){
+			return ChromeMsg.callCmd("Page.bringToFront",paramO);
+		}
+
+		Page.captureScreenshot=function(paramO){
+			return ChromeMsg.callCmd("Page.captureScreenshot",paramO);
+		}
+
+		Page.clearDeviceMetricsOverride=function(paramO){
+			return ChromeMsg.callCmd("Page.clearDeviceMetricsOverride",paramO);
+		}
+
+		Page.clearDeviceOrientationOverride=function(paramO){
+			return ChromeMsg.callCmd("Page.clearDeviceOrientationOverride",paramO);
+		}
+
+		Page.clearGeolocationOverride=function(paramO){
+			return ChromeMsg.callCmd("Page.clearGeolocationOverride",paramO);
+		}
+
+		Page.createIsolatedWorld=function(paramO){
+			return ChromeMsg.callCmd("Page.createIsolatedWorld",paramO);
+		}
+
+		Page.deleteCookie=function(paramO){
+			return ChromeMsg.callCmd("Page.deleteCookie",paramO);
+		}
+
+		Page.disable=function(paramO){
+			return ChromeMsg.callCmd("Page.disable",paramO);
+		}
+
+		Page.enable=function(paramO){
+			return ChromeMsg.callCmd("Page.enable",paramO);
+		}
+
+		Page.getAppManifest=function(paramO){
+			return ChromeMsg.callCmd("Page.getAppManifest",paramO);
+		}
+
+		Page.getCookies=function(paramO){
+			return ChromeMsg.callCmd("Page.getCookies",paramO);
+		}
+
+		Page.getFrameTree=function(paramO){
+			return ChromeMsg.callCmd("Page.getFrameTree",paramO);
+		}
+
+		Page.getLayoutMetrics=function(paramO){
+			return ChromeMsg.callCmd("Page.getLayoutMetrics",paramO);
+		}
+
+		Page.getNavigationHistory=function(paramO){
+			return ChromeMsg.callCmd("Page.getNavigationHistory",paramO);
+		}
+
+		Page.getResourceContent=function(paramO){
+			return ChromeMsg.callCmd("Page.getResourceContent",paramO);
+		}
+
+		Page.getResourceTree=function(paramO){
+			return ChromeMsg.callCmd("Page.getResourceTree",paramO);
+		}
+
+		Page.handleJavaScriptDialog=function(paramO){
+			return ChromeMsg.callCmd("Page.handleJavaScriptDialog",paramO);
+		}
+
+		Page.navigate=function(paramO){
+			return ChromeMsg.callCmd("Page.navigate",paramO);
+		}
+
+		Page.navigateToHistoryEntry=function(paramO){
+			return ChromeMsg.callCmd("Page.navigateToHistoryEntry",paramO);
+		}
+
+		Page.printToPDF=function(paramO){
+			return ChromeMsg.callCmd("Page.printToPDF",paramO);
+		}
+
+		Page.reload=function(paramO){
+			return ChromeMsg.callCmd("Page.reload",paramO);
+		}
+
+		Page.removeScriptToEvaluateOnLoad=function(paramO){
+			return ChromeMsg.callCmd("Page.removeScriptToEvaluateOnLoad",paramO);
+		}
+
+		Page.removeScriptToEvaluateOnNewDocument=function(paramO){
+			return ChromeMsg.callCmd("Page.removeScriptToEvaluateOnNewDocument",paramO);
+		}
+
+		Page.requestAppBanner=function(paramO){
+			return ChromeMsg.callCmd("Page.requestAppBanner",paramO);
+		}
+
+		Page.screencastFrameAck=function(paramO){
+			return ChromeMsg.callCmd("Page.screencastFrameAck",paramO);
+		}
+
+		Page.searchInResource=function(paramO){
+			return ChromeMsg.callCmd("Page.searchInResource",paramO);
+		}
+
+		Page.setAdBlockingEnabled=function(paramO){
+			return ChromeMsg.callCmd("Page.setAdBlockingEnabled",paramO);
+		}
+
+		Page.setBypassCSP=function(paramO){
+			return ChromeMsg.callCmd("Page.setBypassCSP",paramO);
+		}
+
+		Page.setDeviceMetricsOverride=function(paramO){
+			return ChromeMsg.callCmd("Page.setDeviceMetricsOverride",paramO);
+		}
+
+		Page.setDeviceOrientationOverride=function(paramO){
+			return ChromeMsg.callCmd("Page.setDeviceOrientationOverride",paramO);
+		}
+
+		Page.setFontFamilies=function(paramO){
+			return ChromeMsg.callCmd("Page.setFontFamilies",paramO);
+		}
+
+		Page.setFontSizes=function(paramO){
+			return ChromeMsg.callCmd("Page.setFontSizes",paramO);
+		}
+
+		Page.setDocumentContent=function(paramO){
+			return ChromeMsg.callCmd("Page.setDocumentContent",paramO);
+		}
+
+		Page.setDownloadBehavior=function(paramO){
+			return ChromeMsg.callCmd("Page.setDownloadBehavior",paramO);
+		}
+
+		Page.setGeolocationOverride=function(paramO){
+			return ChromeMsg.callCmd("Page.setGeolocationOverride",paramO);
+		}
+
+		Page.setLifecycleEventsEnabled=function(paramO){
+			return ChromeMsg.callCmd("Page.setLifecycleEventsEnabled",paramO);
+		}
+
+		Page.setTouchEmulationEnabled=function(paramO){
+			return ChromeMsg.callCmd("Page.setTouchEmulationEnabled",paramO);
+		}
+
+		Page.startScreencast=function(paramO){
+			return ChromeMsg.callCmd("Page.startScreencast",paramO);
+		}
+
+		Page.stopLoading=function(paramO){
+			return ChromeMsg.callCmd("Page.stopLoading",paramO);
+		}
+
+		Page.crash=function(paramO){
+			return ChromeMsg.callCmd("Page.crash",paramO);
+		}
+
+		Page.close=function(paramO){
+			return ChromeMsg.callCmd("Page.close",paramO);
+		}
+
+		Page.setWebLifecycleState=function(paramO){
+			return ChromeMsg.callCmd("Page.setWebLifecycleState",paramO);
+		}
+
+		Page.stopScreencast=function(paramO){
+			return ChromeMsg.callCmd("Page.stopScreencast",paramO);
+		}
+
+		Page.setProduceCompilationCache=function(paramO){
+			return ChromeMsg.callCmd("Page.setProduceCompilationCache",paramO);
+		}
+
+		Page.addCompilationCache=function(paramO){
+			return ChromeMsg.callCmd("Page.addCompilationCache",paramO);
+		}
+
+		Page.clearCompilationCache=function(paramO){
+			return ChromeMsg.callCmd("Page.clearCompilationCache",paramO);
+		}
+
+		Page.generateTestReport=function(paramO){
+			return ChromeMsg.callCmd("Page.generateTestReport",paramO);
+		}
+
+		Page.domContentEventFired="Page.domContentEventFired";
+		Page.frameAttached="Page.frameAttached";
+		Page.frameClearedScheduledNavigation="Page.frameClearedScheduledNavigation";
+		Page.frameDetached="Page.frameDetached";
+		Page.frameNavigated="Page.frameNavigated";
+		Page.frameResized="Page.frameResized";
+		Page.frameScheduledNavigation="Page.frameScheduledNavigation";
+		Page.frameStartedLoading="Page.frameStartedLoading";
+		Page.frameStoppedLoading="Page.frameStoppedLoading";
+		Page.interstitialHidden="Page.interstitialHidden";
+		Page.interstitialShown="Page.interstitialShown";
+		Page.javascriptDialogClosed="Page.javascriptDialogClosed";
+		Page.javascriptDialogOpening="Page.javascriptDialogOpening";
+		Page.lifecycleEvent="Page.lifecycleEvent";
+		Page.loadEventFired="Page.loadEventFired";
+		Page.navigatedWithinDocument="Page.navigatedWithinDocument";
+		Page.screencastFrame="Page.screencastFrame";
+		Page.screencastVisibilityChanged="Page.screencastVisibilityChanged";
+		Page.windowOpen="Page.windowOpen";
+		Page.compilationCacheProduced="Page.compilationCacheProduced";
+		__static(Page,
+		['DependDomains',function(){return this.DependDomains=[Debugger,DOM,Network,Runtime];}
+		]);
+		return Page;
+	})()
+
+
+	//class debugprotocol.Runtime
+	var Runtime=(function(){
+		function Runtime(){}
+		__class(Runtime,'debugprotocol.Runtime');
+		Runtime.awaitPromise=function(paramO){
+			return ChromeMsg.callCmd("Runtime.awaitPromise",paramO);
+		}
+
+		Runtime.callFunctionOn=function(paramO){
+			return ChromeMsg.callCmd("Runtime.callFunctionOn",paramO);
+		}
+
+		Runtime.compileScript=function(paramO){
+			return ChromeMsg.callCmd("Runtime.compileScript",paramO);
+		}
+
+		Runtime.disable=function(paramO){
+			return ChromeMsg.callCmd("Runtime.disable",paramO);
+		}
+
+		Runtime.discardConsoleEntries=function(paramO){
+			return ChromeMsg.callCmd("Runtime.discardConsoleEntries",paramO);
+		}
+
+		Runtime.enable=function(paramO){
+			return ChromeMsg.callCmd("Runtime.enable",paramO);
+		}
+
+		Runtime.evaluate=function(paramO){
+			return ChromeMsg.callCmd("Runtime.evaluate",paramO);
+		}
+
+		Runtime.getIsolateId=function(paramO){
+			return ChromeMsg.callCmd("Runtime.getIsolateId",paramO);
+		}
+
+		Runtime.getHeapUsage=function(paramO){
+			return ChromeMsg.callCmd("Runtime.getHeapUsage",paramO);
+		}
+
+		Runtime.getProperties=function(paramO){
+			return ChromeMsg.callCmd("Runtime.getProperties",paramO);
+		}
+
+		Runtime.globalLexicalScopeNames=function(paramO){
+			return ChromeMsg.callCmd("Runtime.globalLexicalScopeNames",paramO);
+		}
+
+		Runtime.queryObjects=function(paramO){
+			return ChromeMsg.callCmd("Runtime.queryObjects",paramO);
+		}
+
+		Runtime.releaseObject=function(paramO){
+			return ChromeMsg.callCmd("Runtime.releaseObject",paramO);
+		}
+
+		Runtime.releaseObjectGroup=function(paramO){
+			return ChromeMsg.callCmd("Runtime.releaseObjectGroup",paramO);
+		}
+
+		Runtime.runIfWaitingForDebugger=function(paramO){
+			return ChromeMsg.callCmd("Runtime.runIfWaitingForDebugger",paramO);
+		}
+
+		Runtime.runScript=function(paramO){
+			return ChromeMsg.callCmd("Runtime.runScript",paramO);
+		}
+
+		Runtime.setAsyncCallStackDepth=function(paramO){
+			return ChromeMsg.callCmd("Runtime.setAsyncCallStackDepth",paramO);
+		}
+
+		Runtime.setCustomObjectFormatterEnabled=function(paramO){
+			return ChromeMsg.callCmd("Runtime.setCustomObjectFormatterEnabled",paramO);
+		}
+
+		Runtime.setMaxCallStackSizeToCapture=function(paramO){
+			return ChromeMsg.callCmd("Runtime.setMaxCallStackSizeToCapture",paramO);
+		}
+
+		Runtime.terminateExecution=function(paramO){
+			return ChromeMsg.callCmd("Runtime.terminateExecution",paramO);
+		}
+
+		Runtime.addBinding=function(paramO){
+			return ChromeMsg.callCmd("Runtime.addBinding",paramO);
+		}
+
+		Runtime.removeBinding=function(paramO){
+			return ChromeMsg.callCmd("Runtime.removeBinding",paramO);
+		}
+
+		Runtime.DependDomains=[];
+		Runtime.bindingCalled="Runtime.bindingCalled";
+		Runtime.consoleAPICalled="Runtime.consoleAPICalled";
+		Runtime.exceptionRevoked="Runtime.exceptionRevoked";
+		Runtime.exceptionThrown="Runtime.exceptionThrown";
+		Runtime.executionContextCreated="Runtime.executionContextCreated";
+		Runtime.executionContextDestroyed="Runtime.executionContextDestroyed";
+		Runtime.executionContextsCleared="Runtime.executionContextsCleared";
+		Runtime.inspectRequested="Runtime.inspectRequested";
+		return Runtime;
+	})()
+
+
+	//class debugprotocol.Security
+	var Security=(function(){
+		function Security(){}
+		__class(Security,'debugprotocol.Security');
+		Security.disable=function(paramO){
+			return ChromeMsg.callCmd("Security.disable",paramO);
+		}
+
+		Security.enable=function(paramO){
+			return ChromeMsg.callCmd("Security.enable",paramO);
+		}
+
+		Security.setIgnoreCertificateErrors=function(paramO){
+			return ChromeMsg.callCmd("Security.setIgnoreCertificateErrors",paramO);
+		}
+
+		Security.handleCertificateError=function(paramO){
+			return ChromeMsg.callCmd("Security.handleCertificateError",paramO);
+		}
+
+		Security.setOverrideCertificateErrors=function(paramO){
+			return ChromeMsg.callCmd("Security.setOverrideCertificateErrors",paramO);
+		}
+
+		Security.DependDomains=[];
+		Security.certificateError="Security.certificateError";
+		Security.securityStateChanged="Security.securityStateChanged";
+		return Security;
+	})()
 
 
 	/**
@@ -19305,6 +20089,118 @@ var Laya=window.Laya=(function(window,document){
 		AutoBitmap.textureCache={};
 		return AutoBitmap;
 	})(Graphics)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class chromedebug.ChromeSocket extends laya.events.EventDispatcher
+	var ChromeSocket=(function(_super){
+		function ChromeSocket(){
+			this.socket=null;
+			this.userName=null;
+			this.md5Pwd=null;
+			this.isLogined=false;
+			this._serverStr=null;
+			this.channel=null;
+			this.autoOpenUrl="http://baidu.com";
+			this._resolveDic={};
+			this.msgID=0;
+			ChromeSocket.__super.call(this);
+			this.socket=new Socket("127.0.0.1",0,Byte);
+			this.socket.disableInput=true;
+			this.socket.on("open",this,this.onConnect);
+			this.socket.on("message",this,this.onMessage);
+			this.socket.on("error",this,this.onErr);
+			this.socket.on("close",this,this.onClose);
+			ChromeMsg.socket=this;
+		}
+
+		__class(ChromeSocket,'chromedebug.ChromeSocket',_super);
+		var __proto=ChromeSocket.prototype;
+		__proto.connectByTargetO=function(targetO){
+			var targetPath;
+			targetPath=targetO["webSocketDebuggerUrl"];
+			this.connect(targetPath);
+		}
+
+		__proto.connect=function(serverStr){
+			this._serverStr=serverStr;
+			this.socket.connectByUrl(serverStr);
+		}
+
+		__proto.onConnect=function(){
+			console.log('socket connect');
+			if (this.autoOpenUrl){
+				Page.enable();
+				Page.navigate({url:this.autoOpenUrl });
+			}
+		}
+
+		//sendCmd(Page.navigate,{url:autoOpenUrl });
+		__proto.sendCmd=function(method,params){
+			this.sendJson(ChromeMsg.createCmd(method,params));
+		}
+
+		__proto.sendCmdAndWaitReplay=function(cmdO){
+			var _$this=this;
+			function sendPromise (resolve,reject){
+				_$this.sendJson(cmdO);
+				_$this._resolveDic[cmdO.id]=resolve;
+			};
+			var promise=new Promise(sendPromise);
+			return promise;
+		}
+
+		__proto.onMessage=function(msg){
+			console.log('socket onMessage');
+			console.log("Msg:"+msg);
+			var dataO;
+			dataO=JSON.parse(msg);
+			var tMethodId=0;
+			tMethodId=dataO.id;
+			if (tMethodId && this._resolveDic[tMethodId]){
+				console.log("resolve:",tMethodId,dataO.result);
+				this._resolveDic[tMethodId](dataO.result);
+				delete this._resolveDic[tMethodId];
+			}
+		}
+
+		__proto.send=function(msg){
+			this.msgID++;
+			msg=msg+this.msgID;
+			console.log("try send:"+msg);
+			this.socket.send(msg);
+		}
+
+		__proto.sendJson=function(obj){
+			if (!obj)
+				return;
+			this.socket.send(JSON.stringify(obj));
+		}
+
+		__proto.closeLater=function(){
+			this.socket.close();
+			console.log("after close");
+		}
+
+		__proto.onErr=function(e){
+			console.log('socket onErr',e);
+		}
+
+		__proto.onClose=function(){
+			console.log('socket onClose');
+		}
+
+		ChromeSocket.DataFromServer="DataFromServer";
+		ChromeSocket.Logined="Logined";
+		ChromeSocket.OnServerMsg="OnServerMsg";
+		ChromeSocket.Welcome="welcome";
+		ChromeSocket.OnJoinedChannel="OnJoinedChannel";
+		ChromeSocket.OnChannelMsg="OnChannelMsg";
+		return ChromeSocket;
+	})(EventDispatcher)
 
 
 	/**
@@ -32166,122 +33062,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*<code>CheckBox</code> 组件显示一个小方框，该方框内可以有选中标记。
-	*<code>CheckBox</code> 组件还可以显示可选的文本标签，默认该标签位于 CheckBox 右侧。
-	*<p><code>CheckBox</code> 使用 <code>dataSource</code>赋值时的的默认属性是：<code>selected</code>。</p>
-	*
-	*@example <caption>以下示例代码，创建了一个 <code>CheckBox</code> 实例。</caption>
-	*package
-	*{
-		*import laya.ui.CheckBox;
-		*import laya.utils.Handler;
-		*public class CheckBox_Example
-		*{
-			*public function CheckBox_Example()
-			*{
-				*Laya.init(640,800);//设置游戏画布宽高。
-				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-				*Laya.loader.load("resource/ui/check.png",Handler.create(this,onLoadComplete));//加载资源。
-				*}
-			*private function onLoadComplete():void
-			*{
-				*trace("资源加载完成！");
-				*var checkBox:CheckBox=new CheckBox("resource/ui/check.png","这个是一个CheckBox组件。");//创建一个 CheckBox 类的实例对象 checkBox ,传入它的皮肤skin和标签label。
-				*checkBox.x=100;//设置 checkBox 对象的属性 x 的值，用于控制 checkBox 对象的显示位置。
-				*checkBox.y=100;//设置 checkBox 对象的属性 y 的值，用于控制 checkBox 对象的显示位置。
-				*checkBox.clickHandler=new Handler(this,onClick,[checkBox]);//设置 checkBox 的点击事件处理器。
-				*Laya.stage.addChild(checkBox);//将此 checkBox 对象添加到显示列表。
-				*}
-			*private function onClick(checkBox:CheckBox):void
-			*{
-				*trace("输出选中状态: checkBox.selected = "+checkBox.selected);
-				*}
-			*}
-		*}
-	*@example
-	*Laya.init(640,800);//设置游戏画布宽高
-	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
-	*Laya.loader.load("resource/ui/check.png",laya.utils.Handler.create(this,loadComplete));//加载资源
-	*function loadComplete()
-	*{
-		*console.log("资源加载完成！");
-		*var checkBox:laya.ui.CheckBox=new laya.ui.CheckBox("resource/ui/check.png","这个是一个CheckBox组件。");//创建一个 CheckBox 类的类的实例对象 checkBox ,传入它的皮肤skin和标签label。
-		*checkBox.x=100;//设置 checkBox 对象的属性 x 的值，用于控制 checkBox 对象的显示位置。
-		*checkBox.y=100;//设置 checkBox 对象的属性 y 的值，用于控制 checkBox 对象的显示位置。
-		*checkBox.clickHandler=new laya.utils.Handler(this,this.onClick,[checkBox],false);//设置 checkBox 的点击事件处理器。
-		*Laya.stage.addChild(checkBox);//将此 checkBox 对象添加到显示列表。
-		*}
-	*function onClick(checkBox)
-	*{
-		*console.log("checkBox.selected = ",checkBox.selected);
-		*}
-	*@example
-	*import CheckBox=laya.ui.CheckBox;
-	*import Handler=laya.utils.Handler;
-	*class CheckBox_Example{
-		*constructor()
-		*{
-			*Laya.init(640,800);
-			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-			*Laya.loader.load("resource/ui/check.png",Handler.create(this,this.onLoadComplete));//加载资源。
-			*}
-		*private onLoadComplete()
-		*{
-			*var checkBox:CheckBox=new CheckBox("resource/ui/check.png","这个是一个CheckBox组件。");//创建一个 CheckBox 类的实例对象 checkBox ,传入它的皮肤skin和标签label。
-			*checkBox.x=100;//设置 checkBox 对象的属性 x 的值，用于控制 checkBox 对象的显示位置。
-			*checkBox.y=100;//设置 checkBox 对象的属性 y 的值，用于控制 checkBox 对象的显示位置。
-			*checkBox.clickHandler=new Handler(this,this.onClick,[checkBox]);//设置 checkBox 的点击事件处理器。
-			*Laya.stage.addChild(checkBox);//将此 checkBox 对象添加到显示列表。
-			*}
-		*private onClick(checkBox:CheckBox):void
-		*{
-			*console.log("输出选中状态: checkBox.selected = "+checkBox.selected);
-			*}
-		*}
-	*/
-	//class laya.ui.CheckBox extends laya.ui.Button
-	var CheckBox=(function(_super){
-		/**
-		*创建一个新的 <code>CheckBox</code> 组件实例。
-		*@param skin 皮肤资源地址。
-		*@param label 文本标签的内容。
-		*/
-		function CheckBox(skin,label){
-			(label===void 0)&& (label="");
-			CheckBox.__super.call(this,skin,label);
-		}
-
-		__class(CheckBox,'laya.ui.CheckBox',_super);
-		var __proto=CheckBox.prototype;
-		/**@inheritDoc */
-		__proto.preinitialize=function(){
-			laya.ui.Component.prototype.preinitialize.call(this);
-			this.toggle=true;
-			this._autoSize=false;
-		}
-
-		/**@inheritDoc */
-		__proto.initialize=function(){
-			_super.prototype.initialize.call(this);
-			this.createText();
-			this._text.align="left";
-			this._text.valign="top";
-			this._text.width=0;
-		}
-
-		/**@inheritDoc */
-		__getset(0,__proto,'dataSource',_super.prototype._$get_dataSource,function(value){
-			this._dataSource=value;
-			if ((typeof value=='boolean'))this.selected=value;
-			else if ((typeof value=='string'))this.selected=value==="true";
-			else _super.prototype._$set_dataSource.call(this,value);
-		});
-
-		return CheckBox;
-	})(Button)
-
-
-	/**
 	*<code>Panel</code> 是一个面板容器类。
 	*/
 	//class laya.ui.Panel extends laya.ui.Box
@@ -32596,6 +33376,122 @@ var Laya=window.Laya=(function(window,document){
 
 		return Panel;
 	})(Box)
+
+
+	/**
+	*<code>CheckBox</code> 组件显示一个小方框，该方框内可以有选中标记。
+	*<code>CheckBox</code> 组件还可以显示可选的文本标签，默认该标签位于 CheckBox 右侧。
+	*<p><code>CheckBox</code> 使用 <code>dataSource</code>赋值时的的默认属性是：<code>selected</code>。</p>
+	*
+	*@example <caption>以下示例代码，创建了一个 <code>CheckBox</code> 实例。</caption>
+	*package
+	*{
+		*import laya.ui.CheckBox;
+		*import laya.utils.Handler;
+		*public class CheckBox_Example
+		*{
+			*public function CheckBox_Example()
+			*{
+				*Laya.init(640,800);//设置游戏画布宽高。
+				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+				*Laya.loader.load("resource/ui/check.png",Handler.create(this,onLoadComplete));//加载资源。
+				*}
+			*private function onLoadComplete():void
+			*{
+				*trace("资源加载完成！");
+				*var checkBox:CheckBox=new CheckBox("resource/ui/check.png","这个是一个CheckBox组件。");//创建一个 CheckBox 类的实例对象 checkBox ,传入它的皮肤skin和标签label。
+				*checkBox.x=100;//设置 checkBox 对象的属性 x 的值，用于控制 checkBox 对象的显示位置。
+				*checkBox.y=100;//设置 checkBox 对象的属性 y 的值，用于控制 checkBox 对象的显示位置。
+				*checkBox.clickHandler=new Handler(this,onClick,[checkBox]);//设置 checkBox 的点击事件处理器。
+				*Laya.stage.addChild(checkBox);//将此 checkBox 对象添加到显示列表。
+				*}
+			*private function onClick(checkBox:CheckBox):void
+			*{
+				*trace("输出选中状态: checkBox.selected = "+checkBox.selected);
+				*}
+			*}
+		*}
+	*@example
+	*Laya.init(640,800);//设置游戏画布宽高
+	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
+	*Laya.loader.load("resource/ui/check.png",laya.utils.Handler.create(this,loadComplete));//加载资源
+	*function loadComplete()
+	*{
+		*console.log("资源加载完成！");
+		*var checkBox:laya.ui.CheckBox=new laya.ui.CheckBox("resource/ui/check.png","这个是一个CheckBox组件。");//创建一个 CheckBox 类的类的实例对象 checkBox ,传入它的皮肤skin和标签label。
+		*checkBox.x=100;//设置 checkBox 对象的属性 x 的值，用于控制 checkBox 对象的显示位置。
+		*checkBox.y=100;//设置 checkBox 对象的属性 y 的值，用于控制 checkBox 对象的显示位置。
+		*checkBox.clickHandler=new laya.utils.Handler(this,this.onClick,[checkBox],false);//设置 checkBox 的点击事件处理器。
+		*Laya.stage.addChild(checkBox);//将此 checkBox 对象添加到显示列表。
+		*}
+	*function onClick(checkBox)
+	*{
+		*console.log("checkBox.selected = ",checkBox.selected);
+		*}
+	*@example
+	*import CheckBox=laya.ui.CheckBox;
+	*import Handler=laya.utils.Handler;
+	*class CheckBox_Example{
+		*constructor()
+		*{
+			*Laya.init(640,800);
+			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+			*Laya.loader.load("resource/ui/check.png",Handler.create(this,this.onLoadComplete));//加载资源。
+			*}
+		*private onLoadComplete()
+		*{
+			*var checkBox:CheckBox=new CheckBox("resource/ui/check.png","这个是一个CheckBox组件。");//创建一个 CheckBox 类的实例对象 checkBox ,传入它的皮肤skin和标签label。
+			*checkBox.x=100;//设置 checkBox 对象的属性 x 的值，用于控制 checkBox 对象的显示位置。
+			*checkBox.y=100;//设置 checkBox 对象的属性 y 的值，用于控制 checkBox 对象的显示位置。
+			*checkBox.clickHandler=new Handler(this,this.onClick,[checkBox]);//设置 checkBox 的点击事件处理器。
+			*Laya.stage.addChild(checkBox);//将此 checkBox 对象添加到显示列表。
+			*}
+		*private onClick(checkBox:CheckBox):void
+		*{
+			*console.log("输出选中状态: checkBox.selected = "+checkBox.selected);
+			*}
+		*}
+	*/
+	//class laya.ui.CheckBox extends laya.ui.Button
+	var CheckBox=(function(_super){
+		/**
+		*创建一个新的 <code>CheckBox</code> 组件实例。
+		*@param skin 皮肤资源地址。
+		*@param label 文本标签的内容。
+		*/
+		function CheckBox(skin,label){
+			(label===void 0)&& (label="");
+			CheckBox.__super.call(this,skin,label);
+		}
+
+		__class(CheckBox,'laya.ui.CheckBox',_super);
+		var __proto=CheckBox.prototype;
+		/**@inheritDoc */
+		__proto.preinitialize=function(){
+			laya.ui.Component.prototype.preinitialize.call(this);
+			this.toggle=true;
+			this._autoSize=false;
+		}
+
+		/**@inheritDoc */
+		__proto.initialize=function(){
+			_super.prototype.initialize.call(this);
+			this.createText();
+			this._text.align="left";
+			this._text.valign="top";
+			this._text.width=0;
+		}
+
+		/**@inheritDoc */
+		__getset(0,__proto,'dataSource',_super.prototype._$get_dataSource,function(value){
+			this._dataSource=value;
+			if ((typeof value=='boolean'))this.selected=value;
+			else if ((typeof value=='string'))this.selected=value==="true";
+			else _super.prototype._$set_dataSource.call(this,value);
+		});
+
+		return CheckBox;
+	})(Button)
 
 
 	/**
@@ -37696,25 +38592,6 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
-	var FindNodeSmall=(function(_super){
-		function FindNodeSmall(){
-			FindNodeSmall.__super.call(this);
-			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
-			this.createView(FindNodeSmallUI.uiView);
-		}
-
-		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
-		var __proto=FindNodeSmall.prototype;
-		__proto.createChildren=function(){}
-		return FindNodeSmall;
-	})(FindNodeSmallUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
 	//class laya.debug.view.nodeInfo.nodetree.FindNode extends laya.debug.ui.debugui.FindNodeUI
 	var FindNode=(function(_super){
 		function FindNode(){
@@ -37731,6 +38608,25 @@ var Laya=window.Laya=(function(window,document){
 
 		return FindNode;
 	})(FindNodeUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
+	var FindNodeSmall=(function(_super){
+		function FindNodeSmall(){
+			FindNodeSmall.__super.call(this);
+			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
+			this.createView(FindNodeSmallUI.uiView);
+		}
+
+		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
+		var __proto=FindNodeSmall.prototype;
+		__proto.createChildren=function(){}
+		return FindNodeSmall;
+	})(FindNodeSmallUI)
 
 
 	/**
@@ -37835,6 +38731,26 @@ var Laya=window.Laya=(function(window,document){
 		__proto.createChildren=function(){}
 		return NodeTool;
 	})(NodeToolUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.view.nodeInfo.nodetree.NodeTreeSetting extends laya.debug.ui.debugui.NodeTreeSettingUI
+	var NodeTreeSetting=(function(_super){
+		function NodeTreeSetting(){
+			NodeTreeSetting.__super.call(this);
+			Base64AtlasManager.replaceRes(NodeTreeSettingUI.uiView);
+			this.createView(NodeTreeSettingUI.uiView);
+		}
+
+		__class(NodeTreeSetting,'laya.debug.view.nodeInfo.nodetree.NodeTreeSetting',_super);
+		var __proto=NodeTreeSetting.prototype;
+		//inits();
+		__proto.createChildren=function(){}
+		return NodeTreeSetting;
+	})(NodeTreeSettingUI)
 
 
 	/**
@@ -38084,26 +39000,6 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class laya.debug.view.nodeInfo.nodetree.NodeTreeSetting extends laya.debug.ui.debugui.NodeTreeSettingUI
-	var NodeTreeSetting=(function(_super){
-		function NodeTreeSetting(){
-			NodeTreeSetting.__super.call(this);
-			Base64AtlasManager.replaceRes(NodeTreeSettingUI.uiView);
-			this.createView(NodeTreeSettingUI.uiView);
-		}
-
-		__class(NodeTreeSetting,'laya.debug.view.nodeInfo.nodetree.NodeTreeSetting',_super);
-		var __proto=NodeTreeSetting.prototype;
-		//inits();
-		__proto.createChildren=function(){}
-		return NodeTreeSetting;
-	})(NodeTreeSettingUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
 	//class laya.debug.view.nodeInfo.nodetree.ObjectCreate extends laya.debug.ui.debugui.ObjectCreateUI
 	var ObjectCreate=(function(_super){
 		function ObjectCreate(){
@@ -38254,7 +39150,7 @@ var Laya=window.Laya=(function(window,document){
 	})(ToolBarUI)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,Browser,Render,View,Timer,GraphicAnimation,LocalStorage]);
+	Laya.__init([LoaderManager,EventDispatcher,Render,View,Timer,GraphicAnimation,LocalStorage,Browser]);
 	new DebugPlatform();
 
 })(window,document,Laya);

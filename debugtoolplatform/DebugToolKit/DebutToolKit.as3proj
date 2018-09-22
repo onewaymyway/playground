@@ -17,6 +17,7 @@
   <classpaths>
     <class path="src" />
     <class path="libs\laya\src" />
+    <class path="..\..\chromedebugprotocal\Libs\debugprotocol\src" />
   </classpaths>
   <!-- Build options -->
   <build>
