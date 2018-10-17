@@ -419,37 +419,33 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class testcodes.TestSourceMap
-	var TestSourceMap=(function(){
-		function TestSourceMap(){
+	//class Game
+	var Game=(function(){
+		function Game(){
+			this.drowningMachine=null;
 			Laya.init(1000,900);
-			this.testCreateSourceMap();
+			this.test();
 		}
 
-		__class(TestSourceMap,'testcodes.TestSourceMap');
-		var __proto=TestSourceMap.prototype;
-		__proto.testCreateSourceMap=function(){
-			var sourceMap;
-			sourceMap=new SourceMapTool();
-			sourceMap.file="code.adpt.js";
-			sourceMap.sourceRoot="";
-			sourceMap.addSourceFile("code.t");
-			sourceMap.addLine();
-			sourceMap.addMappintPointEx(0,0,0,null,"code.t");
-			sourceMap.addMappingPoint(8,0,12);
-			sourceMap.addLine();
-			sourceMap.addMappintPointEx(7,3,0);
-			sourceMap.addLine();
-			sourceMap.addMappintPointEx(4,7,3);
-			sourceMap.addMappintPointEx(8,7,6);
-			sourceMap.addLine(4);
-			sourceMap.addMappintPointEx(0,11,0);
-			sourceMap.addMappintPointEx(9,12,0);
-			console.log(sourceMap.createSouceMap());
-			console.log(sourceMap.createSourceMapStr());
+		__class(Game,'Game');
+		var __proto=Game.prototype;
+		__proto.test=function(){
+			console.log("hello Simulator");
+			this.drowningMachine=new DrowningMachine();
+			this.drowningMachine.initByRules("data/rules.json",new Handler(this,this.initDrowningMachine));
 		}
 
-		return TestSourceMap;
+		__proto.initDrowningMachine=function(){
+			debugger;
+			this.drowningMachine.addItem("start");
+			this.drowningMachine.traceState();
+			this.drowningMachine.doAction("start");
+			this.drowningMachine.traceState();
+			this.drowningMachine.doAction("age0");
+			this.drowningMachine.traceState();
+		}
+
+		return Game;
 	})()
 
 
@@ -457,244 +453,150 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class wraps.Base64VlqTool
-	var Base64VlqTool=(function(){
-		function Base64VlqTool(){}
-		__class(Base64VlqTool,'wraps.Base64VlqTool');
-		Base64VlqTool.encodeBase64=function(num){
-			return "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[num];
+	//class simulator.DrowningMachine
+	var DrowningMachine=(function(){
+		function DrowningMachine(){
+			this.ruleUrl=null;
+			this.complete=null;
+			this.actionDic={};
+			this.availableActionDic={};
+			this.itemDic={};
 		}
 
-		Base64VlqTool.decodeBase64=function(str){
-			if (!Base64VlqTool._base64Dic){
-				Base64VlqTool._base64Dic={};
-				var i=0,len=0;
-				len=Base64VlqTool.Base64CodeStr.length;
-				for (i=0;i < len;i++){
-					Base64VlqTool._base64Dic["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[i]]=i;
-				}
+		__class(DrowningMachine,'simulator.DrowningMachine');
+		var __proto=DrowningMachine.prototype;
+		__proto.initByRules=function(ruleUrl,complete){
+			this.ruleUrl=ruleUrl;
+			this.complete=complete;
+			Laya.loader.load(ruleUrl,new Handler(this,this.onRuleLoaded));
+		}
+
+		__proto.onRuleLoaded=function(){
+			this.initByRuleObject(Loader.getRes(this.ruleUrl));
+			if (this.complete){
+				this.complete.run();
 			}
-			return Base64VlqTool._base64Dic[str];
 		}
 
-		Base64VlqTool.encodeVlq=function(field){
-			var vlq="";
-			var sign=0;
-			sign=field < 0 ? 1 :0;
-			field=(field << 1)+sign;
-			do {
-				var byte=field & 0x1F;
-				if ((field >> 5)> 0){
-					byte+=0x20;
-				}
-				vlq+=Base64VlqTool.encodeBase64(byte);
-				field=field >> 5;
-			}while (field > 0);
-			return vlq;
-		}
-
-		Base64VlqTool.encodeVlqArr=function(segment){
-			var vlq='';
-			for (var fieldIndex=0;fieldIndex < segment.length;++fieldIndex){
-				var field=segment[fieldIndex];
-				vlq+=Base64VlqTool.encodeVlq(field);
-			}
-			return vlq;
-		}
-
-		Base64VlqTool.decodeVlq=function(segment){
-			var bits=0;
-			var continuation=false;
-			var fields=[];
-			for (var i=0;i < segment.length;++i){
-				if (!continuation){
-					fields.push(0);
-					bits=0;
-				};
-				var byte=Base64VlqTool.decodeBase64(segment[i]);
-				continuation=(byte & 0x20)> 0;
-				fields[fields.length-1]+=(byte & 0x1F)*Math.pow(2,bits);
-				bits+=5;
-				if (!continuation){
-					if (fields[fields.length-1] & 1){
-						fields[fields.length-1]=-fields[fields.length-1];
-					}
-					fields[fields.length-1]=fields[fields.length-1] >> 1;
-				}
-			}
-			return fields;
-		}
-
-		Base64VlqTool.Base64CodeStr="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-		Base64VlqTool._base64Dic=null
-		return Base64VlqTool;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class wraps.SourceMapTool
-	var SourceMapTool=(function(){
-		function SourceMapTool(){
-			this.version=3;
-			this.file="min.js";
-			this.names=[];
-			this._nameDic={};
-			this.sourceRoot="";
-			this.sources=[];
-			this._sourcesDic={};
-			this.sourcesContent=null;
-			this.mappings=null;
-			this._mappings=[];
-			this._temp=[];
-		}
-
-		__class(SourceMapTool,'wraps.SourceMapTool');
-		var __proto=SourceMapTool.prototype;
-		__proto.addSourceFile=function(name){
-			if (!this._sourcesDic.hasOwnProperty(name)){
-				this.sources.push(name);
-				this._sourcesDic[name]=this.sources.length-1;
-			}
-			return this._sourcesDic[name];
-		}
-
-		__proto.getFileNameIndex=function(name){
-			if (!name)return 0;
-			return this.addSourceFile(name);
-		}
-
-		__proto.addName=function(name){
-			if (!this._nameDic.hasOwnProperty(name)){
-				this.names.push(name);
-				this._nameDic[name]=this.names.length-1;
-			}
-			return this._nameDic[name];
-		}
-
-		__proto.getNameIndex=function(name){
-			if (!name)name="";
-			return this.addName(name);
-		}
-
-		__proto.createSouceMap=function(){
-			var obj;
-			obj={};
-			var keys=["version","file","names","sourceRoot","sources"];
+		__proto.initByRuleObject=function(ruleO){
+			var rules;
+			rules=ruleO.rules;
 			var i=0,len=0;
-			len=keys.length;
-			var key;
+			len=rules.length;
+			var tRuleO;
 			for (i=0;i < len;i++){
-				key=keys[i];
-				obj[key]=this[key];
+				tRuleO=rules[i];
+				this.actionDic[tRuleO.name]=tRuleO;
 			}
-			obj["mappings"]=this.createMappingStr();
-			return obj;
+			console.log("actionDic:",this.actionDic);
 		}
 
-		__proto.createSourceMapStr=function(){
-			return JSON.stringify(this.createSouceMap());
+		__proto.isAction=function(itemName){
+			return this.actionDic.hasOwnProperty(itemName);
 		}
 
-		__proto.addLine=function(LineNum){
-			(LineNum===void 0)&& (LineNum=-1);
-			if (LineNum < 0){
-				LineNum=this._mappings.length;
-			}
-			if (!this._mappings[LineNum]){
-				var i=0,len=0;
-				len=LineNum+1;
-				for (i=this._mappings.length;i< len;i++){
-					this._mappings.push([]);
-				}
-			}
-			return this._mappings[LineNum];
-		}
-
-		/**
-		*添加代码映射
-		*@param FileColumn 当前代码列
-		*@param SourceFileLine 原代码行
-		*@param SourceFileColumn 原代码列
-		*@param nameIndex 名字索引
-		*@param sourceFileID 原文件索引
-		*/
-		__proto.addMappingPoint=function(FileColumn,SourceFileLine,SourceFileColumn,nameIndex,sourceFileID){
-			(SourceFileLine===void 0)&& (SourceFileLine=-1);
-			(SourceFileColumn===void 0)&& (SourceFileColumn=-1);
-			(nameIndex===void 0)&& (nameIndex=-1);
-			(sourceFileID===void 0)&& (sourceFileID=0);
-			var line;
-			line=this._mappings[this._mappings.length-1];
-			if (SourceFileLine >=0){
-				if (nameIndex >=0){
-					line.push([FileColumn,sourceFileID,SourceFileLine,SourceFileColumn,nameIndex]);
+		__proto.addItem=function(itemName,itemCount){
+			(itemCount===void 0)&& (itemCount=1);
+			if (this.isAction(itemName)){
+				if (itemCount > 0){
+					this.availableActionDic[itemName]=this.actionDic[itemName];
 					}else{
-					line.push([FileColumn,sourceFileID,SourceFileLine,SourceFileColumn]);
+					delete this.availableActionDic[itemName];
 				}
 				}else{
-				line.push([FileColumn]);
+				if (!this.itemDic.hasOwnProperty(itemName)){
+					this.itemDic[itemName]={count:0,name:itemName};
+				}
+				this.itemDic[itemName].count+=itemCount;
 			}
 		}
 
-		/**
-		*添加代码映射
-		*@param FileColumn 代码列
-		*@param SourceFileLine 原代码行
-		*@param SourceFileColumn 原代码列
-		*@param name 原代码名
-		*@param SourceFile 原代码文件
-		*/
-		__proto.addMappintPointEx=function(FileColumn,SourceFileLine,SourceFileColumn,name,SourceFile){
-			(SourceFileLine===void 0)&& (SourceFileLine=-1);
-			(SourceFileColumn===void 0)&& (SourceFileColumn=-1);
-			this.addMappingPoint(FileColumn,SourceFileLine,SourceFileColumn,name?this.getNameIndex(name):-1,this.getFileNameIndex(SourceFile));
-		}
-
-		__proto.createPosLine=function(curPosArr,prePosArr){
-			this._temp.length=curPosArr.length;
-			var i=0,len=0;
-			len=curPosArr.length;
-			for (i=0;i < len;i++){
-				this._temp[i]=curPosArr[i]-prePosArr[i];
+		__proto.doAction=function(action){
+			var actionItem;
+			actionItem=this.availableActionDic[action];
+			if (!actionItem){
+				console.log("action not found:",action,this.availableActionDic);
+				return;
 			}
-			return Base64VlqTool.encodeVlqArr(this._temp);
-		}
-
-		__proto.createMappingStr=function(){
-			var rst;
-			rst="";
+			console.log("doAction:",action,actionItem);
+			var solveO;
+			solveO=actionItem.solve;
+			if (!solveO){
+				console.log("solveO not found:",actionItem);
+			};
 			var i=0,len=0;
-			var prePosLine;
-			var curPosLine;
-			len=this._mappings.length;
-			var lineStrs;
-			lineStrs=[];
-			var j=0,jLen=0;
-			var tLineArr;
-			var tLineStrs;
-			prePosLine=[0,0,0,0,0];
-			for (i=0;i < len;i++){
-				tLineArr=this._mappings[i];
-				if (tLineArr && tLineArr.length > 0){
-					tLineStrs=[];
-					jLen=tLineArr.length;
-					for(j=0;j < jLen;j++){
-						curPosLine=tLineArr[j];
-						tLineStrs.push(this.createPosLine(curPosLine,prePosLine));
-						prePosLine=curPosLine;
+			var adds;
+			adds=solveO.add;
+			var tSolveItem;
+			if (adds && adds.length){
+				len=adds.length;
+				for (i=0;i < len;i++){
+					tSolveItem=adds[i];
+					if ((typeof tSolveItem=='string')){
+						this.addItem(tSolveItem,1);
+					}else
+					if ((tSolveItem instanceof Array)){
+						if (tSolveItem.length >1){
+							this.addItem(tSolveItem[0],1);
+							}else{
+							this.addItem(tSolveItem[0],tSolveItem[1]);
+						}
 					}
-					lineStrs.push(tLineStrs.join(","));
-					}else{
-					lineStrs.push("");
+				}
+			};
+			var subs;
+			subs=solveO.sub;
+			if (subs && subs.length){
+				len=subs.length;
+				for (i=0;i < len;i++){
+					tSolveItem=subs[i];
+					if ((typeof tSolveItem=='string')){
+						this.addItem(tSolveItem,-1);
+					}else
+					if ((tSolveItem instanceof Array)){
+						if (tSolveItem.length >1){
+							this.addItem(tSolveItem[0],-1);
+							}else{
+							this.addItem(tSolveItem[0],-tSolveItem[1]);
+						}
+					}
 				}
 			}
-			return lineStrs.join(";");
+			console.log("doAction success:",action);
 		}
 
-		return SourceMapTool;
+		__proto.getAvailableActionList=function(){
+			var key;
+			var rst;
+			rst=[];
+			for (key in this.availableActionDic){
+				rst.push(this.availableActionDic[key]);
+			}
+			rst.sort(this._sortName);
+			return rst;
+		}
+
+		__proto.getItemList=function(){
+			var key;
+			var rst;
+			rst=[];
+			for (key in this.itemDic){
+				rst.push(this.itemDic[key]);
+			}
+			rst.sort(this._sortName);
+			return rst;
+		}
+
+		__proto._sortName=function(a,b){
+			return a.name > b.name?1:-1;
+		}
+
+		__proto.traceState=function(){
+			console.log("action:",this.getAvailableActionList());
+			console.log("items:",this.getItemList());
+		}
+
+		return DrowningMachine;
 	})()
 
 
@@ -16987,6 +16889,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	Laya.__init([LoaderManager,EventDispatcher,Render,Browser,Timer,LocalStorage]);
-	new testcodes.TestSourceMap();
+	new Game();
 
 })(window,document,Laya);

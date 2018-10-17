@@ -1,5 +1,7 @@
 package simulator 
 {
+	import laya.debug.tools.IDTools;
+	import laya.utils.Utils;
 	/**
 	 * ...
 	 * @author ww
@@ -20,47 +22,70 @@ package simulator
 			runTasks();
 			doChecks();
 		}
-		public function runUpdates():void
+		
+		private var _tempArr:Array=[];
+		public function runSafeLoop(funName:String):void
 		{
 			var i:int, len:int;
-			len = objectList.length;
+			
+			var objList:Array;
+			objList = Utils.copyArray(_tempArr, objectList);
+			len = objList.length;
 			for (i = 0; i < len; i++)
 			{
-				objectList[i].update(this);
+				if(objList[i][funName] is Function)
+				objList[i][funName](this);
 			}
+		}
+		public function runUpdates():void
+		{
+			runSafeLoop("update");
 		}
 		public function runTasks():void
 		{
-			var i:int, len:int;
-			len = objectList.length;
-			for (i = 0; i < len; i++)
-			{
-				objectList[i].runTasks(this);
-			}
+			runSafeLoop("runTasks");
 		}
 		public function doChecks():void
 		{
-			var i:int, len:int;
-			len = objectList.length;
-			for (i = 0; i < len; i++)
-			{
-				objectList[i].doChecks(this);
-			}
+			runSafeLoop("doChecks");
 		}
 		
 		public function getObject(id:String):Object
 		{
+			var i:int, len:int;
+			len = objectList.length;
+			for (i = 0; i < len; i++)
+			{
+				if (IDTools.getObjID(objectList[i]) == id)
+				{
+					return objectList[i];
+				}
+			}
 			return null;
 		}
 		
 		public function getObjectByName(name:String):Array
 		{
-			return null;
+			var rst:Array;
+			rst = [];
+			var i:int, len:int;
+			len = objectList.length;
+			for (i = 0; i < len; i++)
+			{
+				if (objectList[i].name== name)
+				{
+					rst.push(objectList[i]);
+				}
+			}
+			return rst;
 		}
 		
 		public function addObject(obj:ObjectBase):void
 		{
-			
+			if (objectList.indexOf(obj) < 0)
+			{
+				objectList.push(obj);
+			}
 		}
 	}
 
