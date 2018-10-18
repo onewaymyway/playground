@@ -770,6 +770,7 @@ var Laya=window.Laya=(function(window,document){
 			this.actionDic={};
 			this.availableActionDic={};
 			this.itemDic={};
+			DrowningMachine.I=this;
 		}
 
 		__class(DrowningMachine,'simulator.DrowningMachine');
@@ -828,7 +829,25 @@ var Laya=window.Laya=(function(window,document){
 			}
 		}
 
-		__proto.isActionCanSolve=function(action){}
+		__proto.isActionCanSolve=function(action){
+			var actionItem;
+			actionItem=this.availableActionDic[action];
+			if (!actionItem){
+				console.log("action not found:",action,this.availableActionDic);
+				return false;
+			};
+			var opList;
+			opList=actionItem.sub;
+			var i=0,len=0;
+			len=opList.length;
+			var tOp;
+			for (i=0;i < len;i++){
+				tOp=opList[i];
+				if (this.getItemCount(tOp.name)< tOp.count)return false;
+			}
+			return true;
+		}
+
 		__proto.doOpList=function(opList,dir){
 			(dir===void 0)&& (dir=1);
 			var i=0,len=0;
@@ -848,6 +867,10 @@ var Laya=window.Laya=(function(window,document){
 				return;
 			}
 			console.log("doAction:",action,actionItem);
+			if (!this.isActionCanSolve(action)){
+				console.log("doAction Fail:",action);
+				return;
+			}
 			this.doOpList(actionItem.add,1);
 			this.doOpList(actionItem.sub,-1);
 			console.log("doAction success:",action);
@@ -884,6 +907,7 @@ var Laya=window.Laya=(function(window,document){
 			console.log("items:",this.getItemList());
 		}
 
+		DrowningMachine.I=null
 		return DrowningMachine;
 	})()
 
@@ -26834,7 +26858,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(ActionItemUI.uiView);
 		}
 
-		ActionItemUI.uiView={"type":"View","props":{"width":247,"height":25},"child":[{"type":"Label","props":{"y":5,"x":5,"width":80,"var":"actionText","text":"actionTip","styleSkin":"comp/label.png","runtime":"components.TextField","height":16,"color":"#ea302d"}},{"type":"Button","props":{"y":1,"x":207,"width":40,"var":"actionBtn","skin":"comp/button.png","label":"do","height":24}}]};
+		ActionItemUI.uiView={"type":"View","props":{"width":247,"height":25},"child":[{"type":"Label","props":{"y":5,"x":5,"width":80,"var":"actionText","text":"actionTip","styleSkin":"comp/label.png","runtime":"components.TextField","height":16,"color":"#ea302d"}},{"type":"Button","props":{"y":1,"x":207,"width":40,"var":"actionBtn","skin":"comp/button.png","labelColors":"#ffffff,#ffffff,#ffffff,#ffffff","label":"do","height":24}}]};
 		return ActionItemUI;
 	})(View)
 
@@ -26854,7 +26878,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(ActionListUI.uiView);
 		}
 
-		ActionListUI.uiView={"type":"View","props":{"width":258,"height":291},"child":[{"type":"List","props":{"y":2,"x":3,"width":255,"var":"list","height":289},"child":[{"type":"ActionItem","props":{"y":0,"x":-1,"runtime":"view.actionlist.ActionItem","name":"render"}}]}]};
+		ActionListUI.uiView={"type":"View","props":{"width":258,"height":291},"child":[{"type":"List","props":{"var":"list","top":0,"right":0,"repeatX":1,"left":0,"bottom":0},"child":[{"type":"ActionItem","props":{"y":0,"runtime":"view.actionlist.ActionItem","right":2,"name":"render","left":2}}]}]};
 		return ActionListUI;
 	})(View)
 
@@ -26915,7 +26939,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(PlayMainViewUI.uiView);
 		}
 
-		PlayMainViewUI.uiView={"type":"View","props":{"width":400,"height":300},"child":[{"type":"ItemList","props":{"y":12,"x":289,"var":"itemList","runtime":"view.itemlist.ItemList"}},{"type":"ActionList","props":{"y":-1,"x":-1,"var":"actionList","runtime":"view.actionlist.ActionList"}}]};
+		PlayMainViewUI.uiView={"type":"View","props":{"width":577,"height":295},"child":[{"type":"ItemList","props":{"y":17,"x":473,"var":"itemList","runtime":"view.itemlist.ItemList"}},{"type":"ActionList","props":{"x":-1,"width":400,"var":"actionList","top":5,"runtime":"view.actionlist.ActionList","bottom":5}}]};
 		return PlayMainViewUI;
 	})(View)
 
@@ -27459,8 +27483,42 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.initByData=function(dataO){
 			this.dataO=dataO;
-			this.actionText.text=dataO.tip;
+			this.actionText.text=dataO.tip+" "+this.createActionTip();
 			this.actionBtn.x=this.actionText.x+this.actionText.width+5;
+			if (DrowningMachine.I.isActionCanSolve(dataO.name)){
+				this.actionBtn.label="Do";
+				}else{
+				this.actionBtn.label="Wait";
+			}
+		}
+
+		__proto.createActionTip=function(){
+			var strList;
+			strList=[];
+			this.getStrByOpList(this.dataO.sub,"-",strList);
+			this.getStrByOpList(this.dataO.add,"+",strList);
+			return strList.join(" ");
+		}
+
+		__proto.getStrByOpList=function(opList,sign,arr){
+			var i=0,len=0;
+			len=opList.length;
+			var tOp;
+			for (i=0;i < len;i++){
+				tOp=opList[i];
+				if(!DrowningMachine.I.isAction(tOp.name))
+					arr.push(this.getStrByOp(tOp,sign));
+			}
+		}
+
+		__proto.getStrByOp=function(op,sign){
+			var rst;
+			if (op.count > 1){
+				rst=sign+" "+op.count+op.name;
+				}else{
+				rst=sign+op.name;
+			}
+			return rst;
 		}
 
 		return ActionItem;

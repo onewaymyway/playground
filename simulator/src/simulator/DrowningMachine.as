@@ -8,10 +8,10 @@ package simulator
 	 */
 	public class DrowningMachine 
 	{
-		
+		public static var I:DrowningMachine;
 		public function DrowningMachine() 
 		{
-			
+			I = this;
 		}
 		
 		private var ruleUrl:String;
@@ -51,7 +51,7 @@ package simulator
 			trace("actionDic:",actionDic);
 		}
 		
-		private function isAction(itemName:String):Boolean
+		public function isAction(itemName:String):Boolean
 		{
 			return actionDic.hasOwnProperty(itemName);
 		}
@@ -89,7 +89,26 @@ package simulator
 		
 		public function isActionCanSolve(action:String):Boolean
 		{
+			var actionItem:SolveItem;
+			actionItem = availableActionDic[action];
+			if (!actionItem)
+			{
+				trace("action not found:", action, availableActionDic);
+				return false;
+			}
+			var opList:Array;
+			opList = actionItem.sub;
 			
+			var i:int, len:int;
+			len = opList.length;
+			var tOp:Object;
+			for (i = 0; i < len; i++)
+			{
+				tOp = opList[i];
+				if (getItemCount(tOp.name) < tOp.count) return false;
+				
+			}
+			return true;
 		}
 		
 		private function doOpList(opList:Array,dir:int=1):void
@@ -114,6 +133,11 @@ package simulator
 			}
 			trace("doAction:", action, actionItem);
 		
+			if (!isActionCanSolve(action))
+			{
+				trace("doAction Fail:",action);
+				return ;
+			}
 			doOpList(actionItem.add, 1);
 			doOpList(actionItem.sub, -1);
 			trace("doAction success:",action);

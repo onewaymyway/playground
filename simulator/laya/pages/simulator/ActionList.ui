@@ -1,8 +1,8 @@
 {
     "x":0,
     "type":"View",
-    "selectedBox":1,
-    "selecteID":5,
+    "selectedBox":5,
+    "selecteID":6,
     "props":{"width":258,"sceneWidth":258,"sceneHeight":291,"sceneColor":"#000000","height":291},
     "nodeParent":-1,
     "label":"View",
@@ -15,7 +15,7 @@
         {
             "x":15,
             "type":"List",
-            "props":{"y":2,"x":3,"width":255,"var":"list","height":289},
+            "props":{"var":"list","top":0,"right":0,"repeatX":1,"left":0,"bottom":0},
             "nodeParent":1,
             "label":"List(list)",
             "isOpen":true,
@@ -28,7 +28,7 @@
                     "x":30,
                     "type":"UIView",
                     "source":"simulator/ActionItem.ui",
-                    "props":{"y":0,"x":-1,"runtime":"view.actionlist.ActionItem","name":"render"},
+                    "props":{"y":0,"runtime":"view.actionlist.ActionItem","right":2,"name":"render","left":2},
                     "nodeParent":5,
                     "label":"UIView(render)",
                     "isDirectory":false,
