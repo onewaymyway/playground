@@ -16,7 +16,7 @@
             "x":15,
             "type":"UIView",
             "source":"simulator/ItemList.ui",
-            "props":{"y":17,"x":473,"var":"itemList","runtime":"view.itemlist.ItemList"},
+            "props":{"x":473,"var":"itemList","top":50,"runtime":"view.itemlist.ItemList","bottom":0},
             "nodeParent":1,
             "label":"UIView(itemList)",
             "isDirectory":false,
@@ -30,13 +30,26 @@
             "x":15,
             "type":"UIView",
             "source":"simulator/ActionList.ui",
-            "props":{"x":-1,"width":400,"var":"actionList","top":5,"runtime":"view.actionlist.ActionList","bottom":5},
+            "props":{"x":-1,"width":400,"var":"actionList","top":50,"runtime":"view.actionlist.ActionList","bottom":5},
             "nodeParent":1,
             "label":"UIView(actionList)",
             "isDirectory":false,
             "isAniNode":true,
             "hasChild":false,
             "compId":3,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Label",
+            "props":{"y":9,"x":456,"width":92,"text":"you have:","styleSkin":"comp/label.png","height":18,"color":"#2defc0"},
+            "nodeParent":1,
+            "label":"Label",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":4,
             "child":[
                 ]
         }],

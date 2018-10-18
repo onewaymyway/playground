@@ -751,6 +751,8 @@ var Laya=window.Laya=(function(window,document){
 			var mainView;
 			mainView=new PlayMainView();
 			mainView.pos(50,50);
+			mainView.top=0;
+			mainView.bottom=0;
 			Laya.stage.addChild(mainView);
 		}
 
@@ -26878,7 +26880,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(ActionListUI.uiView);
 		}
 
-		ActionListUI.uiView={"type":"View","props":{"width":258,"height":291},"child":[{"type":"List","props":{"var":"list","top":0,"right":0,"repeatX":1,"left":0,"bottom":0},"child":[{"type":"ActionItem","props":{"y":0,"runtime":"view.actionlist.ActionItem","right":2,"name":"render","left":2}}]}]};
+		ActionListUI.uiView={"type":"View","props":{"width":258,"height":291},"child":[{"type":"List","props":{"var":"list","vScrollBarSkin":"comp/vscroll.png","top":0,"right":0,"repeatX":1,"left":0,"bottom":0},"child":[{"type":"ActionItem","props":{"y":0,"runtime":"view.actionlist.ActionItem","right":2,"name":"render","left":2}}]}]};
 		return ActionListUI;
 	})(View)
 
@@ -26917,7 +26919,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(ItemListUI.uiView);
 		}
 
-		ItemListUI.uiView={"type":"View","props":{"width":104,"height":268},"child":[{"type":"List","props":{"y":-1,"x":2,"width":102,"var":"list","height":269},"child":[{"type":"ItemListItem","props":{"runtime":"view.itemlist.ItemListItem","name":"render"}}]}]};
+		ItemListUI.uiView={"type":"View","props":{"width":104,"height":268},"child":[{"type":"List","props":{"x":2,"width":102,"var":"list","vScrollBarSkin":"comp/vscroll.png","top":2,"bottom":2},"child":[{"type":"ItemListItem","props":{"runtime":"view.itemlist.ItemListItem","name":"render"}}]}]};
 		return ItemListUI;
 	})(View)
 
@@ -26939,7 +26941,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(PlayMainViewUI.uiView);
 		}
 
-		PlayMainViewUI.uiView={"type":"View","props":{"width":577,"height":295},"child":[{"type":"ItemList","props":{"y":17,"x":473,"var":"itemList","runtime":"view.itemlist.ItemList"}},{"type":"ActionList","props":{"x":-1,"width":400,"var":"actionList","top":5,"runtime":"view.actionlist.ActionList","bottom":5}}]};
+		PlayMainViewUI.uiView={"type":"View","props":{"width":577,"height":295},"child":[{"type":"ItemList","props":{"x":473,"var":"itemList","top":50,"runtime":"view.itemlist.ItemList","bottom":0}},{"type":"ActionList","props":{"x":-1,"width":400,"var":"actionList","top":50,"runtime":"view.actionlist.ActionList","bottom":5}},{"type":"Label","props":{"y":9,"x":456,"width":92,"text":"you have:","styleSkin":"comp/label.png","height":18,"color":"#2defc0"}}]};
 		return PlayMainViewUI;
 	})(View)
 
@@ -27544,6 +27546,7 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.initList=function(){
+			this.list.scrollBar.autoHide=true;
 			this.list.renderHandler=new Handler(this,this.itemRender);
 		}
 
@@ -27600,6 +27603,7 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.initList=function(){
+			this.list.scrollBar.autoHide=true;
 			this.list.renderHandler=new Handler(this,this.itemRender);
 		}
 

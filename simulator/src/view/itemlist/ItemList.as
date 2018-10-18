@@ -22,6 +22,7 @@ package view.itemlist
 		
 		private function initList():void
 		{
+			list.scrollBar.autoHide = true;
 			list.renderHandler = new Handler(this, itemRender);
 		}
 		

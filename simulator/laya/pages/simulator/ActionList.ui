@@ -1,8 +1,8 @@
 {
     "x":0,
     "type":"View",
-    "selectedBox":5,
-    "selecteID":6,
+    "selectedBox":1,
+    "selecteID":5,
     "props":{"width":258,"sceneWidth":258,"sceneHeight":291,"sceneColor":"#000000","height":291},
     "nodeParent":-1,
     "label":"View",
@@ -15,7 +15,7 @@
         {
             "x":15,
             "type":"List",
-            "props":{"var":"list","top":0,"right":0,"repeatX":1,"left":0,"bottom":0},
+            "props":{"var":"list","vScrollBarSkin":"comp/vscroll.png","top":0,"right":0,"repeatX":1,"left":0,"bottom":0},
             "nodeParent":1,
             "label":"List(list)",
             "isOpen":true,

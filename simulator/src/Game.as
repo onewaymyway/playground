@@ -45,6 +45,8 @@ package
 			var mainView:PlayMainView;
 			mainView = new PlayMainView();
 			mainView.pos(50, 50);
+			mainView.top = 0;
+			mainView.bottom = 0;
 			Laya.stage.addChild(mainView);
 		}
 		
