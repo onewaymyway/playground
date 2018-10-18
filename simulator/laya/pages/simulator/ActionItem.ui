@@ -2,7 +2,7 @@
     "x":0,
     "type":"View",
     "selectedBox":1,
-    "selecteID":3,
+    "selecteID":4,
     "props":{"width":247,"sceneWidth":247,"sceneHeight":25,"sceneColor":"#000000","height":25},
     "nodeParent":-1,
     "label":"View",
@@ -15,7 +15,7 @@
         {
             "x":15,
             "type":"Label",
-            "props":{"y":5,"x":5,"width":80,"var":"actionText","text":"actionTip","styleSkin":"comp/label.png","height":16,"color":"#ea302d"},
+            "props":{"y":5,"x":5,"width":80,"var":"actionText","text":"actionTip","styleSkin":"comp/label.png","runtime":"components.TextField","height":16,"color":"#ea302d"},
             "nodeParent":1,
             "label":"Label(actionText)",
             "isDirectory":false,

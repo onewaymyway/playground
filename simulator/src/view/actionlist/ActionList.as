@@ -20,13 +20,16 @@ package view.actionlist
 			list.array = dataList;
 		}
 		
+		
 		private function initList():void
 		{
+			
 			list.renderHandler = new Handler(this, itemRender);
 		}
-		
+		public var actionClickHandler:Handler;
 		private function itemRender(cell:*, index:int):void
 		{
+			cell.clickHandler = actionClickHandler;
 			cell.initByData(cell.dataSource);
 		}
 	}

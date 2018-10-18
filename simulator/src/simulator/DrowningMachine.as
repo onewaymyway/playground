@@ -78,6 +78,10 @@ package simulator
 			}
 		}
 		
+		public function isActionCanSolve(action:String):Boolean
+		{
+			
+		}
 		public function doAction(action:String):void
 		{
 			var actionItem:Object;

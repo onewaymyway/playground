@@ -13,6 +13,8 @@ package view
 		
 		public function PlayMainView() 
 		{
+			_actionClickHandler = new Handler(this, onActionClick);
+			actionList.actionClickHandler = _actionClickHandler;
 			test();
 		}
 		private var drowningMachine:DrowningMachine;
@@ -24,15 +26,23 @@ package view
 			drowningMachine.initByRules("data/rules.json", new Handler(this, initDrowningMachine));
 		}
 		
+		private function onActionClick(dataO:Object):void
+		{
+			drowningMachine.doAction(dataO.name);
+			freshUI();
+			//debugger;
+		}
+		private var _actionClickHandler:Handler;
+		
 		private function initDrowningMachine():void
 		{
 			debugger;
 			drowningMachine.addItem("start");
 			freshUI();
-			drowningMachine.doAction("start");
-			freshUI();
-			drowningMachine.doAction("age0");
-			freshUI();
+			//drowningMachine.doAction("start");
+			//freshUI();
+			//drowningMachine.doAction("age0");
+			//freshUI();
 		}
 		
 		private function freshUI() :void
