@@ -27514,7 +27514,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.getStrByOp=function(op,sign){
 			var rst;
 			if (op.count > 1){
-				rst=sign+" "+op.count+op.name;
+				rst=sign+op.count+" "+op.name;
 				}else{
 				rst=sign+op.name;
 			}
