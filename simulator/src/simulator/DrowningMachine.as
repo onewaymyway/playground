@@ -46,7 +46,7 @@ package simulator
 			for (i = 0; i < len; i++)
 			{
 				tRuleO = rules[i];
-				actionDic[tRuleO.name] = tRuleO;
+				actionDic[tRuleO.name] = SolveItem.createByData(tRuleO);
 			}
 			trace("actionDic:",actionDic);
 		}
@@ -56,6 +56,15 @@ package simulator
 			return actionDic.hasOwnProperty(itemName);
 		}
 		
+		public function getItemCount(itemName:String):int
+		{
+			if (isAction(itemName))
+			{
+				return availableActionDic.hasOwnProperty(itemName)?1:0;
+			}
+			if (!itemDic[itemName]) return 0;
+			return itemDic[itemName].count;
+		}
 		public function addItem(itemName:String, itemCount:int = 1):void
 		{
 			if (isAction(itemName))
@@ -82,9 +91,21 @@ package simulator
 		{
 			
 		}
+		
+		private function doOpList(opList:Array,dir:int=1):void
+		{
+			var i:int, len:int;
+			len = opList.length;
+			var tOp:Object;
+			for (i = 0; i < len; i++)
+			{
+				tOp = opList[i];
+				addItem(tOp.name, dir * tOp.count);
+			}
+		}
 		public function doAction(action:String):void
 		{
-			var actionItem:Object;
+			var actionItem:SolveItem;
 			actionItem = availableActionDic[action];
 			if (!actionItem)
 			{
@@ -92,63 +113,9 @@ package simulator
 				return;
 			}
 			trace("doAction:", action, actionItem);
-			var solveO:Object;
-			solveO = actionItem.solve;
-			if (!solveO)
-			{
-				trace("solveO not found:",actionItem);
-			}
-			
-			var i:int, len:int;
-			var adds:Array;
-			adds = solveO.add;
-			var tSolveItem:*;
-			if (adds && adds.length)
-			{
-				len = adds.length;
-				for (i = 0; i < len; i++)
-				{
-					tSolveItem = adds[i];
-					if (tSolveItem is String)
-					{
-						addItem(tSolveItem,1);
-					}else
-					if (tSolveItem is Array)
-					{
-						if (tSolveItem.length >1)
-						{
-							addItem(tSolveItem[0],1);
-						}else
-						{
-							addItem(tSolveItem[0],tSolveItem[1]);
-						}
-					}
-				}
-			}
-			var subs:Array;
-			subs = solveO.sub;
-			if (subs && subs.length)
-			{
-				len = subs.length;
-				for (i = 0; i < len; i++)
-				{
-					tSolveItem = subs[i];
-					if (tSolveItem is String)
-					{
-						addItem(tSolveItem,-1);
-					}else
-					if (tSolveItem is Array)
-					{
-						if (tSolveItem.length >1)
-						{
-							addItem(tSolveItem[0],-1);
-						}else
-						{
-							addItem(tSolveItem[0],-tSolveItem[1]);
-						}
-					}
-				}
-			}
+		
+			doOpList(actionItem.add, 1);
+			doOpList(actionItem.sub, -1);
 			trace("doAction success:",action);
 		}
 		public function getAvailableActionList():Array

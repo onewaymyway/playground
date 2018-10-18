@@ -795,13 +795,21 @@ var Laya=window.Laya=(function(window,document){
 			var tRuleO;
 			for (i=0;i < len;i++){
 				tRuleO=rules[i];
-				this.actionDic[tRuleO.name]=tRuleO;
+				this.actionDic[tRuleO.name]=SolveItem.createByData(tRuleO);
 			}
 			console.log("actionDic:",this.actionDic);
 		}
 
 		__proto.isAction=function(itemName){
 			return this.actionDic.hasOwnProperty(itemName);
+		}
+
+		__proto.getItemCount=function(itemName){
+			if (this.isAction(itemName)){
+				return this.availableActionDic.hasOwnProperty(itemName)?1:0;
+			}
+			if (!this.itemDic[itemName])return 0;
+			return this.itemDic[itemName].count;
 		}
 
 		__proto.addItem=function(itemName,itemCount){
@@ -820,6 +828,18 @@ var Laya=window.Laya=(function(window,document){
 			}
 		}
 
+		__proto.isActionCanSolve=function(action){}
+		__proto.doOpList=function(opList,dir){
+			(dir===void 0)&& (dir=1);
+			var i=0,len=0;
+			len=opList.length;
+			var tOp;
+			for (i=0;i < len;i++){
+				tOp=opList[i];
+				this.addItem(tOp.name,dir *tOp.count);
+			}
+		}
+
 		__proto.doAction=function(action){
 			var actionItem;
 			actionItem=this.availableActionDic[action];
@@ -828,49 +848,8 @@ var Laya=window.Laya=(function(window,document){
 				return;
 			}
 			console.log("doAction:",action,actionItem);
-			var solveO;
-			solveO=actionItem.solve;
-			if (!solveO){
-				console.log("solveO not found:",actionItem);
-			};
-			var i=0,len=0;
-			var adds;
-			adds=solveO.add;
-			var tSolveItem;
-			if (adds && adds.length){
-				len=adds.length;
-				for (i=0;i < len;i++){
-					tSolveItem=adds[i];
-					if ((typeof tSolveItem=='string')){
-						this.addItem(tSolveItem,1);
-					}else
-					if ((tSolveItem instanceof Array)){
-						if (tSolveItem.length >1){
-							this.addItem(tSolveItem[0],1);
-							}else{
-							this.addItem(tSolveItem[0],tSolveItem[1]);
-						}
-					}
-				}
-			};
-			var subs;
-			subs=solveO.sub;
-			if (subs && subs.length){
-				len=subs.length;
-				for (i=0;i < len;i++){
-					tSolveItem=subs[i];
-					if ((typeof tSolveItem=='string')){
-						this.addItem(tSolveItem,-1);
-					}else
-					if ((tSolveItem instanceof Array)){
-						if (tSolveItem.length >1){
-							this.addItem(tSolveItem[0],-1);
-							}else{
-							this.addItem(tSolveItem[0],-tSolveItem[1]);
-						}
-					}
-				}
-			}
+			this.doOpList(actionItem.add,1);
+			this.doOpList(actionItem.sub,-1);
 			console.log("doAction success:",action);
 		}
 
@@ -906,6 +885,68 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		return DrowningMachine;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class simulator.SolveItem
+	var SolveItem=(function(){
+		function SolveItem(){
+			this.add=null;
+			this.sub=null;
+			this.name=null;
+			this.tip=null;
+		}
+
+		__class(SolveItem,'simulator.SolveItem');
+		var __proto=SolveItem.prototype;
+		__proto.initByData=function(dataO){
+			this.name=dataO.name;
+			this.tip=dataO.tip;
+			this.add=this.getAdptOpList(dataO.solve.add);
+			this.sub=this.getAdptOpList(dataO.solve.sub);
+		}
+
+		__proto.getAdptOpList=function(opList){
+			var i=0,len=0;
+			var rst;
+			rst=[];
+			var tObject;
+			var tSolveItem;
+			len=opList.length;
+			for (i=0;i < len;i++){
+				tSolveItem=opList[i];
+				tObject={};
+				if ((typeof tSolveItem=='string')){
+					tObject.name=tSolveItem;
+					tObject.count=1;
+				}
+				else if ((tSolveItem instanceof Array)){
+					if (tSolveItem.length > 1){
+						tObject.name=tSolveItem[0];
+						tObject.count=tSolveItem[1];
+					}
+					else {
+						tObject.name=tSolveItem[0];
+						tObject.count=1;
+					}
+				}
+				rst.push(tObject);
+			}
+			return rst;
+		}
+
+		SolveItem.createByData=function(dataO){
+			var item;
+			item=new SolveItem();
+			item.initByData(dataO);
+			return item;
+		}
+
+		return SolveItem;
 	})()
 
 
@@ -27461,6 +27502,32 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class view.itemlist.ItemListItem extends ui.simulator.ItemListItemUI
+	var ItemListItem=(function(_super){
+		function ItemListItem(){
+			this.dataO=null;
+			ItemListItem.__super.call(this);
+		}
+
+		__class(ItemListItem,'view.itemlist.ItemListItem',_super);
+		var __proto=ItemListItem.prototype;
+		__proto.initByData=function(dataO){
+			this.dataO=dataO;
+			if (dataO.count > 1){
+				this.itemText.text=dataO.name+":"+dataO.count;
+				}else{
+				this.itemText.text=dataO.name;
+			}
+		}
+
+		return ItemListItem;
+	})(ItemListItemUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class view.itemlist.ItemList extends ui.simulator.ItemListUI
 	var ItemList=(function(_super){
 		function ItemList(){
@@ -27484,32 +27551,6 @@ var Laya=window.Laya=(function(window,document){
 
 		return ItemList;
 	})(ItemListUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class view.itemlist.ItemListItem extends ui.simulator.ItemListItemUI
-	var ItemListItem=(function(_super){
-		function ItemListItem(){
-			this.dataO=null;
-			ItemListItem.__super.call(this);
-		}
-
-		__class(ItemListItem,'view.itemlist.ItemListItem',_super);
-		var __proto=ItemListItem.prototype;
-		__proto.initByData=function(dataO){
-			this.dataO=dataO;
-			if (dataO.count > 1){
-				this.itemText.text=dataO.name+":"+dataO.count;
-				}else{
-				this.itemText.text=dataO.name;
-			}
-		}
-
-		return ItemListItem;
-	})(ItemListItemUI)
 
 
 	/**
