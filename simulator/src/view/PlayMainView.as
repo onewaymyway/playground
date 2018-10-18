@@ -1,29 +1,25 @@
-package  
+package view 
 {
-	import laya.net.Loader;
 	import laya.utils.Handler;
 	import simulator.DrowningMachine;
-	import view.PlayMainView;
+	import ui.simulator.PlayMainViewUI;
+	
 	/**
 	 * ...
 	 * @author ww
 	 */
-	public class Game 
+	public class PlayMainView extends PlayMainViewUI 
 	{
 		
-		public function Game() 
+		public function PlayMainView() 
 		{
-			Laya.init(1000, 900);
-			Laya.loader.load( [{url:"res/atlas/comp.json",type:Loader.ATLAS }], new Handler(this, initGameView));
-			
+			test();
 		}
-		
 		private var drowningMachine:DrowningMachine;
 		private function test():void
 		{
 			trace("hello Simulator");
-			initGameView();
-			return;
+			
 			drowningMachine = new DrowningMachine();
 			drowningMachine.initByRules("data/rules.json", new Handler(this, initDrowningMachine));
 		}
@@ -32,22 +28,19 @@ package
 		{
 			debugger;
 			drowningMachine.addItem("start");
-			drowningMachine.traceState();
+			freshUI();
 			drowningMachine.doAction("start");
-			drowningMachine.traceState();
+			freshUI();
 			drowningMachine.doAction("age0");
-			drowningMachine.traceState();
+			freshUI();
 		}
 		
-		
-		private function initGameView():void
+		private function freshUI() :void
 		{
-			var mainView:PlayMainView;
-			mainView = new PlayMainView();
-			mainView.pos(50, 50);
-			Laya.stage.addChild(mainView);
+			drowningMachine.traceState();
+			actionList.setData(drowningMachine.getAvailableActionList());
+			itemList.setData(drowningMachine.getItemList());
 		}
-		
 	}
 
 }

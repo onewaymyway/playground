@@ -1,0 +1,37 @@
+{
+    "x":0,
+    "type":"View",
+    "selectedBox":1,
+    "selecteID":2,
+    "props":{"width":102,"sceneWidth":102,"sceneHeight":18,"sceneColor":"#000000","height":18},
+    "nodeParent":-1,
+    "label":"View",
+    "isOpen":true,
+    "isDirectory":true,
+    "isAniNode":true,
+    "hasChild":true,
+    "compId":1,
+    "child":[
+        {
+            "x":15,
+            "type":"Label",
+            "props":{"y":0,"x":0,"width":102,"var":"itemText","text":"label","styleSkin":"comp/label.png","height":18,"color":"#2e92ef"},
+            "nodeParent":1,
+            "label":"Label(itemText)",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":2,
+            "child":[
+                ]
+        }],
+    "animations":[
+        {
+            "nodes":[
+                ],
+            "name":"ani1",
+            "id":1,
+            "frameRate":24,
+            "action":0
+        }]
+}
