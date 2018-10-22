@@ -65,6 +65,7 @@ package simulator
 			if (!itemDic[itemName]) return 0;
 			return itemDic[itemName].count;
 		}
+		
 		public function addItem(itemName:String, itemCount:int = 1):void
 		{
 			if (isAction(itemName))
@@ -84,7 +85,16 @@ package simulator
 					itemDic[itemName] = {count:0,name:itemName};
 				}
 				itemDic[itemName].count += itemCount;
+				if (itemDic[itemName].count <= 0)
+				{
+					delete itemDic[itemName];
+				}
 			}
+		}
+		
+		private function checkTriggers():void
+		{
+			
 		}
 		
 		public function isActionCanSolve(action:String):Boolean
@@ -140,7 +150,8 @@ package simulator
 			}
 			doOpList(actionItem.add, 1);
 			doOpList(actionItem.sub, -1);
-			trace("doAction success:",action);
+			trace("doAction success:", action);
+			checkTriggers();
 		}
 		public function getAvailableActionList():Array
 		{

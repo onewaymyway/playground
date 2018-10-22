@@ -828,6 +828,9 @@ var Laya=window.Laya=(function(window,document){
 					this.itemDic[itemName]={count:0,name:itemName};
 				}
 				this.itemDic[itemName].count+=itemCount;
+				if (this.itemDic[itemName].count <=0){
+					delete this.itemDic[itemName];
+				}
 			}
 		}
 
