@@ -834,6 +834,7 @@ var Laya=window.Laya=(function(window,document){
 			}
 		}
 
+		__proto.checkTriggers=function(){}
 		__proto.isActionCanSolve=function(action){
 			var actionItem;
 			actionItem=this.availableActionDic[action];
@@ -879,6 +880,7 @@ var Laya=window.Laya=(function(window,document){
 			this.doOpList(actionItem.add,1);
 			this.doOpList(actionItem.sub,-1);
 			console.log("doAction success:",action);
+			this.checkTriggers();
 		}
 
 		__proto.getAvailableActionList=function(){
