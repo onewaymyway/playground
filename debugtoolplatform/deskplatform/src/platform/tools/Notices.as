@@ -24,6 +24,8 @@ package platform.tools
 		/**
 		 * 拖动东西到渲染器
 		 */
-		public static const DROP_RENDER:String="DROP_RENDER";
+		public static const DROP_RENDER:String = "DROP_RENDER";
+		
+		public static const OPEN_PLUGIN:String = "OPEN_PLUGIN";
 	}
 }

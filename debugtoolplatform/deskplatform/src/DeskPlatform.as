@@ -52,6 +52,7 @@ package
 			Paths.dataPath = FileTools.getAppPath("data") + "/";
 			SystemDragOverManager.init();
 			ContextMenu.init();
+			SystemSetting.appPath = FileTools.appPath;
 		
 		}
 		private function test():void

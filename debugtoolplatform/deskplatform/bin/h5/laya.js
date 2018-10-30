@@ -4124,6 +4124,138 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*本类用于操作html对象
+	*@author ww
+	*/
+	//class laya.debug.tools.JSTools
+	var JSTools=(function(){
+		function JSTools(){}
+		__class(JSTools,'laya.debug.tools.JSTools');
+		JSTools.showToBody=function(el,x,y){
+			(x===void 0)&& (x=0);
+			(y===void 0)&& (y=0);
+			Browser.document.body.appendChild(el);
+			var style;
+			style=el.style;
+			style.position="absolute";
+			style.top=y+"px";
+			style.left=x+"px";
+		}
+
+		JSTools.showToParent=function(el,x,y,parent){
+			(x===void 0)&& (x=0);
+			(y===void 0)&& (y=0);
+			parent.appendChild(el);
+			var style;
+			style=el.style;
+			style.position="absolute";
+			style.top=y+"px";
+			style.left=x+"px";
+		}
+
+		JSTools.addToBody=function(el){
+			Browser.document.body.appendChild(el);
+		}
+
+		JSTools.setPos=function(el,x,y){
+			var style;
+			style=el.style;
+			style.top=y+"px";
+			style.left=x+"px";
+		}
+
+		JSTools.setSize=function(el,width,height){
+			var style;
+			style=el.style;
+			style.width=width+"px";
+			style.height=height+"px";
+		}
+
+		JSTools.setTransform=function(el,mat){
+			var style;
+			style=el.style;
+			style.transformOrigin=style.webkitTransformOrigin=style.msTransformOrigin=style.mozTransformOrigin=style.oTransformOrigin="0px 0px 0px";
+			style.transform=style.webkitTransform=style.msTransform=style.mozTransform=style.oTransform="matrix("+mat.toString()+")";
+		}
+
+		JSTools.noMouseEvent=function(el){
+			var style;
+			style=el.style;
+			style["pointer-events"]="none";
+		}
+
+		JSTools.setMouseEnable=function(el,enable){
+			var style;
+			style=el.style;
+			style["pointer-events"]=enable?"auto":"none";
+		}
+
+		JSTools.setZIndex=function(el,zIndex){
+			var style;
+			style=el.style;
+			style["z-index"]=zIndex;
+		}
+
+		JSTools.showAboveSprite=function(el,sprite,dx,dy){
+			(dx===void 0)&& (dx=0);
+			(dy===void 0)&& (dy=0);
+			var pos;
+			pos=new Point();
+			pos=sprite.localToGlobal(pos);
+			pos.x+=dx;
+			pos.y+=dy;
+			pos.x+=Laya.stage.offset.x;
+			pos.y+=Laya.stage.offset.y;
+			JSTools.showToBody(el,pos.x,pos.y);
+		}
+
+		JSTools.removeElement=function(el){
+			Browser.removeElement(el);
+		}
+
+		JSTools.isElementInDom=function(el){
+			return el && el.parentNode;
+		}
+
+		JSTools.getImageSpriteByFile=function(file,width,height){
+			(width===void 0)&& (width=0);
+			(height===void 0)&& (height=0);
+			var reader;
+			reader=new FileReader();;
+			reader.readAsDataURL(file);
+			var sprite;
+			sprite=new Sprite();
+			reader.onload=function (e){
+				var txt;
+				txt=new Texture();
+				txt.load(reader.result);
+				sprite.graphics.drawTexture(txt,0,0,width,height);
+			}
+			return sprite;
+		}
+
+		JSTools.getPixelRatio=function(){
+			if (JSTools._pixelRatio > 0)return JSTools._pixelRatio;
+			var canvas=Browser.createElement("canvas");
+			var context=canvas.getContext('2d');
+			var devicePixelRatio=Browser.window.devicePixelRatio || 1;
+			var backingStoreRatio=context.webkitBackingStorePixelRatio ||
+			context.mozBackingStorePixelRatio ||
+			context.msBackingStorePixelRatio ||
+			context.oBackingStorePixelRatio ||
+			context.backingStorePixelRatio || 1;
+			var ratio=devicePixelRatio / backingStoreRatio;
+			console.log("pixelRatioc:",ratio);
+			JSTools._pixelRatio=ratio;
+			return ratio;
+		}
+
+		JSTools._pixelRatio=-1;
+		return JSTools;
+	})()
+
+
+	/**
 	*...
 	*@author ww
 	*/

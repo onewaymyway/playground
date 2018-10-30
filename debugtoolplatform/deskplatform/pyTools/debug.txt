@@ -18,8 +18,8 @@ Project configuration:D:\codes\playground.git\trunk\debugtoolplatform\deskplatfo
 7,89.33,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
 7,89.72,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/NodeJSTools.as,36,Sys.mParseFloat This variable is not defined.
 1,89.94,,0,Disable Flash3D D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/DeskPlatform.as
-12,89.94,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.js,4314,
-12,89.94,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/laya.js,1139319,
+12,89.94,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.js,13496,
+12,89.94,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/laya.js,1142677,
 11,89.94,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.html,799,
 ******************************************************************************
 Error or warning message:DeskPlatform.max.js
