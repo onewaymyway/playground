@@ -13,6 +13,7 @@ package
 	import nodetools.devices.Paths;
 	import nodetools.devices.PythonTools;
 	import nodetools.devices.SystemSetting;
+	import view.MainView;
 	/**
 	 * ...
 	 * @author ww
@@ -57,6 +58,10 @@ package
 		{
 			trace("AppPath:",FileTools.appPath);
 			
+			var mainView:MainView;
+			mainView = new MainView();
+			mainView.left = mainView.right = mainView.top = mainView.bottom = 5;
+			Laya.stage.addChild(mainView);
 		}
 	}
 
