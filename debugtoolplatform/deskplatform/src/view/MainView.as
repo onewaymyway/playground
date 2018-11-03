@@ -53,7 +53,7 @@ package view
 				tItem.name = FileTools.getFileName(tFile);
 				tItem.path = tFile;
 				items.push(tItem);
-			}
+			} 
 			itemList.array = items;
 		}
 		
