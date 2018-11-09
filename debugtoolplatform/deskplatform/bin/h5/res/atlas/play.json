@@ -1,0 +1,178 @@
+{
+    "frames": {
+        "btn_add.png": {
+            "frame": {
+                "h": 52,
+                "idx": 0,
+                "w": 26,
+                "x": 0,
+                "y": 49
+            },
+            "sourceSize": {
+                "h": 52,
+                "w": 26
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "btn_back.png": {
+            "frame": {
+                "h": 48,
+                "idx": 0,
+                "w": 24,
+                "x": 50,
+                "y": 49
+            },
+            "sourceSize": {
+                "h": 48,
+                "w": 24
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "btn_begin.png": {
+            "frame": {
+                "h": 48,
+                "idx": 0,
+                "w": 42,
+                "x": 0,
+                "y": 0
+            },
+            "sourceSize": {
+                "h": 48,
+                "w": 42
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "btn_clone.png": {
+            "frame": {
+                "h": 60,
+                "idx": 0,
+                "w": 28,
+                "x": 86,
+                "y": 0
+            },
+            "sourceSize": {
+                "h": 60,
+                "w": 32
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "btn_del.png": {
+            "frame": {
+                "h": 60,
+                "idx": 0,
+                "w": 22,
+                "x": 27,
+                "y": 49
+            },
+            "sourceSize": {
+                "h": 60,
+                "w": 22
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "btn_end.png": {
+            "frame": {
+                "h": 48,
+                "idx": 0,
+                "w": 42,
+                "x": 43,
+                "y": 0
+            },
+            "sourceSize": {
+                "h": 48,
+                "w": 42
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "btn_forward.png": {
+            "frame": {
+                "h": 48,
+                "idx": 0,
+                "w": 24,
+                "x": 75,
+                "y": 61
+            },
+            "sourceSize": {
+                "h": 48,
+                "w": 24
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "btn_play.png": {
+            "frame": {
+                "h": 48,
+                "idx": 0,
+                "w": 18,
+                "x": 125,
+                "y": 73
+            },
+            "sourceSize": {
+                "h": 48,
+                "w": 18
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "btn_replay.png": {
+            "frame": {
+                "h": 72,
+                "idx": 0,
+                "w": 26,
+                "x": 115,
+                "y": 0
+            },
+            "sourceSize": {
+                "h": 72,
+                "w": 26
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0
+            }
+        },
+        "btn_stop.png": {
+            "frame": {
+                "h": 48,
+                "idx": 0,
+                "w": 24,
+                "x": 100,
+                "y": 73
+            },
+            "sourceSize": {
+                "h": 48,
+                "w": 24
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0
+            }
+        }
+    },
+    "meta": {
+        "image": "play.png",
+        "prefix": "play/"
+    }
+}
