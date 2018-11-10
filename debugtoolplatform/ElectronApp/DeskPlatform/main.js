@@ -20,7 +20,7 @@ function trace(msg)
 app.on('ready', function() {
   mainWindow = new BrowserWindow({
     width: 800,
-    height: 400,
+    height: 800,
     "min-width":300,
 		"min-height":200,
     'auto-hide-menu-bar': false,
