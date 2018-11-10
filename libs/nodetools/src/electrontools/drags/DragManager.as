@@ -1,11 +1,10 @@
 package electrontools.drags {
+	import extendui.FocusManager;
 	import laya.debug.tools.DisControlTool;
 	import laya.display.Sprite;
-	import laya.editor.core.Wraps.Keyboard;
-	import laya.editor.core.events.DragEvent;
 	import laya.events.Event;
 	import laya.events.EventDispatcher;
-	import laya.ide.managers.FocusManager;
+	import laya.events.Keyboard;
 	import laya.maths.Point;
 	import laya.ui.Clip;
 	import laya.utils.Browser;
@@ -18,6 +17,12 @@ package electrontools.drags {
 		public static var dragOffset:Point=new Point(7,7);
 		public function DragManager() {
 			Laya.stage.on(Event.KEY_DOWN,this,onStageKeyDown);
+		}
+		public static var _i:DragManager;
+		public static function get I():DragManager
+		{
+			if (!_i) _i = new DragManager();
+			return _i;
 		}
 		private function onStageKeyDown(e:Event):void
 		{

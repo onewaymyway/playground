@@ -11,6 +11,8 @@ package electrontools.menus {
 	import laya.events.Event;
 	import laya.ui.Box;
 	import laya.utils.Browser;
+	import nodetools.devices.Sys;
+	import nodetools.devices.SystemSetting;
 	
 	/**
 	 *
