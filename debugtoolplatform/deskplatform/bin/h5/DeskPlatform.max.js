@@ -3,19 +3,22 @@
 	var __un=Laya.un,__uns=Laya.uns,__static=Laya.static,__class=Laya.class,__getset=Laya.getset,__newvec=Laya.__newvec;
 
 	var Box=laya.ui.Box,Browser=laya.utils.Browser,Button=laya.ui.Button,CMDShell=nodetools.devices.CMDShell;
-	var CheckBox=laya.ui.CheckBox,Clip=laya.ui.Clip,Component=laya.ui.Component,ContextMenu$1=electrontools.menus.ContextMenu;
-	var Device=nodetools.devices.Device,Dialog=laya.ui.Dialog,DisControlTool=laya.debug.tools.DisControlTool;
-	var DragEvent=electrontools.drags.DragEvent,DragManager=electrontools.drags.DragManager,Event=laya.events.Event;
-	var EventDispatcher=laya.events.EventDispatcher,File=nodetools.devices.File,FileManager=nodetools.devices.FileManager;
-	var FileTools=nodetools.devices.FileTools,FocusManager=extendui.FocusManager,Handler=laya.utils.Handler,Image=laya.ui.Image;
-	var Input=laya.display.Input,JSTools=laya.debug.tools.JSTools,KeyManager=extendui.KeyManager,Keyboard=laya.events.Keyboard;
-	var Label=laya.ui.Label,List=laya.ui.List,ListBase$1=extendui.ui.ListBase,ListEx=extendui.ui.ListEx,Loader=laya.net.Loader;
-	var MessageManager=electrontools.MessageManager,Node=laya.display.Node,NodeTree$1=extendui.ui.NodeTree,NodeUtils=laya.debug.view.nodeInfo.NodeUtils;
-	var OSInfo=nodetools.devices.OSInfo,Paths=nodetools.devices.Paths,Point=laya.maths.Point,PythonTools=nodetools.devices.PythonTools;
-	var RenderContext=laya.renders.RenderContext,Sprite=laya.display.Sprite,Stage=laya.display.Stage,StringTool=laya.debug.tools.StringTool;
-	var Styles=laya.ui.Styles,Sys=nodetools.devices.Sys,SystemDragOverManager=electrontools.drags.SystemDragOverManager;
-	var SystemSetting=nodetools.devices.SystemSetting,TextInput=laya.ui.TextInput,TreeBase$1=extendui.ui.TreeBase;
-	var TreeEx=extendui.ui.TreeEx,UIConfig=Laya.UIConfig,Utils=laya.utils.Utils,View=laya.ui.View;
+	var CheckBox=laya.ui.CheckBox,ClassTool=laya.debug.tools.ClassTool,Clip=laya.ui.Clip,Component=laya.ui.Component;
+	var ContextMenu$1=electrontools.menus.ContextMenu,Device=nodetools.devices.Device,Dialog=laya.ui.Dialog,DisControlTool=laya.debug.tools.DisControlTool;
+	var DisResizer=laya.debug.tools.resizer.DisResizer,DisTools=electrontools.DisTools,DragEvent=electrontools.drags.DragEvent;
+	var DragManager=electrontools.drags.DragManager,Ease=laya.utils.Ease,Event=laya.events.Event,EventDispatcher=laya.events.EventDispatcher;
+	var File=nodetools.devices.File,FileManager=nodetools.devices.FileManager,FileTools=nodetools.devices.FileTools;
+	var FocusManager=extendui.FocusManager,Graphics=laya.display.Graphics,Handler=laya.utils.Handler,HitArea=laya.utils.HitArea;
+	var IDTools=laya.debug.tools.IDTools,Image=laya.ui.Image,Input=laya.display.Input,JSTools=laya.debug.tools.JSTools;
+	var KeyManager=extendui.KeyManager,Keyboard=laya.events.Keyboard,Label=laya.ui.Label,List=laya.ui.List,ListBase$1=extendui.ui.ListBase;
+	var ListEx=extendui.ui.ListEx,Loader=laya.net.Loader,MathUtil=laya.maths.MathUtil,MessageManager=electrontools.MessageManager;
+	var Node=laya.display.Node,NodeTree$1=extendui.ui.NodeTree,NodeUtils=laya.debug.view.nodeInfo.NodeUtils,OSInfo=nodetools.devices.OSInfo;
+	var ObjectTools=laya.debug.tools.ObjectTools,Paths$1=nodetools.devices.Paths,Point=laya.maths.Point,PythonTools=nodetools.devices.PythonTools;
+	var Rectangle=laya.maths.Rectangle,RelativePos=extendui.layout.RelativePos,Render=laya.renders.Render,RenderContext=laya.renders.RenderContext;
+	var Sprite=laya.display.Sprite,Stage=laya.display.Stage,StringTool=laya.debug.tools.StringTool,Styles=laya.ui.Styles;
+	var Sys=nodetools.devices.Sys,SystemDragOverManager=electrontools.drags.SystemDragOverManager,SystemSetting=nodetools.devices.SystemSetting;
+	var Tab=laya.ui.Tab,TextField=extendui.ui.TextField,TextInput=laya.ui.TextInput,TreeBase$1=extendui.ui.TreeBase;
+	var TreeEx=extendui.ui.TreeEx,Tween=laya.utils.Tween,UIConfig=Laya.UIConfig,Utils=laya.utils.Utils,View=laya.ui.View;
 	/**
 	*IDE可视化编辑样式
 	*/
@@ -101,8 +104,8 @@
 			FileTools.init2();
 			CMDShell.init();
 			PythonTools.PythonFolder=FileTools.getAppPath("pythontools")+"/";
-			Paths.tempPath=FileTools.getAppPath("tempdata")+"/";
-			Paths.dataPath=FileTools.getAppPath("data")+"/";
+			Paths$1.tempPath=FileTools.getAppPath("tempdata")+"/";
+			Paths$1.dataPath=FileTools.getAppPath("data")+"/";
 			SystemDragOverManager.init();
 			ContextMenu$1.init();
 			SystemSetting.appPath=FileTools.appPath;
@@ -110,6 +113,8 @@
 
 		__proto.test=function(){
 			console.log("AppPath:",FileTools.appPath);
+			this.initApp();
+			return;
 			this.testResPanel();
 			return;
 			var mainView;
@@ -124,6 +129,15 @@
 			ResPanel.instance.top=0;
 			ResPanel.instance.bottom=0;
 			Laya.stage.addChild(ResPanel.instance);
+		}
+
+		__proto.initApp=function(){
+			CursorManager.init();
+			SystemSetting.assetsPath="D:/codes/playground.git/trunk/debugtoolplatform/deskplatform";
+			ResPanel.instance.init(SystemSetting.assetsPath);
+			LayerManager.init();
+			LayoutRecManager.init();
+			LayoutRecManager.createDefault();
 		}
 
 		return DeskPlatform;
@@ -212,6 +226,1599 @@
 
 
 	/**
+	*路径定义
+	*@author ww
+	*/
+	//class platform.interfaces.Paths
+	var Paths=(function(){
+		function Paths(){}
+		__class(Paths,'platform.interfaces.Paths');
+		Paths.LogFile="log.txt";
+		Paths.LayoutFile_Default="layout/layout.config";
+		Paths.LayoutFile_Static="laya/tpls/default.config";
+		return Paths;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class platform.interfaces.PlatformEvents
+	var PlatformEvents=(function(){
+		function PlatformEvents(){}
+		__class(PlatformEvents,'platform.interfaces.PlatformEvents');
+		PlatformEvents.SHOW_LAYOUTTAB_BY_NAME="SHOW_LayoutTab_By_Name";
+		return PlatformEvents;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class platform.interfaces.PlatformVars
+	var PlatformVars=(function(){
+		function PlatformVars(){}
+		__class(PlatformVars,'platform.interfaces.PlatformVars');
+		PlatformVars.isDragingLayout=false;
+		PlatformVars.disableTabDrag=false;
+		return PlatformVars;
+	})()
+
+
+	/**
+	*皮肤定义
+	*@author ww
+	*/
+	//class platform.interfaces.SkinDefines
+	var SkinDefines=(function(){
+		function SkinDefines(){}
+		__class(SkinDefines,'platform.interfaces.SkinDefines');
+		SkinDefines.DisDragIcon="comp/clip_folder.png";
+		SkinDefines.PageDragIcon="comp/clip_folder.png";
+		SkinDefines.ResDragIcon="comp/clip_folder.png";
+		SkinDefines.LayoutRecDragIcon="comp/clip_folder.png";
+		SkinDefines.LayoutTabDragIcon="comp/clip_folder.png";
+		return SkinDefines;
+	})()
+
+
+	/**
+	*布局管理类
+	*@author ww
+	*/
+	//class platform.layout.LayoutRecManager
+	var LayoutRecManager=(function(){
+		function LayoutRecManager(){}
+		__class(LayoutRecManager,'platform.layout.LayoutRecManager');
+		var __proto=LayoutRecManager.prototype;
+		__proto.saveDragBarInfo=function(dragBar){}
+		__getset(1,LayoutRecManager,'containerBox',function(){
+			return LayoutRecManager._ct;
+		});
+
+		__getset(1,LayoutRecManager,'tLayoutFile',function(){
+			return LayoutRecManager._layoutFile?LayoutRecManager._layoutFile:"layout/layout.config";
+		});
+
+		LayoutRecManager.popLocked=function(){
+			return false;
+		}
+
+		LayoutRecManager.onMouseDown=function(e){
+			LayoutRecManager.target=e.currentTarget;
+			LayoutRecManager.dragItem(LayoutRecManager.target,LayoutRecManager.target["type"]);
+			LayerManager.stage.on("mouseup",null,LayoutRecManager.onMouseUp);
+			LayerManager.stage.on("mousemove",null,LayoutRecManager.onMouseMove);
+		}
+
+		LayoutRecManager.dragItem=function(target,type){
+			(type===void 0)&& (type=0);
+			var option={};
+			var area=new Rectangle();
+			if (type==0){
+				area=(target).getDragArea();
+			}
+			else if (type==1){
+				area=(target).getDragArea();
+			}
+			else{
+				return;
+			}
+			option.area=area;
+			DisControlTool.setTop(target);
+			target.startDrag(area,false,0,300,{useDlen:true});
+		}
+
+		LayoutRecManager.onMouseUp=function(e){
+			LayerManager.stage.off("mouseup",null,LayoutRecManager.onMouseUp);
+			LayerManager.stage.off("mousemove",null,LayoutRecManager.onMouseMove);
+			LayoutRecManager.doLayOut();
+			LayoutRecManager.target.stopDrag();
+			LayoutRecManager.target.left=Math.ceil(LayoutRecManager.target.x);
+			LayoutRecManager.target.top=Math.ceil(LayoutRecManager.target.y);
+		}
+
+		LayoutRecManager.onMouseMove=function(e){
+			Laya.timer.callLater(this,LayoutRecManager.updateTargetPosAndDoLayout);
+		}
+
+		LayoutRecManager.updateTargetPosAndDoLayout=function(){
+			LayoutRecManager.target.left=Math.ceil(LayoutRecManager.target.x);
+			LayoutRecManager.target.top=Math.ceil(LayoutRecManager.target.y);
+			LayoutRecManager.doLayOut();
+		}
+
+		LayoutRecManager.doLayOut=function(){
+			(LayoutRecManager.target).updates();
+		}
+
+		LayoutRecManager.init=function(){
+			LayoutRecManager._ct=new Box();
+			LayoutRecManager._ct.mouseEnabled=true;
+			LayoutRecManager._ct.name="LayoutRecManager_Container";
+			LayoutRecManager._ct.width=800;
+			LayoutRecManager._ct.height=800;
+			LayerManager.stage.addChild(LayoutRecManager._ct);
+			LayerManager.stage.on("resize",null,LayoutRecManager.resizeWork);
+			LayoutRecManager._ct.on("dragDrop",null,LayoutRecManager.onDragDrop);
+		}
+
+		LayoutRecManager.resizeWork=function(e){
+			LayoutRecManager._ct.x=LayoutRecManager.ctOffSetX;
+			LayoutRecManager._ct.y=LayoutRecManager.ctOffSetY;
+			Laya.timer.once(50,null,LayoutRecManager.tryResizeSafe,null,true);
+			return;
+		}
+
+		LayoutRecManager.tryResizeSafe=function(){
+			try{
+				LayoutRecManager.tryResizeNoScale();
+				}catch(e){
+				LayoutRecManager.createDefault();
+			}
+		}
+
+		LayoutRecManager.scaleResize=function(){
+			var nW=LayerManager.stage.width-LayoutRecManager.ctOffSetX;
+			var nH=LayerManager.stage.height-30+LayoutRecManager.ctOffHeight;
+			if ((nW *nH *LayoutRecManager._ct.width *LayoutRecManager._ct.height)!=0){
+				var scaleX=nW / LayoutRecManager._ct.width;
+				var scaleY=nH / LayoutRecManager._ct.height;
+				LayoutRecManager.adptScales(scaleX,scaleY);
+			}
+			LayoutRecManager._ct.width=LayerManager.stage.width-LayoutRecManager.ctOffSetX;
+			LayoutRecManager._ct.height=LayerManager.stage.height-LayoutRecManager._ct.y+LayoutRecManager.ctOffHeight;
+			Laya.timer.once(100,null,LayoutRecManager.adptAll);
+		}
+
+		LayoutRecManager.tryResizeNoScale=function(){
+			var items;
+			items=DisControlTool.getAllChild(LayoutRecManager._ct);
+			var i=0,len=0;
+			len=items.length;
+			var tRec;
+			var tRecHeight=0;
+			var maxFree;
+			for (i=0;i < len;i++){
+				tRec=items[i];
+				if ((tRec instanceof platform.layout.LayoutRec )){
+					if(tRec.sizeFree){
+						if(!maxFree||maxFree.height<tRec.height){
+							maxFree=tRec;
+						}
+					}
+				}
+			}
+			tRec=maxFree;
+			if(!tRec||!tRec.sizeFree){
+				LayoutRecManager.scaleResize();
+				return;
+				}else{
+			};
+			var nW=LayerManager.stage.width-LayoutRecManager.ctOffSetX+3;
+			var nH=LayerManager.stage.height-LayoutRecManager._ct.y+LayoutRecManager.ctOffHeight;
+			var pW=LayoutRecManager._ct.width;
+			var pH=LayoutRecManager._ct.height;
+			var dW=NaN;
+			var dH=NaN;
+			dW=nW-pW;
+			dH=nH-pH;
+			if ((nW *nH *pW *pH)!=0){
+				if(dW+tRec.width<0){
+					console.log("width not availeble");
+					LayoutRecManager.scaleResize();
+					return;
+				}
+				if(dH+tRec.height<0){
+					console.log("height not availeble");
+					LayoutRecManager.scaleResize();
+					return;
+				}
+				}else{
+				console.log("wrong size");
+				LayoutRecManager.scaleResize();
+				return;
+			};
+			var tDragBar;
+			var barList;
+			barList=[];
+			var resizeStruct;
+			resizeStruct=new ResizeRecStruct();
+			var workDragBar;
+			for (i=0;i < len;i++){
+				tDragBar=items[i];
+				if ((tDragBar instanceof platform.layout.LayoutDragBar )){
+					tDragBar.walked=false;
+					if(tDragBar.cusorType=="e-resize"){
+						if(tDragBar.x>=tRec.x+10){
+							barList.push(tDragBar);
+						}
+					}
+					if(tDragBar.type==2){
+						workDragBar=tDragBar;
+						switch(tDragBar.getSideType()){
+							case "right":
+								resizeStruct.rightSide=tDragBar;
+								break ;
+							case "left":
+								resizeStruct.leftSide=tDragBar;
+								break ;
+							case "up":
+								resizeStruct.upSide=tDragBar;
+								break ;
+							case "down":
+								resizeStruct.downSide=tDragBar;
+								break ;
+							}
+					}
+				}
+			}
+			resizeStruct.isRoot=true;
+			resizeStruct.resizeItems=[];
+			resizeStruct.tryMoveRight(dW);
+			barList=[];
+			for (i=0;i < len;i++){
+				tDragBar=items[i];
+				if ((tDragBar instanceof platform.layout.LayoutDragBar )){
+					tDragBar.walked=false;
+					if(tDragBar.cusorType=="n-resize"){
+						if(tDragBar.y>=tRec.y+tRec.height||tDragBar.y+200>nH){
+							barList.push(tDragBar);
+							tDragBar.top+=dH;
+						}
+						if(tDragBar.type==2&&tDragBar.getSideType()=="down"&&tDragBar.cusorType=="n-resize"){
+							workDragBar=tDragBar;
+						}
+					}
+				}
+			}
+			if(workDragBar){
+			}
+			LayoutRecManager._ct.width=nW;
+			LayoutRecManager._ct.height=nH;
+			Laya.timer.once(100,null,LayoutRecManager.adptAll);
+		}
+
+		LayoutRecManager.adptDis=function(dis,scaleX,scaleY){
+			dis.left *=scaleX;
+			dis.right *=scaleX;
+			dis.top *=scaleY;
+			dis.bottom *=scaleY;
+		}
+
+		LayoutRecManager.adptScales=function(scaleX,scaleY){
+			var items;
+			items=DisControlTool.getAllChild(LayoutRecManager._ct);
+			var i=0,len=0;
+			len=items.length;
+			var tDragBar;
+			for (i=0;i < len;i++){
+				tDragBar=items[i];
+				if ((tDragBar instanceof platform.layout.LayoutDragBar )){
+					LayoutRecManager.adptDis(tDragBar,scaleX,scaleY);
+				}
+			}
+		}
+
+		LayoutRecManager.getAllDragBars=function(type){
+			var rst;
+			rst=[];
+			var items;
+			items=DisControlTool.getAllChild(LayoutRecManager._ct);
+			var i=0,len=0;
+			len=items.length;
+			var tDragBar;
+			for (i=0;i < len;i++){
+				tDragBar=items[i];
+				if ((tDragBar instanceof platform.layout.LayoutDragBar )){
+					if(tDragBar.type==type)
+						rst.push(tDragBar);
+				}
+			}
+			return rst;
+		}
+
+		LayoutRecManager.adptAll=function(){
+			var items;
+			items=DisControlTool.getAllChild(LayoutRecManager._ct);
+			var i=0,len=0;
+			len=items.length;
+			var tDragBar;
+			for (i=0;i < len;i++){
+				tDragBar=items[i];
+				if ((tDragBar instanceof platform.layout.LayoutDragBar )){
+					tDragBar.updates();
+				}
+			}
+		}
+
+		LayoutRecManager.saveLayoutInfo=function(){
+			var items;
+			items=DisControlTool.getAllChild(LayoutRecManager._ct);
+			var i=0,len=0;
+			len=items.length;
+			for (i=0;i < len;i++){
+				IDTools.idObj(items[i]);
+			};
+			var rst=[];
+			var tDis;
+			for (i=0;i < len;i++){
+				tDis=items[i];
+				if ((tDis instanceof platform.layout.LayoutDragBar )){
+					rst.push(LayoutRecManager.getInfoO(tDis));
+				}
+				else if ((tDis instanceof platform.layout.LayoutRec )){
+					rst.push(LayoutRecManager.saveRecInfo(tDis));
+				}
+			};
+			var saveO;
+			saveO={};
+			saveO.width=LayoutRecManager._ct.width;
+			saveO.height=LayoutRecManager._ct.height;
+			saveO.items=rst;
+			FileManager.createTxtFile(FileManager.getDataPath(LayoutRecManager.tLayoutFile),ObjectTools.getJsonString(saveO));
+		}
+
+		LayoutRecManager.showPanelByClassName=function(className){
+			if(LayoutRecManager.popLocked())return;
+			LayoutRecManager.initClassToUIO();
+			var tPanel;
+			tPanel=LayoutRecManager.classToUIO[className];
+			LayoutRecManager.showPanelToStage(tPanel);
+		}
+
+		LayoutRecManager.showPanelToStage=function(tPanel){
+			if (!tPanel)
+				return;
+			if (LayoutRecManager.isPanelInStage(tPanel))
+				return;
+			var rec=new LayoutRec();
+			if (tPanel.width > 0 && tPanel.height > 0 && 0){
+				rec.width=tPanel.width+5;
+				rec.height=tPanel.height+20;
+			}
+			else{
+				rec.width=tPanel["minWidth"]? tPanel["minWidth"]:200;
+				if(rec.width<200)rec.width=200;
+				rec.height=300;
+			}
+			LayoutRecManager.addPanelToRec(tPanel,rec);
+			DisTools.showToCenter(rec,LayerManager.stage);
+		}
+
+		LayoutRecManager.removePanel=function(tPanel){
+			var rec;
+			rec=LayoutRecManager.findPanelRec(tPanel);
+			if(rec){
+				rec.removeUI(tPanel,true);
+			}
+		}
+
+		LayoutRecManager.isPanelInStage=function(panel){
+			var i=0,len=0;
+			var childs;
+			var layouts;
+			layouts=[];
+			childs=DisControlTool.getAllChild(LayoutRecManager._ct);
+			len=childs.length;
+			for (i=0;i < len;i++){
+				if (((childs[i])instanceof platform.layout.LayoutRec )){
+					ObjectTools.concatArr(layouts,childs[i].getUIs());
+				}
+			}
+			childs=DisControlTool.getAllChild(LayerManager.stage);
+			len=childs.length;
+			for (i=0;i < len;i++){
+				if (((childs[i])instanceof platform.layout.LayoutRec )){
+					ObjectTools.concatArr(layouts,childs[i].getUIs());
+				}
+			}
+			len=layouts.length;
+			for (i=0;i < len;i++){
+				if (layouts[i]==panel)
+					return true;
+			}
+			return false;
+		}
+
+		LayoutRecManager.findPanelRec=function(panel){
+			var i=0,len=0;
+			var childs;
+			var layouts;
+			layouts=[];
+			childs=DisControlTool.getAllChild(LayoutRecManager._ct);
+			len=childs.length;
+			for (i=0;i < len;i++){
+				if (((childs[i])instanceof platform.layout.LayoutRec )){
+					if(LayoutRecManager.isPanelInRec(panel,childs[i])){
+						return childs[i];
+					}
+				}
+			}
+			childs=DisControlTool.getAllChild(LayerManager.stage);
+			len=childs.length;
+			for (i=0;i < len;i++){
+				if (((childs[i])instanceof platform.layout.LayoutRec )){
+					if(LayoutRecManager.isPanelInRec(panel,childs[i])){
+						return childs[i];
+					}
+				}
+			}
+			return null;
+		}
+
+		LayoutRecManager.isPanelInRec=function(panel,rec){
+			var layouts;
+			layouts=rec.getUIs();
+			if(!layouts)return false;
+			return layouts.indexOf(panel)>=0;
+		}
+
+		LayoutRecManager.initClassToUIO=function(){
+			if (!LayoutRecManager._classInited){
+				LayoutRecManager._classInited=true;
+				LayoutRecManager.classToUIO["ResPanel"]=ResPanel.instance;
+			}
+		}
+
+		LayoutRecManager.regLayoutPanel=function(name,panel){
+			LayoutRecManager.classToUIO[name]=panel;
+		}
+
+		LayoutRecManager.recoverLayoutInfo=function(layoutFile,force,isDebug){
+			(layoutFile===void 0)&& (layoutFile="layout/layout.config");
+			(force===void 0)&& (force=false);
+			(isDebug===void 0)&& (isDebug=false);
+			if((!force)&&(LayoutRecManager._layoutFile==layoutFile))return;
+			if(LayoutRecManager._layoutFile){
+				LayoutRecManager.saveLayoutInfo();
+			}
+			LayoutRecManager.clearAll();
+			LayoutRecManager.initClassToUIO();
+			LayoutRecManager._layoutFile=layoutFile;
+			var path;
+			path=FileManager.getDataPath(LayoutRecManager.tLayoutFile);
+			if (!FileTools.exist(path)){
+				LayoutRecManager.createDefault();
+				return;
+			}
+			LayoutRecManager.layoutByLayoutFile(path);
+		}
+
+		LayoutRecManager.layoutByLayoutFile=function(path){
+			var layoutO;
+			layoutO=ObjectTools.getObj(FileManager.readTxtFile(path));
+			LayoutRecManager._ct.width=layoutO.width;
+			LayoutRecManager._ct.height=layoutO.height;
+			var itemList;
+			itemList=layoutO.items;
+			var i=0,len=0;
+			len=itemList.length;
+			var tO;
+			var tDis;
+			var tClass;
+			var objDic={};
+			for (i=0;i < len;i++){
+				tO=itemList[i];
+				tClass=LayoutRecManager.itemClassO[tO.className];
+				if (!tClass)
+					continue ;
+				if (tClass==LayoutDragBar){
+					var type=tO.width < tO.height ? "R" :"T";
+					tDis=LayoutRecManager.getADragBar(type);
+				}
+				else{
+					tDis=new tClass();
+				}
+				ObjectTools.copyValueByArr(tDis,tO,LayoutRecManager.sizeInfos);
+				objDic[tO.id]=tDis;
+				if ((tDis instanceof platform.layout.LayoutDragBar )){
+				}
+				if ((tDis instanceof platform.layout.LayoutRec )){
+					LayoutRecManager.recoverLayoutRec(tDis,tO);
+				}
+				LayoutRecManager._ct.addChild(tDis);
+			};
+			var key;
+			var tar;
+			var relativeO;
+			for (i=0;i < len;i++){
+				tO=itemList[i];
+				tDis=objDic[tO.id];
+				relativeO=tO.relativeO;
+				if (relativeO){
+					for (key in relativeO){
+						tar=objDic[relativeO[key]];
+						if (tar){
+							RelativePos.addRelative(tDis,tar,key);
+						}
+						else{
+							console.log("tar not find");
+						}
+					}
+				}
+				else{
+					console.log("relativeO not find");
+				}
+				ObjectTools.copyValueByArr(tDis,tO,LayoutRecManager.sizeInfos);
+			}
+			LayoutRecManager.adptAll();
+			LayoutRecManager.resizeWork();
+		}
+
+		LayoutRecManager.recoverLayoutRec=function(rec,data){
+			var i=0,len=0;
+			var uiList;
+			uiList=data.uiList;
+			len=uiList.length;
+			var tUI;
+			for (i=0;i < len;i++){
+				tUI=LayoutRecManager.classToUIO[uiList[i]];
+				if (tUI){
+					LayoutRecManager.addPanelToRec(tUI,rec);
+				}
+			}
+			if(parseInt(data.select)>0){
+				rec.tab.selectedIndex=data.select;
+				}else{
+				rec.tab.selectedIndex=0;
+			}
+			if(data.disMode){
+				rec.disMode=data.disMode;
+			}
+			if(data.preMoveLen){
+				rec.preMoveLen=data.preMoveLen;
+			}
+			if(rec.tab.items.length<1){
+				Laya.timer.once(1000,null,LayoutRecManager.removeRec,[rec]);
+			}
+		}
+
+		LayoutRecManager.saveRecInfo=function(rec){
+			var rst;
+			rst=LayoutRecManager.getInfoO(rec);
+			var uiList;
+			var i=0,len=0;
+			uiList=rec.tab.items;
+			var saveList;
+			len=uiList.length;
+			var tab;
+			saveList=[];
+			for (i=0;i < len;i++){
+				tab=uiList[i];
+				saveList.push(ClassTool.getClassName(tab.ui));
+			}
+			rst.disMode=rec.disMode;
+			rst.preMoveLen=rec.preMoveLen;
+			rst.select=rec.tab.selectedIndex;
+			rst.uiList=saveList;
+			return rst;
+		}
+
+		LayoutRecManager.getInfoO=function(obj){
+			var rst;
+			rst={};
+			ObjectTools.copyValueByArr(rst,obj,LayoutRecManager.sizeInfos);
+			rst.className=ClassTool.getClassName(obj);
+			rst.id=IDTools.getObjID(obj);
+			rst.relativeO=RelativePos.saveRelative(obj);
+			return rst;
+		}
+
+		LayoutRecManager.onDragDrop=function(e){
+			if (!e.data)
+				return;
+			var tType;
+			tType=e.data.type;
+			if (tType !="LayoutRec" && tType !="LayoutTab")
+				return;
+			var src;
+			src=e.data.target;
+			if (!src)
+				return;
+			var hitList;
+			hitList=e.hitList;
+			var i=0,len=0;
+			len=hitList.length;
+			var tTarget;
+			if (hitList.indexOf(src)>=0){
+				tTarget=src;
+				if (tType !="LayoutTab"){
+					if (tType=="LayoutRec"){
+						LayoutRecManager.popRec(src);
+						return;
+					}
+				}
+			}
+			else{
+				for (i=0;i < len;i++){
+					tTarget=hitList[i];
+					if ((tTarget instanceof platform.layout.LayoutRec )){
+						if(RelativePos.getDisMouseRelativePos(tTarget)!="out"){
+							break ;
+						}
+					}
+				}
+			}
+			if (!((tTarget instanceof platform.layout.LayoutRec )))
+				return;
+			if(tTarget.parent!=LayoutRecManager._ct)return;
+			if (src !=tTarget || tType=="LayoutTab"){
+				var posType;
+				posType=RelativePos.getDisMouseRelativePos(tTarget);
+				if (tType=="LayoutRec"){
+					switch (posType){
+						case "up":
+							LayoutRecManager.removeRec(src);
+							LayoutRecManager.insetToBarV(RelativePos.getBar(tTarget,"up"),src);
+							break ;
+						case "down":
+							LayoutRecManager.removeRec(src);
+							LayoutRecManager.insertV(tTarget,src);
+							break ;
+						case "left":
+							LayoutRecManager.removeRec(src);
+							LayoutRecManager.insertL(tTarget,src);
+							break ;
+						case "center":
+							if(src.parent==LayerManager.stage)return;
+						case "right":
+							LayoutRecManager.removeRec(src);
+							LayoutRecManager.insert(tTarget,src);
+							break ;
+						default :
+							return;
+						}
+				}
+				else if (tType=="LayoutTab"){
+					var tTab;
+					tTab=e.dragInitiator;
+					var tRec;
+					tRec=tTarget;
+					if (src==tTarget){
+						if (src.tab.items.length <=1){
+							LayoutRecManager.popRec(src);
+							return;
+						}
+						else{
+							if (posType=="center"){
+								src.removeTab(tTab);
+								tRec=new LayoutRec();
+								tRec.pos(src.x,src.y);
+								src.parent.addChild(tRec);
+								tRec.addTab(tTab);
+								LayoutRecManager.popRec(tRec);
+								return;
+							}
+						}
+					}
+					switch (posType){
+						case "down":
+							src.removeTab(tTab);
+							tRec=new LayoutRec();
+							tRec.addTab(tTab);
+							LayoutRecManager.insertV(tTarget,tRec);
+							break ;
+						case "right":
+							src.removeTab(tTab);
+							tRec=new LayoutRec();
+							tRec.addTab(tTab);
+							LayoutRecManager.insert(tTarget,tRec);
+							break ;
+						case "left":
+							src.removeTab(tTab);
+							tRec=new LayoutRec();
+							tRec.addTab(tTab);
+							LayoutRecManager.insertL(tTarget,tRec);
+							break ;
+						case "center":
+						case "up":
+							if(!tRec.canAddTab)return;
+							if (src !=tRec){
+								src.removeTab(tTab);
+								tRec.addTab(tTab);
+							}
+							else{
+								return;
+								src.removeTab(tTab);
+								tRec=new LayoutRec();
+								tRec.addTab(tTab);
+								LayoutRecManager.popRec(tRec);
+							}
+							break ;
+						default :
+							return;
+						}
+					if (src.tab.items.length < 1){
+						LayoutRecManager.removeRec(src);
+					}
+				}
+			}
+		}
+
+		LayoutRecManager.test=function(){
+			var _leftBar;
+			var _rightBar;
+			var _upBar;
+			var _downBar;
+			_leftBar=LayoutRecManager.getADragBar("R");
+			_leftBar.width=0;
+			_leftBar.left=0;
+			_leftBar.top=0;
+			_leftBar.bottom=0;
+			_leftBar.type=2;
+			LayoutRecManager._ct.addChild(_leftBar);
+			_rightBar=LayoutRecManager.getADragBar("R");
+			_rightBar.width=0;
+			_rightBar.right=0;
+			_rightBar.top=0;
+			_rightBar.bottom=0;
+			_rightBar.type=2;
+			LayoutRecManager._ct.addChild(_rightBar);
+			_upBar=LayoutRecManager.getADragBar("T");
+			_upBar.height=0;
+			_upBar.left=0;
+			_upBar.top=0;
+			_upBar.right=0;
+			_upBar.type=2;
+			LayoutRecManager._ct.addChild(_upBar);
+			_downBar=LayoutRecManager.getADragBar("T");
+			_downBar.height=0;
+			_downBar.left=0;
+			_downBar.bottom=0;
+			_downBar.right=0;
+			_downBar.type=2;
+			LayoutRecManager._ct.addChild(_downBar);
+			var rec=LayoutRecManager.getARec();
+			LayoutRecManager._ct.addChild(rec);
+			rec.left=0;
+			rec.right=0;
+			rec.top=0;
+			rec.bottom=0;
+			RelativePos.addRelative(rec,_leftBar,"left");
+			RelativePos.addRelative(rec,_rightBar,"right");
+			RelativePos.addRelative(rec,_upBar,"up");
+			RelativePos.addRelative(rec,_downBar,"down");
+			LayoutRecManager.insert(rec,LayoutRecManager.getARec());
+			var tRec;
+			tRec=LayoutRecManager.getARec();
+			LayoutRecManager.insertV(rec,tRec);
+			LayoutRecManager.insert(tRec,LayoutRecManager.getARec());
+			console.log("onlySide:",RelativePos.getOnlySide(tRec));
+			LayoutRecManager.insertV(tRec,LayoutRecManager.getARec());
+			console.log("onlySide:",RelativePos.getOnlySide(tRec));
+		}
+
+		LayoutRecManager.clearAll=function(){
+			LayoutRecManager.clearLayoutsOfContainer(LayoutRecManager._ct);
+			LayoutRecManager.clearLayoutsOfContainer(LayerManager.stage);
+		}
+
+		LayoutRecManager.clearLayoutsOfContainer=function(_ct){
+			var items;
+			items=DisControlTool.getAllChild(_ct);
+			var i=0,len=0;
+			len=items.length;
+			var tDis;
+			for (i=0;i < len;i++){
+				tDis=items[i];
+				if ((tDis instanceof platform.layout.LayoutDragBar )){
+					(tDis).clears();
+					tDis.removeSelf();
+				}
+				else if ((tDis instanceof platform.layout.LayoutRec )){
+					(tDis).clears();
+					tDis.removeSelf();
+				}
+			}
+		}
+
+		LayoutRecManager.createDefault=function(){
+			LayoutRecManager.clearAll();
+			LayoutRecManager.resizeWork();
+			var path;
+			path=FileManager.getAppPath("laya/tpls/default.config");
+			if(FileTools.exist(path)){
+				LayoutRecManager.layoutByLayoutFile(path);
+				return;
+			};
+			var _leftBar;
+			var _rightBar;
+			var _upBar;
+			var _downBar;
+			_leftBar=LayoutRecManager.getADragBar("R");
+			_leftBar.width=0;
+			_leftBar.left=0;
+			_leftBar.top=0;
+			_leftBar.bottom=0;
+			_leftBar.type=2;
+			LayoutRecManager._ct.addChild(_leftBar);
+			_rightBar=LayoutRecManager.getADragBar("R");
+			_rightBar.width=0;
+			_rightBar.right=0;
+			_rightBar.top=0;
+			_rightBar.bottom=0;
+			_rightBar.type=2;
+			LayoutRecManager._ct.addChild(_rightBar);
+			_upBar=LayoutRecManager.getADragBar("T");
+			_upBar.height=0;
+			_upBar.left=0;
+			_upBar.top=0;
+			_upBar.right=0;
+			_upBar.type=2;
+			LayoutRecManager._ct.addChild(_upBar);
+			_downBar=LayoutRecManager.getADragBar("T");
+			_downBar.height=0;
+			_downBar.left=0;
+			_downBar.bottom=0;
+			_downBar.right=0;
+			_downBar.type=2;
+			LayoutRecManager._ct.addChild(_downBar);
+			RelativePos.addRelative(_upBar,_leftBar,"left");
+			RelativePos.addRelative(_upBar,_rightBar,"right");
+			RelativePos.addRelative(_downBar,_leftBar,"left");
+			RelativePos.addRelative(_downBar,_rightBar,"right");
+			RelativePos.addRelative(_leftBar,_upBar,"up");
+			RelativePos.addRelative(_leftBar,_downBar,"down");
+			RelativePos.addRelative(_rightBar,_upBar,"up");
+			RelativePos.addRelative(_rightBar,_downBar,"down");
+			var rec=new LayoutRec();
+			LayoutRecManager._ct.addChild(rec);
+			rec.left=0;
+			rec.right=0;
+			rec.top=0;
+			rec.bottom=0;
+			RelativePos.addRelative(rec,_leftBar,"left");
+			RelativePos.addRelative(rec,_rightBar,"right");
+			RelativePos.addRelative(rec,_upBar,"up");
+			RelativePos.addRelative(rec,_downBar,"down");
+			debugger;
+			LayoutRecManager.addPanelToRec(ResPanel.instance,rec);
+			var uiRec;
+			uiRec=new LayoutRec();
+			LayoutRecManager.insert(rec,uiRec,0.8);
+			LayoutRecManager.addPanelToRec(IFrameSprite.I,uiRec);
+			return;
+			var resRec;
+			resRec=new LayoutRec();
+			LayoutRecManager.insertV(rec,resRec);
+			LayoutRecManager.addPanelToRec(/*no*/this.CompPanel.instance,resRec);
+			LayoutRecManager.addPanelToRec(ResPanel.instance,resRec);
+			var propRec;
+			propRec=new LayoutRec();
+			LayoutRecManager.insert(uiRec,propRec,0.3);
+			LayoutRecManager.addPanelToRec(/*no*/this.PropPanel.instance,propRec);
+			var disTreeRec;
+			disTreeRec=new LayoutRec();
+			LayoutRecManager.insertV(propRec,disTreeRec);
+			LayoutRecManager.addPanelToRec(/*no*/this.DisplayTreePanel.instance,disTreeRec);
+		}
+
+		LayoutRecManager.popRec=function(tar){
+			if (tar.parent==LayerManager.stage)
+				return;
+			var point;
+			point=new Point();
+			point=tar.localToGlobal(point);
+			point=LayerManager.stage.globalToLocal(point);
+			var posInfo={};
+			ObjectTools.copyValueByArr(posInfo,tar,LayoutRecManager.sizePosKeys);
+			posInfo.x=point.x+DragManager.dPos.x;
+			posInfo.y=point.y+DragManager.dPos.y;
+			LayoutRecManager.removeRec(tar);
+			DisControlTool.clearItemRelativeInfo(tar);
+			LayoutRecManager.addToStageLater(tar,posInfo);
+		}
+
+		LayoutRecManager.addToStageLater=function(tar,posInfo){
+			LayerManager.stage.addChild(tar);
+			if(posInfo.height<200)posInfo.height=200;
+			tar.x=posInfo.x-10;
+			tar.y=posInfo.y-10;
+			tar.width=posInfo.width+20;
+			tar.height=posInfo.height+20;
+		}
+
+		LayoutRecManager.clearRelativePosition=function(tar){
+			tar.top=NaN;
+			tar.bottom=NaN;
+			tar.left=NaN;
+			tar.right=NaN;
+		}
+
+		LayoutRecManager.removeRec=function(tar){
+			var onlySide;
+			onlySide=RelativePos.getOnlySide(tar);
+			if (!onlySide){
+				console.log("无可拖动条");
+				tar.removeSelf();
+				RelativePos.clearBar(tar);
+				return;
+			};
+			var onlyBar;
+			onlyBar=RelativePos.getBar(tar,onlySide);
+			var otherSide;
+			otherSide=RelativePos.getOtherSide(onlySide);
+			var otherBar;
+			otherBar=RelativePos.getBar(tar,otherSide);
+			if (onlyBar && otherBar){
+				otherBar.mergeUpdates(onlyBar);
+				onlyBar.removeSelf();
+				onlyBar.clears();
+				RelativePos.clearBar(onlyBar);
+				tar.removeSelf();
+				RelativePos.clearBar(tar);
+			}
+			LayoutRecManager.adptAll();
+		}
+
+		LayoutRecManager.minToBottom=function(tar){
+			if(LayoutRecManager.isTweening)return;
+			var topBar;
+			var bottomBar;
+			topBar=RelativePos.getBar(tar,"up");
+			bottomBar=RelativePos.getBar(tar,"down");
+			if(tar.disMode==1){
+				tar.disMode=2;
+				LayoutRecManager.recTween(topBar,{"_dragY":bottomBar.y-tar.preMoveLen});
+				}else{
+				tar.disMode=1;
+				tar.preMoveLen=bottomBar.y-topBar.y;
+				LayoutRecManager.recTween(topBar,{"_dragY":bottomBar.y-22});
+			}
+		}
+
+		LayoutRecManager.minToRight=function(tar){
+			if(LayoutRecManager.isTweening)return;
+			var rightBar;
+			var leftBar;
+			rightBar=RelativePos.getBar(tar,"right");
+			leftBar=RelativePos.getBar(tar,"left");
+			if(tar.disMode==1){
+				tar.disMode=2;
+				LayoutRecManager.recTween(leftBar,{"_dragX":rightBar.x-tar.preMoveLen});
+				}else{
+				tar.disMode=1;
+				tar.preMoveLen=rightBar.x-leftBar.x;
+				LayoutRecManager.recTween(leftBar,{"_dragX":rightBar.x-22});
+			}
+		}
+
+		LayoutRecManager.minToLeft=function(tar){
+			if(LayoutRecManager.isTweening)return;
+			var rightBar;
+			var leftBar;
+			rightBar=RelativePos.getBar(tar,"right");
+			leftBar=RelativePos.getBar(tar,"left");
+			if(tar.disMode==1){
+				tar.disMode=2;
+				LayoutRecManager.recTween(rightBar,{"_dragX":leftBar.x+tar.preMoveLen});
+				}else{
+				tar.disMode=1;
+				tar.preMoveLen=rightBar.x-leftBar.x;
+				LayoutRecManager.recTween(rightBar,{"_dragX":leftBar.x+22});
+			}
+		}
+
+		LayoutRecManager.recTween=function(tar,props){
+			if(!LayoutRecManager.tweenCompleteHandler)LayoutRecManager.tweenCompleteHandler=new Handler(null,LayoutRecManager.onTweenComplete);
+			LayoutRecManager.isTweening=true;
+			Tween.to(tar,props,150,Ease.circInOut,LayoutRecManager.tweenCompleteHandler);
+		}
+
+		LayoutRecManager.onTweenComplete=function(){
+			LayoutRecManager.isTweening=false;
+		}
+
+		LayoutRecManager.minRec=function(tar){
+			var onlySide;
+			onlySide=RelativePos.getOnlySide(tar);
+			if (!onlySide)
+				return;
+			var onlyBar;
+			onlyBar=RelativePos.getBar(tar,onlySide);
+			var otherSide;
+			otherSide=RelativePos.getOtherSide(onlySide);
+			var otherBar;
+			otherBar=RelativePos.getBar(tar,otherSide);
+			if (onlyBar && otherBar){
+				switch (onlySide){
+					case "right":
+						onlyBar.left-=tar.width-4;
+						break ;
+					case "left":
+						onlyBar.left+=tar.width-4;
+						break ;
+					case "up":
+						onlyBar.top+=tar.height-4;
+						break ;
+					case "down":
+						onlyBar.top-=tar.height-4;
+						break ;
+					}
+			}
+			onlyBar.updates();
+		}
+
+		LayoutRecManager.recoverRec=function(tar){
+			var onlySide;
+			onlySide=RelativePos.getOnlySide(tar);
+			if (!onlySide)
+				return;
+			var onlyBar;
+			onlyBar=RelativePos.getBar(tar,onlySide);
+			var otherSide;
+			otherSide=RelativePos.getOtherSide(onlySide);
+			var otherBar;
+			otherBar=RelativePos.getBar(tar,otherSide);
+			if (onlyBar && otherBar){
+				switch (onlySide){
+					case "right":
+						onlyBar.left-=tar.width-tar.preWidth;
+						break ;
+					case "left":
+						onlyBar.left+=tar.width-tar.preWidth;
+						break ;
+					case "up":
+						onlyBar.top+=tar.height-tar.preHeight;
+						break ;
+					case "down":
+						onlyBar.top-=tar.height-tar.preHeight;
+						break ;
+					}
+			}
+			onlyBar.updates();
+		}
+
+		LayoutRecManager.adptTo=function(tar){
+			var onlySide;
+			onlySide=RelativePos.getOnlySide(tar);
+			if (!onlySide)
+				return;
+			var onlyBar;
+			onlyBar=RelativePos.getBar(tar,onlySide);
+			var otherSide;
+			otherSide=RelativePos.getOtherSide(onlySide);
+			var otherBar;
+			otherBar=RelativePos.getBar(tar,otherSide);
+			if (onlyBar && otherBar){
+				switch (onlySide){
+					case "right":
+						onlyBar.left=tar.left+tar.width;
+						break ;
+					case "left":
+						onlyBar.left=tar.left-onlyBar.width;
+						break ;
+					case "up":
+						onlyBar.top=tar.top-onlyBar.height;
+						break ;
+					case "down":
+						onlyBar.top=tar.top+tar.height;
+						break ;
+					}
+			}
+			onlyBar.updates();
+		}
+
+		LayoutRecManager.insetToBar=function(tar,insert,rate){
+			(rate===void 0)&& (rate=0.4);
+			var rec;
+			rec=tar.getDragArea();
+			rec.width=200;
+			if (rec.width < 20)
+				return;
+			var tLen=0;
+			tLen=rec.width;
+			var dragBar;
+			dragBar=LayoutRecManager.getADragBar("R");
+			dragBar.size(0,tar.height);
+			dragBar.right=tar.right;
+			dragBar.left=tar.left
+			dragBar.top=tar.top;
+			dragBar.bottom=tar.bottom;
+			dragBar.type=0;
+			dragBar.mergeUpdates(tar);
+			tar.clear();
+			dragBar.left+=rate *tLen;
+			RelativePos.clearBar(insert);
+			insert.left=tar.left
+			insert.top=tar.top;
+			insert.bottom=tar.bottom;
+			if (RelativePos.getBar(tar,"right")){
+				RelativePos.copyRelative(dragBar,tar,"right");
+			}
+			RelativePos.addRelative(insert,tar,"left");
+			RelativePos.addRelative(insert,dragBar,"right");
+			RelativePos.copyRelative(insert,tar,"down");
+			RelativePos.copyRelative(dragBar,tar,"down");
+			RelativePos.copyRelative(insert,tar,"up");
+			RelativePos.copyRelative(dragBar,tar,"up");
+			LayoutRecManager._ct.addChild(dragBar);
+			LayoutRecManager._ct.addChild(insert);
+			LayoutRecManager.adptAll();
+		}
+
+		LayoutRecManager.insetToBarV=function(tar,insert,rate){
+			(rate===void 0)&& (rate=0.4);
+			var rec;
+			rec=tar.getDragArea();
+			rec.height=200;
+			if (rec.height < 20)
+				return;
+			var tLen=0;
+			tLen=rec.height;
+			var dragBar;
+			dragBar=LayoutRecManager.getADragBar("T");
+			dragBar.size(tar.width,0);
+			dragBar.right=tar.right;
+			dragBar.left=tar.left
+			dragBar.top=tar.top;
+			dragBar.bottom=tar.bottom;
+			dragBar.type=1;
+			dragBar.copyUpdates(tar,"up");
+			dragBar.top+=rate *tLen;
+			RelativePos.clearBar(insert);
+			insert.right=tar.right;
+			insert.left=tar.left
+			insert.top=tar.top;
+			insert.bottom=tar.bottom;
+			if (RelativePos.getBar(tar,"down")){
+				RelativePos.copyRelative(dragBar,tar,"down");
+				RelativePos.cancelRelative(tar,"down");
+			}
+			RelativePos.addRelative(insert,tar,"up");
+			RelativePos.addRelative(insert,dragBar,"down");
+			RelativePos.copyRelative(insert,tar,"right");
+			RelativePos.copyRelative(dragBar,tar,"right");
+			RelativePos.copyRelative(insert,tar,"left");
+			RelativePos.copyRelative(dragBar,tar,"left");
+			LayoutRecManager._ct.addChild(dragBar);
+			LayoutRecManager._ct.addChild(insert);
+			LayoutRecManager.adptAll();
+		}
+
+		LayoutRecManager.insert=function(tar,insert,rate){
+			(rate===void 0)&& (rate=0.4);
+			var tLen=0;
+			tLen=tar.width;
+			insert.right=tar.right;
+			tar.right+=tLen *rate;
+			insert.left=tar.x+tar.width;
+			insert.top=tar.top;
+			insert.bottom=tar.bottom;
+			var dragBar;
+			dragBar=LayoutRecManager.getADragBar("R");
+			dragBar.size(0,tar.height);
+			dragBar.left=tar.x+tar.width;
+			dragBar.top=tar.top;
+			dragBar.bottom=tar.bottom;
+			if (RelativePos.getBar(tar,"right")){
+				RelativePos.copyRelative(insert,tar,"right");
+				RelativePos.cancelRelative(tar,"right");
+			}
+			RelativePos.addRelative(tar,dragBar,"right");
+			RelativePos.addRelative(insert,dragBar,"left");
+			RelativePos.copyRelative(insert,tar,"down");
+			RelativePos.copyRelative(dragBar,tar,"down");
+			RelativePos.copyRelative(insert,tar,"up");
+			RelativePos.copyRelative(dragBar,tar,"up");
+			tar.parent.addChild(dragBar);
+			tar.parent.addChild(insert);
+			DisControlTool.setTop(dragBar);
+			dragBar.type=0;
+			LayoutRecManager.adptAll();
+		}
+
+		LayoutRecManager.insertL=function(tar,insert,rate){
+			(rate===void 0)&& (rate=0.4);
+			var tLen=0;
+			tLen=tar.width;
+			insert.right=tar.right;
+			insert.left=tar.left;
+			tar.left+=tLen *rate;
+			insert.top=tar.top;
+			insert.bottom=tar.bottom;
+			var dragBar;
+			dragBar=LayoutRecManager.getADragBar("R");
+			dragBar.size(0,tar.height);
+			dragBar.left=tar.x;
+			dragBar.top=tar.top;
+			dragBar.bottom=tar.bottom;
+			if (RelativePos.getBar(tar,"left")){
+				RelativePos.copyRelative(insert,tar,"left");
+				RelativePos.cancelRelative(tar,"left");
+			}
+			RelativePos.addRelative(tar,dragBar,"left");
+			RelativePos.addRelative(insert,dragBar,"right");
+			RelativePos.copyRelative(insert,tar,"down");
+			RelativePos.copyRelative(dragBar,tar,"down");
+			RelativePos.copyRelative(insert,tar,"up");
+			RelativePos.copyRelative(dragBar,tar,"up");
+			tar.parent.addChild(dragBar);
+			tar.parent.addChild(insert);
+			DisControlTool.setTop(dragBar);
+			dragBar.type=0;
+			LayoutRecManager.adptAll();
+		}
+
+		LayoutRecManager.insertV=function(tar,insert,rate){
+			(rate===void 0)&& (rate=0.4);
+			if(tar.height<150){
+				var downBar;
+				downBar=RelativePos.getBar(tar,"down");
+				if(downBar.type!=2){
+					LayoutRecManager.insetToBarV(downBar,insert);
+					return;
+				}
+			};
+			var tLen=0;
+			tLen=tar.height;
+			insert.right=tar.right;
+			insert.bottom=tar.bottom;
+			tar.bottom+=tLen *rate;
+			insert.left=tar.left;
+			insert.top=tar.y+tar.height;
+			var dragBar;
+			dragBar=LayoutRecManager.getADragBar("T");
+			dragBar.size(tar.width,0);
+			dragBar.left=tar.x;
+			dragBar.top=tar.y+tar.height;
+			if (RelativePos.getBar(tar,"down")){
+				RelativePos.copyRelative(insert,tar,"down");
+				RelativePos.cancelRelative(tar,"down");
+			}
+			RelativePos.addRelative(tar,dragBar,"down");
+			RelativePos.addRelative(insert,dragBar,"up");
+			RelativePos.copyRelative(insert,tar,"right");
+			RelativePos.copyRelative(dragBar,tar,"right");
+			RelativePos.copyRelative(insert,tar,"left");
+			RelativePos.copyRelative(dragBar,tar,"left");
+			tar.parent.addChild(dragBar);
+			tar.parent.addChild(insert);
+			DisControlTool.setTop(dragBar);
+			dragBar.type=1;
+			LayoutRecManager.adptAll();
+		}
+
+		LayoutRecManager.getADragBar=function(type){
+			var dragBar=new LayoutDragBar(type);
+			dragBar.on("mousedown",null,LayoutRecManager.onMouseDown);
+			return dragBar;
+		}
+
+		LayoutRecManager.addPanelToRec=function(panel,rec){
+			panel.top=20;
+			panel.left=0;
+			panel.right=0;
+			panel.bottom=0;
+			rec.addUI(panel);
+		}
+
+		LayoutRecManager.getARec=function(){
+			var rec=new LayoutRec();
+			rec.addUI(LayoutRecManager.getAUI("#ff00ff"));
+			rec.addUI(LayoutRecManager.getAUI("#ff000f"));
+			return rec;
+		}
+
+		LayoutRecManager.getAUI=function(color){
+			(color===void 0)&& (color="#ff00ff");
+			var box=new Box();
+			box.graphics.drawRect(0,0,20,20,color);
+			box.width=20;
+			box.height=20;
+			box.left=5;
+			box.right=5;
+			box["title"]="tt:"+Math.ceil(Math.random()*10);
+			return box;
+		}
+
+		LayoutRecManager.target=null
+		LayoutRecManager.Side=2;
+		LayoutRecManager.Vertical=1;
+		LayoutRecManager.Horizon=0;
+		LayoutRecManager._ct=null
+		LayoutRecManager.ctOffSetX=0;
+		LayoutRecManager.ctOffSetY=0;
+		LayoutRecManager.ctOffHeight=5;
+		LayoutRecManager.classToUIO={};
+		LayoutRecManager._classInited=false;
+		LayoutRecManager._layoutFile=null;
+		LayoutRecManager.minRecLen=4;
+		LayoutRecManager.RecTweenTime=150;
+		LayoutRecManager.tweenCompleteHandler=null
+		LayoutRecManager.isTweening=false;
+		LayoutRecManager.DragBarWidth=0;
+		__static(LayoutRecManager,
+		['itemClassO',function(){return this.itemClassO={"LayoutDragBar":LayoutDragBar,"LayoutRec":LayoutRec};},'sizeInfos',function(){return this.sizeInfos=["height","width","left","right","bottom","top","x","y","type"];},'sizePosKeys',function(){return this.sizePosKeys=["x","y","width","height"];},'emptyLayoutO',function(){return this.emptyLayoutO={"top":NaN,"bottom":NaN,"left":NaN,"right":NaN};}
+		]);
+		return LayoutRecManager;
+	})()
+
+
+	/**
+	*调整布局的功能
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2016-6-27 上午10:10:36
+	*/
+	//class platform.layout.ResizeRecStruct
+	var ResizeRecStruct=(function(){
+		function ResizeRecStruct(){
+			this.upSide=null;
+			this.downSide=null;
+			this.leftSide=null;
+			this.rightSide=null;
+			this.isRoot=false;
+			this.resizeItems=null;
+			this.mDis=NaN;
+			this.sortByXFun=MathUtil.sortByKey("x",false,true);
+			this.sortByYFun=MathUtil.sortByKey("y",false,true);
+		}
+
+		__class(ResizeRecStruct,'platform.layout.ResizeRecStruct');
+		var __proto=ResizeRecStruct.prototype;
+		__proto.reset=function(){
+			this.upSide=null;
+			this.downSide=null;
+			this.leftSide=null;
+			this.rightSide=null;
+		}
+
+		__proto.setBars=function(left,right,up,down){
+			this.upSide=up;
+			this.downSide=down;
+			this.leftSide=left;
+			this.rightSide=right;
+		}
+
+		__proto.isSame=function(left,right,up,down){
+			return this.upSide==up&&this.downSide==down&&this.leftSide==left&&this.rightSide==right;
+		}
+
+		__proto.isSameStruct=function(st){
+			return this.upSide==st.upSide&&this.downSide==st.downSide&&this.leftSide==st.leftSide&&this.rightSide==st.rightSide;
+		}
+
+		__proto.traceMyInfo=function(){
+			console.log("up:",this.upSide.getDragBarInfo("up"));
+			console.log("down:",this.downSide.getDragBarInfo("down"));
+			console.log("left:",this.leftSide.getDragBarInfo("left"));
+			console.log("right:",this.rightSide.getDragBarInfo("right"));
+		}
+
+		/**
+		*调整垂直方向的拖动条
+		*@param dis
+		*@return
+		*
+		*/
+		__proto.tryMoveRight=function(dis){
+			this.mDis=dis;
+			var i=0,len=0;
+			var _updaters;
+			_updaters=this.upSide._updaters;
+			len=_updaters.length;
+			var tR;
+			var dragBarList;
+			dragBarList=[];
+			var tDragBar;
+			for (i=len-1;i >=0;i--){
+				tR=_updaters[i];
+				if(Laya.__typeof(tR.tar,laya.editor.comonents.LayoutDragBar)){
+					tDragBar=tR.tar;
+					if(tDragBar.cusorType=="e-resize"&&RelativePos.getTypeByFun(tR._fun)=="up"){
+						if(this.downSide.findTarType(tDragBar)!=null){
+							if(tDragBar.x>=this.leftSide.x&&tDragBar.x<=this.rightSide.x)
+								dragBarList.push(tDragBar);
+						}
+					}
+				}
+			}
+			dragBarList.sort(this.sortByXFun);
+			if(dragBarList[0]!=this.leftSide){
+				dragBarList.unshift(this.leftSide);
+			}
+			if(dragBarList[dragBarList.length-1]!=this.rightSide){
+				dragBarList.push(this.rightSide);
+			}
+			if(dragBarList.length<2){
+				return false;
+			};
+			var tWidth=NaN;
+			tWidth=0;
+			var maxWidth=NaN;
+			maxWidth=0;
+			var tSelecteDragBar;
+			len=dragBarList.length;
+			for(i=1;i<len;i++){
+				tWidth=dragBarList[i].x-dragBarList[i-1].x;
+				if(tWidth>maxWidth){
+					maxWidth=tWidth;
+					tSelecteDragBar=dragBarList[i];
+				}
+				if(tWidth+dis>150&&laya.editor.comonents.LayoutDragBar.hasFreeTar((dragBarList [i]).getTarsByType("right"))){
+					tSelecteDragBar=dragBarList[i];
+					break ;
+				}
+			}
+			if(tSelecteDragBar){
+				this.moveRightWork(tSelecteDragBar,dragBarList,dis)
+				}else{
+				debugger;
+			}
+			return true;
+		}
+
+		/**
+		*调整水平方向的拖动条
+		*@param dis
+		*
+		*/
+		__proto.moveRightWork=function(selectBar,barList,dis){
+			var i=0,len=0;
+			var rightIndex=0;
+			rightIndex=barList.indexOf(selectBar);
+			var tLeftBar;
+			var tRightBar;
+			if(rightIndex>=1){
+				tLeftBar=barList[rightIndex-1];
+				tRightBar=barList[rightIndex];
+				if(tLeftBar==this.leftSide&&tRightBar==this.rightSide){
+					}else{
+				}
+				this.resizeSmallRec(tLeftBar,tRightBar);
+			}
+			len=barList.length;
+			if(this.isRoot){
+				len=this.resizeItems.length;
+				for(i=0;i<len;i++){
+					if(!this.resizeItems[i].walked){
+						this.resizeItems[i].left+=dis;
+						this.resizeItems[i].walked=true;
+					}
+				}
+				}else{
+				for(i=rightIndex;i<len;i++){
+					this.resizeItems.push(barList[i]);
+				}
+			}
+		}
+
+		__proto.resizeSmallRec=function(tLeftBar,tRightBar){
+			var i=0,len=0;
+			var _updaters;
+			_updaters=tRightBar._updaters;
+			len=_updaters.length;
+			var tR;
+			var dragBarList;
+			dragBarList=[];
+			var tDragBar;
+			for (i=len-1;i >=0;i--){
+				tR=_updaters[i];
+				if(Laya.__typeof(tR.tar,laya.editor.comonents.LayoutDragBar)){
+					tDragBar=tR.tar;
+					if(tDragBar.cusorType=="n-resize"&&RelativePos.getTypeByFun(tR._fun)=="right"){
+						if(this.leftSide.findTarType(tDragBar)!=null){
+							if(tDragBar.y>=this.upSide.y&&tDragBar.y<=this.downSide.y)
+								dragBarList.push(tDragBar);
+						}
+					}
+				}
+			};
+			var tSelecteDragBar;
+			dragBarList.sort(this.sortByYFun);
+			if(dragBarList[0]!=this.upSide){
+				dragBarList.unshift(this.upSide);
+			}
+			if(dragBarList[dragBarList.length-1]!=this.downSide){
+				dragBarList.push(this.downSide);
+			}
+			len=dragBarList.length;
+			var resizeRec;
+			for(i=1;i<len;i++){
+				resizeRec=new ResizeRecStruct();
+				resizeRec.resizeItems=this.resizeItems;
+				resizeRec.setBars(tLeftBar,tRightBar,dragBarList[i-1],dragBarList[i]);
+				if(this.isSameStruct(resizeRec)){
+					}else{
+					resizeRec.tryMoveRight(this.mDis);
+				}
+			}
+		}
+
+		return ResizeRecStruct;
+	})()
+
+
+	/**
+	*本类控制鼠标光标样式
+	*@author ww
+	*/
+	//class platform.managers.CursorManager
+	var CursorManager=(function(){
+		function CursorManager(){}
+		__class(CursorManager,'platform.managers.CursorManager');
+		CursorManager.init=function(){
+			CursorManager._style=Browser.document.body.style;
+			CursorManager.setType("default");
+		}
+
+		CursorManager.setType=function(type){
+			CursorManager._style.cursor=type;
+		}
+
+		CursorManager.Auto="default";
+		CursorManager.Hand="all-scroll";
+		CursorManager.HResize="e-resize";
+		CursorManager.VResize="n-resize";
+		CursorManager._style=null
+		return CursorManager;
+	})()
+
+
+	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-12-25 上午10:19:18
+	*/
+	//class platform.managers.LayerManager
+	var LayerManager=(function(){
+		function LayerManager(){}
+		__class(LayerManager,'platform.managers.LayerManager');
+		LayerManager.init=function(){
+			LayerManager.stage=new Box();
+			LayerManager.stage.mouseEnabled=true;
+			Laya.stage.addChild(LayerManager.stage);
+			LayerManager.onStage();
+			Laya.stage.on("resize",null,LayerManager.onStage);
+		}
+
+		LayerManager.onStage=function(){
+			if (Browser.pixelRatio !=1){
+				Laya.stage._width=Browser.clientWidth;
+				Laya.stage._height=Browser.clientHeight;
+				Laya.stage.scale(Browser.pixelRatio,Browser.pixelRatio);
+			}
+			LayerManager.stage.width=Laya.stage._width>900?Laya.stage._width:900;
+			LayerManager.stage.height=Laya.stage._height>700?Laya.stage._height:700;
+			LayerManager.stage.height-=1;
+			LayerManager.stage.width+=2;
+		}
+
+		LayerManager.stage=null
+		LayerManager.minWidth=900;
+		LayerManager.minHeight=700;
+		return LayerManager;
+	})()
+
+
+	/**
 	*
 	*@author ww
 	*@version 1.0
@@ -226,6 +1833,375 @@
 		Notices.DROP_RENDER="DROP_RENDER";
 		Notices.OPEN_PLUGIN="OPEN_PLUGIN";
 		return Notices;
+	})()
+
+
+	/**对象工具集*/
+	//class platform.tools.ObjectUtils
+	var ObjectUtils=(function(){
+		function ObjectUtils(){};
+		__class(ObjectUtils,'platform.tools.ObjectUtils');
+		ObjectUtils.addFilter=function(target,filter){
+			var filters=target.filters || [];
+			filters.push(filter);
+			target.filters=filters;
+		}
+
+		ObjectUtils.clearFilter=function(target,filterType){
+			var filters=target.filters;
+			if (filters !=null && filters.length > 0){
+				for (var i=filters.length-1;i >-1;i--){
+					var filter=filters[i];
+					if (Laya.__typeof(filter,filterType)){
+						filters.splice(i,1);
+					}
+				}
+				target.filters=filters;
+			}
+		}
+
+		ObjectUtils.getTextField=function(format,text){
+			(text===void 0)&& (text="Test");
+			ObjectUtils._tf.align="left";
+			ObjectUtils._tf.text=text;
+			return ObjectUtils._tf;
+		}
+
+		ObjectUtils.measureTextWidth=function(format,text){
+			(text===void 0)&& (text="Test");
+			return ObjectUtils.getTextField(format,text).width;
+		}
+
+		__static(ObjectUtils,
+		['_tf',function(){return this._tf=new TextField();}
+		]);
+		return ObjectUtils;
+	})()
+
+
+	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2018-6-13 上午11:49:38
+	*/
+	//class platform.viewers.IFrameRenderItem
+	var IFrameRenderItem=(function(){
+		function IFrameRenderItem(){
+			this.renderFrame=null;
+			this.render=null;
+			this.style=null;
+			this.iframeWindow=null;
+			this.eDispatcher=null;
+			this.renderHit=null;
+			this.hitBounds=null;
+			this.isLoaded=false;
+			this.targetParent=null;
+			this.eDispatcher=new EventDispatcher();
+			this.renderHit=new Sprite();
+			this.hitBounds=new Rectangle(0,0);
+			IFrameRenderItem.offPos=new Point();
+			this.init();
+			this.adpt();
+		}
+
+		__class(IFrameRenderItem,'platform.viewers.IFrameRenderItem');
+		var __proto=IFrameRenderItem.prototype;
+		__proto.onRenderHitDown=function(){
+			Laya.stage.focus=this.renderHit;
+		}
+
+		__proto.onRenderHitMouseOver=function(){
+			if(SystemSetting.autoFocsEditRect)
+				Laya.stage.focus=this.renderHit;
+		}
+
+		__proto.init=function(){
+			var _$this=this;
+			if (this.renderFrame)return;
+			this.renderHit.name="renderHit";
+			this.renderHit.mouseEnabled=true;
+			this.renderHit.on("dragDrop",this,this.renderDragDrop);
+			this.renderFrame=Browser.createElement("iframe");
+			this.renderHit.on("mousedown",this,this.onRenderHitDown);
+			this.renderHit.on("rightmousedown",this,this.onRenderHitDown);
+			this.renderHit.on("mouseover",this,this.onRenderHitMouseOver);
+			this.renderFrame.id="viewrender";
+			this.renderFrame.width="400";
+			this.renderFrame.height="300";
+			this.renderFrame.left="400";
+			this.renderFrame.top="400";
+			this.style=this.renderFrame.style;
+			this.style.position="absolute";
+			this.style.top="100px";
+			this.style.left="220px";
+			this.style["z-index"]=101;
+			this.style.border="0";
+			this.render=this.renderFrame.contentWindow;
+			var passEventList=["mousedown","mousemove","mouseup","keydown","keypress","keyup"];
+			this.renderFrame.addEventListener("load",onRenderFrameloaded,false)
+			function onRenderFrameloaded (){
+				_$this.render=_$this.renderFrame.contentWindow.renderBinds;
+				_$this.iframeWindow=_$this.renderFrame.contentWindow;
+				var i=0,len=0;
+				len=passEventList.length;
+				for(i=0;i<len;i++){
+					_$this.iframeWindow.document.removeEventListener(passEventList[i],_$this.passEvent);
+					_$this.iframeWindow.document.addEventListener(passEventList[i],_$this.passEvent);
+				}
+				_$this.loaded();
+			};
+			var idePassEventList=["keydown","keypress","keyup"];
+			var i=0,len=0;
+			len=idePassEventList.length;
+			for(i=0;i<len;i++){
+				Laya.stage.on(idePassEventList[i],this,this.passEvent2);
+			}
+		}
+
+		__proto.passEvent=function(e){
+			var evt;
+			evt=Browser.document.createEvent("Events");
+			evt.initEvent(e.type,true,true);
+			var key;
+			for(key in e){
+				if(!((typeof (e[key])=='function'))){
+					evt[key]=e[key];
+				}
+			}
+			evt.isFromIDE=true;
+			evt.clientX+=IFrameRenderItem.offPos.x;
+			evt.clientY+=IFrameRenderItem.offPos.y;
+			evt.pageX=0;
+			evt.pageY=0;
+			if(e.type=="mousedown"){
+				if(Browser.window.uicodeMenuDiv){
+					Browser.window.uicodeMenuDiv.hide();
+				}
+			}
+			if(!IFrameRenderItem.isFromMe)
+				Render.canvas.dispatchEvent(evt);
+		}
+
+		__proto.passEvent2=function(e){
+			if(!this.iframeWindow)return;
+			if(Input.isInputting)return;
+			e=e.nativeEvent;
+			if(e.isFromIDE)return;
+			var evt;
+			evt=Browser.document.createEvent("Events");
+			evt.initEvent(e.type,true,true);
+			var key;
+			for(key in e){
+				if(!((typeof (e[key])=='function'))){
+					evt[key]=e[key];
+				}
+			}
+			IFrameRenderItem.isFromMe=true;
+			this.iframeWindow.document.dispatchEvent(evt);
+			IFrameRenderItem.isFromMe=false;
+		}
+
+		__proto.insertClassList=function(clsList,tarWindow){
+			if(!tarWindow)tarWindow=this.iframeWindow;
+			var i=0,len=0;
+			len=clsList.length;
+			var tClz;
+			for(i=0;i<len;i++){
+				tClz=clsList[i];
+				this.insertClass(tClz,tarWindow);
+			}
+		}
+
+		__proto.insertClass=function(clz,tarWindow){
+			if(!tarWindow)tarWindow=this.iframeWindow;
+			var tName;
+			tName=clz.__className;
+			var pathList
+			pathList=tName.split(".");
+			var i=0,len=0;
+			len=pathList.length;
+			var tPath;
+			var tO;
+			tO=tarWindow;
+			for(i=0;i<len-1;i++){
+				tPath=pathList[i];
+				if(!tO[tPath])tO[tPath]={};
+				tO=tO[tPath];
+			}
+			tO[pathList[len-1]]=clz;
+		}
+
+		__proto.renderDragDrop=function(e){
+			Laya.stage.focus=this.renderHit;
+			var point=DisControlTool.getMousePoint(this.renderHit);
+			e.data.dropX=point.x;
+			e.data.dropY=point.y;
+			Notice.notify("DROP_RENDER",[e]);
+		}
+
+		__proto.renderMouseHandler=function(e){
+			if(!this.iframeWindow)return;
+			var point;
+			point=DisControlTool.getMousePoint(this.renderHit);
+			var evt;
+			evt=Browser.document.createEvent("MouseEvents");
+			evt.initMouseEvent(
+			e.type,
+			true,
+			true,
+			Browser.document.defaultView,
+			0,
+			point.x,
+			point.y,
+			point.x,
+			point.y);
+			this.iframeWindow.dispatchEvent(evt);
+		}
+
+		// trace("re patch event:",evt,point.x,point.y);
+		__proto.loaded=function(){
+			console.log("IFrameRenderItem loaded");
+			Notice.listen("RenderInited",null,this.renderInited);
+			if(this.render)
+				this.render.setNotice(Notice.I);
+			this.eDispatcher.event("complete");
+			this.adpt();
+			Laya.stage.event("focus");
+			this.isLoaded=true;
+		}
+
+		__proto.renderInited=function(){
+			console.log("renderInited");
+		}
+
+		/**
+		*调整iframe位置
+		*
+		*/
+		__proto.adpt=function(){
+			if (this.renderFrame){
+				var pos=new Point();
+				pos=this.targetParent.localToGlobal(pos);
+				var dLen=0;
+				dLen=25;
+				this.renderHit.width=this.targetParent.width;
+				this.renderHit.height=this.targetParent.height-dLen;
+				this.renderHit.x=this.targetParent.x;
+				this.renderHit.y=this.targetParent.y+dLen;
+				var style;
+				style=this.renderFrame.style;
+				IFrameRenderItem.offPos.setTo(pos.x,pos.y+dLen);
+				style.top=pos.y+dLen+"px";
+				style.left=(pos.x)+"px";
+				this.renderFrame.width=this.renderHit.width;
+				this.renderFrame.height=this.renderHit.height;
+				this.hitBounds.width=this.renderHit.width;
+				this.hitBounds.height=this.renderHit.height;
+				this.hitBounds.x=0;
+				this.hitBounds.y=0;
+				this.renderHit.setBounds(this.hitBounds);
+			}
+		}
+
+		/**
+		*设置渲染器的url
+		*@param url
+		*
+		*/
+		__proto.setRender=function(url){
+			if(this.isLoaded)return;
+			this.renderFrame.src=url;
+		}
+
+		/**
+		*显示
+		*
+		*/
+		__proto.show=function(){
+			if(!this.renderFrame.parentNode)
+				Browser.container.appendChild(this.renderFrame);
+			this.setVisible(true);
+			this.targetParent.parent.addChild(this.renderHit);
+			this.adpt();
+		}
+
+		/**
+		*隐藏
+		*
+		*/
+		__proto.hide=function(clearSrc){
+			(clearSrc===void 0)&& (clearSrc=false);
+			Notice.cancel(/*no*/this.IDEEvent.Adpt_IFrames,this,this.adpt);
+			this.setVisible(false);
+			if(clearSrc){
+				this.renderFrame.src="";
+			}
+			this.renderHit.removeSelf();
+		}
+
+		__proto.setVisible=function(visible){
+			var style;
+			style=this.renderFrame.style;
+			if(visible){
+				style.display="";
+				}else{
+				style.display="none";
+			}
+		}
+
+		IFrameRenderItem.offPos=null
+		IFrameRenderItem.isFromMe=false;
+		return IFrameRenderItem;
+	})()
+
+
+	/**
+	*...
+	*@author WW
+	*/
+	//class viewRender.ViewRenderBase
+	var ViewRenderBase=(function(){
+		function ViewRenderBase(){
+			this.initFuns();
+		}
+
+		__class(ViewRenderBase,'viewRender.ViewRenderBase');
+		var __proto=ViewRenderBase.prototype;
+		__proto.initFuns=function(){
+			Browser.window.renderBinds={};
+			Browser.window.renderBinds.setData=Utils.bind(this.setData,this);
+			Browser.window.renderBinds.updateData=Utils.bind(this.updateData,this);
+			Browser.window.renderBinds.clearRender=Utils.bind(this.clearRender,this);
+			Browser.window.renderBinds.sizeRender=Utils.bind(this.sizeRender,this);
+			Browser.window.renderBinds.posRender=Utils.bind(this.posRender,this);
+			Browser.window.renderBinds.getRenderData=Utils.bind(this.getRenderData,this);
+			Browser.window.renderBinds.getStage=Utils.bind(this.getStage,this);
+			Browser.window.renderBinds.setNotice=Utils.bind(this.setNotice,this);
+			Browser.window.renderBinds.firstInit=Utils.bind(this.firstInit,this);
+		}
+
+		__proto.getRenderData=function(){
+			return null;
+		}
+
+		__proto.setData=function(data){}
+		__proto.updateData=function(data){}
+		__proto.clearRender=function(){}
+		__proto.sizeRender=function(width,height){}
+		__proto.posRender=function(x,y){}
+		__proto.getStage=function(){
+			return Laya.stage;
+		}
+
+		__proto.setNotice=function(notice){
+			Notice.I=notice;
+			Notice.notify("RenderInited");
+		}
+
+		__proto.firstInit=function(complete,param){}
+		return ViewRenderBase;
 	})()
 
 
@@ -259,6 +2235,73 @@
 		]);
 		return Notice;
 	})(EventDispatcher)
+
+
+	/**拖动条
+	*@author ww
+	*/
+	//class platform.layout.DragBar extends laya.ui.Component
+	var DragBar=(function(_super){
+		function DragBar(mouseType){
+			this._map={"R":"WE","L":"WE","T":"NS","B":"NS","BL":"NESW","BR":"NWSE"};
+			this._cursorType=null;
+			this.isDraging=false;
+			DragBar.__super.call(this);
+			this._bitmap=new Image();
+			(mouseType===void 0)&& (mouseType="R");
+			switch(mouseType){
+				case "R":
+					this._cursorType="e-resize";
+					break ;
+				case "T":
+					this._cursorType="n-resize";
+					break ;
+				default :
+				this._cursorType="default";
+				}
+			this.on("mouseover",this,this.onRollOver);
+			this.on("mouseout",this,this.onRollOut);
+			this.mouseEnabled=true;
+			Laya.stage.on("mouseout",this,this.onRollOut);
+			this.on("dragstart",this,this.dragingBegin);
+			this.on("dragend",this,this.dragingEnd);
+		}
+
+		__class(DragBar,'platform.layout.DragBar',_super);
+		var __proto=DragBar.prototype;
+		__proto.dragingBegin=function(e){
+			this.isDraging=true;
+			PlatformVars.isDragingLayout=true;
+			LayoutRecManager.containerBox.mouseEnabled=false;
+			this.onRollOver(null);
+		}
+
+		__proto.dragingEnd=function(e){
+			this.isDraging=false;
+			CursorManager.setType("default");
+			PlatformVars.isDragingLayout=false;
+			LayoutRecManager.containerBox.mouseEnabled=true;
+		}
+
+		__proto.onStageMouseLeave=function(e){
+			this.onRollOut();
+		}
+
+		__proto.onRollOut=function(e){
+			if (this.isDraging)return;
+			CursorManager.setType("default");
+		}
+
+		__proto.onRollOver=function(e){
+			CursorManager.setType(this._cursorType);
+		}
+
+		__getset(0,__proto,'cusorType',function(){
+			return this._cursorType;
+		});
+
+		return DragBar;
+	})(Component)
 
 
 	/**
@@ -373,6 +2416,497 @@
 
 
 	/**
+	*布局框的拖动条
+	*@author ww
+	*/
+	//class platform.layout.LayoutDragBar extends platform.layout.DragBar
+	var LayoutDragBar=(function(_super){
+		function LayoutDragBar(mouseType){
+			this.type=0;
+			this.mId=0;
+			this.walked=false;
+			this._updaters=[];
+			this.relativeO={};
+			this.sortByXFun=MathUtil.sortByKey("x",false,true);
+			this.sortByYFun=MathUtil.sortByKey("y",false,true);
+			(mouseType===void 0)&& (mouseType="R");
+			LayoutDragBar.__super.call(this,mouseType);
+			this.mId=LayoutDragBar.ID;
+			LayoutDragBar.ID++;
+			this.hitArea=new HitArea();
+			this.zOrder=99;
+		}
+
+		__class(LayoutDragBar,'platform.layout.LayoutDragBar',_super);
+		var __proto=LayoutDragBar.prototype;
+		/**
+		*获取可拖动范围
+		*@return
+		*
+		*/
+		__proto.getDragArea=function(){
+			var area;
+			area=new Rectangle();
+			var borderVar=NaN;
+			switch (this.type){
+				case 0:
+					area.y=this.y;
+					area.height=0;
+					area.x=this.getBorderVar("right","left",0,false)+220;
+					borderVar=this.x+this.getBorderVar("left","width",999,true);
+					borderVar-=220;
+					if (borderVar < this.x)
+						borderVar=this.x;
+					area.width=borderVar-area.x;
+					break ;
+				case 1:
+					area.y=this.getBorderVar("down","top",0,false)+220;
+					borderVar=this.y+this.getBorderVar("up","height",999,true);
+					borderVar-=220;
+					if (borderVar < this.y)
+						borderVar=this.y;
+					area.height=borderVar-area.y;
+					area.x=this.x;
+					area.width=0;
+					break ;
+				}
+			return area;
+		}
+
+		__proto.changeSize=function(){
+			laya.ui.Component.prototype.changeSize.call(this);
+			var g=this.graphics;
+			g.clear();
+			var hArea;
+			hArea=this.hitArea;
+			hArea.hit.clear();
+			if(this.width<this.height){
+				hArea.hit.drawRect(-4,0,4*2,this.height,"#ff0000");
+				}else{
+				hArea.hit.drawRect(0,-4,this.width,4*2,"#ff0000");
+			}
+			this.updates();
+		}
+
+		__proto.updates=function(){
+			var i=0,len=0;
+			len=this._updaters.length;
+			for (i=0;i < len;i++){
+				this._updaters[i].update();
+			}
+		}
+
+		__proto.getBorderVar=function(type,sign,sValue,isMin){
+			(isMin===void 0)&& (isMin=true);
+			var i=0,len=0;
+			var uList=this._updaters;
+			len=uList.length;
+			var tValue=NaN;
+			tValue=sValue;
+			var tUpdater;
+			var tFun;
+			tFun=RelativePos.typeToFunO[type];
+			if (isMin){
+				for (i=0;i < len;i++){
+					tUpdater=uList[i];
+					if (tUpdater._fun==tFun){
+						if (tUpdater.tar[sign] < tValue){
+							tValue=tUpdater.tar[sign];
+						}
+					}
+				}
+			}
+			else{
+				for (i=0;i < len;i++){
+					tUpdater=uList[i];
+					if (tUpdater._fun==tFun){
+						if (tUpdater.tar[sign] > tValue){
+							tValue=tUpdater.tar[sign];
+						}
+					}
+				}
+			}
+			return tValue;
+		}
+
+		__proto.clear=function(){
+			this._updaters.length=0;
+		}
+
+		/**
+		*
+		*@param tar
+		*
+		*/
+		__proto.mergeUpdates=function(tar){
+			if (!tar)
+				return;
+			var i=0,len=0;
+			var tarUpdaters;
+			tarUpdaters=tar._updaters;
+			tarUpdaters=ObjectTools.setValueArr([],tarUpdaters);
+			len=tarUpdaters.length;
+			var tR;
+			var tType;
+			for (i=0;i < len;i++){
+				tR=tarUpdaters[i];
+				tType=RelativePos.getTypeByFun(tR._fun);
+				if(tR.tar==this||tR.to==this)continue ;
+				RelativePos.addRelative(tR.tar,this,tType,tR.d);
+			}
+			this.updates();
+		}
+
+		__proto.copyUpdates=function(tar,side){
+			var i=0,len=0;
+			var tarUpdaters;
+			tarUpdaters=tar._updaters;
+			tarUpdaters=ObjectTools.setValueArr([],tarUpdaters);
+			len=tarUpdaters.length;
+			var tR;
+			var tType;
+			for (i=0;i < len;i++){
+				tR=tarUpdaters[i];
+				tType=RelativePos.getTypeByFun(tR._fun);
+				if(tR.tar==this||tR.to==this)continue ;
+				if(side==tType){
+					RelativePos.addRelative(tR.tar,this,tType,tR.d);
+				}
+			}
+			this.updates();
+		}
+
+		/**
+		*
+		*@param tar
+		*
+		*/
+		__proto.removeTarget=function(tar){
+			var i=0,len=0;
+			len=this._updaters.length;
+			for (i=len-1;i >=0;i--){
+				if (this._updaters[i].tar==tar){
+					this._updaters.splice(i,1);
+				}
+			}
+		}
+
+		__proto.findTarType=function(tar){
+			var i=0,len=0;
+			len=this._updaters.length;
+			var tR;
+			for (i=0;i < len;i++){
+				tR=this._updaters[i];
+				if (tR.tar==tar){
+					return tR._fun;
+				}
+			}
+			return null;
+		}
+
+		__proto.canMove=function(dirType,len){
+			if (!LayoutDragBar.canMoveO){
+				LayoutDragBar.canMoveO={};
+				var tO;
+				tO={};
+				tO["left"]=true;
+				tO["right"]=true;
+				LayoutDragBar.canMoveO[0]=tO;
+				tO={};
+				tO["up"]=true;
+				tO["down"]=true;
+				LayoutDragBar.canMoveO[1]=tO;
+			}
+			if (!LayoutDragBar.canMoveO[this.type][dirType])return false;
+			return false;
+		}
+
+		/**
+		*对象所在的方向是否只有它一个对象
+		*@param tar
+		*@return
+		*
+		*/
+		__proto.isOnly=function(tar){
+			if (this.type==2)
+				return false;
+			var i=0,len=0;
+			len=this._updaters.length;
+			var fun=this.findTarType(tar);
+			if (fun==null)
+				return false;
+			var tR;
+			for (i=0;i < len;i++){
+				tR=this._updaters[i];
+				if ((tR._fun==fun)&& (tR.tar !=tar)){
+					return false;
+				}
+				if (tR.tar !=tar){
+					if ((tR.tar instanceof platform.layout.LayoutRec )){
+						if ((tR.tar).disMode==1){
+							return false;
+						}
+					}
+				}
+			}
+			return true;
+		}
+
+		__proto.getSideType=function(){
+			if(this._updaters.length>0){
+				return RelativePos.getTypeByFun(this._updaters[0]._fun);
+			}
+			return null;
+		}
+
+		__proto.addItem=function(tar,fun,d){
+			(d===void 0)&& (d=0);
+			var updater;
+			updater=new RelativePos(fun,tar,this,0);
+			this._updaters.push(updater);
+		}
+
+		__proto.clears=function(){
+			this.clear();
+			this.destroy(false);
+		}
+
+		__proto.getTarsByType=function(type){
+			var i=0,len=0;
+			len=this._updaters.length;
+			var tR;
+			var tFun;
+			tFun=tFun=RelativePos.typeToFunO[type];
+			var rst;
+			rst=[];
+			for (i=0;i < len;i++){
+				tR=this._updaters[i];
+				if (tR._fun==tFun){
+					rst.push(tR.tar);
+				}
+			}
+			return rst;
+		}
+
+		__proto.getDragBarInfo=function(type){
+			var rsts;
+			rsts=[];
+			var i=0,len=0;
+			len=this._updaters.length;
+			var tR;
+			var dragBarList;
+			dragBarList=[];
+			var tDragBar;
+			for (i=len-1;i >=0;i--){
+				tR=this._updaters[i];
+				if((tR.tar instanceof platform.layout.LayoutRec )){
+					if(type&&type==RelativePos.getTypeByFun(tR._fun))
+						rsts.push((tR.tar).tTabTxt);
+				}
+			}
+			return "id:"+this.mId+"_"+rsts.join(",");
+		}
+
+		/**
+		*调整垂直方向的拖动条
+		*@param dis
+		*@return
+		*
+		*/
+		__proto.tryMoveRight=function(dis){
+			if(this.walked)return false;
+			this.walked=true;
+			var i=0,len=0;
+			len=this._updaters.length;
+			var tR;
+			var dragBarList;
+			dragBarList=[];
+			var tDragBar;
+			for (i=len-1;i >=0;i--){
+				tR=this._updaters[i];
+				if((tR.tar instanceof platform.layout.LayoutDragBar )){
+					tDragBar=tR.tar;
+					if(tDragBar.cusorType=="e-resize"&&RelativePos.getTypeByFun(tR._fun)=="up"){
+						dragBarList.push(tDragBar);
+					}
+				}
+			}
+			if(dragBarList.length<2){
+				return false;
+			}
+			dragBarList.sort(this.sortByXFun);
+			var tWidth=NaN;
+			tWidth=0;
+			var maxWidth=NaN;
+			maxWidth=0;
+			var tSelecteDragBar;
+			len=dragBarList.length;
+			for(i=1;i<len;i++){
+				tWidth=dragBarList[i].x-dragBarList[i-1].x;
+				if(tWidth>maxWidth){
+					maxWidth=tWidth;
+					tSelecteDragBar=dragBarList[i];
+				}
+			}
+			if(tSelecteDragBar){
+				tSelecteDragBar.moveRightWork(dis);
+			}
+			return true;
+		}
+
+		/**
+		*调整水平方向的拖动条
+		*@param dis
+		*
+		*/
+		__proto.moveRightWork=function(dis){
+			if(this.walked)return;
+			this.walked=true;
+			var i=0,len=0;
+			len=this._updaters.length;
+			var tR;
+			var dragBarList;
+			dragBarList=[];
+			var tDragBar;
+			for (i=len-1;i >=0;i--){
+				tR=this._updaters[i];
+				if((tR.tar instanceof platform.layout.LayoutDragBar )){
+					tDragBar=tR.tar;
+					if(tDragBar.cusorType=="n-resize"&&RelativePos.getTypeByFun(tR._fun)=="right"){
+						dragBarList.push(tDragBar);
+					}
+				}
+			};
+			var tSelecteDragBar;
+			dragBarList.sort(this.sortByYFun);
+			len=dragBarList.length;
+			for(i=0;i<len;i++){
+				tSelecteDragBar=dragBarList[i];
+				tSelecteDragBar.tryMoveRight(dis);
+			}
+			this.left+=dis;
+		}
+
+		/**
+		*调整垂直方向的拖动条
+		*@param dis
+		*@return
+		*
+		*/
+		__proto.tryMoveDown=function(dis){
+			var i=0,len=0;
+			len=this._updaters.length;
+			var tR;
+			var dragBarList;
+			dragBarList=[];
+			var tDragBar;
+			for (i=len-1;i >=0;i--){
+				tR=this._updaters[i];
+				if((tR.tar instanceof platform.layout.LayoutDragBar )){
+					tDragBar=tR.tar;
+					if(tDragBar.cusorType=="n-resize"){
+						dragBarList.push(tDragBar);
+					}
+				}
+			}
+			if(dragBarList.length<2){
+				return false;
+			}
+			dragBarList.sort(this.sortByYFun);
+			var tWidth=NaN;
+			tWidth=0;
+			var maxWidth=NaN;
+			maxWidth=0;
+			var tSelecteDragBar;
+			len=dragBarList.length;
+			for(i=1;i<len;i++){
+				tWidth=dragBarList[i].y-dragBarList[i-1].y;
+				if(tWidth>maxWidth){
+					maxWidth=tWidth;
+					tSelecteDragBar=dragBarList[i];
+				}
+			}
+			if(tSelecteDragBar){
+				tSelecteDragBar.moveDownWork(dis);
+			}
+			return true;
+		}
+
+		/**
+		*调整水平方向的拖动条
+		*@param dis
+		*
+		*/
+		__proto.moveDownWork=function(dis){
+			if(this.walked)return;
+			this.walked=true;
+			var i=0,len=0;
+			len=this._updaters.length;
+			var tR;
+			var dragBarList;
+			dragBarList=[];
+			var tDragBar;
+			for (i=len-1;i >=0;i--){
+				tR=this._updaters[i];
+				if((tR.tar instanceof platform.layout.LayoutDragBar )){
+					tDragBar=tR.tar;
+					if(tDragBar.cusorType=="e-resize"&&RelativePos.getTypeByFun(tR._fun)=="down"){
+						if(!tDragBar.walked)
+							dragBarList.push(tDragBar);
+					}
+				}
+			};
+			var tSelecteDragBar;
+			dragBarList.sort(this.sortByXFun);
+			len=dragBarList.length;
+			for(i=0;i<len;i++){
+				tSelecteDragBar=dragBarList[i];
+				tSelecteDragBar.tryMoveDown(dis);
+			}
+			this.top+=dis;
+		}
+
+		__getset(0,__proto,'_dragX',function(){
+			return this.x;
+			},function(value){
+			this.x=value;
+			this.left=value;
+			this.updates();
+		});
+
+		__getset(0,__proto,'_dragY',function(){
+			return this.y;
+			},function(value){
+			this.y=value;
+			this.top=value;
+			this.updates();
+		});
+
+		LayoutDragBar.hasFreeTar=function(items){
+			var i=0,len=0;
+			len=items.length;
+			var tRec;
+			for (i=0;i < len;i++){
+				tRec=items[i];
+				if ((tRec instanceof platform.layout.LayoutRec )){
+					if(tRec.sizeFree){
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		LayoutDragBar.ID=1;
+		LayoutDragBar.debugMode=true;
+		LayoutDragBar.BarDragAreaLen=4;
+		LayoutDragBar.minWidth=220;
+		LayoutDragBar.canMoveO=null;
+		return LayoutDragBar;
+	})(DragBar)
+
+
+	/**
 	*
 	*@author ww
 	*@version 1.0
@@ -396,8 +2930,81 @@
 			this.div.src=path;
 		}
 
+		__getset(1,IFrameSprite,'I',function(){
+			if (!IFrameSprite._I)IFrameSprite._I=new IFrameSprite();
+			return IFrameSprite._I;
+		},platform.extenddisplay.HtmlSprite._$SET_I);
+
+		IFrameSprite._I=null
 		return IFrameSprite;
 	})(HtmlSprite)
+
+
+	/**
+	*可拖动布局框的基类
+	*@author ww
+	*/
+	//class platform.layout.DragView extends laya.ui.View
+	var DragView=(function(_super){
+		function DragView(){
+			this.minWidth=50;
+			this.minHeight=50;
+			this.defaultWidth=100;
+			this.defaultHeight=100;
+			this.title="";
+			this.helpUrl="";
+			this.canClose=true;
+			this.canMix=true;
+			this.freeSize=false;
+			this.layoutTab=null;
+			DragView.__super.call(this);
+		}
+
+		__class(DragView,'platform.layout.DragView',_super);
+		return DragView;
+	})(View)
+
+
+	//class ui.layout.LayoutRecUI extends laya.ui.View
+	var LayoutRecUI=(function(_super){
+		function LayoutRecUI(){
+			this.back=null;
+			this.tab=null;
+			this.tipIcon=null;
+			this.actionIcon=null;
+			LayoutRecUI.__super.call(this);
+		}
+
+		__class(LayoutRecUI,'ui.layout.LayoutRecUI',_super);
+		var __proto=LayoutRecUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(LayoutRecUI.uiView);
+		}
+
+		LayoutRecUI.uiView={"type":"View","props":{"hitTestPrior":true},"child":[{"type":"Image","props":{"y":0,"x":0,"width":600,"var":"back","top":0,"skin":"view/bg_panel_layoutrec.png","right":0,"left":0,"height":25}},{"type":"Tab","props":{"y":0,"x":0,"var":"tab","skin":"view/tab_panel.png","labelColors":"#61737C,#c5c5c5,#c5c5c5,#c5c5c5"}},{"type":"Image","props":{"y":6,"x":581,"visible":false,"var":"tipIcon","skin":"comp/iconhelp.png","scaleX":0.5,"scaleY":0.5}},{"type":"Image","props":{"y":9,"x":5,"visible":false,"var":"actionIcon","skin":"view/arrow_down.png","scaleY":0.5,"scaleX":0.5}}]};
+		return LayoutRecUI;
+	})(View)
+
+
+	//class ui.layout.LayoutTabUI extends laya.ui.View
+	var LayoutTabUI=(function(_super){
+		function LayoutTabUI(){
+			this.btn=null;
+			this.close=null;
+			LayoutTabUI.__super.call(this);
+		}
+
+		__class(LayoutTabUI,'ui.layout.LayoutTabUI',_super);
+		var __proto=LayoutTabUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(LayoutTabUI.uiView);
+		}
+
+		LayoutTabUI.uiView={"type":"View","props":{"scenecolor":"#dddddd"},"child":[{"type":"Button","props":{"y":0,"x":0,"width":75,"var":"btn","skin":"view/tab_panel.png","labelColors":"#dddddd,#888888,#e0e0e0","label":"label","height":25}},{"type":"Button","props":{"y":10,"x":60,"var":"close","skin":"view/btn_close1.png","scaleX":0.5,"scaleY":0.5,"stateNum":2}}]};
+		return LayoutTabUI;
+	})(View)
 
 
 	//class ui.deskplatform.MainViewItemUI extends laya.ui.View
@@ -440,7 +3047,660 @@
 	})(View)
 
 
-	//class ui.deskplatform.ResPanelUI extends laya.ui.View
+	/**
+	*布局框
+	*@author ww
+	*/
+	//class platform.layout.LayoutRec extends ui.layout.LayoutRecUI
+	var LayoutRec=(function(_super){
+		function LayoutRec(){
+			this.disList=null;
+			this._backHeight=NaN;
+			this.preWidth=0;
+			this.preHeight=0;
+			this.preMoveLen=0;
+			this._curUI=null;
+			this._curMenuBox=null;
+			this.tTabTxt=null;
+			this.tTabHelpUrl=null;
+			this.curActionType=null;
+			this.relativeO={};
+			this._disMode=2;
+			LayoutRec.__super.call(this);
+			this.tab.on("change",this,this.onTabChange);
+			this.back.on("mousedown",this,this.onBackDown);
+			this.back.on("doubleclick",this,this.onBackDoubleDown);
+			this.disList=[this.tab];
+			this._backHeight=this.back.height;
+			this.on("Draging_Hit",this,this._$7_onMouseOver);
+			this.on("mouseover",this,this.onMouseOverThis);
+			this.on("mouseout",this,this.onMouseOutThis);
+			this.updateUIState();
+			this.on("added",this,this._$7_onAdded);
+			Notice.listen("SHOW_LayoutTab_By_Name",this,this.showTabByName);
+			this.tab.labelColors=StyleConsts.TreeItemColor;
+			this.tipIcon.on("mousedown",this,this.onTipClick);
+			this.tipIcon.toolTip=Sys.lang("点击打开帮助文档");
+			var hArea;
+			hArea=new HitArea();
+			this.actionIcon.hitArea=hArea;
+			hArea.hit.clear();
+			hArea.hit.drawRect(-10,-16,60,40,"#ff0000");
+			this.actionIcon.on("mousedown",this,this.onActionIconClick);
+		}
+
+		__class(LayoutRec,'platform.layout.LayoutRec',_super);
+		var __proto=LayoutRec.prototype;
+		__proto.onActionIconClick=function(e){
+			e.stopPropagation();
+			console.log("onActionIconClick:",this.curActionType);
+			switch(this.curActionType){
+				case "toBottom":
+					LayoutRecManager.minToBottom(this);
+					break ;
+				case "toLeft":
+					LayoutRecManager.minToLeft(this);
+					break ;
+				case "toRight":
+					LayoutRecManager.minToRight(this);
+					break ;
+				}
+		}
+
+		__proto.onTipClick=function(){
+			if(!this._curUI)return;
+			var className;
+			className=ClassTool.getClassName(this._curUI);
+			var tUrl;
+			tUrl=LayoutRec.PanelTips[className];
+			if(tUrl){
+				Browser.window.open(tUrl);
+			}
+		}
+
+		__proto.getCurTipUrl=function(){
+			if(!this._curUI)return null;
+			var className;
+			className=ClassTool.getClassName(this._curUI);
+			var tUrl;
+			tUrl=LayoutRec.PanelTips[className];
+			return tUrl;
+		}
+
+		__proto.onMouseOutThis=function(){}
+		__proto._$7_onAdded=function(){}
+		__proto.updateUIState=function(){
+			this.back.visible=this.tab.visible=this.canAddTab;
+		}
+
+		__proto.onMouseOverThis=function(E){
+			if(this.isMinRecState)return;
+			if(this._curMenuBox){
+				this._curMenuBox.visible=true;
+			}
+			if (this.parent==LayerManager.stage){
+				DisResizer.setUp(this,true);
+			}
+		}
+
+		__proto.onThisDown=function(e){
+			if (this.parent==LayerManager.stage){
+				DisResizer.setUp(this,true);
+			}
+		}
+
+		__proto.onBackDown=function(e){
+			if (this.parent==LayerManager.stage){
+				this.startDrag();
+				this.once("dragend",this,this.stopDrag);
+				}else{
+				this.startDragMe();
+			}
+		}
+
+		__proto.updateUIMinStates=function(){
+			var isMinRec=false;
+			isMinRec=this.isMinRecState;
+			if(isMinRec){
+				if(this._curMenuBox){
+					this._curMenuBox.visible=false;
+				}
+				if(this._curUI){
+					this._curUI.visible=false;
+				}
+				this.tipIcon.visible=false;
+				}else{
+				if(this._curMenuBox){
+				}
+				if(this._curUI){
+					this._curUI.visible=true;
+				}
+			}
+			this.tab.visible=this.canAddTab&&(this.width>30);
+		}
+
+		__proto.updateActionIcon=function(){
+			if(this._disMode==1){
+				switch(this.curActionType){
+					case "toBottom":
+						this.actionIcon.skin="view/arrow_up.png";
+						break ;
+					case "toLeft":
+						this.actionIcon.skin="view/arrow_right.png";
+						break ;
+					case "toRight":
+						this.actionIcon.skin="view/arrow_left.png";
+						break ;
+					default :
+						this.actionIcon.skin=null;
+					}
+				}else{
+				switch(this.curActionType){
+					case "toBottom":
+						this.actionIcon.skin="view/arrow_down.png";
+						break ;
+					case "toLeft":
+						this.actionIcon.skin="view/arrow_left.png";
+						break ;
+					case "toRight":
+						this.actionIcon.skin="view/arrow_right.png";
+						break ;
+					default :
+						this.actionIcon.skin=null;
+					}
+			}
+		}
+
+		__proto.onBackDoubleDown=function(e){
+			if(/*no*/this.IDEVars.disableTabDrag)return;
+			if (this.parent !=LayerManager.stage){
+				LayoutRecManager.popRec(this);
+			}
+			else{
+			}
+		}
+
+		//DisResizer.setUp(this);
+		__proto.goMinState=function(){
+			DisControlTool.removeItems(this.disList);
+		}
+
+		//back.bottom=0;
+		__proto.goMaxState=function(){
+			DisControlTool.addItems(this.disList,this);
+		}
+
+		//Laya.timer.once(100,this,later);
+		__proto.later=function(){
+			this.back.height=this._backHeight;
+		}
+
+		__proto._$7_onMouseOver=function(e){
+			if (!DragManager.isDraging)return;
+			if (!(DragManager.getDragType()=="LayoutRec" || DragManager.getDragType()=="LayoutTab"))return;
+			var type=RelativePos.getDisMouseRelativePos(this);
+			if(DragManager.getDragTarget()==this){
+				if(type=="up"){
+					type="center";
+				}
+			}
+			if(DragManager.getDragType()=="LayoutTab"){
+				if(type=="up"){
+					type="center";
+				}
+			};
+			var focusWidth=NaN;
+			switch (type){
+				case "right":
+				case "left":
+					focusWidth=0.5*this.width;
+					/*no*/this.FocusManager.showBorder(this,type,true,null,focusWidth);
+					break ;
+				case "up":
+				case "down":
+					focusWidth=0.5*this.height;
+					/*no*/this.FocusManager.showBorder(this,type,true,null,focusWidth);
+					break ;
+				case "center":
+					/*no*/this.FocusManager.showFocus(this);
+					break ;
+				}
+			DisControlTool.setTop(this);
+		}
+
+		__proto._$7_onMouseOut=function(e){}
+		__proto.onDragDown=function(e){
+			e.stopPropagation();
+			this.startDragMe();
+		}
+
+		__proto.startDragMe=function(self){
+			(self===void 0)&& (self=false);
+			if(LayoutRecManager.popLocked())return;
+			if(!this.canDragMe)return;
+			if(PlatformVars.disableTabDrag)return;
+			var clip=new Clip(SkinDefines.LayoutRecDragIcon,1,3);
+			clip.index=2;
+			var type="LayoutRec";
+			DragManager.I.doDrag(this,self?null:clip,{type:type,target:this},DragManager.dragOffset);
+		}
+
+		__proto.closeHandler=function(e){
+			LayoutRecManager.removeRec(this);
+		}
+
+		__proto.changeSize=function(){
+			laya.ui.Component.prototype.changeSize.call(this);
+			if(this.tab){
+				var rec;
+				rec=this.tab.scrollRect||new Rectangle();
+				rec.setTo(0,0,this.width,25);
+				this.tab.scrollRect=rec;
+			}
+			this.updateUIMinStates();
+		}
+
+		__proto.getTabSkin=function(){
+			return this.getTabProp("recTabSkin");
+		}
+
+		__proto.getTabAction=function(){
+			return this.getTabProp("recActionType");
+		}
+
+		__proto.getTabActionPos=function(){
+			return this.getTabProp("recActionPos");
+		}
+
+		__proto.getTabProp=function(key){
+			var tabList;
+			tabList=this.tab.items;
+			var i=0,len=0;
+			len=tabList.length;
+			for(i=0;i<len;i++){
+				if(tabList[i]&&tabList[i].ui&&tabList[i].ui[key])return tabList[i].ui[key];
+			}
+			return null;
+		}
+
+		__proto.onTabChange=function(e){
+			if (this._curUI){
+				this._curUI.removeSelf();
+				if(this._curMenuBox){
+					this._curMenuBox.removeSelf();
+				}
+				this._curUI=null;
+			}
+			if (this.tab.selectedIndex !=-1){
+				this._curUI=(this.tab.selection).ui;
+				if(PlatformVars.enableTabMenu){
+					this._curMenuBox=this._curUI["menuBox"];
+					if(this._curMenuBox){
+						this._curMenuBox.left=80;
+						this._curMenuBox.right=0;
+						this._curMenuBox.bottom=NaN;
+						this._curMenuBox.top=NaN;
+						this._curMenuBox.y=0;
+						this._curMenuBox.visible=false;
+						this.addChild(this._curMenuBox);
+					}
+				}
+				if(this._curUI["recBarSkin"]){
+					this.back.skin=this._curUI["recBarSkin"];
+				}
+				this.curActionType=this.getTabAction();
+				if(this.curActionType){
+					this.actionIcon.visible=true;
+					switch(this.getTabActionPos()){
+						case "right":
+							this.tab.left=0;
+							this.actionIcon.right=9;
+							this.actionIcon.left=NaN;
+							break ;
+						default :
+							this.tab.left=this.actionIcon.x+this.actionIcon.displayWidth+6;
+							this.actionIcon.left=5;
+							this.actionIcon.right=NaN;
+						}
+					this.updateActionIcon();
+					}else{
+					this.actionIcon.visible=false;
+					this.tab.left=0;
+				}
+				this.addChildAt(this._curUI,0);
+				this.tTabTxt=this._curUI["title"];
+				this.tTabHelpUrl=this._curUI["helpUrl"];
+				if(Laya.__typeof(this._curUI,this.UIPanel)){
+					this.cacheAsBitmap=false;
+					(this.tab.selection).cacheAsBitmap=false;
+				}
+			}
+		}
+
+		__proto.addUI=function(ui){
+			var uiTab=new LayoutTab(ui);
+			if(!uiTab.hasTabSkin){
+				if(this.getTabSkin()){
+					uiTab.setTabSkin(this.getTabSkin());
+				}
+			}
+			this.addTab(uiTab);
+		}
+
+		__proto.addTab=function(uiTab){
+			var index=0;
+			index=this.tab.addItem(uiTab);
+			this.tab.selectedIndex=index;
+			uiTab._rec=this;
+			this.updateUIState();
+		}
+
+		__proto.removeTab=function(uiTab,autoRemove){
+			(autoRemove===void 0)&& (autoRemove=false);
+			this.tab.delItem(uiTab);
+			uiTab._rec=null;
+			this.updateUIState();
+			if(autoRemove&&this.tab.items.length<1){
+				LayoutRecManager.removeRec(this);
+			}
+		}
+
+		// onTabChange(null);
+		__proto.removeUI=function(ui,autoRemove){
+			(autoRemove===void 0)&& (autoRemove=false);
+			var tabList;
+			tabList=this.tab.items;
+			var i=0,len=0;
+			len=tabList.length;
+			for(i=0;i<len;i++){
+				if(tabList[i].ui==ui){
+					this.removeTab(tabList[i],autoRemove);
+					return;
+				}
+			}
+		}
+
+		__proto.getUIs=function(){
+			var i=0,len=0;
+			var items;
+			items=this.tab.items;
+			len=items.length;
+			var rst;
+			rst=[];
+			for (i=0;i < len;i++){
+				rst.push((items [i]).ui);
+			}
+			return rst;
+		}
+
+		__proto.clearRelative=function(){
+			RelativePos.clearBar(this);
+		}
+
+		__proto.showTabByName=function(tabName){
+			if(this._curUI&&this._curUI["title"]==tabName)return;
+			var tabList;
+			tabList=this.tab.items;
+			var i=0,len=0;
+			len=tabList.length;
+			for(i=0;i<len;i++){
+				if(tabList[i].ui&&tabList[i].ui["title"]==tabName){
+					this.tab.selectedIndex=i;
+					return;
+				}
+			}
+		}
+
+		__proto.clears=function(){
+			Notice.cancel("SHOW_LayoutTab_By_Name",this,this.showTabByName);
+			this.clearRelative();
+			this.tab.destroy();
+			this.destroy(false);
+		}
+
+		__getset(0,__proto,'disMode',function(){
+			return this._disMode;
+			},function(type){
+			if (this._disMode !=1){
+				this.preWidth=this.width;
+				this.preHeight=this.height;
+			}
+			if (this._disMode==type)
+				return;
+			this._disMode=type;
+			this.updateActionIcon();
+			return;
+			switch (this._disMode){
+				case 1:
+					this.goMinState();
+					LayoutRecManager.minRec(this);
+					this.back.off("mousedown",this,this.onBackDown);
+					this.back.on("mousedown",this,this.onBackDown);
+					break ;
+				default :
+					this.back.off("mousedown",this,this.onBackDown);
+					this.goMaxState();
+					LayoutRecManager.recoverRec(this);
+				}
+		});
+
+		__getset(0,__proto,'isMinRecState',function(){
+			return this.width<30||this.height<30;
+		});
+
+		__getset(0,__proto,'canAddTab',function(){
+			var tabList;
+			tabList=this.tab.items;
+			var i=0,len=0;
+			len=tabList.length;
+			for(i=0;i<len;i++){
+				if(!tabList[i].canMix)return false;
+			}
+			return true;
+		});
+
+		__getset(0,__proto,'canClose',function(){
+			var tabList;
+			tabList=this.tab.items;
+			var i=0,len=0;
+			len=tabList.length;
+			for(i=0;i<len;i++){
+				if(!tabList[i].canClose)return false;
+			}
+			return true;
+		});
+
+		__getset(0,__proto,'hasFree',function(){
+			var tabList;
+			tabList=this.tab.items;
+			var i=0,len=0;
+			len=tabList.length;
+			for(i=0;i<len;i++){
+				if(tabList[i].freeSize)return true;
+			}
+			return false;
+		});
+
+		__getset(0,__proto,'canDragMe',function(){
+			return this.canAddTab;
+		});
+
+		__getset(0,__proto,'sizeFree',function(){
+			if(this.hasFree){
+				return true;
+			}
+			return !this.canAddTab;
+		});
+
+		LayoutRec.Min=1;
+		LayoutRec.Normal=2;
+		LayoutRec.Max=3;
+		LayoutRec.preTipIcon=null
+		__static(LayoutRec,
+		['PanelTips',function(){return this.PanelTips={
+		};}
+
+		]);
+		return LayoutRec;
+	})(LayoutRecUI)
+
+
+	/**
+	*布局框标签
+	*@author ww
+	*/
+	//class platform.layout.LayoutTab extends ui.layout.LayoutTabUI
+	var LayoutTab=(function(_super){
+		function LayoutTab(tabUI){
+			this._ui=null;
+			this._rec=null;
+			LayoutTab.__super.call(this);
+			this._ui=tabUI;
+			this._ui.left=this._ui.right=this._ui.bottom=0;
+			if(Laya.__typeof(this._ui,this.HtmlSprite)){
+				this._ui.left=this._ui.right=this._ui.bottom=5;
+			}
+			this._ui.top=25;
+			if(!this.canMix){
+				this._ui.top=0;
+			}
+			this._ui["layoutTab"]=this;
+			this.btn.skin=this.tabSkin;
+			this.close.on("click",this,this.onCloseClick);
+			this.btn.on("mousedown",this,this.onBtnDown);
+			this.onTitleChange();
+			if(!this.canClose){
+				this.close.visible=false;
+			}
+			if(PlatformVars.disableTabClose){
+				this.close.visible=false;
+				}else{
+				this.btn.labelAlign="left";
+				this.btn.labelPadding="-2,5,0,5";
+			}
+			this.btn.labelColors=StyleConsts.LayoutTabTitleBtnColors;
+		}
+
+		__class(LayoutTab,'platform.layout.LayoutTab',_super);
+		var __proto=LayoutTab.prototype;
+		//cacheAsBitmap=true;
+		__proto.setTabSkin=function(skin){
+			this.btn.skin=skin;
+		}
+
+		__proto.onBtnDown=function(e){
+			if(laya.ide.managers.LayoutRecManager.popLocked())return;
+			if(this._rec&&!this._rec.canDragMe)return;
+			if(PlatformVars.disableTabDrag)return;
+			var clip=new Clip(/*no*/this.SkinDefines.LayoutTabDragIcon,1,3);
+			clip.index=2;
+			var type="LayoutTab";
+			DragManager.I.doDrag(this ,clip,{type:type,target:this._rec},DragManager.dragOffset);
+		}
+
+		__proto.onCloseClick=function(e){
+			if(this._rec)
+				this._rec.removeTab(this,true);
+			this.clears();
+		}
+
+		__proto.onTitleChange=function(e){
+			var title;
+			title=this._ui["title"]?this._ui["title"]:"我是标题啊";
+			var len=ObjectUtils.getTextField(null,"*"+title).width+20;
+			this.btn.width=len;
+			this.close.x=len-this.close.displayWidth-3;
+			this.btn.label=title;
+		}
+
+		__proto.clears=function(){
+			this._ui=null;
+		}
+
+		__getset(0,__proto,'recActionPos',function(){
+			if(this._ui&&this._ui["recActionPos"]){
+				return this._ui["recActionPos"];
+			}
+			return null;
+		});
+
+		__getset(0,__proto,'recActionType',function(){
+			if(this._ui&&this._ui["recActionType"]){
+				return this._ui["recActionType"];
+			}
+			return null;
+		});
+
+		__getset(0,__proto,'canClose',function(){
+			if(!this._ui)return true;
+			return this._ui["canClose"];
+		});
+
+		__getset(0,__proto,'recBarSkin',function(){
+			if(this._ui&&this._ui["recBarSkin"]){
+				return this._ui["recBarSkin"];
+			}
+			return "view/bg_panel_layoutrec.png";
+		});
+
+		__getset(0,__proto,'canMix',function(){
+			if(!this._ui||!this._ui.hasOwnProperty("canMix"))return true;
+			return this._ui["canMix"];
+		});
+
+		__getset(0,__proto,'recLineSkin',function(){
+			if(this._ui&&this._ui["recLineSkin"]){
+				return this._ui["recLineSkin"];
+			}
+			return null;
+		});
+
+		__getset(0,__proto,'freeSize',function(){
+			if(!this._ui||!this._ui.hasOwnProperty("freeSize"))return false;
+			return this._ui["freeSize"];
+		});
+
+		__getset(0,__proto,'hasTabSkin',function(){
+			if(this._ui&&this._ui["recTabSkin"]){
+				return true;
+			}
+			return false;
+		});
+
+		__getset(0,__proto,'tabSkin',function(){
+			if(this._ui&&this._ui["recTabSkin"]){
+				return this._ui["recTabSkin"];
+			}
+			return "view/tab_panel.png";
+		});
+
+		__getset(0,__proto,'width',function(){
+			return this.btn.width;
+		},_super.prototype._$set_width);
+
+		/**点击处理器(无默认参数)*/
+		__getset(0,__proto,'clickHandler',function(){
+			return this.btn.clickHandler;
+			},function(value){
+			this.btn.clickHandler=value;
+		});
+
+		/**是否是选择状态*/
+		__getset(0,__proto,'selected',function(){
+			return this.btn.selected;
+			},function(value){
+			this.btn.selected=value;
+		});
+
+		__getset(0,__proto,'ui',function(){
+			return this._ui;
+		});
+
+		return LayoutTab;
+	})(LayoutTabUI)
+
+
+	//class ui.deskplatform.ResPanelUI extends platform.layout.DragView
 	var ResPanelUI=(function(_super){
 		function ResPanelUI(){
 			this.resTree=null;
@@ -459,9 +3719,9 @@
 			this.createView(ResPanelUI.uiView);
 		}
 
-		ResPanelUI.uiView={"type":"View","props":{"width":200,"title":"资源","scenecolor":"#dddddd","hitTestPrior":true,"height":300},"child":[{"type":"Image","props":{"y":48,"x":415,"width":200,"top":0,"skin":"view/bg_panel.png","right":0,"left":0,"height":300,"bottom":0}},{"type":"TreeEx","props":{"y":552,"x":173,"width":196,"var":"resTree","top":112,"scrollBarSkin":"comp/vscroll.png","right":2,"left":2,"hitTestPrior":true,"height":136,"bottom":29},"child":[{"type":"Box","props":{"right":0,"name":"render","left":0},"child":[{"type":"Clip","props":{"y":0,"x":13,"skin":"comp/clip_selectBox.png","right":0,"name":"selectBox","left":9,"height":25,"clipY":2}},{"type":"Image","props":{"y":4,"x":14,"skin":"comp/folder.png","name":"icon","width":16,"height":16}},{"type":"Label","props":{"y":1,"width":150,"text":"label","right":0,"padding":"4,0,0,0","name":"label","left":38,"height":22,"color":"#d8d8d8"}},{"type":"Clip","props":{"y":6,"x":0,"skin":"comp/clip_tree.png","name":"arrow","clipY":2,"width":11,"height":12}}]}]},{"type":"Image","props":{"y":3,"x":222,"width":198,"var":"resViewer","right":1,"left":1,"height":100}},{"type":"Image","props":{"y":106,"x":2,"skin":"comp/line.png","right":0,"left":0,"height":1}},{"type":"Box","props":{"y":271,"x":1,"width":198,"var":"opBox","right":0,"left":0,"height":28,"bottom":0},"child":[{"type":"Image","props":{"width":191,"top":0,"skin":"view/bg_panel_bar.png","right":0,"left":0,"bottom":0}},{"type":"TextInput","props":{"y":4,"x":80,"width":148,"var":"fliterTxt","toolTip":"输入关键词过滤","skin":"comp/input_filter.png","right":5,"padding":"0,10,0,20","left":80,"color":"#dddddd","sizeGrid":"0,3,0,3"}},{"type":"Button","props":{"y":3,"x":3,"toolTip":"打开所在目录","stateNum":3,"skin":"view/login2.png","name":"openDirBtn","scaleX":0.5,"scaleY":0.5}},{"type":"Button","props":{"y":3,"x":29,"toolTip":"设置默认属性","stateNum":3,"skin":"view/settings2.png","name":"setPropBtn","scaleX":0.5,"scaleY":0.5}},{"type":"Button","props":{"y":4,"x":55,"toolTip":"刷新资源树","stateNum":3,"skin":"view/refresh2.png","name":"refreshBtn","scaleX":0.5,"scaleY":0.5}},{"type":"Clip","props":{"y":7,"x":82,"skin":"view/search.png","clipY":1,"index":0,"scaleX":0.5,"scaleY":0.5}},{"type":"Button","props":{"y":12,"var":"clearSearchBtn","skin":"view/btn_close1.png","right":9,"scaleX":0.5,"scaleY":0.5,"stateNum":2}}]},{"type":"Label","props":{"y":82,"x":6,"width":162,"var":"sizeTxt","text":"512*512","padding":"4,0,0,0","name":"label","height":19,"color":"#d8d8d8","align":"left"}}]};
+		ResPanelUI.uiView={"type":"DragView","props":{"width":200,"title":"资源","scenecolor":"#dddddd","hitTestPrior":true,"height":300},"child":[{"type":"Image","props":{"y":48,"x":415,"width":200,"top":0,"skin":"view/bg_panel.png","right":0,"left":0,"height":300,"bottom":0}},{"type":"TreeEx","props":{"y":552,"x":173,"width":196,"var":"resTree","top":112,"scrollBarSkin":"comp/vscroll.png","right":2,"left":2,"hitTestPrior":true,"height":136,"bottom":29},"child":[{"type":"Box","props":{"right":0,"name":"render","left":0},"child":[{"type":"Clip","props":{"y":0,"x":13,"skin":"comp/clip_selectBox.png","right":0,"name":"selectBox","left":9,"height":25,"clipY":2}},{"type":"Image","props":{"y":4,"x":14,"skin":"comp/folder.png","name":"icon","width":16,"height":16}},{"type":"Label","props":{"y":1,"width":150,"text":"label","right":0,"padding":"4,0,0,0","name":"label","left":38,"height":22,"color":"#d8d8d8"}},{"type":"Clip","props":{"y":6,"x":0,"skin":"comp/clip_tree.png","name":"arrow","clipY":2,"width":11,"height":12}}]}]},{"type":"Image","props":{"y":3,"x":222,"width":198,"var":"resViewer","right":1,"left":1,"height":100}},{"type":"Image","props":{"y":106,"x":2,"skin":"comp/line.png","right":0,"left":0,"height":1}},{"type":"Box","props":{"y":271,"x":1,"width":198,"var":"opBox","right":0,"left":0,"height":28,"bottom":0},"child":[{"type":"Image","props":{"width":191,"top":0,"skin":"view/bg_panel_bar.png","right":0,"left":0,"bottom":0}},{"type":"TextInput","props":{"y":4,"x":80,"width":148,"var":"fliterTxt","toolTip":"输入关键词过滤","skin":"comp/input_22.png","right":5,"padding":"0,10,0,20","left":80,"color":"#dddddd","sizeGrid":"0,3,0,3","height":22}},{"type":"Button","props":{"y":3,"x":3,"toolTip":"打开所在目录","stateNum":3,"skin":"view/login2.png","name":"openDirBtn","scaleX":0.5,"scaleY":0.5}},{"type":"Button","props":{"y":3,"x":29,"toolTip":"设置默认属性","stateNum":3,"skin":"view/settings2.png","name":"setPropBtn","scaleX":0.5,"scaleY":0.5}},{"type":"Button","props":{"y":4,"x":55,"toolTip":"刷新资源树","stateNum":3,"skin":"view/refresh2.png","name":"refreshBtn","scaleX":0.5,"scaleY":0.5}},{"type":"Clip","props":{"y":7,"x":82,"skin":"view/search.png","clipY":1,"index":0,"scaleX":0.5,"scaleY":0.5}},{"type":"Button","props":{"y":12,"var":"clearSearchBtn","skin":"view/btn_close1.png","right":9,"scaleX":0.5,"scaleY":0.5,"stateNum":2}}]},{"type":"Label","props":{"y":82,"x":6,"width":162,"var":"sizeTxt","text":"512*512","padding":"4,0,0,0","name":"label","height":19,"color":"#d8d8d8","align":"left"}}]};
 		return ResPanelUI;
-	})(View)
+	})(DragView)
 
 
 	//class ui.deskplatform.AlertUI extends laya.ui.Dialog
@@ -531,6 +3791,34 @@
 	*...
 	*@author ww
 	*/
+	//class view.MainViewItem extends ui.deskplatform.MainViewItemUI
+	var MainViewItem=(function(_super){
+		function MainViewItem(){
+			this._dataO=null;
+			MainViewItem.__super.call(this);
+			this.on("click",this,this.onClick);
+		}
+
+		__class(MainViewItem,'view.MainViewItem',_super);
+		var __proto=MainViewItem.prototype;
+		__proto.initByData=function(dataO){
+			this._dataO=dataO;
+			this.label.text=dataO.name;
+		}
+
+		__proto.onClick=function(){
+			console.log("onClick:",this._dataO);
+			Notice.notify("OPEN_PLUGIN",this._dataO.path);
+		}
+
+		return MainViewItem;
+	})(MainViewItemUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class view.MainView extends ui.deskplatform.MainViewUI
 	var MainView=(function(_super){
 		function MainView(){
@@ -581,34 +3869,6 @@
 
 		return MainView;
 	})(MainViewUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class view.MainViewItem extends ui.deskplatform.MainViewItemUI
-	var MainViewItem=(function(_super){
-		function MainViewItem(){
-			this._dataO=null;
-			MainViewItem.__super.call(this);
-			this.on("click",this,this.onClick);
-		}
-
-		__class(MainViewItem,'view.MainViewItem',_super);
-		var __proto=MainViewItem.prototype;
-		__proto.initByData=function(dataO){
-			this._dataO=dataO;
-			this.label.text=dataO.name;
-		}
-
-		__proto.onClick=function(){
-			console.log("onClick:",this._dataO);
-			Notice.notify("OPEN_PLUGIN",this._dataO.path);
-		}
-
-		return MainViewItem;
-	})(MainViewItemUI)
 
 
 	/**资源面板
@@ -999,8 +4259,6 @@
 			if (Boolean(this.resTree.selectedPath)){
 				var fileName=this.resTree.selectedItem.path;
 				RenameRes.instance.start(fileName);
-				}else {
-				Alert.show(Sys.lang("当前资源为SWF资源，不能直接重命名"));
 			}
 		}
 
@@ -1057,7 +4315,7 @@
 			if (e.type=="mousedown"){
 				Laya.stage.focus=this.resTree;
 				this._mouseIndex=index;
-				var clip=new Clip("",1,3);
+				var clip=new Clip(SkinDefines.ResDragIcon,1,3);
 				clip.index=2;
 				if(this.resTree.mList.selectItems&&this.resTree.mList.selectItems.length>1){
 					DragManager.I.doDrag(e.currentTarget,clip,{type:"multiResFile",fileList:this.getSelectFiles()},DragManager.dragOffset);

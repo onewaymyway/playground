@@ -4,7 +4,6 @@ package platform.layout
 	import electrontools.drags.DragEvent;
 	import electrontools.drags.DragManager;
 	import extendui.layout.RelativePos;
-	import ide.managers.Notice;
 	import laya.debug.tools.ClassTool;
 	import laya.debug.tools.DTrace;
 	import laya.debug.tools.DisControlTool;
@@ -12,9 +11,6 @@ package platform.layout
 	import laya.debug.tools.ObjectTools;
 	import laya.debug.tools.Watcher;
 	import laya.display.Sprite;
-	import laya.editor.comonents.LayoutDragBar;
-	import laya.editor.comonents.LayoutTab;
-	import laya.editor.view.LayoutRec;
 	import laya.events.Event;
 	import laya.maths.Point;
 	import laya.maths.Rectangle;
@@ -26,9 +22,11 @@ package platform.layout
 	import laya.utils.Utils;
 	import nodetools.devices.FileManager;
 	import nodetools.devices.FileTools;
-	import nodetools.devices.Paths;
+	import platform.extenddisplay.IFrameSprite;
+	import platform.interfaces.Paths;
 	import platform.managers.CursorManager;
 	import platform.managers.LayerManager;
+	import platform.viewers.IFrameRenderItem;
 	import view.ResPanel;
 	
 	/**
@@ -128,8 +126,8 @@ package platform.layout
 		}
 		private static var _ct:Box;
 		
-		public static var ctOffSetX:int=45;
-		public static var ctOffSetY:int=39;
+		public static var ctOffSetX:int=0;
+		public static var ctOffSetY:int=0;
 		
 		public static function get containerBox():Box
 		{
@@ -146,8 +144,8 @@ package platform.layout
 			//_ct.right = 0;
 			//_ct.top = 30;
 			//_ct.bottom = 20;
-			_ct.width = 0;
-			_ct.height = 0;
+			_ct.width = 800;
+			_ct.height = 800;
 			LayerManager.stage.addChild(_ct);
 			//_ct.width = LayerManager.stage.width;
 			//_ct.height = LayerManager.stage.height;
@@ -661,10 +659,6 @@ package platform.layout
 			path = FileManager.getDataPath(tLayoutFile);
 			if (!FileTools.exist(path))
 			{
-				if(isDebug)
-				{
-					createDefaultDebug();
-				}else
 				createDefault();
 				return;
 			}
@@ -1214,17 +1208,16 @@ package platform.layout
 			RelativePos.addRelative(rec, _upBar, RelativePos.Up);
 			RelativePos.addRelative(rec, _downBar, RelativePos.Down);
 			
+			debugger;
+			addPanelToRec(ResPanel.instance, rec);
 			
-			addPanelToRec(ResPanel.instance, resRec);
-			return;
-			addPanelToRec(PagePanel.instance, rec);
 			
 			
 			var uiRec:LayoutRec;
 			uiRec = new LayoutRec();
 			insert(rec, uiRec, 0.8);
-			addPanelToRec(UIPanel.instance, uiRec);
-			
+			addPanelToRec(IFrameSprite.I, uiRec);
+			return;
 			var resRec:LayoutRec;
 			resRec = new LayoutRec();
 			insertV(rec, resRec);

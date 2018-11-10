@@ -2,6 +2,7 @@
 package ui.deskplatform {
 	import laya.ui.*;
 	import laya.display.*; 
+	import platform.layout.*;
 
 	public class AlertUI extends Dialog {
 		public var titleLbl:Label;

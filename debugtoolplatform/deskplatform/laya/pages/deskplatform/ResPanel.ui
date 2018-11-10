@@ -1,10 +1,11 @@
 {
     "x":0,
-    "type":"View",
-    "selectedBox":1,
+    "type":"DragView",
+    "selectedBox":11,
+    "selecteID":13,
     "props":{"width":200,"title":"资源","scenecolor":"#dddddd","sceneColor":null,"layers":"1,1,0,0,第 1 层","hitTestPrior":true,"height":300},
     "nodeParent":-1,
-    "label":"View",
+    "label":"DragView",
     "isOpen":true,
     "isDirectory":true,
     "isAniNode":true,
@@ -156,7 +157,7 @@
                 {
                     "x":30,
                     "type":"TextInput",
-                    "props":{"y":4,"x":80,"width":148,"var":"fliterTxt","toolTip":"输入关键词过滤","skin":"comp/input_filter.png","right":5,"padding":"0,10,0,20","left":80,"layer":1,"color":"#dddddd"},
+                    "props":{"y":4,"x":80,"width":148,"var":"fliterTxt","toolTip":"输入关键词过滤","skin":"comp/input_22.png","right":5,"padding":"0,10,0,20","left":80,"layer":1,"color":"#dddddd"},
                     "nodeParent":11,
                     "label":"TextInput(fliterTxt)",
                     "isDirectory":false,

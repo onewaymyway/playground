@@ -3,7 +3,6 @@ package platform.layout
 	import extendui.layout.RelativePos;
 	import laya.debug.tools.ObjectTools;
 	import laya.display.Graphics;
-	import laya.ide.managers.LayoutRecManager;
 	import laya.maths.MathUtil;
 	import laya.maths.Rectangle;
 	import laya.ui.Component;
@@ -27,7 +26,6 @@ package platform.layout
 			ID++;
 			hitArea=new HitArea();
 			this.zOrder=99;
-			CanvasSprite.setSpriteRenderEmpty(this);
 		}
 		public var walked:Boolean=false;
 		/**

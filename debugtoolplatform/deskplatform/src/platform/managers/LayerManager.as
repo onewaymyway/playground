@@ -34,7 +34,7 @@ package platform.managers
 			//stage.bottom=0;
 			stage.mouseEnabled=true;
 			Laya.stage.addChild(stage);
-			
+			onStage();
 			Laya.stage.on("resize", null, onStage);
 		}
 		

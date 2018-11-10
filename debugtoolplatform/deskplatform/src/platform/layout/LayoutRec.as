@@ -2,6 +2,7 @@ package platform.layout
 {
 
 	import configs.StyleConsts;
+	import electrontools.drags.DragEvent;
 	import electrontools.drags.DragManager;
 	import extendui.layout.RelativePos;
 	import laya.debug.tools.ClassTool;
@@ -9,10 +10,7 @@ package platform.layout
 	import laya.debug.tools.resizer.DisResizer;
 	import laya.display.Graphics;
 	import laya.display.Sprite;
-	import laya.editor.comonents.LayoutDragBar;
-	import laya.editor.comonents.LayoutTab;
 	import laya.events.Event;
-	import laya.ide.managers.LayoutRecManager;
 	import laya.maths.Point;
 	import laya.maths.Rectangle;
 	import laya.ui.Box;

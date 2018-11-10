@@ -33,5 +33,11 @@ package platform.extenddisplay
 			div.src=path;
 		}
 		
+		private static var _I:IFrameSprite;
+		public static function get I():IFrameSprite
+		{
+			if (!_I) _I = new IFrameSprite();
+			return _I;
+		}
 	}
 }

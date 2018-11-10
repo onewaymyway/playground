@@ -1,7 +1,6 @@
 package platform.layout {
 	import laya.display.Graphics;
 	import laya.events.Event;
-	import laya.ide.managers.LayoutRecManager;
 	import laya.ui.Component;
 	import laya.ui.Image;
 	import platform.interfaces.PlatformVars;

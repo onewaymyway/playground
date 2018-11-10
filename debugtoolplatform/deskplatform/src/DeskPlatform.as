@@ -6,6 +6,7 @@ package
 	import extendui.ui.ListEx;
 	import extendui.ui.TreeBase;
 	import extendui.ui.TreeEx;
+	import laya.debug.DebugPanel;
 	import laya.display.Stage;
 	import laya.net.Loader;
 	import laya.ui.Styles;
@@ -18,6 +19,9 @@ package
 	import nodetools.devices.Paths;
 	import nodetools.devices.PythonTools;
 	import nodetools.devices.SystemSetting;
+	import platform.layout.LayoutRecManager;
+	import platform.managers.CursorManager;
+	import platform.managers.LayerManager;
 	import view.MainView;
 	import view.ResPanel;
 	/**
@@ -72,7 +76,9 @@ package
 		}
 		private function test():void
 		{
-			trace("AppPath:",FileTools.appPath);
+			trace("AppPath:", FileTools.appPath);
+			initApp();
+			return;
 			testResPanel();
 			return;
 			var mainView:MainView;
@@ -88,6 +94,17 @@ package
 			ResPanel.instance.top = 0;
 			ResPanel.instance.bottom = 0;
 			Laya.stage.addChild(ResPanel.instance);
+		}
+		
+		private function initApp():void
+		{
+			CursorManager.init();
+			SystemSetting.assetsPath = "D:/codes/playground.git/trunk/debugtoolplatform/deskplatform";
+			ResPanel.instance.init(SystemSetting.assetsPath);
+			LayerManager.init();
+			LayoutRecManager.init();
+			LayoutRecManager.createDefault();
+			//DebugPanel.init();
 		}
 	}
 

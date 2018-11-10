@@ -2,6 +2,7 @@
 package ui.deskplatform {
 	import laya.ui.*;
 	import laya.display.*; 
+	import platform.layout.*;
 	import view.MainViewItem;
 
 	public class MainViewUI extends View {

@@ -2,6 +2,7 @@
 package ui.layout {
 	import laya.ui.*;
 	import laya.display.*; 
+	import platform.layout.*;
 
 	public class LayoutTabUI extends View {
 		public var btn:Button;

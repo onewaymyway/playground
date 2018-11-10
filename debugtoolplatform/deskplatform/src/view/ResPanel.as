@@ -31,6 +31,7 @@ package view {
 	import nodetools.devices.FileTools;
 	import nodetools.devices.Sys;
 	import nodetools.devices.SystemSetting;
+	import platform.interfaces.SkinDefines;
 	import ui.deskplatform.ResPanelUI;
 	
 	
@@ -557,8 +558,6 @@ package view {
 				var fileName:String = resTree.selectedItem.path;
 //				fileName=FileTools.getFileName(fileName);
 				RenameRes.instance.start(fileName);
-			} else {
-				Alert.show(Sys.lang("当前资源为SWF资源，不能直接重命名"));
 			}
 		}
 		
@@ -624,7 +623,7 @@ package view {
 			if (e.type == Event.MOUSE_DOWN) {
 				Laya.stage.focus = resTree;
 				_mouseIndex = index;
-				var clip:Clip = new Clip("", 1, 3);
+				var clip:Clip = new Clip(SkinDefines.ResDragIcon, 1, 3);
 				clip.index = 2;				
 				if(resTree.mList.selectItems&&resTree.mList.selectItems.length>1)
 				{
