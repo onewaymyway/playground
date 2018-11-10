@@ -3,6 +3,7 @@ package view {
 	
 	import configs.StyleConsts;
 	import electrontools.drags.DragEvent;
+	import electrontools.drags.DragManager;
 	import electrontools.menus.ContextMenu;
 	import electrontools.MessageManager;
 	import extendui.FocusManager;
@@ -176,7 +177,7 @@ package view {
 				_refreshComplete.run();
 			} else {
 				if(this.displayedInStage&&_withTip)
-				MessageManager.instance.show(Sys.lang("资源刷新完毕"));
+				MessageManager.I.show(Sys.lang("资源刷新完毕"));
 			}
 		}
 		private var _menu:ContextMenu;
@@ -268,7 +269,7 @@ package view {
 			
 			var targetFile:File;
 			
-			
+			debugger;
 			var hitList:Array;
 //			hitList = DisControlTool.getObjectsUnderGlobalPoint(resTree);
 			hitList=e.hitList;
@@ -327,7 +328,7 @@ package view {
 				}
 				if(targetDir.nativePath.indexOf(tFile)>=0)
 				{
-					MessageManager.instance.show(Sys.lang("不能把文件拖动到子文件夹中"));
+					MessageManager.I.show(Sys.lang("不能把文件拖动到子文件夹中"));
 					return;
 				}
 			}
@@ -627,24 +628,21 @@ package view {
 				clip.index = 2;				
 				if(resTree.mList.selectItems&&resTree.mList.selectItems.length>1)
 				{
-					LayaBuilder.drag.doDrag(e.currentTarget as Sprite, clip, {type: DragEvent.MULTI_RESFILE,fileList:getSelectFiles()}, DragManager.dragOffset);
+					DragManager.I.doDrag(e.currentTarget as Sprite, clip, {type: DragEvent.MULTI_RESFILE,fileList:getSelectFiles()}, DragManager.dragOffset);
 					return;
 				}
 				var asset:String = resTree.array[index].path;
 				if (resTree.array[index].isDirectory) {
-					LayaBuilder.drag.doDrag(e.currentTarget as Sprite, clip, {type: DragEvent.ResDir,asset: asset}, DragManager.dragOffset);
+					DragManager.I.doDrag(e.currentTarget as Sprite, clip, {type: DragEvent.ResDir,asset: asset}, DragManager.dragOffset);
 				}else {
-//					trace("try drag from ResPanel");
-					
-					var compType:String = ResStyleManager.getResCompType(FileManager.getResRelativePath(asset));
-					//var compType:String ="Image";
+
 					var dragType:String;
 					dragType=DragEvent.Res;
 					if(compType==DragEvent.Props)
 					{
 						dragType=DragEvent.Props;
 					}
-					LayaBuilder.drag.doDrag(e.currentTarget as Sprite, clip, {type: dragType, compType: compType, asset: asset}, DragManager.dragOffset);
+					DragManager.I.doDrag(e.currentTarget as Sprite, clip, {type: dragType, asset: asset}, DragManager.dragOffset);
 				}
 			}
 			var cell:Box = resTree.list.getCell(index);
@@ -686,8 +684,7 @@ package view {
 //			trace("onResTreeDoubleClick");
 			if (e.target.parent == resTree.list.content)
 			{
-//				trace("checkSetResProp");
-				checkSetResProp();
+
 			}
 		}
 		/**页面快捷键*/
@@ -775,7 +772,8 @@ package view {
 					compStr=FileManager.adptToCommonUrl(FileManager.getResRelativePath(item.path));
 
 
-					label.color=StyleConsts.TreeItemColor;
+					label.color = StyleConsts.TreeItemColor;
+					icon.skin = "view/ui.png";
 
 
 

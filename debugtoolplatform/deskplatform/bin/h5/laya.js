@@ -3015,33 +3015,31 @@ var Laya=window.Laya=(function(window,document){
 		__class(DisControlTool,'laya.debug.tools.DisControlTool');
 		DisControlTool.getObjectsUnderPoint=function(sprite,x,y,rst,filterFun){
 			rst=rst?rst:[];
-			if (filterFun !=null && !filterFun(sprite))return rst;
-			var rec;
-			if (sprite.width > 0 && sprite.height > 0){
-				rec=Rectangle.TEMP.setTo(0,0,sprite.width,sprite.height);
-				}else{
-				rec=sprite.getBounds();
-			}
-			if (rec.contains(x,y)){
-				rst.push(sprite);
+			if(filterFun!=null&&!filterFun(sprite))return rst;
+			if (sprite.getBounds().contains(x,y)){
 				var tS;
 				var tempP=new Point();
 				tempP.setTo(x,y);
 				tempP=sprite.fromParentPoint(tempP);
 				x=tempP.x;
 				y=tempP.y;
-				for (var i=sprite._childs.length-1;i >-1;i--){
-					var child=sprite._childs[i];
+				var childList;
+				childList=sprite._childs||sprite._children;
+				for (var i=childList.length-1;i >-1;i--){
+					var child=childList[i];
 					if((child instanceof laya.display.Sprite ))
 						DisControlTool.getObjectsUnderPoint(child,x,y,rst,filterFun);
 				}
+				rst.push(sprite);
 			}
 			return rst;
 		}
 
-		DisControlTool.getObjectsUnderGlobalPoint=function(sprite,filterFun){
-			var point=new Point();
-			point.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
+		DisControlTool.getObjectsUnderGlobalPoint=function(sprite,filterFun,point){
+			if(!point){
+				point=new Point();
+				point.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
+			}
 			if(sprite.parent)
 				point=(sprite.parent).globalToLocal(point);
 			return DisControlTool.getObjectsUnderPoint(sprite,point.x,point.y,null,filterFun);
@@ -3472,6 +3470,42 @@ var Laya=window.Laya=(function(window,document){
 		DisplayHook.instance=null
 		DisplayHook.isFirst=false;
 		return DisplayHook;
+	})()
+
+
+	/**
+	*简单的显示对象对象池
+	*从父容器上移除时即被视为可被重用
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-11-13 下午8:05:13
+	*/
+	//class laya.debug.tools.DisPool
+	var DisPool=(function(){
+		function DisPool(){}
+		__class(DisPool,'laya.debug.tools.DisPool');
+		DisPool.getDis=function(clz){
+			var clzName;
+			clzName=ClassTool.getClassNameByClz(clz);
+			if(!DisPool._objDic[clzName]){
+				DisPool._objDic[clzName]=[];
+			};
+			var disList;
+			disList=DisPool._objDic[clzName];
+			var i=0,len=0;
+			len=disList.length;
+			for(i=0;i<len;i++){
+				if(!disList[i].parent){
+					return disList[i];
+				}
+			}
+			disList.push(new clz());
+			return disList[disList.length-1];
+		}
+
+		DisPool._objDic={};
+		return DisPool;
 	})()
 
 
@@ -7066,9 +7100,9 @@ var Laya=window.Laya=(function(window,document){
 	*@author ww
 	*/
 	//class laya.debug.view.StyleConsts
-	var StyleConsts=(function(){
+	var StyleConsts$1=(function(){
 		function StyleConsts(){}
-		__class(StyleConsts,'laya.debug.view.StyleConsts');
+		__class(StyleConsts,'laya.debug.view.StyleConsts',null,'StyleConsts$1');
 		StyleConsts.setViewScale=function(view){
 			view.scaleX=view.scaleY=StyleConsts.PanelScale;
 		}
@@ -8093,6 +8127,116 @@ var Laya=window.Laya=(function(window,document){
 		Event.WORLDMATRIX_NEEDCHANGE="worldmatrixneedchanged";
 		Event.ANIMATION_CHANGED="animationchanged";
 		return Event;
+	})()
+
+
+	/**
+	*<code>Keyboard</code> 类的属性是一些常数，这些常数表示控制游戏时最常用的键。
+	*/
+	//class laya.events.Keyboard
+	var Keyboard=(function(){
+		function Keyboard(){};
+		__class(Keyboard,'laya.events.Keyboard');
+		Keyboard.NUMBER_0=48;
+		Keyboard.NUMBER_1=49;
+		Keyboard.NUMBER_2=50;
+		Keyboard.NUMBER_3=51;
+		Keyboard.NUMBER_4=52;
+		Keyboard.NUMBER_5=53;
+		Keyboard.NUMBER_6=54;
+		Keyboard.NUMBER_7=55;
+		Keyboard.NUMBER_8=56;
+		Keyboard.NUMBER_9=57;
+		Keyboard.A=65;
+		Keyboard.B=66;
+		Keyboard.C=67;
+		Keyboard.D=68;
+		Keyboard.E=69;
+		Keyboard.F=70;
+		Keyboard.G=71;
+		Keyboard.H=72;
+		Keyboard.I=73;
+		Keyboard.J=74;
+		Keyboard.K=75;
+		Keyboard.L=76;
+		Keyboard.M=77;
+		Keyboard.N=78;
+		Keyboard.O=79;
+		Keyboard.P=80;
+		Keyboard.Q=81;
+		Keyboard.R=82;
+		Keyboard.S=83;
+		Keyboard.T=84;
+		Keyboard.U=85;
+		Keyboard.V=86;
+		Keyboard.W=87;
+		Keyboard.X=88;
+		Keyboard.Y=89;
+		Keyboard.Z=90;
+		Keyboard.F1=112;
+		Keyboard.F2=113;
+		Keyboard.F3=114;
+		Keyboard.F4=115;
+		Keyboard.F5=116;
+		Keyboard.F6=117;
+		Keyboard.F7=118;
+		Keyboard.F8=119;
+		Keyboard.F9=120;
+		Keyboard.F10=121;
+		Keyboard.F11=122;
+		Keyboard.F12=123;
+		Keyboard.F13=124;
+		Keyboard.F14=125;
+		Keyboard.F15=126;
+		Keyboard.NUMPAD=21;
+		Keyboard.NUMPAD_0=96;
+		Keyboard.NUMPAD_1=97;
+		Keyboard.NUMPAD_2=98;
+		Keyboard.NUMPAD_3=99;
+		Keyboard.NUMPAD_4=100;
+		Keyboard.NUMPAD_5=101;
+		Keyboard.NUMPAD_6=102;
+		Keyboard.NUMPAD_7=103;
+		Keyboard.NUMPAD_8=104;
+		Keyboard.NUMPAD_9=105;
+		Keyboard.NUMPAD_ADD=107;
+		Keyboard.NUMPAD_DECIMAL=110;
+		Keyboard.NUMPAD_DIVIDE=111;
+		Keyboard.NUMPAD_ENTER=108;
+		Keyboard.NUMPAD_MULTIPLY=106;
+		Keyboard.NUMPAD_SUBTRACT=109;
+		Keyboard.SEMICOLON=186;
+		Keyboard.EQUAL=187;
+		Keyboard.COMMA=188;
+		Keyboard.MINUS=189;
+		Keyboard.PERIOD=190;
+		Keyboard.SLASH=191;
+		Keyboard.BACKQUOTE=192;
+		Keyboard.LEFTBRACKET=219;
+		Keyboard.BACKSLASH=220;
+		Keyboard.RIGHTBRACKET=221;
+		Keyboard.QUOTE=222;
+		Keyboard.ALTERNATE=18;
+		Keyboard.BACKSPACE=8;
+		Keyboard.CAPS_LOCK=20;
+		Keyboard.COMMAND=15;
+		Keyboard.CONTROL=17;
+		Keyboard.DELETE=46;
+		Keyboard.ENTER=13;
+		Keyboard.ESCAPE=27;
+		Keyboard.PAGE_UP=33;
+		Keyboard.PAGE_DOWN=34;
+		Keyboard.END=35;
+		Keyboard.HOME=36;
+		Keyboard.LEFT=37;
+		Keyboard.UP=38;
+		Keyboard.RIGHT=39;
+		Keyboard.DOWN=40;
+		Keyboard.SHIFT=16;
+		Keyboard.SPACE=32;
+		Keyboard.TAB=9;
+		Keyboard.INSERT=45;
+		return Keyboard;
 	})()
 
 
@@ -14641,6 +14785,199 @@ var Laya=window.Laya=(function(window,document){
 	})()
 
 
+	/**拖动管理类*/
+	//class electrontools.drags.DragManager
+	var DragManager=(function(){
+		function DragManager(){
+			this._dragInitiator=null;
+			this._dragImage=null;
+			this._offSet=new Point();
+			Laya.stage.on("keydown",this,this.onStageKeyDown);
+		}
+
+		__class(DragManager,'electrontools.drags.DragManager');
+		var __proto=DragManager.prototype;
+		__proto.onStageKeyDown=function(e){
+			switch(e.keyCode){
+				case 27:
+					Laya.stage.off("mousemove",this,this.onStageMouseMove);
+					Laya.stage.off("mouseup",this,this.onStageMouseUp);
+					this.clears();
+					break ;
+				}
+		}
+
+		/**开始拖动
+		*@param dragInitiator 拖动的源对象
+		*@param dragImage 显示拖动的图片，如果为null，则是源对象本身
+		*@param data 拖动传递的数据
+		*@param offset 鼠标居拖动图片的偏移*/
+		__proto.doDrag=function(dragInitiator,dragImage,data,offset){
+			this.clears();
+			DragManager.prePos.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
+			this._dragInitiator=dragInitiator;
+			this._dragImage=dragImage ? dragImage :dragInitiator;
+			if((this._dragImage instanceof laya.ui.Clip )){
+				this._dragImage.width*=0.5;
+				this._dragImage.height*=0.5;
+			}
+			DragManager._data=data || {};
+			offset=null;
+			if(offset){
+				this._offSet.setTo(offset.x,offset.y);
+				}else{
+				this._offSet.setTo(this._dragImage.width*0.5,this._dragImage.height*0.5);
+			}
+			if (this._dragImage !=this._dragInitiator){
+				if (!this._dragImage.parent){
+					Laya._currentStage.addChild(this._dragImage);
+				}
+				offset=offset || new Point();
+				var p=this._dragImage.globalToLocal(new Point(Laya.stage.mouseX,Laya.stage.mouseY));
+				this._dragImage.x=p.x-offset.x;
+				this._dragImage.y=p.y-offset.y;
+				this._dragImage.visible=false;
+				this._dragImage.mouseEnabled=false;
+			}
+			Laya.stage.on("mousemove",this,this.onStageMouseMove);
+			Laya.stage.on("mouseup",this,this.onStageMouseUp);
+		}
+
+		/**放置把拖动条拖出显示区域*/
+		__proto.onStageMouseMove=function(e){
+			if (Math.abs(DragManager.prePos.x-Laya.stage.mouseX)+Math.abs(DragManager.prePos.y-Laya.stage.mouseY)<8){
+				return;
+			}
+			if(!this._dragImage)return;
+			if (!DragManager.isDraging){
+				this._dragImage.visible=true;
+				this._dragImage.x=Laya.stage.mouseX-this._offSet.x;
+				this._dragImage.y=Laya.stage.mouseY-this._offSet.y;
+				this._dragImage.startDrag();
+				this._dragImage.on("dragmove",this,this.onDraging);
+				this._dragInitiator.event("dragStart",[ this._dragInitiator,DragManager._data]);
+				DragManager.isDraging=true;
+				this._dragImage.mouseEnabled=false;
+			}
+			this.sendDragEvent("Draging_Hit");
+		}
+
+		__proto.onDraging=function(){
+			if(!this._dragImage)return;
+			this._dragImage.x=Laya.stage.mouseX-this._offSet.x;
+			this._dragImage.y=Laya.stage.mouseY-this._offSet.y;
+		}
+
+		__proto.onStageMouseUp=function(e){
+			Laya.stage.off("mousemove",this,this.onStageMouseMove);
+			Laya.stage.off("mouseup",this,this.onStageMouseUp);
+			DragManager.dPos.setTo(Laya.stage.mouseX-DragManager.prePos.x,Laya.stage.mouseY-DragManager.prePos.y);
+			if (Math.abs(DragManager.prePos.x-Laya.stage.mouseX)+Math.abs(DragManager.prePos.y-Laya.stage.mouseY)<8){
+				this.clears();
+				return;
+			}
+			this.getTarList();
+			if(!this._dragInitiator)return;
+			this._dragInitiator.event("dragComplete",[ this._dragInitiator,DragManager._data]);
+			this.clears();
+		}
+
+		__proto.clears=function(){
+			if(this._dragImage){
+				this._dragImage.off("dragmove",this,this.onDraging);
+				this._dragImage.mouseEnabled=true;
+				if(this._dragImage!=this._dragInitiator)
+					this._dragImage.removeSelf();
+			}
+			this._dragInitiator=null;
+			DragManager._data=null;
+			this._dragImage=null;
+			DragManager.isDraging=false;
+			FocusManager.clearFocus();
+		}
+
+		__proto.sendDragEvent=function(type){
+			this.getTarList(type);
+		}
+
+		__proto.getTarList=function(type){
+			(type===void 0)&& (type="dragDrop");
+			DragManager.sendDragEventByData(type,this._dragInitiator,DragManager._data);
+			return;
+			var rst;
+			rst=DisControlTool.getObjectsUnderPoint(Laya.stage,Laya.stage.mouseX*Browser.pixelRatio,Laya.stage.mouseY*Browser.pixelRatio,null,DisControlTool.visibleAndEnableObjFun);
+			var i=0,len=0;
+			var tTar;
+			len=rst.length;
+			var tEvent=DragEvent.TEMP;
+			tEvent.dragInitiator=this._dragInitiator;
+			tEvent.data=DragManager._data;
+			tEvent.hitList=rst;
+			for (i=0;i < len;i++){
+				tTar=rst[i];
+				if ((tTar instanceof laya.events.EventDispatcher )){
+					if (tTar.hasListener(type)){
+						tEvent.target=tTar;
+						tTar.event(type,tEvent);
+					}
+				}
+			}
+		}
+
+		__getset(1,DragManager,'I',function(){
+			if (!DragManager._i)DragManager._i=new DragManager();
+			return DragManager._i;
+		});
+
+		DragManager.getDragType=function(){
+			if (!DragManager._data||!DragManager._data.type)return null;
+			return DragManager._data.type;
+		}
+
+		DragManager.getDragTarget=function(){
+			if (!DragManager._data || !DragManager._data.target)return null;
+			return DragManager._data.target;
+		}
+
+		DragManager.sendDragEventByData=function(type,_dragInitiator,_data,x,y){
+			(x===void 0)&& (x="s");
+			(y===void 0)&& (y="s");
+			if(x=="s"){
+				x=Laya.stage.mouseX;
+			}
+			if(y=="s"){
+				y=Laya.stage.mouseY;
+			};
+			var rst;
+			rst=DisControlTool.getObjectsUnderPoint(Laya.stage,x*Browser.pixelRatio,y*Browser.pixelRatio,null,DisControlTool.visibleAndEnableObjFun);
+			var i=0,len=0;
+			var tTar;
+			len=rst.length;
+			var tEvent=DragEvent.TEMP;
+			tEvent.dragInitiator=_dragInitiator;
+			tEvent.data=_data;
+			tEvent.hitList=rst;
+			for (i=0;i < len;i++){
+				tTar=rst[i];
+				if ((tTar instanceof laya.events.EventDispatcher )){
+					if (tTar.hasListener(type)){
+						tEvent.target=tTar;
+						tTar.event(type,tEvent);
+					}
+				}
+			}
+		}
+
+		DragManager._data=null
+		DragManager._i=null
+		DragManager.isDraging=false;
+		__static(DragManager,
+		['dragOffset',function(){return this.dragOffset=new Point(7,7);},'prePos',function(){return this.prePos=new Point();},'dPos',function(){return this.dPos=new Point();}
+		]);
+		return DragManager;
+	})()
+
+
 	/**
 	*...
 	*@author ww
@@ -14714,6 +15051,400 @@ var Laya=window.Laya=(function(window,document){
 		SystemDragOverManager.SystemDrag="SystemDrag";
 		SystemDragOverManager.tempEvent={};
 		return SystemDragOverManager;
+	})()
+
+
+	/**
+	*用于在对象上显示焦点框的工具类
+	*@author ww
+	*/
+	//class extendui.FocusManager
+	var FocusManager=(function(){
+		function FocusManager(){}
+		__class(FocusManager,'extendui.FocusManager');
+		FocusManager.showFocus=function(tar,width,clearPre){
+			(width===void 0)&& (width=5);
+			(clearPre===void 0)&& (clearPre=true);
+			var bounds;
+			bounds=FocusManager.getTarBounds(tar);
+			FocusManager.showBorder(tar,"up",clearPre,bounds,width);
+			FocusManager.showBorder(tar,"down",false,bounds,width);
+			FocusManager.showBorder(tar,"left",false,bounds,width);
+			FocusManager.showBorder(tar,"right",false,bounds,width);
+		}
+
+		FocusManager.getTarBounds=function(tar){
+			if(FocusManager.useGetBounds){
+				return tar.getSelfBounds();
+				}else{
+				return new Rectangle().setTo(0,0,tar.width,tar.height);
+			}
+		}
+
+		FocusManager.showBorder=function(tar,type,clearPre,rec,width){
+			(clearPre===void 0)&& (clearPre=true);
+			(width===void 0)&& (width=5);
+			if (clearPre==true){
+				FocusManager.clearFocus();
+			};
+			var bounds;
+			bounds=rec?rec:FocusManager.getTarBounds(tar);
+			var tFocus;
+			tFocus=DisPool.getDis(FocusItem);
+			switch (type){
+				case "left":
+					tFocus.width=width;
+					tFocus.height=bounds.height;
+					tFocus.x=bounds.x;
+					tFocus.y=bounds.y;
+					break ;
+				case "right":
+					tFocus.width=width;
+					tFocus.height=bounds.height;
+					tFocus.x=bounds.x+bounds.width-width;
+					tFocus.y=bounds.y;
+					break ;
+				case "up":
+					tFocus.width=bounds.width;
+					tFocus.height=width;
+					tFocus.x=bounds.x;
+					tFocus.y=bounds.y;
+					break ;
+				case "down":
+					tFocus.width=bounds.width;
+					tFocus.height=width;
+					tFocus.x=bounds.x;
+					tFocus.y=bounds.y+bounds.height-width;
+					break ;
+				}
+			FocusManager.showFocusToTar(tar,tFocus);
+		}
+
+		FocusManager.showFocusToTar=function(tar,focus){
+			FocusManager._focusList.push(focus);
+			tar.addChild(focus);
+		}
+
+		FocusManager.clearFocus=function(tar){
+			var i=0,len=0;
+			len=FocusManager._focusList.length;
+			if (tar){
+				for (i=len-1;i >=0;i--){
+					if (FocusManager._focusList[i].parent==tar){
+						(FocusManager._focusList [i]).removeSelf();
+						FocusManager._focusList.splice(i,1);
+					}
+				}
+			}
+			else{
+				for (i=0;i < len;i++){
+					(FocusManager._focusList [i]).removeSelf();
+				}
+				FocusManager._focusList.length=0;
+			}
+		}
+
+		FocusManager.flashItem=function(item,count,loopTime){
+			(count===void 0)&& (count=3);
+			(loopTime===void 0)&& (loopTime=200);
+			if(!FocusManager._focusFilter){
+				var mat;
+				mat=[1,0,0,0,100,
+				0,1,0,0,100,
+				0,0,1,0,100,
+				0,0,0,1,200];
+				FocusManager._focusFilter=new ColorFilter(mat);
+			}
+			Laya.timer.once(loopTime,null,FocusManager._flashItem,[item,count,loopTime],false);
+		}
+
+		FocusManager._flashItem=function(item,leftCount,loopTime){
+			(loopTime===void 0)&& (loopTime=200);
+			if(!item.filters){
+				item.filters=[FocusManager._focusFilter];
+				Laya.timer.once(loopTime,null,FocusManager._flashItem,[item,leftCount],false);
+				}else{
+				item.filters=null;
+				leftCount--;
+				if(leftCount>0)
+					Laya.timer.once(loopTime,null,FocusManager._flashItem,[item,leftCount],false);
+			}
+		}
+
+		FocusManager.focusWidth=5;
+		FocusManager.useGetBounds=false;
+		FocusManager._focusList=[];
+		FocusManager._focusFilter=null
+		return FocusManager;
+	})()
+
+
+	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2016-4-20 下午4:48:41
+	*/
+	//class extendui.KeyManager
+	var KeyManager=(function(){
+		function KeyManager(){
+			this.isCommandKeyDown=false;
+		}
+
+		__class(KeyManager,'extendui.KeyManager');
+		var __proto=KeyManager.prototype;
+		__proto.init=function(){
+			Laya.stage.on("keydown",this,this.keyDown);
+			Laya.stage.on("keyup",this,this.keyUp);
+			Laya.stage.on("blur",this,this.onBlur);
+		}
+
+		__proto.onBlur=function(){
+			this.isCommandKeyDown=false;
+		}
+
+		__proto.isCommandKey=function(keyCode){
+			if(KeyManager.commandKeys[keyCode])return true;
+			return false;
+		}
+
+		__proto.keyDown=function(e){
+			if(this.isCommandKey(e.keyCode)){
+				this.isCommandKeyDown=true;
+			}
+			if(Input.isInputting){
+				this.isCommandKeyDown=false;
+			}
+		}
+
+		__proto.keyUp=function(e){
+			if(Input.isInputting){
+				this.isCommandKeyDown=false;
+			}
+			if(this.isCommandKey(e.keyCode)){
+				this.isCommandKeyDown=false;
+			}
+		}
+
+		KeyManager.isABC=function(keyCode){
+			return keyCode>=65&&keyCode<=90;
+		}
+
+		KeyManager.getCharByCode=function(code){
+			return String.fromCharCode(code);
+		}
+
+		KeyManager.setNewFocus=function(item){
+			if(Laya.stage.focus){
+				KeyManager.focusList.push(Laya.stage.focus);
+			}
+			Laya.stage.focus=item;
+		}
+
+		KeyManager.restoreFocus=function(){
+			if(KeyManager.focusList.length>0){
+				Laya.stage.focus=KeyManager.focusList.pop();
+			}
+		}
+
+		KeyManager.focusList=[];
+		__static(KeyManager,
+		['I',function(){return this.I=new KeyManager();},'commandKeys',function(){return this.commandKeys={
+				91:true,
+				93:true,
+				244:true,
+				17:true
+		};}
+
+		]);
+		return KeyManager;
+	})()
+
+
+	/**
+	*本类用于处理对象之间的排版关系
+	*@author ww
+	*/
+	//class extendui.layout.RelativePos
+	var RelativePos=(function(){
+		function RelativePos(fun,tar,to,d){
+			this.tar=null;
+			this.to=null;
+			this.d=NaN;
+			this._fun=null;
+			this.tar=tar;
+			this.to=to;
+			this.d=d;
+			this._fun=fun;
+		}
+
+		__class(RelativePos,'extendui.layout.RelativePos');
+		var __proto=RelativePos.prototype;
+		/**
+		*更新排版
+		*
+		*/
+		__proto.update=function(){
+			this._fun(this.tar,this.to,this.d);
+		}
+
+		RelativePos.getDisMouseRelativePos=function(tTarget,edgePercent){
+			(edgePercent===void 0)&& (edgePercent=0.1);
+			var pos;
+			pos=DisControlTool.getMousePoint(tTarget);
+			if (pos.x < 0 || pos.x > tTarget.width || pos.y < 0 || pos.y > tTarget.height)return "out";
+			if (pos.y < tTarget.height *edgePercent){
+				return "up";
+			}
+			else if (pos.y > tTarget.height *(1-edgePercent)){
+				return "down";
+			}
+			else if (pos.x > tTarget.width *(1-edgePercent)){
+				return "right";
+				}else if (pos.x < tTarget.width *edgePercent){
+				return "left";
+				}else{
+				return "center";
+			}
+			return "center";
+		}
+
+		RelativePos.rightTo=function(tar,to,d){
+			(d===void 0)&& (d=0);
+			if (!to.parent)
+				return;
+			tar.right=Math.ceil((to.parent).width-to.x+d);
+		}
+
+		RelativePos.leftTo=function(tar,to,d){
+			(d===void 0)&& (d=0);
+			tar.left=Math.ceil(to.x+to.width+d);
+		}
+
+		RelativePos.downTo=function(tar,to,d){
+			(d===void 0)&& (d=0);
+			if (!to.parent)
+				return;
+			tar.bottom=Math.ceil((to.parent).height-to.y+d);
+		}
+
+		RelativePos.upTo=function(tar,to,d){
+			(d===void 0)&& (d=0);
+			tar.top=Math.ceil(to.y+to.height+d);
+		}
+
+		RelativePos.saveRelative=function(tar){
+			var relativeO;
+			relativeO=tar["relativeO"];
+			if (!relativeO)
+				return {};
+			var key;
+			var rst={};
+			for (key in relativeO){
+				rst[key]=IDTools.getObjID(relativeO[key]);
+			}
+			return rst;
+		}
+
+		RelativePos.getTypeByFun=function(fun){
+			var key;
+			for (key in RelativePos.typeToFunO){
+				if (RelativePos.typeToFunO[key]==fun)
+					return key;
+			}
+			return null;
+		}
+
+		RelativePos.getOtherSide=function(type){
+			return RelativePos.otherSideO[type];
+		}
+
+		RelativePos.getOnlySide=function(o){
+			var relativeO;
+			relativeO=o["relativeO"];
+			if (!relativeO)
+				return null;
+			var type;
+			var tBar;
+			var tRst;
+			var tArea=0;
+			var tRstBar;
+			for (type in relativeO){
+				tBar=relativeO[type];
+				if (tBar){
+					if (tBar.isOnly(o)){
+						if (!tRst || RelativePos.getBarWeight(tBar)> tArea){
+							tRst=type;
+							tRstBar=tBar;
+							tArea=RelativePos.getBarWeight(tBar);
+						}
+					}
+				}
+			}
+			return tRst;
+		}
+
+		RelativePos.getBarWeight=function(bar){
+			var tRec;
+			tRec=bar.getDragArea();
+			return tRec.width+tRec.height;
+		}
+
+		RelativePos.addRelative=function(o,dragBar,type,d){
+			(d===void 0)&& (d=0);
+			if (!dragBar)
+				return;
+			RelativePos.cancelRelative(o,type);
+			dragBar.addItem(o,RelativePos.typeToFunO[type]);
+			var relativeO;
+			if (!o["relativeO"])
+				o["relativeO"]={};
+			relativeO=o["relativeO"];
+			relativeO[type]=dragBar;
+		}
+
+		RelativePos.copyRelative=function(o,tar,type){
+			RelativePos.addRelative(o,RelativePos.getBar(tar,type),type);
+		}
+
+		RelativePos.cancelRelative=function(o,sign){
+			var relativeO;
+			relativeO=o["relativeO"];
+			if (!relativeO)
+				return;
+			if (relativeO[sign]){
+				(relativeO[sign]).removeTarget(o);
+			}
+			delete relativeO[sign];
+		}
+
+		RelativePos.getBar=function(o,sign){
+			var relativeO;
+			relativeO=o["relativeO"];
+			if (!relativeO)
+				return null;
+			return relativeO[sign];
+		}
+
+		RelativePos.clearBar=function(o){
+			RelativePos.cancelRelative(o,"left");
+			RelativePos.cancelRelative(o,"right");
+			RelativePos.cancelRelative(o,"up");
+			RelativePos.cancelRelative(o,"down");
+		}
+
+		RelativePos.Right="right";
+		RelativePos.Left="left";
+		RelativePos.Down="down";
+		RelativePos.Up="up";
+		RelativePos.Center="center";
+		RelativePos.Out="out";
+		RelativePos.EdgePercent=0.1;
+		__static(RelativePos,
+		['typeToFunO',function(){return this.typeToFunO={"right":extendui.layout.RelativePos.rightTo,"left":extendui.layout.RelativePos.leftTo,"up":extendui.layout.RelativePos.upTo,"down":extendui.layout.RelativePos.downTo};},'otherSideO',function(){return this.otherSideO={"right":"left","left":"right","up":"down","down":"up"};}
+		]);
+		return RelativePos;
 	})()
 
 
@@ -14809,6 +15540,72 @@ var Laya=window.Laya=(function(window,document){
 		Device.electron=null
 		Device.win=null
 		return Device;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nodetools.devices.File
+	var File=(function(){
+		function File(path){
+			this.nativePath=null;
+			this.nativePath=path;
+		}
+
+		__class(File,'nodetools.devices.File');
+		var __proto=File.prototype;
+		__proto.copyTo=function(path,overwrite){
+			(overwrite===void 0)&& (overwrite=false);
+			FileTools.copyE(this.nativePath,path);
+		}
+
+		__proto.deleteFile=function(){
+			FileTools.removeE(this.nativePath);
+		}
+
+		__proto.moveToTrash=function(){
+			this.deleteFile();
+		}
+
+		__proto.getRelativePath=function(path){
+			return FileTools.getRelativePath(this.nativePath,path);
+		}
+
+		__proto.moveTo=function(path,overwrite){
+			(overwrite===void 0)&& (overwrite=false);
+			FileTools.rename(this.nativePath,path);
+		}
+
+		__proto.resolvePath=function(path){
+			return new File(FileTools.getPath(this.nativePath,path));
+		}
+
+		__getset(0,__proto,'extension',function(){
+			return FileTools.getExtensionName(this.nativePath);
+		});
+
+		__getset(0,__proto,'isDirectory',function(){
+			return FileTools.isDirectory(this.nativePath);
+		});
+
+		__getset(0,__proto,'parent',function(){
+			return new File(FileTools.getParent(this.nativePath));
+		});
+
+		__getset(0,__proto,'exists',function(){
+			return FileTools.exist(this.nativePath);
+		});
+
+		__getset(0,__proto,'name',function(){
+			return FileTools.getFileNameWithExtension(this.nativePath);
+		});
+
+		__static(File,
+		['applicationDirectory',function(){return this.applicationDirectory=new File("");},'applicationStorageDirectory',function(){return this.applicationStorageDirectory=new File("");},'userDirectory',function(){return this.userDirectory=new File("");}
+		]);
+		return File;
 	})()
 
 
@@ -19125,6 +19922,89 @@ var Laya=window.Laya=(function(window,document){
 		UIEvent.SHOW_TIP="showtip";
 		UIEvent.HIDE_TIP="hidetip";
 		return UIEvent;
+	})(Event)
+
+
+	/**拖动事件类*/
+	//class electrontools.drags.DragEvent extends laya.events.Event
+	var DragEvent=(function(_super){
+		function DragEvent(type,dragInitiator,data,bubbles,cancelable){
+			this._data=null;
+			this._dragInitiator=null;
+			this.hitList=null;
+			DragEvent.__super.call(this);
+			(bubbles===void 0)&& (bubbles=true);
+			(cancelable===void 0)&& (cancelable=false);
+			this.type=type;
+			this._dragInitiator=dragInitiator;
+			this._data=data;
+		}
+
+		__class(DragEvent,'electrontools.drags.DragEvent',_super);
+		var __proto=DragEvent.prototype;
+		__proto.clone=function(){
+			return new DragEvent(this.type,this._dragInitiator,this._data);
+		}
+
+		/**拖动的源对象*/
+		__getset(0,__proto,'dragInitiator',function(){
+			return this._dragInitiator;
+			},function(value){
+			this._dragInitiator=value;
+		});
+
+		/**拖动传递的数据*/
+		__getset(0,__proto,'data',function(){
+			return this._data;
+			},function(value){
+			this._data=value;
+		});
+
+		DragEvent.getMutiDragFiles=function(e){
+			var data=e.data;
+			if(data.type!="multiResFile"&&data.type!="resDir"){
+				return null;
+			};
+			var src=e.dragInitiator;
+			var fileList;
+			fileList=data.fileList;
+			if(data.type=="resDir"){
+				fileList=FileTools.getFileList(data.asset);
+			};
+			var i=0,len=0;
+			len=fileList.length;
+			var files;
+			files=[];
+			for(i=0;i<len;i++){
+				var path;
+				path=fileList[i];
+				if(FileTools.isDirectory(path))continue ;
+				path=FileManager.getRelativePath(/*no*/this.SystemSetting.assetsPath,path);
+				path=FileManager.adptToCommonUrl(path);
+				files.push(path);
+			}
+			files.sort();
+			return files;
+		}
+
+		DragEvent.DRAG_START="dragStart";
+		DragEvent.DRAG_DROP="dragDrop";
+		DragEvent.Draging_Hit="Draging_Hit";
+		DragEvent.DRAG_COMPLETE="dragComplete";
+		DragEvent.DRAG_MOVE="dragMove";
+		DragEvent.Res="res";
+		DragEvent.ResDir="resDir";
+		DragEvent.Props="Props";
+		DragEvent.MULTI_RESFILE="multiResFile";
+		DragEvent.DisplayDrag="displayDrag";
+		DragEvent.SystemDrag="SystemDrag";
+		DragEvent.Page="page";
+		DragEvent.PageDir="pageDir";
+		DragEvent.MULTI_PAGEFILE="multiPageFile";
+		__static(DragEvent,
+		['TEMP',function(){return this.TEMP=new DragEvent("dragDrop");}
+		]);
+		return DragEvent;
 	})(Event)
 
 
@@ -24012,6 +24892,244 @@ var Laya=window.Laya=(function(window,document){
 		Stage.FRAME_MOUSE="mouse";
 		Stage.FRAME_SLEEP="sleep";
 		return Stage;
+	})(Sprite)
+
+
+	/**
+	*<code>DialogManager</code> 对话框管理容器，所有的对话框都在该容器内，并且受管理器管理。
+	*任意对话框打开和关闭，都会出发管理类的open和close事件
+	*可以通过UIConfig设置弹出框背景透明度，模式窗口点击边缘是否关闭，点击窗口是否切换层次等
+	*通过设置对话框的zOrder属性，可以更改弹出的层次
+	*/
+	//class laya.ui.DialogManager extends laya.display.Sprite
+	var DialogManager=(function(_super){
+		function DialogManager(){
+			this.lockLayer=null;
+			this.popupEffect=function(dialog){
+				dialog.scale(1,1);
+				Tween.from(dialog,{x:Laya.stage.width / 2,y:Laya.stage.height / 2,scaleX:0,scaleY:0},300,Ease.backOut,Handler.create(this,this.doOpen,[dialog]));
+			}
+			this.closeEffect=function(dialog,type){
+				Tween.to(dialog,{x:Laya.stage.width / 2,y:Laya.stage.height / 2,scaleX:0,scaleY:0},300,Ease.strongOut,Handler.create(this,this.doClose,[dialog,type]));
+			}
+			DialogManager.__super.call(this);
+			this.maskLayer=new Sprite();
+			this.popupEffectHandler=new Handler(this,this.popupEffect);
+			this.closeEffectHandler=new Handler(this,this.closeEffect);
+			this.mouseEnabled=this.maskLayer.mouseEnabled=true;
+			this.zOrder=1000;
+			Laya.stage.addChild(this);
+			Laya.stage.on("resize",this,this._onResize);
+			if (UIConfig.closeDialogOnSide)this.maskLayer.on("click",this,this._closeOnSide);
+			this._onResize(null);
+		}
+
+		__class(DialogManager,'laya.ui.DialogManager',_super);
+		var __proto=DialogManager.prototype;
+		__proto._closeOnSide=function(){
+			var dialog=this.getChildAt(this.numChildren-1);
+			if ((dialog instanceof laya.ui.Dialog ))dialog.close("side");
+		}
+
+		/**设置锁定界面，如果为空则什么都不显示*/
+		__proto.setLockView=function(value){
+			if (!this.lockLayer){
+				this.lockLayer=new Box();
+				this.lockLayer.mouseEnabled=true;
+				this.lockLayer.size(Laya.stage.width,Laya.stage.height);
+			}
+			this.lockLayer.removeChildren();
+			if (value){
+				value.centerX=value.centerY=0;
+				this.lockLayer.addChild(value);
+			}
+		}
+
+		/**@private */
+		__proto._onResize=function(e){
+			var width=this.maskLayer.width=Laya.stage.width;
+			var height=this.maskLayer.height=Laya.stage.height;
+			if (this.lockLayer)this.lockLayer.size(width,height);
+			this.maskLayer.graphics.clear();
+			this.maskLayer.graphics.drawRect(0,0,width,height,UIConfig.popupBgColor);
+			this.maskLayer.alpha=UIConfig.popupBgAlpha;
+			for (var i=this.numChildren-1;i >-1;i--){
+				var item=this.getChildAt(i);
+				if (item.popupCenter)this._centerDialog(item);
+			}
+		}
+
+		__proto._centerDialog=function(dialog){
+			dialog.x=Math.round(((Laya.stage.width-dialog.width)>> 1)+dialog.pivotX);
+			dialog.y=Math.round(((Laya.stage.height-dialog.height)>> 1)+dialog.pivotY);
+		}
+
+		/**
+		*显示对话框(非模式窗口类型)。
+		*@param dialog 需要显示的对象框 <code>Dialog</code> 实例。
+		*@param closeOther 是否关闭其它对话框，若值为ture，则关闭其它的对话框。
+		*/
+		__proto.open=function(dialog,closeOther){
+			(closeOther===void 0)&& (closeOther=false);
+			if (closeOther)this.removeChildren();
+			if (dialog.popupCenter)this._centerDialog(dialog);
+			this.addChild(dialog);
+			if (dialog.isModal || this._$P["hasZorder"])this.timer.callLater(this,this._checkMask);
+			if (dialog.popupEffect !=null)dialog.popupEffect.runWith(dialog);
+			else this.doOpen(dialog);
+			this.event("open");
+		}
+
+		/**
+		*执行打开对话框。
+		*@param dialog 需要关闭的对象框 <code>Dialog</code> 实例。
+		*@param type 关闭的类型，默认为空
+		*/
+		__proto.doOpen=function(dialog){
+			dialog.onOpened();
+		}
+
+		/**
+		*锁定所有层，显示加载条信息，防止双击
+		*/
+		__proto.lock=function(value){
+			if (this.lockLayer){
+				if (value)this.addChild(this.lockLayer);
+				else this.lockLayer.removeSelf();
+			}
+		}
+
+		/**
+		*关闭对话框。
+		*@param dialog 需要关闭的对象框 <code>Dialog</code> 实例。
+		*@param type 关闭的类型，默认为空
+		*/
+		__proto.close=function(dialog,type){
+			if (dialog.closeEffect !=null)dialog.closeEffect.runWith([dialog,type]);
+			else this.doClose(dialog,type);
+			this.event("close");
+		}
+
+		/**
+		*执行关闭对话框。
+		*@param dialog 需要关闭的对象框 <code>Dialog</code> 实例。
+		*@param type 关闭的类型，默认为空
+		*/
+		__proto.doClose=function(dialog,type){
+			dialog.removeSelf();
+			dialog.isModal && this._checkMask();
+			dialog.closeHandler && dialog.closeHandler.runWith(type);
+			dialog.onClosed(type);
+		}
+
+		/**
+		*关闭所有的对话框。
+		*/
+		__proto.closeAll=function(){
+			this.removeChildren();
+			this.event("close");
+		}
+
+		/**
+		*根据组获取所有对话框
+		*@param group 组名称
+		*@return 对话框数组
+		*/
+		__proto.getDialogsByGroup=function(group){
+			var arr=[];
+			for (var i=this.numChildren-1;i >-1;i--){
+				var item=this.getChildAt(i);
+				if (item.group===group){
+					arr.push(item);
+				}
+			}
+			return arr;
+		}
+
+		/**
+		*根据组关闭所有弹出框
+		*@param group 需要关闭的组名称
+		*@return 需要关闭的对话框数组
+		*/
+		__proto.closeByGroup=function(group){
+			var arr=[];
+			for (var i=this.numChildren-1;i >-1;i--){
+				var item=this.getChildAt(i);
+				if (item.group===group){
+					item.close();
+					arr.push(item);
+				}
+			}
+			return arr;
+		}
+
+		/**@private 发生层次改变后，重新检查遮罩层是否正确*/
+		__proto._checkMask=function(){
+			this.maskLayer.removeSelf();
+			for (var i=this.numChildren-1;i >-1;i--){
+				var dialog=this.getChildAt(i);
+				if (dialog && dialog.isModal){
+					this.addChildAt(this.maskLayer,i);
+					return;
+				}
+			}
+		}
+
+		return DialogManager;
+	})(Sprite)
+
+
+	/**消息管理器
+	*/
+	//class electrontools.MessageManager extends laya.display.Sprite
+	var MessageManager=(function(_super){
+		function MessageManager(){
+			this.preTime=0;
+			MessageManager.__super.call(this);
+			this._vbox=new Box();
+			this.addChild(this._vbox);
+			this.setBounds(new Rectangle(0,0,150,150));
+			Laya.stage.addChild(this);
+		}
+
+		__class(MessageManager,'electrontools.MessageManager',_super);
+		var __proto=MessageManager.prototype;
+		__proto.show=function(msg,color,time){
+			(color===void 0)&& (color="#ff0000");
+			(time===void 0)&& (time=1000);
+			var label=new Label();
+			label.fontSize=14;
+			label.text=msg;
+			label.y=100;
+			label.height=30;
+			label.color=color;
+			var delayTime=0;
+			var nowTime=0;
+			var startTime=0;
+			nowTime=Browser.now();
+			startTime=Math.max(this.preTime+500,nowTime);
+			delayTime=startTime-nowTime;
+			this.preTime=startTime;
+			Laya.timer.once(delayTime,this,this.showLabel,[label,time],false);
+		}
+
+		__proto.showLabel=function(label,time){
+			this.pos(Laya.stage.width *0.5-100,20);
+			this._vbox.addChild(label);
+			Tween.to(label,{y:-20},time,Ease.cubicOut,null);
+			Laya.timer.once(time,this,this.clear,[label],false);
+		}
+
+		__proto.clear=function(label){
+			label.removeSelf();
+		}
+
+		__getset(1,MessageManager,'I',function(){
+			return MessageManager._instance ? MessageManager._instance :MessageManager._instance=new MessageManager();
+		},laya.display.Sprite._$SET_I);
+
+		MessageManager._instance=null
+		return MessageManager;
 	})(Sprite)
 
 
@@ -29289,7 +30407,7 @@ var Laya=window.Laya=(function(window,document){
 		function ContextMenu(){
 			this._tY=0;
 			ContextMenu.__super.call(this);
-			StyleConsts.setViewScale(this);
+			StyleConsts$1.setViewScale(this);
 		}
 
 		__class(ContextMenu,'laya.debug.uicomps.ContextMenu',_super);
@@ -31940,7 +33058,7 @@ var Laya=window.Laya=(function(window,document){
 
 		ContextMenu.getContextMenuLang=function(str){
 			var langStr;
-			langStr=/*no*/this.Sys.lang(str);
+			langStr=Sys.lang(str);
 			if(langStr!=str){
 				ContextMenu.revertLangDic[langStr]=str;
 			}
@@ -31988,7 +33106,7 @@ var Laya=window.Laya=(function(window,document){
 			function click (item,focusedWindow){
 				cmenu.event("select",item.preLabel);
 			}
-			if (/*no*/this.SystemSetting.isCMDVer)return null;
+			if (SystemSetting.isCMDVer)return null;
 			var menu;
 			const remote=require("electron").remote;;
 			const Menu=remote.Menu;;
@@ -32028,6 +33146,29 @@ var Laya=window.Laya=(function(window,document){
 
 		]);
 		return ContextMenu;
+	})(Box)
+
+
+	/**
+	*焦点提示
+	*@author ww
+	*/
+	//class extendui.focus.FocusItem extends laya.ui.Box
+	var FocusItem=(function(_super){
+		function FocusItem(){
+			FocusItem.__super.call(this);
+		}
+
+		__class(FocusItem,'extendui.focus.FocusItem',_super);
+		var __proto=FocusItem.prototype;
+		__proto.changeSize=function(){
+			laya.ui.Component.prototype.changeSize.call(this);
+			var g=this.graphics;
+			g.clear();
+			g.drawRect(0,0,this.width,this.height,"#33c5f5");
+		}
+
+		return FocusItem;
 	})(Box)
 
 
@@ -32195,7 +33336,7 @@ var Laya=window.Laya=(function(window,document){
 			this.clickSelectChange();
 			this.view.selectWhenClick.on("change",this,this.clickSelectChange);
 			Notice$1.listen("ItemClicked",this,this.itemClicked);
-			StyleConsts.setViewScale(this.view);
+			StyleConsts$1.setViewScale(this.view);
 			this.dragIcon=this.view.dragIcon;
 			this.dragIcon.removeSelf();
 			this.view.mouseAnalyseBtn.on("mousedown",this,this.mouseAnalyserMouseDown);
@@ -32352,7 +33493,7 @@ var Laya=window.Laya=(function(window,document){
 		var __proto=FindSmallView.prototype;
 		__proto.createPanel=function(){
 			this.view=new FindNodeSmall();
-			StyleConsts.setViewScale(this.view);
+			StyleConsts$1.setViewScale(this.view);
 			DisControlTool.setDragingItem(this.view.bg,this.view);
 			this.view.typeSelect.selectedIndex=1;
 			this.view.closeBtn.on("click",this,this.close);
@@ -32669,7 +33810,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.createPanel=function(){
 			_super.prototype.createPanel.call(this);
 			this.view=new NodeTreeSetting();
-			StyleConsts.setViewScale(this.view);
+			StyleConsts$1.setViewScale(this.view);
 			this.addChild(this.view);
 			this.inits();
 			this.dis=this.view;
@@ -32898,7 +34039,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.createPanel=function(){
 			_super.prototype.createPanel.call(this);
 			this.view=new ObjectInfo();
-			StyleConsts.setViewScale(this.view);
+			StyleConsts$1.setViewScale(this.view);
 			this.addChild(this.view);
 			this.inits();
 		}
@@ -33066,7 +34207,7 @@ var Laya=window.Laya=(function(window,document){
 			this.view=new OutPut();
 			DisControlTool.setDragingItem(this.view.txt,this.view);
 			DisControlTool.setDragingItem(this.view.bg,this.view);
-			StyleConsts.setViewScale(this.view);
+			StyleConsts$1.setViewScale(this.view);
 			this.view.txt.textField.overflow=Text.SCROLL;
 			this.view.txt.textField.wordWrap=true;
 			this.view.on("mousewheel",this,this.mouseWheel);
@@ -34253,6 +35394,103 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
+	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
+	*
+	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
+	*package
+	*{
+		*import laya.ui.HSlider;
+		*import laya.ui.VSlider;
+		*import laya.utils.Handler;
+		*public class VSlider_Example
+		*{
+			*private var vSlider:VSlider;
+			*public function VSlider_Example()
+			*{
+				*Laya.init(640,800);//设置游戏画布宽高。
+				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
+				*}
+			*private function onLoadComplete():void
+			*{
+				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+				*vSlider.min=0;//设置 vSlider 最低位置值。
+				*vSlider.max=10;//设置 vSlider 最高位置值。
+				*vSlider.value=2;//设置 vSlider 当前位置值。
+				*vSlider.tick=1;//设置 vSlider 刻度值。
+				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
+				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+				*}
+			*private function onChange(value:Number):void
+			*{
+				*trace("滑块的位置： value="+value);
+				*}
+			*}
+		*}
+	*@example
+	*Laya.init(640,800);//设置游戏画布宽高
+	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
+	*var vSlider;
+	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
+	*function onLoadComplete(){
+		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+		*vSlider.min=0;//设置 vSlider 最低位置值。
+		*vSlider.max=10;//设置 vSlider 最高位置值。
+		*vSlider.value=2;//设置 vSlider 当前位置值。
+		*vSlider.tick=1;//设置 vSlider 刻度值。
+		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
+		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+		*}
+	*function onChange(value){
+		*console.log("滑块的位置： value="+value);
+		*}
+	*@example
+	*import HSlider=laya.ui.HSlider;
+	*import VSlider=laya.ui.VSlider;
+	*import Handler=laya.utils.Handler;
+	*class VSlider_Example {
+		*private vSlider:VSlider;
+		*constructor(){
+			*Laya.init(640,800);//设置游戏画布宽高。
+			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
+			*}
+		*private onLoadComplete():void {
+			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+			*this.vSlider.min=0;//设置 vSlider 最低位置值。
+			*this.vSlider.max=10;//设置 vSlider 最高位置值。
+			*this.vSlider.value=2;//设置 vSlider 当前位置值。
+			*this.vSlider.tick=1;//设置 vSlider 刻度值。
+			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
+			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
+			*}
+		*private onChange(value:number):void {
+			*console.log("滑块的位置： value="+value);
+			*}
+		*}
+	*@see laya.ui.Slider
+	*/
+	//class laya.ui.VSlider extends laya.ui.Slider
+	var VSlider=(function(_super){
+		function VSlider(){VSlider.__super.call(this);;
+		};
+
+		__class(VSlider,'laya.ui.VSlider',_super);
+		return VSlider;
+	})(Slider)
+
+
+	/**
 	*<code>TextInput</code> 类用于创建显示对象以显示和输入文本。
 	*
 	*@example <caption>以下示例代码，创建了一个 <code>TextInput</code> 实例。</caption>
@@ -34573,103 +35811,6 @@ var Laya=window.Laya=(function(window,document){
 
 		return TextInput;
 	})(Label)
-
-
-	/**
-	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
-	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
-	*
-	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
-	*package
-	*{
-		*import laya.ui.HSlider;
-		*import laya.ui.VSlider;
-		*import laya.utils.Handler;
-		*public class VSlider_Example
-		*{
-			*private var vSlider:VSlider;
-			*public function VSlider_Example()
-			*{
-				*Laya.init(640,800);//设置游戏画布宽高。
-				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
-				*}
-			*private function onLoadComplete():void
-			*{
-				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-				*vSlider.min=0;//设置 vSlider 最低位置值。
-				*vSlider.max=10;//设置 vSlider 最高位置值。
-				*vSlider.value=2;//设置 vSlider 当前位置值。
-				*vSlider.tick=1;//设置 vSlider 刻度值。
-				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
-				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-				*}
-			*private function onChange(value:Number):void
-			*{
-				*trace("滑块的位置： value="+value);
-				*}
-			*}
-		*}
-	*@example
-	*Laya.init(640,800);//设置游戏画布宽高
-	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
-	*var vSlider;
-	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
-	*function onLoadComplete(){
-		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-		*vSlider.min=0;//设置 vSlider 最低位置值。
-		*vSlider.max=10;//设置 vSlider 最高位置值。
-		*vSlider.value=2;//设置 vSlider 当前位置值。
-		*vSlider.tick=1;//设置 vSlider 刻度值。
-		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
-		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-		*}
-	*function onChange(value){
-		*console.log("滑块的位置： value="+value);
-		*}
-	*@example
-	*import HSlider=laya.ui.HSlider;
-	*import VSlider=laya.ui.VSlider;
-	*import Handler=laya.utils.Handler;
-	*class VSlider_Example {
-		*private vSlider:VSlider;
-		*constructor(){
-			*Laya.init(640,800);//设置游戏画布宽高。
-			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
-			*}
-		*private onLoadComplete():void {
-			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-			*this.vSlider.min=0;//设置 vSlider 最低位置值。
-			*this.vSlider.max=10;//设置 vSlider 最高位置值。
-			*this.vSlider.value=2;//设置 vSlider 当前位置值。
-			*this.vSlider.tick=1;//设置 vSlider 刻度值。
-			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
-			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
-			*}
-		*private onChange(value:number):void {
-			*console.log("滑块的位置： value="+value);
-			*}
-		*}
-	*@see laya.ui.Slider
-	*/
-	//class laya.ui.VSlider extends laya.ui.Slider
-	var VSlider=(function(_super){
-		function VSlider(){VSlider.__super.call(this);;
-		};
-
-		__class(VSlider,'laya.ui.VSlider',_super);
-		return VSlider;
-	})(Slider)
 
 
 	/**
@@ -35159,6 +36300,309 @@ var Laya=window.Laya=(function(window,document){
 
 		return GraphicAnimation;
 	})(FrameAnimation)
+
+
+	/**
+	*<code>Dialog</code> 组件是一个弹出对话框，实现对话框弹出，拖动，模式窗口功能。
+	*可以通过UIConfig设置弹出框背景透明度，模式窗口点击边缘是否关闭等
+	*通过设置zOrder属性，可以更改弹出的层次
+	*通过设置popupEffect和closeEffect可以设置弹出效果和关闭效果，如果不想有任何弹出关闭效果，可以设置前述属性为空
+	*
+	*@example <caption>以下示例代码，创建了一个 <code>Dialog</code> 实例。</caption>
+	*package
+	*{
+		*import laya.ui.Dialog;
+		*import laya.utils.Handler;
+		*public class Dialog_Example
+		*{
+			*private var dialog:Dialog_Instance;
+			*public function Dialog_Example()
+			*{
+				*Laya.init(640,800);//设置游戏画布宽高、渲染模式。
+				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+				*Laya.loader.load("resource/ui/btn_close.png",Handler.create(this,onLoadComplete));//加载资源。
+				*}
+			*private function onLoadComplete():void
+			*{
+				*dialog=new Dialog_Instance();//创建一个 Dialog_Instance 类的实例对象 dialog。
+				*dialog.dragArea="0,0,150,50";//设置 dialog 的拖拽区域。
+				*dialog.show();//显示 dialog。
+				*dialog.closeHandler=new Handler(this,onClose);//设置 dialog 的关闭函数处理器。
+				*}
+			*private function onClose(name:String):void
+			*{
+				*if (name==Dialog.CLOSE)
+				*{
+					*trace("通过点击 name 为"+name+"的组件，关闭了dialog。");
+					*}
+				*}
+			*}
+		*}
+	*import laya.ui.Button;
+	*import laya.ui.Dialog;
+	*import laya.ui.Image;
+	*class Dialog_Instance extends Dialog
+	*{
+		*function Dialog_Instance():void
+		*{
+			*var bg:Image=new Image("resource/ui/bg.png");
+			*bg.sizeGrid="40,10,5,10";
+			*bg.width=150;
+			*bg.height=250;
+			*addChild(bg);
+			*var image:Image=new Image("resource/ui/image.png");
+			*addChild(image);
+			*var button:Button=new Button("resource/ui/btn_close.png");
+			*button.name=Dialog.CLOSE;//设置button的name属性值。
+			*button.x=0;
+			*button.y=0;
+			*addChild(button);
+			*}
+		*}
+	*@example
+	*Laya.init(640,800);//设置游戏画布宽高、渲染模式
+	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
+	*var dialog;
+	*Laya.loader.load("resource/ui/btn_close.png",laya.utils.Handler.create(this,loadComplete));//加载资源
+	*(function (_super){//新建一个类Dialog_Instance继承自laya.ui.Dialog。
+		*function Dialog_Instance(){
+			*Dialog_Instance.__super.call(this);//初始化父类
+			*var bg=new laya.ui.Image("resource/ui/bg.png");//新建一个 Image 类的实例 bg 。
+			*bg.sizeGrid="10,40,10,5";//设置 bg 的网格信息。
+			*bg.width=150;//设置 bg 的宽度。
+			*bg.height=250;//设置 bg 的高度。
+			*this.addChild(bg);//将 bg 添加到显示列表。
+			*var image=new laya.ui.Image("resource/ui/image.png");//新建一个 Image 类的实例 image 。
+			*this.addChild(image);//将 image 添加到显示列表。
+			*var button=new laya.ui.Button("resource/ui/btn_close.png");//新建一个 Button 类的实例 bg 。
+			*button.name=laya.ui.Dialog.CLOSE;//设置 button 的 name 属性值。
+			*button.x=0;//设置 button 对象的属性 x 的值，用于控制 button 对象的显示位置。
+			*button.y=0;//设置 button 对象的属性 y 的值，用于控制 button 对象的显示位置。
+			*this.addChild(button);//将 button 添加到显示列表。
+			*};
+		*Laya.class(Dialog_Instance,"mypackage.dialogExample.Dialog_Instance",_super);//注册类Dialog_Instance。
+		*})(laya.ui.Dialog);
+	*function loadComplete(){
+		*console.log("资源加载完成！");
+		*dialog=new mypackage.dialogExample.Dialog_Instance();//创建一个 Dialog_Instance 类的实例对象 dialog。
+		*dialog.dragArea="0,0,150,50";//设置 dialog 的拖拽区域。
+		*dialog.show();//显示 dialog。
+		*dialog.closeHandler=new laya.utils.Handler(this,onClose);//设置 dialog 的关闭函数处理器。
+		*}
+	*function onClose(name){
+		*if (name==laya.ui.Dialog.CLOSE){
+			*console.log("通过点击 name 为"+name+"的组件，关闭了dialog。");
+			*}
+		*}
+	*@example
+	*import Dialog=laya.ui.Dialog;
+	*import Handler=laya.utils.Handler;
+	*class Dialog_Example {
+		*private dialog:Dialog_Instance;
+		*constructor(){
+			*Laya.init(640,800);//设置游戏画布宽高。
+			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+			*Laya.loader.load("resource/ui/btn_close.png",Handler.create(this,this.onLoadComplete));//加载资源。
+			*}
+		*private onLoadComplete():void {
+			*this.dialog=new Dialog_Instance();//创建一个 Dialog_Instance 类的实例对象 dialog。
+			*this.dialog.dragArea="0,0,150,50";//设置 dialog 的拖拽区域。
+			*this.dialog.show();//显示 dialog。
+			*this.dialog.closeHandler=new Handler(this,this.onClose);//设置 dialog 的关闭函数处理器。
+			*}
+		*private onClose(name:string):void {
+			*if (name==Dialog.CLOSE){
+				*console.log("通过点击 name 为"+name+"的组件，关闭了dialog。");
+				*}
+			*}
+		*}
+	*import Button=laya.ui.Button;
+	*class Dialog_Instance extends Dialog {
+		*Dialog_Instance():void {
+			*var bg:laya.ui.Image=new laya.ui.Image("resource/ui/bg.png");
+			*bg.sizeGrid="40,10,5,10";
+			*bg.width=150;
+			*bg.height=250;
+			*this.addChild(bg);
+			*var image:laya.ui.Image=new laya.ui.Image("resource/ui/image.png");
+			*this.addChild(image);
+			*var button:Button=new Button("resource/ui/btn_close.png");
+			*button.name=Dialog.CLOSE;//设置button的name属性值。
+			*button.x=0;
+			*button.y=0;
+			*this.addChild(button);
+			*}
+		*}
+	*/
+	//class laya.ui.Dialog extends laya.ui.View
+	var Dialog=(function(_super){
+		function Dialog(){
+			this.popupCenter=true;
+			this.closeHandler=null;
+			this.popupEffect=null;
+			this.closeEffect=null;
+			this.group=null;
+			this.isModal=false;
+			this._dragArea=null;
+			Dialog.__super.call(this);
+		}
+
+		__class(Dialog,'laya.ui.Dialog',_super);
+		var __proto=Dialog.prototype;
+		/**@inheritDoc */
+		__proto.initialize=function(){
+			this.popupEffect=Dialog.manager.popupEffectHandler;
+			this.closeEffect=Dialog.manager.closeEffectHandler;
+			this._dealDragArea();
+			this.on("click",this,this._onClick);
+		}
+
+		/**@private */
+		__proto._dealDragArea=function(){
+			var dragTarget=this.getChildByName("drag");
+			if (dragTarget){
+				this.dragArea=dragTarget.x+","+dragTarget.y+","+dragTarget.width+","+dragTarget.height;
+				dragTarget.removeSelf();
+			}
+		}
+
+		/**
+		*@private (protected)
+		*对象的 <code>Event.CLICK</code> 点击事件侦听处理函数。
+		*/
+		__proto._onClick=function(e){
+			var btn=e.target;
+			if (btn){
+				switch (btn.name){
+					case "close":
+					case "cancel":
+					case "sure":
+					case "no":
+					case "ok":
+					case "yes":
+						this.close(btn.name);
+						break ;
+					}
+			}
+		}
+
+		/**
+		*显示对话框（以非模式窗口方式显示）。
+		*@param closeOther 是否关闭其它的对话框。若值为true则关闭其它对话框。
+		*/
+		__proto.show=function(closeOther){
+			(closeOther===void 0)&& (closeOther=false);
+			this._open(false,closeOther);
+		}
+
+		/**
+		*显示对话框（以模式窗口方式显示）。
+		*@param closeOther 是否关闭其它的对话框。若值为true则关闭其它对话框。
+		*/
+		__proto.popup=function(closeOther){
+			(closeOther===void 0)&& (closeOther=false);
+			this._open(true,closeOther);
+		}
+
+		/**@private */
+		__proto._open=function(modal,closeOther){
+			Dialog.manager.lock(false);
+			this.isModal=modal;
+			Dialog.manager.open(this,closeOther);
+		}
+
+		/**打开完成后，调用此方法（如果有弹出动画，则在动画完成后执行）*/
+		__proto.onOpened=function(){}
+		/**
+		*关闭对话框。
+		*@param type 如果是点击默认关闭按钮触发，则传入关闭按钮的名字(name)，否则为null。
+		*/
+		__proto.close=function(type){
+			Dialog.manager.close(this,type);
+		}
+
+		/**关闭完成后，调用此方法（如果有关闭动画，则在动画完成后执行）
+		*@param type 如果是点击默认关闭按钮触发，则传入关闭按钮的名字(name)，否则为null。
+		*/
+		__proto.onClosed=function(type){}
+		/**@private */
+		__proto._onMouseDown=function(e){
+			var point=this.getMousePoint();
+			if (this._dragArea.contains(point.x,point.y))this.startDrag();
+			else this.stopDrag();
+		}
+
+		/**
+		*用来指定对话框的拖拽区域。默认值为"0,0,0,0"。
+		*<p><b>格式：</b>构成一个矩形所需的 x,y,width,heith 值，用逗号连接为字符串。
+		*例如："0,0,100,200"。
+		*</p>
+		*
+		*@see #includeExamplesSummary 请参考示例
+		*/
+		__getset(0,__proto,'dragArea',function(){
+			if (this._dragArea)return this._dragArea.toString();
+			return null;
+			},function(value){
+			if (value){
+				var a=UIUtils.fillArray([0,0,0,0],value,Number);
+				this._dragArea=new Rectangle(a[0],a[1],a[2],a[3]);
+				this.on("mousedown",this,this._onMouseDown);
+				}else {
+				this._dragArea=null;
+				this.off("mousedown",this,this._onMouseDown);
+			}
+		});
+
+		/**
+		*弹出框的显示状态；如果弹框处于显示中，则为true，否则为false;
+		*/
+		__getset(0,__proto,'isPopup',function(){
+			return this.parent !=null;
+		});
+
+		__getset(0,__proto,'zOrder',_super.prototype._$get_zOrder,function(value){
+			_super.prototype._$set_zOrder.call(this,value);
+			Dialog.manager._checkMask();
+		});
+
+		/**对话框管理容器，所有的对话框都在该容器内，并且受管理器管，可以自定义自己的管理器，来更改窗口管理的流程。
+		*任意对话框打开和关闭，都会触发管理类的open和close事件*/
+		__getset(1,Dialog,'manager',function(){
+			return Dialog._manager=Dialog._manager|| new DialogManager();
+			},function(value){
+			Dialog._manager=value;
+		});
+
+		Dialog.setLockView=function(view){
+			Dialog.manager.setLockView(view);
+		}
+
+		Dialog.lock=function(value){
+			Dialog.manager.lock(value);
+		}
+
+		Dialog.closeAll=function(){
+			Dialog.manager.closeAll();
+		}
+
+		Dialog.getDialogsByGroup=function(group){
+			return Dialog.manager.getDialogsByGroup(group);
+		}
+
+		Dialog.closeByGroup=function(group){
+			return Dialog.manager.closeByGroup(group);
+		}
+
+		Dialog.CLOSE="close";
+		Dialog.CANCEL="cancel";
+		Dialog.SURE="sure";
+		Dialog.NO="no";
+		Dialog.OK="ok";
+		Dialog.YES="yes";
+		Dialog._manager=null
+		return Dialog;
+	})(View)
 
 
 	//class laya.debug.ui.debugui.comps.ListItemUI extends laya.ui.View
@@ -35718,6 +37162,148 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2016-7-6 上午9:42:46
+	*/
+	//class extendui.ui.ListBase extends laya.ui.List
+	var ListBase$1=(function(_super){
+		function ListBase(){
+			this.useFloorMethod=false;
+			ListBase.__super.call(this);
+		}
+
+		__class(ListBase,'extendui.ui.ListBase',_super,'ListBase$1');
+		var __proto=ListBase.prototype;
+		__proto.isNumInViewRange=function(value){
+			return value>=this._startIndex&&value<this._startIndex+this.repeatX*this.repeatY;
+		}
+
+		__proto.scrollToIndex=function(value){
+			if (this.selectEnable && this._scrollBar){
+				var numX=this._isVertical ? this.repeatX :this.repeatY;
+				if (!this.isNumInViewRange(value)){
+					this.scrollTo(value);
+				}
+			}
+		}
+
+		__proto.changeCells=function(){
+			this._cellChanged=false;
+			if (this._itemRender){
+				this.scrollBar=this.getChildByName("scrollBar");
+				var cell=/*no*/this._getOneCell();
+				var cellWidth=(cell.width+this._spaceX)|| 1;
+				var cellHeight=(cell.height+this._spaceY)|| 1;
+				if(this.useFloorMethod){
+					if (this._width > 0)this._repeatX2=this._isVertical ? Math.floor(this._width / cellWidth):Math.floor(this._width / cellWidth);
+					if (this._height > 0)this._repeatY2=this._isVertical ? Math.floor(this._height / cellHeight):Math.floor(this._height / cellHeight);
+					}else{
+					if (this._width > 0)this._repeatX2=this._isVertical ? Math.round(this._width / cellWidth):Math.ceil(this._width / cellWidth);
+					if (this._height > 0)this._repeatY2=this._isVertical ? Math.ceil(this._height / cellHeight):Math.round(this._height / cellHeight);
+				};
+				var listWidth=this._width ? this._width :(cellWidth *this.repeatX-this._spaceX);
+				var listHeight=this._height ? this._height :(cellHeight *this.repeatY-this._spaceY);
+				this._cellSize=this._isVertical ? cellHeight :cellWidth;
+				this._cellOffset=this._isVertical ? (cellHeight *Math.max(this._repeatY2,this._repeatY)-listHeight-this._spaceY):(cellWidth *Math.max(this._repeatX2,this._repeatX)-listWidth-this._spaceX);
+				if (this._isVertical && this._scrollBar)this._scrollBar.height=listHeight;
+				else if (!this._isVertical && this._scrollBar)this._scrollBar.width=listWidth;
+				this.setContentSize(listWidth,listHeight);
+				var numX=this._isVertical ? this.repeatX :this.repeatY;
+				var numY=(this._isVertical ? this.repeatY :this.repeatX)+(this._scrollBar ? 1 :0);
+				/*no*/this._createItems(0,numX,numY);
+				this._createdLine=numY;
+				if (this._array){
+					this.array=this._array;
+					this.runCallLater(this.renderItems);
+				}
+			}
+		}
+
+		__getset(0,__proto,'selectedIndex',_super.prototype._$get_selectedIndex,function(value){
+			if (this.selectEnable && this._scrollBar){
+				var numX=this._isVertical ? this.repeatX :this.repeatY;
+				if (!this.isNumInViewRange(value)){
+					this.scrollTo(value);
+				}
+			}
+			if (this._selectedIndex !=value){
+				this._selectedIndex=value;
+				this.changeSelectStatus();
+				this.event("change");
+				this.selectHandler && this.selectHandler.runWith(value);
+			}
+		});
+
+		return ListBase;
+	})(List)
+
+
+	/**
+	*节点树基类
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-12-25 下午2:21:31
+	*/
+	//class extendui.ui.NodeTree extends laya.ui.Tree
+	var NodeTree$1=(function(_super){
+		function NodeTree(){
+			this.arrFilterFun=null;
+			NodeTree.__super.call(this);
+			this.spaceLeft=15;
+		}
+
+		__class(NodeTree,'extendui.ui.NodeTree',_super,'NodeTree$1');
+		var __proto=NodeTree.prototype;
+		// list.spaceY=2;
+		__proto.refreshList=function(){
+			this._list.array=this.getArray();
+		}
+
+		__proto.selectByCompId=function(compId){
+			var arr;
+			arr=this.list.array;
+			var i=0,len=0;
+			len=arr.length;
+			var tItem;
+			for(i=0;i<len;i++){
+				tItem=arr[i];
+				if(tItem.compId==compId){
+					this.list.selectedIndex=i;
+					return;
+				}
+			}
+		}
+
+		__proto.getParentIndex=function(item){
+			if(!/*no*/this._treeData){
+				return this.getIndexByData(item.nodeParent);
+			}
+			return-1;
+		}
+
+		__proto.getIndexByData=function(dis){
+			var dataList;
+			dataList=this.list.array;
+			var i=0,len=0;
+			len=dataList.length;
+			for (i=0;i < len;i++){
+				if (dataList[i]==dis){
+					return i;
+				}
+			}
+			return-1;
+		}
+
+		NodeTree.TreeSpaceLeft=15;
+		return NodeTree;
+	})(Tree)
+
+
+	/**
 	*<code>HBox</code> 是一个水平布局容器类。
 	*/
 	//class laya.ui.HBox extends laya.ui.LayoutBox
@@ -35774,6 +37360,33 @@ var Laya=window.Laya=(function(window,document){
 		HBox.BOTTOM="bottom";
 		return HBox;
 	})(LayoutBox)
+
+
+	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2016-7-6 上午9:49:47
+	*/
+	//class extendui.ui.TreeBase extends laya.ui.Tree
+	var TreeBase$1=(function(_super){
+		function TreeBase(){
+			TreeBase.__super.call(this);
+		}
+
+		__class(TreeBase,'extendui.ui.TreeBase',_super,'TreeBase$1');
+		var __proto=TreeBase.prototype;
+		/**@inheritDoc */
+		__proto.createChildren=function(){
+			this.addChild(this._list=new ListBase$1());
+			this._list.renderHandler=Handler.create(this,this.renderItem,null,false);
+			this._list.repeatX=1;
+			this._list.on("change",this,this.onListChange);
+		}
+
+		return TreeBase;
+	})(Tree)
 
 
 	/**
@@ -36880,7 +38493,473 @@ var Laya=window.Laya=(function(window,document){
 	})(ToolBarUI)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,Render,View,Browser,Timer,GraphicAnimation,LocalStorage]);
+	/**
+	*节点树上用的List 支持多选
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-11-13 上午11:27:36
+	*/
+	//class extendui.ui.ListEx extends extendui.ui.ListBase
+	var ListEx=(function(_super){
+		function ListEx(){
+			this._selectIndexs=[];
+			this._preIndex=0;
+			this._preClickIndex=0;
+			this.onlySameParentSelect=false;
+			this.mutiSelectEnable=true;
+			this._preNoShiftIndex=-1;
+			this.changeCellStateH=null;
+			this._selectItems=[];
+			this._plainSelectList=[];
+			ListEx.__super.call(this);
+		}
+
+		__class(ListEx,'extendui.ui.ListEx',_super);
+		var __proto=ListEx.prototype;
+		__proto.isIDSelected=function(id){
+			return this._selectIndexs.indexOf(id)>=0;
+		}
+
+		__proto.setSelectList=function(selectList){
+			this._selectIndexs=selectList;
+			this.changeSelectStatus();
+			if(this._selectIndexs&&this._selectIndexs.length>0){
+				this._selectedIndex=selectList[0];
+				this.scrollToIndex(this._selectIndexs[0]);
+			}
+		}
+
+		__proto.getCellUnderMouse=function(maxLen){
+			(maxLen===void 0)&& (maxLen=5);
+			if(!this._cells||this._cells.length<1)return null;
+			var mouseY=this.mouseY;
+			var i=0,len=0;
+			len=this._cells.length;
+			var tCell;
+			var mCell;
+			for(i=0;i<len;i++){
+				tCell=this._cells[i];
+				if(tCell.y<=mouseY&&tCell.y+tCell.height>=mouseY){
+					return tCell;
+				}
+				console.log(Math.abs(tCell.y-mouseY));
+				if(Math.abs(tCell.y-mouseY)<maxLen){
+					mCell=tCell;
+				}
+			}
+			return mCell;
+		}
+
+		__proto.getParentByIndex=function(index){
+			var item;
+			item=this.getItem(index);
+			if(item){
+				return item.nodeParent;
+			}
+			return-1;
+		}
+
+		__proto.onCellMouse=function(e){
+			if (e.type==="mousedown")this._isMoved=false;
+			var cell=e.currentTarget;
+			var index=this._startIndex+this._cells.indexOf(cell);
+			var ctrl=e.nativeEvent.ctrlKey;
+			var shift=e.nativeEvent.shiftKey;
+			if (index < 0)return;
+			if (e.type==="mousedown" || e.type==="rightmousedown"){
+				this._preIndex=-1;
+				this._preClickIndex=index;
+				if(ctrl&&this.mutiSelectEnable){
+					if(this.onlySameParentSelect){
+						var tP=0;
+						tP=this.tSelectParent;
+						if(tP<=0||tP==this.getParentByIndex(index)){
+							this.switchSelect(index);
+						}
+						}else{
+						this.switchSelect(index);
+					}
+					}else{
+					if(shift&&this.mutiSelectEnable){
+					}else
+					if(this.isIDSelected(index)){
+						}else{
+						this.clearSelect();
+						if (this.selectEnable && !this._isMoved){
+							this.selectedIndex=index;
+							this._preIndex=index;
+						}
+						else this.changeCellState(cell,true,0);
+					}
+				}
+			}else
+			if (e.type==="click" || e.type==="rightclick"){
+				var isShiftSelectSuccess=false;
+				if(shift&&this.mutiSelectEnable){
+					if(this.mutiSelectEnable){
+						isShiftSelectSuccess=this.dealShiftSelect(index);
+					}
+				}
+				else
+				if(ctrl){
+					}else{
+					if(this.isIDSelected(index)&&index!=this._preIndex&&index==this._preClickIndex){
+						if(this._selectIndexs.length==1&&this._selectIndexs[0]==index||e.type=="rightclick"){
+							}else{
+							this.clearSelect();
+							this.changeSelectStatus();
+							if (this.selectEnable && !this._isMoved)this.selectedIndex=index;
+							else this.changeCellState(cell,true,0);
+						}
+					}
+				}
+				if(!isShiftSelectSuccess){
+					if(this.isIDSelected(index)){
+						this._preNoShiftIndex=index;
+					}
+				}
+				}else if ((e.type==="mouseover" || e.type==="mouseout")&& !this.isIDSelected(index)){
+				this.changeCellState(cell,e.type==="mouseover",0);
+			}
+			this.mouseHandler && this.mouseHandler.runWith([e,index]);
+		}
+
+		__proto.dealShiftSelect=function(index){
+			if(this._preNoShiftIndex<0)return false;
+			if(!this.isIDSelected(this._preNoShiftIndex))return false;
+			var i=0,len=0;
+			this.clearSelect();
+			var min=0,max=0;
+			if(index>this._preNoShiftIndex){
+				min=this._preNoShiftIndex;
+				max=index;
+				}else{
+				max=this._preNoShiftIndex;
+				min=index;
+			};
+			var parent=0;
+			parent=this.getParentByIndex(min);
+			if(parent!=this.getParentByIndex(max))return false;
+			for(i=min;i<=max;i++){
+				if(this.getParentByIndex(i)==parent){
+					this._selectIndexs.push(i);
+				}
+			}
+			this.changeSelectStatus();
+			return true;
+		}
+
+		__proto.reRender=function(){
+			this.renderItems();
+		}
+
+		/**
+		*@private
+		*改变单元格的可视状态。
+		*@param cell 单元格对象。
+		*@param visable 是否显示。
+		*@param index 单元格的属性 <code>index</code> 值。
+		*/
+		__proto.changeCellState=function(cell,visable,index){
+			laya.ui.List.prototype.changeCellState.call(this,cell,visable,index);
+			if(this.changeCellStateH){
+				this.changeCellStateH.runWith([cell,visable,index]);
+			}
+		}
+
+		__proto.changeSelectStatus=function(){
+			for (var i=0,n=this._cells.length;i < n;i++){
+				this.changeCellState(this._cells[i],this.isIDSelected(this._startIndex+i),1);
+			}
+		}
+
+		__proto.renderItem=function(cell,index){
+			if (index >=0 && index < this._array.length){
+				cell.visible=true;
+				cell.dataSource=this._array[index];
+				this._$7_posCell(cell,index);
+				}else {
+				cell.visible=false;
+				cell.dataSource=null;
+			}
+			this.event("render",[cell,index]);
+			this.renderHandler && this.renderHandler.runWith([cell,index]);
+		}
+
+		__proto._$7_posCell=function(cell,cellIndex){
+			if (!this._scrollBar)return;
+			if (!this._isVertical)return;
+			var lineX=(this._isVertical ? this.repeatX :this.repeatY);
+			var lineY=(this._isVertical ? this.repeatY :this.repeatX);
+			var pos=Math.floor(cellIndex / lineX)*this._cellSize;
+			this._isVertical ? cell.y=pos :cell.x=pos;
+		}
+
+		__proto.getIndexByCell=function(cell){
+			return this._array.indexOf(cell.dataSource);
+		}
+
+		__proto.clearSelect=function(autoChange){
+			(autoChange===void 0)&& (autoChange=false);
+			this._selectedIndex=-1;
+			this._selectIndexs.length=0;
+			if(autoChange){
+				this.changeSelectStatus();
+			}
+		}
+
+		__proto.switchSelect=function(index){
+			var i=0;
+			for(i=this._selectIndexs.length-1;i>=0;i--){
+				if(index==this._selectIndexs[i]){
+					this._selectIndexs.splice(i,1);
+					this.changeSelectStatus();
+					return;
+				}
+			}
+			this._selectIndexs.push(index);
+			this.changeSelectStatus();
+		}
+
+		__proto.addSelect=function(index){
+			if(!this.isIDSelected(index)){
+				this._selectIndexs.push(index);
+			}
+		}
+
+		// trace("selectedIndex:",value);
+		__getset(0,__proto,'selectedItem',function(){
+			return _super.prototype._$get_selectedItem.call(this);
+			},function(value){
+			_super.prototype._$set_selectedItem.call(this,value);
+		});
+
+		__getset(0,__proto,'tSelectParent',function(){
+			if(!this._selectIndexs||this._selectIndexs.length<1)return-1;
+			var i=0,len=0;
+			var item;
+			return this.getParentByIndex(this._selectIndexs[0]);
+		});
+
+		__getset(0,__proto,'selectItems',function(){
+			this._selectItems.length=0;
+			var i=0,len=0;
+			len=this._selectIndexs.length;
+			var tItem;
+			for(i=0;i<len;i++){
+				tItem=this.getItem(this._selectIndexs[i]);
+				if(tItem)
+					this._selectItems.push(tItem);
+			}
+			return this._selectItems;
+		});
+
+		__getset(0,__proto,'plainSelectItems',function(){
+			this._plainSelectList.length=0;
+			var selectList;
+			selectList=this.selectItems;
+			var i=0,len=0;
+			len=selectList.length;
+			var tItem;
+			var tItemParent;
+			for(i=0;i<len;i++){
+				tItem=selectList[i];
+				if(selectList.indexOf(tItem.parent)<0){
+					this._plainSelectList.push(tItem);
+				}
+			}
+			return this._plainSelectList;
+		});
+
+		__getset(0,__proto,'selectedIndex',function(){
+			return _super.prototype._$get_selectedIndex.call(this);
+			},function(value){
+			this.clearSelect();
+			this.addSelect(value);
+			this._selectedIndex=-1;
+			_super.prototype._$set_selectedIndex.call(this,value);
+		});
+
+		ListEx.dealAbcKey=function(keyCode,list){
+			if(!list)return;
+			var key;
+			key=KeyManager.getCharByCode(keyCode);
+			key=key.toLowerCase();
+			var i=0,len=0;
+			var startI=0;
+			startI=list.selectedIndex;
+			if(startI<0)startI=0;
+			var arr;
+			arr=list.array;
+			len=arr.length;
+			var tLabel;
+			for(i=startI+1;i<len;i++){
+				if(arr[i])
+					tLabel=arr[i]["label"];
+				if(tLabel&&tLabel.charAt(0).toLowerCase()==key){
+					list.selectedIndex=i;
+					return;
+				}
+			}
+			for(i=0;i<len;i++){
+				if(arr[i])
+					tLabel=arr[i]["label"];
+				if(tLabel&&tLabel.charAt(0).toLowerCase()==key){
+					list.selectedIndex=i;
+					return;
+				}
+			}
+		}
+
+		return ListEx;
+	})(ListBase$1)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class extendui.ui.TreeEx extends extendui.ui.NodeTree
+	var TreeEx=(function(_super){
+		function TreeEx(){
+			this._isDragUpdate=false;
+			TreeEx.__super.call(this);
+			this.enableDragingAuto();
+			this.on("mouseout",this,this.stopDragUpdate);
+			this.on("mouseup",this,this.stopDragUpdate);
+		}
+
+		__class(TreeEx,'extendui.ui.TreeEx',_super);
+		var __proto=TreeEx.prototype;
+		__proto.createChildren=function(){
+			this.addChild(this._list=new ListEx());
+			this._list.renderHandler=Handler.create(this,this.renderItem,null,false);
+			this._list.repeatX=1;
+			this._list.on("change",this,this.onListChange);
+		}
+
+		__proto.enableDragingAuto=function(){
+			this.on("Draging_Hit",this,this.onDragHit);
+		}
+
+		__proto.onDragHit=function(){
+			if (!DragManager.isDraging)return;
+			if (DragManager.getDragType()=="LayoutRec" || DragManager.getDragType()=="LayoutTab")return;
+			var mouseY=NaN;
+			mouseY=this.mouseY;
+			if(!this.scrollBar)return;
+			this.startDragUpdate();
+		}
+
+		__proto.stopDragUpdate=function(){
+			this._isDragUpdate=false;
+			Laya.timer.clear(this,this._dragUpdateLoop);
+		}
+
+		__proto.startDragUpdate=function(){
+			if(this._isDragUpdate)return;
+			this._isDragUpdate=true;
+			Laya.timer.loop(50,this,this._dragUpdateLoop);
+		}
+
+		__proto._dragUpdateLoop=function(){
+			if(!this.scrollBar)return;
+			var mouseY=NaN;
+			mouseY=this.mouseY;
+			if(mouseY<20){
+				this.scrollBar.value-=10;
+				return;
+			}
+			if(mouseY>this.height-20){
+				this.scrollBar.value+=10;
+				return;
+			}
+			this.stopDragUpdate();
+		}
+
+		/**
+		*更新项列表，显示指定键名的数据项。
+		*@param key 键名。
+		*/
+		__proto.filter=function(key){
+			if (Boolean(key)){
+				var result=[];
+				this.__getFilterSource(this._source,result,key);
+				this._list.array=result;
+				}else {
+				this._list.array=this.getArray();
+			}
+		}
+
+		/**
+		*@private
+		*获取数据源中指定键名的值。
+		*/
+		__proto.__getFilterSource=function(array,result,key){
+			key=key.toLocaleLowerCase();
+			var item;
+			for(var $each_item in array){
+				item=array[$each_item];
+				if ((item.compId||!item.isDirectory)&& (String(item.label).toLowerCase().indexOf(key)>-1||(item.searchKey&&item.searchKey.toLowerCase().indexOf(key)))){
+					item.x=0;
+					if(result.indexOf(item)<0)
+						result.push(item);
+				}
+				if (item.child && item.child.length > 0){
+					this.__getFilterSource(item.child,result,key);
+				}
+			}
+		}
+
+		__getset(0,__proto,'mList',function(){
+			return this._list;
+		});
+
+		TreeEx.onItemCellMouseOver=function(index,cell,tree,filterFun){
+			FocusManager.clearFocus();
+			if (tree.mList.isIDSelected(index)){
+				return;
+			}
+			if (!DragManager.isDraging)return;
+			if(filterFun!=null){
+				if(!filterFun(DragManager.getDragData()))return;
+			};
+			var dataO;
+			dataO=cell.dataSource;
+			if(dataO.isDirectory){
+				FocusManager.showFocus(cell,1,true);
+				}else{
+				var type=RelativePos.getDisMouseRelativePos(cell,0.2);
+				var target=cell;
+				switch (type){
+					case "up":
+					case "down":
+						FocusManager.showBorder(target,type,true,null,1);
+						break ;
+					case "center":
+					case "left":
+					case "right":
+						FocusManager.showBorder(target,"down",true,null,1);
+						break ;
+					};
+				var parentIndex=0;
+				parentIndex=tree.getParentIndex(dataO);
+				if(parentIndex>0){
+					var parentCell;
+					parentCell=tree.list.getCell(parentIndex);
+					if(parentCell){
+						FocusManager.showFocus(parentCell,1,false);
+					}
+				}
+			}
+		}
+
+		return TreeEx;
+	})(NodeTree$1)
+
+
+	Laya.__init([LoaderManager,EventDispatcher,Render,View,Timer,GraphicAnimation,Browser,LocalStorage]);
 })(window,document,Laya);
 
 
@@ -36889,6 +38968,15 @@ var Laya=window.Laya=(function(window,document){
 2 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
 3 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 4 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
-5 file:///D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/menus/ContextMenu.as (85):warning:Sys.lang This variable is not defined.
-6 file:///D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/menus/ContextMenu.as (149):warning:SystemSetting.isCMDVer This variable is not defined.
+5 file:///D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/drags/DragEvent.as (84):warning:SystemSetting.assetsPath This variable is not defined.
+6 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as (60):warning:_getOneCell This variable is not defined.
+7 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as (87):warning:_createItems This variable is not defined.
+8 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/NodeTree.as (49):warning:_treeData This variable is not defined.
+9 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as (593):warning:compType This variable is not defined.
+10 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/Alert.as (16):warning:Sys.lang This variable is not defined.
+11 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/Confirm.as (26):warning:Sys.lang This variable is not defined.
+12 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/Confirm.as (27):warning:Sys.lang This variable is not defined.
+13 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (41):warning:FileTools.isPathSame This variable is not defined.
+14 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (43):warning:Sys.lang This variable is not defined.
+15 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (49):warning:Sys.lang This variable is not defined.
 */

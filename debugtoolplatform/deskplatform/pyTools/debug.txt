@@ -8,26 +8,43 @@ Project configuration:D:\codes\playground.git\trunk\debugtoolplatform\deskplatfo
 1,0.00,D:/codes/playground.git/trunk/libs/laya/src,0,Collect
 1,0.00,D:/codes/playground.git/trunk/libs/nodetools/src,0,Collect
 1,2.00,,0,read class message
-7,50.67,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/viewers/IFrameRenderItem.as,325,IDEEvent.Adpt_IFrames This variable is not defined.
-7,88.72,D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/drags/DragEvent.as,84,SystemSetting.assetsPath This variable is not defined.
-7,88.89,D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/menus/ContextMenu.as,85,Sys.lang This variable is not defined.
-7,88.89,D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/menus/ContextMenu.as,149,SystemSetting.isCMDVer This variable is not defined.
-7,89.28,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as,225,XMLElement This variable is not defined.
-7,89.28,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as,237,XMLElement This variable is not defined.
-7,89.33,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
-7,89.33,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
-7,89.72,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/NodeJSTools.as,36,Sys.mParseFloat This variable is not defined.
-1,89.94,,0,Disable Flash3D D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/DeskPlatform.as
-12,89.94,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.js,13496,
-12,89.94,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/laya.js,1142677,
-11,89.94,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.html,799,
+7,50.70,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/viewers/IFrameRenderItem.as,325,IDEEvent.Adpt_IFrames This variable is not defined.
+7,51.23,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/Alert.as,16,Sys.lang This variable is not defined.
+7,51.29,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/Confirm.as,26,Sys.lang This variable is not defined.
+7,51.29,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/Confirm.as,27,Sys.lang This variable is not defined.
+7,51.45,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as,41,FileTools.isPathSame This variable is not defined.
+7,51.45,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as,43,Sys.lang This variable is not defined.
+7,51.45,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as,49,Sys.lang This variable is not defined.
+7,51.50,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as,593,compType This variable is not defined.
+7,88.07,D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/drags/DragEvent.as,84,SystemSetting.assetsPath This variable is not defined.
+7,88.71,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as,60,_getOneCell This variable is not defined.
+7,88.71,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as,87,_createItems This variable is not defined.
+7,88.82,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/NodeTree.as,49,_treeData This variable is not defined.
+7,89.30,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as,225,XMLElement This variable is not defined.
+7,89.30,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as,237,XMLElement This variable is not defined.
+7,89.36,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
+7,89.36,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
+7,89.73,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/NodeJSTools.as,36,Sys.mParseFloat This variable is not defined.
+1,89.95,,0,Disable Flash3D D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/DeskPlatform.as
+12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.js,47699,
+12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/laya.js,1203254,
+11,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.html,799,
 ******************************************************************************
 Error or warning message:DeskPlatform.max.js
 1 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as (225):warning:XMLElement This variable is not defined.
 2 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
 3 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 4 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
-5 file:///D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/menus/ContextMenu.as (85):warning:Sys.lang This variable is not defined.
-6 file:///D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/menus/ContextMenu.as (149):warning:SystemSetting.isCMDVer This variable is not defined.
+5 file:///D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/drags/DragEvent.as (84):warning:SystemSetting.assetsPath This variable is not defined.
+6 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as (60):warning:_getOneCell This variable is not defined.
+7 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as (87):warning:_createItems This variable is not defined.
+8 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/NodeTree.as (49):warning:_treeData This variable is not defined.
+9 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as (593):warning:compType This variable is not defined.
+10 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/Alert.as (16):warning:Sys.lang This variable is not defined.
+11 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/Confirm.as (26):warning:Sys.lang This variable is not defined.
+12 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/Confirm.as (27):warning:Sys.lang This variable is not defined.
+13 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (41):warning:FileTools.isPathSame This variable is not defined.
+14 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (43):warning:Sys.lang This variable is not defined.
+15 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (49):warning:Sys.lang This variable is not defined.
 ******************************************************************************
-14,89.94,,0,
+14,89.95,,0,
