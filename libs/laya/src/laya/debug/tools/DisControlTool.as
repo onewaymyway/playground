@@ -32,18 +32,10 @@ package laya.debug.tools
 		public static function getObjectsUnderPoint(sprite:Sprite,x:Number,y:Number,rst:Array=null,filterFun:Function=null):Array
 		{
 			rst=rst?rst:[];
-			if (filterFun != null && !filterFun(sprite)) return rst;
-			var rec:Rectangle;
-			if (sprite.width > 0 && sprite.height > 0)
+			if(filterFun!=null&&!filterFun(sprite)) return rst;
+			if (sprite.getBounds().contains(x, y))
 			{
-				rec = Rectangle.TEMP.setTo(0, 0, sprite.width,sprite.height);
-			}else
-			{
-				rec = sprite.getBounds();
-			}
-			if (rec.contains(x, y))
-			{
-				rst.push(sprite);
+				
 //				var i:int, len:int = sprite.numChildren;
 				var tS:Sprite;
 				var tempP:Point=new Point();
@@ -51,19 +43,25 @@ package laya.debug.tools
 				tempP = sprite.fromParentPoint(tempP);
 				x = tempP.x;
 				y = tempP.y;
-				for (var i:int = sprite._childs.length - 1; i > -1; i--) {
-					var child:Sprite = sprite._childs[i];
+				var childList:Array;
+				childList = sprite._childs||sprite._children;
+				for (var i:int = childList.length - 1; i > -1; i--) {
+					var child:Sprite = childList[i];
 					if(child is Sprite)
 						getObjectsUnderPoint(child,x,y,rst,filterFun);
 				}
+				rst.push(sprite);
 
 			}
 			return rst;
 		}
-		public static function getObjectsUnderGlobalPoint(sprite:Sprite,filterFun:Function=null):Array
+		public static function getObjectsUnderGlobalPoint(sprite:Sprite,filterFun:Function=null,point:Point=null):Array
 		{
-			var point:Point = new Point();
-			point.setTo(Laya.stage.mouseX, Laya.stage.mouseY);
+			if(!point)
+			{
+				point=new Point();
+				point.setTo(Laya.stage.mouseX, Laya.stage.mouseY);
+			}		
 			if(sprite.parent)
 			point = (sprite.parent as Sprite).globalToLocal(point);
 			return getObjectsUnderPoint(sprite, point.x, point.y,null,filterFun);
