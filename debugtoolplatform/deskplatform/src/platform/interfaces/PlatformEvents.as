@@ -43,7 +43,9 @@ package platform.interfaces
 		/**
 		 * 显示某个标签页 
 		 */
-		public static const SHOW_LAYOUTTAB_BY_NAME:String="SHOW_LayoutTab_By_Name";
+		public static const SHOW_LAYOUTTAB_BY_NAME:String = "SHOW_LayoutTab_By_Name";
+		
+		public static const WebViewReady:String="WebViewReady";
 	}
 
 }
