@@ -92,6 +92,12 @@ package laya.debug.tools
 			style = el.style;
 			style["pointer-events"]=enable?"auto":"none";
 		}
+		public static function getMouseEnable(el:Object):Boolean
+		{
+			var style:Object;		
+			style = el.style;
+			return style["pointer-events"]!="none";
+		}
 		public static function setZIndex(el:Object,zIndex:int):void
 		{
 			var style:Object;
