@@ -398,6 +398,54 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*...
+	*@author WW
+	*/
+	//class viewRender.EditorRenderBase
+	var EditorRenderBase=(function(){
+		function EditorRenderBase(){
+			this.initFuns();
+		}
+
+		__class(EditorRenderBase,'viewRender.EditorRenderBase');
+		var __proto=EditorRenderBase.prototype;
+		__proto.initFuns=function(){
+			Browser.window.renderBinds={};
+			Browser.window.renderBinds.setData=Utils.bind(this.setData,this);
+			Browser.window.renderBinds.updateData=Utils.bind(this.updateData,this);
+			Browser.window.renderBinds.clearRender=Utils.bind(this.clearRender,this);
+			Browser.window.renderBinds.sizeRender=Utils.bind(this.sizeRender,this);
+			Browser.window.renderBinds.posRender=Utils.bind(this.posRender,this);
+			Browser.window.renderBinds.getRenderData=Utils.bind(this.getRenderData,this);
+			Browser.window.renderBinds.getStage=Utils.bind(this.getStage,this);
+			Browser.window.renderBinds.setNotice=Utils.bind(this.setNotice,this);
+			Browser.window.renderBinds.firstInit=Utils.bind(this.firstInit,this);
+		}
+
+		__proto.getRenderData=function(){
+			return null;
+		}
+
+		__proto.setData=function(data){}
+		__proto.updateData=function(data){}
+		__proto.clearRender=function(){}
+		__proto.sizeRender=function(width,height){}
+		__proto.posRender=function(x,y){}
+		__proto.getStage=function(){
+			return Laya.stage;
+		}
+
+		__proto.setNotice=function(notice){
+			Notice$1.I=notice;
+			Notice$1.notify("RenderInited");
+		}
+
+		__proto.firstInit=function(complete,param){}
+		return EditorRenderBase;
+	})()
+
+
+	/**
 	*<code>EventDispatcher</code> 类是可调度事件的所有类的基类。
 	*/
 	//class laya.events.EventDispatcher
@@ -8418,6 +8466,24 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-11-16 下午1:26:53
+	*/
+	//class platform.tools.Notices
+	var Notices=(function(){
+		function Notices(){}
+		__class(Notices,'platform.tools.Notices');
+		Notices.RENDER_INITED="RenderInited";
+		Notices.DROP_RENDER="DROP_RENDER";
+		Notices.OPEN_PLUGIN="OPEN_PLUGIN";
+		return Notices;
+	})()
+
+
+	/**
 	*@private
 	*<code>Resource</code> 资源存取类。
 	*/
@@ -10846,6 +10912,38 @@ var Laya=window.Laya=(function(window,document){
 		Texture._rect1=new Rectangle();
 		Texture._rect2=new Rectangle();
 		return Texture;
+	})(EventDispatcher)
+
+
+	/**
+	*本类用于模块间消息传递
+	*@author ww
+	*/
+	//class platform.tools.Notice extends laya.events.EventDispatcher
+	var Notice$1=(function(_super){
+		function Notice(){
+			Notice.__super.call(this);
+		}
+
+		__class(Notice,'platform.tools.Notice',_super,'Notice$1');
+		Notice.notify=function(type,data){
+			Notice.I.event(type,data);
+		}
+
+		Notice.listen=function(type,_scope,fun,args,cancelBefore){
+			(cancelBefore===void 0)&& (cancelBefore=false);
+			if(cancelBefore)Notice.cancel(type,_scope,fun);
+			Notice.I.on(type,_scope,fun,args);
+		}
+
+		Notice.cancel=function(type,_scope,fun){
+			Notice.I.off(type,_scope,fun);
+		}
+
+		__static(Notice,
+		['I',function(){return this.I=new Notice();}
+		]);
+		return Notice;
 	})(EventDispatcher)
 
 
@@ -15571,5 +15669,5 @@ var Laya=window.Laya=(function(window,document){
 	})(FileBitmap)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,Render,Browser,Timer,LocalStorage]);
+	Laya.__init([LoaderManager,EventDispatcher,Render,Browser,Timer,LocalStorage]);
 })(window,document,Laya);
