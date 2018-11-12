@@ -4,10 +4,11 @@ package view {
 	import laya.events.Event;
 	import laya.events.Keyboard;
 	import laya.utils.Handler;
+	import nodetools.devices.Sys;
 	import ui.deskplatform.ConfirmUI;
 	
 	/**确认框
-	 * @author yung
+	 * @author ww
 	 */
 	final public class Confirm extends ConfirmUI {
 		private static var _instance:Confirm;

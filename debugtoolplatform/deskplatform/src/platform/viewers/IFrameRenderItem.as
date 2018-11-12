@@ -21,7 +21,7 @@ package platform.viewers
 	import nodetools.devices.SystemSetting;
 	import platform.tools.Notice;
 	import platform.tools.Notices;
-	import viewRender.ViewRenderBase;
+	import viewRender.EditorRenderBase;
 
 	/**
 	 * 
@@ -34,7 +34,7 @@ package platform.viewers
 	{
 		
 		public var renderFrame:*;
-		public var render:ViewRenderBase;
+		public var render:EditorRenderBase;
 		public var style:Object;
 		public var iframeWindow:*;
 		
@@ -344,7 +344,7 @@ package platform.viewers
 		{
 //			debugger;
 //			Browser.removeElement(renderFrame);
-			Notice.cancel(IDEEvent.Adpt_IFrames,this,adpt);
+			
 			setVisible(false);
 			if(clearSrc)
 			{

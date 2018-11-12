@@ -31,7 +31,9 @@ package view {
 	import nodetools.devices.FileTools;
 	import nodetools.devices.Sys;
 	import nodetools.devices.SystemSetting;
+	import platform.interfaces.PlatformEvents;
 	import platform.interfaces.SkinDefines;
+	import platform.tools.Notice;
 	import ui.deskplatform.ResPanelUI;
 	
 	
@@ -681,9 +683,10 @@ package view {
 		
 		private function onResTreeDoubleClick(e:Event):void {
 //			trace("onResTreeDoubleClick");
-			if (e.target.parent == resTree.list.content)
+			if (e.target.parent == resTree.list.content && resTree.selectedItem)
 			{
-
+				debugger;
+				Notice.notify(PlatformEvents.OPEN_PAGE, [resTree.selectedItem.path]);
 			}
 		}
 		/**页面快捷键*/

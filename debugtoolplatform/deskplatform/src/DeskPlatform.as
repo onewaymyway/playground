@@ -4,6 +4,7 @@ package
 	import electrontools.menus.ContextMenu;
 	import extendui.ui.ListBase;
 	import extendui.ui.ListEx;
+	import extendui.ui.TabEx;
 	import extendui.ui.TreeBase;
 	import extendui.ui.TreeEx;
 	import laya.debug.DebugPanel;
@@ -14,6 +15,7 @@ package
 	import laya.utils.Handler;
 	import nodetools.devices.CMDShell;
 	import nodetools.devices.Device;
+	import nodetools.devices.FileManager;
 	import nodetools.devices.FileTools;
 	import nodetools.devices.OSInfo;
 	import nodetools.devices.Paths;
@@ -21,7 +23,9 @@ package
 	import nodetools.devices.SystemSetting;
 	import platform.layout.LayoutRecManager;
 	import platform.managers.CursorManager;
+	import platform.managers.EditRenderManager;
 	import platform.managers.LayerManager;
+	import platform.managers.NoticeRouter;
 	import view.MainView;
 	import view.ResPanel;
 	/**
@@ -40,7 +44,7 @@ package
 			Styles.buttonLabelColors = ["#ffffff", "#32cc6b", "#ff0000", "#C0C0C0"];
 			//注册组件
 			View.regComponent("TreeEx", TreeEx);
-			//View.regComponent("Tab", TabEx);
+			View.regComponent("Tab", TabEx);
 			View.regComponent("List", ListBase);
 			View.regComponent("Tree", TreeBase);
 			View.regComponent("ListEx", ListEx);
@@ -98,8 +102,11 @@ package
 		
 		private function initApp():void
 		{
+			NoticeRouter.init();
+			EditRenderManager.init();
 			CursorManager.init();
-			SystemSetting.assetsPath = "D:/codes/playground.git/trunk/debugtoolplatform/deskplatform";
+			//SystemSetting.assetsPath = "D:/codes/playground.git/trunk/debugtoolplatform/deskplatform";
+			SystemSetting.assetsPath = FileManager.getAppPath("files");;
 			ResPanel.instance.init(SystemSetting.assetsPath);
 			LayerManager.init();
 			LayoutRecManager.init();

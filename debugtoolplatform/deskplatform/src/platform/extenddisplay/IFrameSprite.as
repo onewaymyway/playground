@@ -8,6 +8,7 @@
 package platform.extenddisplay
 {
 	import laya.utils.Browser;
+	import laya.utils.Utils;
 	
 	/**
 	 * 
@@ -26,8 +27,13 @@ package platform.extenddisplay
 		{
 			div = Browser.createElement("iframe");
 			div.style.border = "0px";
+			div.addEventListener("load", Utils.bind(onIFrameLoaded,this), false)
 		}
 		
+		protected function onIFrameLoaded():void
+		{
+			
+		}
 		public function setUrl(path:String):void
 		{
 			div.src=path;

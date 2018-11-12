@@ -8,8 +8,6 @@
 package platform.layout
 {
 	import extendui.layout.RelativePos;
-	import laya.editor.comonents.LayoutDragBar;
-	import laya.editor.view.LayoutRec;
 	import laya.maths.MathUtil;
 	import platform.managers.CursorManager;
 	

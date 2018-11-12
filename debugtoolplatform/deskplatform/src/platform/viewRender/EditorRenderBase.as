@@ -11,10 +11,10 @@ package viewRender
 	 * ...
 	 * @author WW
 	 */
-	public class ViewRenderBase 
+	public class EditorRenderBase 
 	{
 		
-		public function ViewRenderBase() 
+		public function EditorRenderBase() 
 		{
 			initFuns();
 		}

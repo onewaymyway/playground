@@ -1,8 +1,9 @@
 package view {
+	import nodetools.devices.Sys;
 	import ui.deskplatform.AlertUI;
 	
 	/**提示框
-	 * @author yung
+	 * @author ww
 	 */
 	final public class Alert extends AlertUI {
 		private static var _instance:Alert;

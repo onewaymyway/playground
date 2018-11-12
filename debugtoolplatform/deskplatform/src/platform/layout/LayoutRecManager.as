@@ -22,6 +22,7 @@ package platform.layout
 	import laya.utils.Utils;
 	import nodetools.devices.FileManager;
 	import nodetools.devices.FileTools;
+	import platform.editzone.EditZone;
 	import platform.extenddisplay.IFrameSprite;
 	import platform.interfaces.Paths;
 	import platform.managers.CursorManager;
@@ -1216,7 +1217,7 @@ package platform.layout
 			var uiRec:LayoutRec;
 			uiRec = new LayoutRec();
 			insert(rec, uiRec, 0.8);
-			addPanelToRec(IFrameSprite.I, uiRec);
+			addPanelToRec(EditZone.instance, uiRec);
 			return;
 			var resRec:LayoutRec;
 			resRec = new LayoutRec();

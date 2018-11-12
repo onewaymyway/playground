@@ -2,13 +2,13 @@ package view {
 
 	import configs.StyleConsts;
 	import laya.debug.tools.StringTool;
-	import laya.editor.comonents.Alert;
 	import nodetools.devices.FileManager;
+	import nodetools.devices.FileTools;
 	import ui.deskplatform.RenameResUI;
 
 	
 	/**重命名资源
-	 * @author yung
+	 * @author ww
 	 */
 	public class RenameRes extends RenameResUI {
 		private static var _instance:RenameRes;
