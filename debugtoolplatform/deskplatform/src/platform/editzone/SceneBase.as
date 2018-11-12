@@ -79,11 +79,6 @@ package platform.editzone
 			_scaleView=value;
 		}
 		
-		public function removeSelf():Node
-		{
-
-			return null;
-		}
 		public function dealAction(funName:String, param:Array = null):void
 		{
 			if (this[funName] is Function)

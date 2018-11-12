@@ -9,17 +9,14 @@ Project configuration:D:\codes\playground.git\trunk\debugtoolplatform\deskplatfo
 1,0.00,D:/codes/playground.git/trunk/libs/nodetools/src,0,Collect
 1,2.00,,0,read class message
 7,50.46,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/CustomIFrameRender.as,108,IDEEvent.PAGE_CHANGED This variable is not defined.
-7,50.93,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/EditZone.as,336,ViewTab This variable is not defined.
-7,51.50,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,273,IDEVars.disableTabDrag This variable is not defined.
-7,51.50,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,328,FocusManager.showBorder This variable is not defined.
-7,51.50,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,333,FocusManager.showBorder This variable is not defined.
-7,51.50,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,337,FocusManager.showFocus This variable is not defined.
-7,51.50,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,472,UIPanel. This variable is not defined.
+7,50.93,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/EditZone.as,338,ViewTab This variable is not defined.
+7,51.50,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,274,IDEVars.disableTabDrag This variable is not defined.
+7,51.50,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,473,UIPanel. This variable is not defined.
 7,51.55,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1158,CompPanel.instance This variable is not defined.
 7,51.55,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1164,PropPanel.instance This variable is not defined.
 7,51.55,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1171,DisplayTreePanel.instance This variable is not defined.
-7,51.65,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as,29,HtmlSprite. This variable is not defined.
-7,51.65,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as,70,SkinDefines.LayoutTabDragIcon This variable is not defined.
+7,51.65,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as,28,HtmlSprite. This variable is not defined.
+7,51.65,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as,69,SkinDefines.LayoutTabDragIcon This variable is not defined.
 7,51.81,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/managers/EditRenderManager.as,35,TypeManager.getExtension This variable is not defined.
 7,52.89,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as,43,Sys.lang This variable is not defined.
 7,52.89,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as,49,Sys.lang This variable is not defined.
@@ -34,8 +31,8 @@ Project configuration:D:\codes\playground.git\trunk\debugtoolplatform\deskplatfo
 7,89.38,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
 7,89.74,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/NodeJSTools.as,36,Sys.mParseFloat This variable is not defined.
 1,89.95,,0,Disable Flash3D D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/DeskPlatform.as
-12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.js,162291,
-12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/laya.js,1328991,
+12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.js,162241,
+12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/laya.js,1328470,
 11,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.html,799,
 ******************************************************************************
 Error or warning message:DeskPlatform.max.js
@@ -52,16 +49,13 @@ Error or warning message:DeskPlatform.max.js
 11 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as (60):warning:_getOneCell This variable is not defined.
 12 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as (87):warning:_createItems This variable is not defined.
 13 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/NodeTree.as (49):warning:_treeData This variable is not defined.
-14 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (273):warning:IDEVars.disableTabDrag This variable is not defined.
-15 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (328):warning:FocusManager.showBorder This variable is not defined.
-16 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (333):warning:FocusManager.showBorder This variable is not defined.
-17 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (337):warning:FocusManager.showFocus This variable is not defined.
-18 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (472):warning:UIPanel. This variable is not defined.
-19 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (29):warning:HtmlSprite. This variable is not defined.
-20 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (70):warning:SkinDefines.LayoutTabDragIcon This variable is not defined.
-21 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/EditZone.as (336):warning:ViewTab This variable is not defined.
-22 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as (594):warning:compType This variable is not defined.
-23 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (43):warning:Sys.lang This variable is not defined.
-24 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (49):warning:Sys.lang This variable is not defined.
+14 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (274):warning:IDEVars.disableTabDrag This variable is not defined.
+15 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (473):warning:UIPanel. This variable is not defined.
+16 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (28):warning:HtmlSprite. This variable is not defined.
+17 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (69):warning:SkinDefines.LayoutTabDragIcon This variable is not defined.
+18 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/EditZone.as (338):warning:ViewTab This variable is not defined.
+19 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as (594):warning:compType This variable is not defined.
+20 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (43):warning:Sys.lang This variable is not defined.
+21 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (49):warning:Sys.lang This variable is not defined.
 ******************************************************************************
 14,89.95,,0,

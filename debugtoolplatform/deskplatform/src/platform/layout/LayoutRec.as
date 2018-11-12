@@ -4,6 +4,7 @@ package platform.layout
 	import configs.StyleConsts;
 	import electrontools.drags.DragEvent;
 	import electrontools.drags.DragManager;
+	import extendui.FocusManager;
 	import extendui.layout.RelativePos;
 	import laya.debug.tools.ClassTool;
 	import laya.debug.tools.DisControlTool;

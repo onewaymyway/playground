@@ -273,7 +273,7 @@
 		function PlatformVars(){}
 		__class(PlatformVars,'platform.interfaces.PlatformVars');
 		PlatformVars.isDragingLayout=false;
-		PlatformVars.disableTabDrag=false;
+		PlatformVars.disableTabDrag=true;
 		return PlatformVars;
 	})()
 
@@ -2601,10 +2601,6 @@
 		__proto.onActive=function(){}
 		__proto.changeDataO=function(dataO){}
 		__proto.focusDesign=function(){}
-		__proto.removeSelf=function(){
-			return null;
-		}
-
 		__proto.dealAction=function(funName,param){
 			if ((typeof (this[funName])=='function')){
 				this[funName].apply(this,param);
@@ -3879,15 +3875,15 @@
 				case "right":
 				case "left":
 					focusWidth=0.5*this.width;
-					/*no*/this.FocusManager.showBorder(this,type,true,null,focusWidth);
+					FocusManager.showBorder(this,type,true,null,focusWidth);
 					break ;
 				case "up":
 				case "down":
 					focusWidth=0.5*this.height;
-					/*no*/this.FocusManager.showBorder(this,type,true,null,focusWidth);
+					FocusManager.showBorder(this,type,true,null,focusWidth);
 					break ;
 				case "center":
-					/*no*/this.FocusManager.showFocus(this);
+					FocusManager.showFocus(this);
 					break ;
 				}
 			DisControlTool.setTop(this);
@@ -4214,7 +4210,7 @@
 		}
 
 		__proto.onBtnDown=function(e){
-			if(laya.ide.managers.LayoutRecManager.popLocked())return;
+			if(LayoutRecManager.popLocked())return;
 			if(this._rec&&!this._rec.canDragMe)return;
 			if(PlatformVars.disableTabDrag)return;
 			var clip=new Clip(/*no*/this.SkinDefines.LayoutTabDragIcon,1,3);
@@ -4567,6 +4563,7 @@
 
 		/**如果内容没有保存，提示保存*/
 		__proto.tryToClose=function(uiViewer){
+			console.log("tryToClose");
 			if (uiViewer.hasChange){
 				}else {
 				this.closeBack(uiViewer);
@@ -4688,6 +4685,7 @@
 					return;
 				}
 			}
+			this._currViewer=viewer;
 			this.tab.selectedIndex=index;
 		}
 

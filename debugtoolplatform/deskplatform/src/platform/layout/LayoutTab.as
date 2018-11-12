@@ -8,7 +8,6 @@ package platform.layout
 	import platform.tools.ObjectUtils;
 	import ui.layout.LayoutTabUI;
 
-	import laya.ide.managers.LayoutRecManager;
 
 	import laya.ui.Box;
 	import laya.ui.Clip;

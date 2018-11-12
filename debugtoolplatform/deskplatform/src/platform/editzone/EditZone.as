@@ -105,6 +105,7 @@ package platform.editzone {
 		
 		/**如果内容没有保存，提示保存*/
 		public function tryToClose(uiViewer:IEditViewer):void {
+			trace("tryToClose");
 			if (uiViewer.hasChange) {
 			
 			} else {
@@ -253,6 +254,7 @@ package platform.editzone {
 				}
 				
 			}
+			_currViewer = viewer;
 			tab.selectedIndex = index;
 		}
 		
