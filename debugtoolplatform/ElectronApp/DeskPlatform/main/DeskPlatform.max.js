@@ -10,15 +10,17 @@
 	var File=nodetools.devices.File,FileManager=nodetools.devices.FileManager,FileTools=nodetools.devices.FileTools;
 	var FocusManager=extendui.FocusManager,Graphics=laya.display.Graphics,Handler=laya.utils.Handler,HitArea=laya.utils.HitArea;
 	var IDTools=laya.debug.tools.IDTools,Image=laya.ui.Image,Input=laya.display.Input,JSTools=laya.debug.tools.JSTools;
-	var KeyManager=extendui.KeyManager,Keyboard=laya.events.Keyboard,Label=laya.ui.Label,List=laya.ui.List,ListBase$1=extendui.ui.ListBase;
-	var ListEx=extendui.ui.ListEx,Loader=laya.net.Loader,MathUtil=laya.maths.MathUtil,MessageManager=electrontools.MessageManager;
-	var Node=laya.display.Node,NodeTree$1=extendui.ui.NodeTree,NodeUtils=laya.debug.view.nodeInfo.NodeUtils,OSInfo=nodetools.devices.OSInfo;
-	var ObjectTools=laya.debug.tools.ObjectTools,Paths$1=nodetools.devices.Paths,Point=laya.maths.Point,PythonTools=nodetools.devices.PythonTools;
-	var Rectangle=laya.maths.Rectangle,RelativePos=extendui.layout.RelativePos,Render=laya.renders.Render,RenderContext=laya.renders.RenderContext;
-	var Sprite=laya.display.Sprite,Stage=laya.display.Stage,StringTool=laya.debug.tools.StringTool,Styles=laya.ui.Styles;
-	var Sys=nodetools.devices.Sys,SystemDragOverManager=electrontools.drags.SystemDragOverManager,SystemSetting=nodetools.devices.SystemSetting;
-	var Tab=laya.ui.Tab,TextField=extendui.ui.TextField,TextInput=laya.ui.TextInput,TreeBase$1=extendui.ui.TreeBase;
-	var TreeEx=extendui.ui.TreeEx,Tween=laya.utils.Tween,UIConfig=Laya.UIConfig,Utils=laya.utils.Utils,View=laya.ui.View;
+	var JsonTool=laya.debug.tools.JsonTool,KeyManager=extendui.KeyManager,Keyboard=laya.events.Keyboard,Label=laya.ui.Label;
+	var List=laya.ui.List,ListBase$1=extendui.ui.ListBase,ListEx=extendui.ui.ListEx,Loader=laya.net.Loader,MathUtil=laya.maths.MathUtil;
+	var MessageManager=electrontools.MessageManager,Node=laya.display.Node,NodeTree$1=extendui.ui.NodeTree,NodeUtils=laya.debug.view.nodeInfo.NodeUtils;
+	var OSInfo=nodetools.devices.OSInfo,ObjectTools=laya.debug.tools.ObjectTools,Paths$1=nodetools.devices.Paths;
+	var Point=laya.maths.Point,PythonTools=nodetools.devices.PythonTools,Rectangle=laya.maths.Rectangle,RelativePos=extendui.layout.RelativePos;
+	var Render=laya.renders.Render,RenderContext=laya.renders.RenderContext,Sprite=laya.display.Sprite,Stage=laya.display.Stage;
+	var StringTool=laya.debug.tools.StringTool,Styles=laya.ui.Styles,Sys=nodetools.devices.Sys,SystemDragOverManager=electrontools.drags.SystemDragOverManager;
+	var SystemSetting=nodetools.devices.SystemSetting,Tab=laya.ui.Tab,TabEx=extendui.ui.TabEx,TextField=extendui.ui.TextField;
+	var TextInput=laya.ui.TextInput,TreeBase$1=extendui.ui.TreeBase,TreeEx=extendui.ui.TreeEx,Tween=laya.utils.Tween;
+	var UIConfig=Laya.UIConfig,Utils=laya.utils.Utils,View=laya.ui.View;
+	Laya.interface('platform.editzone.IEditViewer');
 	/**
 	*IDE可视化编辑样式
 	*/
@@ -83,6 +85,7 @@
 			UIConfig.touchScrollEnable=false;
 			Styles.buttonLabelColors=["#ffffff","#32cc6b","#ff0000","#C0C0C0"];
 			View.regComponent("TreeEx",TreeEx);
+			View.regComponent("Tab",TabEx);
 			View.regComponent("List",ListBase$1);
 			View.regComponent("Tree",TreeBase$1);
 			View.regComponent("ListEx",ListEx);
@@ -132,8 +135,10 @@
 		}
 
 		__proto.initApp=function(){
+			NoticeRouter.init();
+			EditRenderManager.init();
 			CursorManager.init();
-			SystemSetting.assetsPath="D:/codes/playground.git/trunk/debugtoolplatform/deskplatform";
+			SystemSetting.assetsPath=FileManager.getAppPath("files");;
 			ResPanel.instance.init(SystemSetting.assetsPath);
 			LayerManager.init();
 			LayoutRecManager.init();
@@ -248,6 +253,12 @@
 	var PlatformEvents=(function(){
 		function PlatformEvents(){}
 		__class(PlatformEvents,'platform.interfaces.PlatformEvents');
+		PlatformEvents.PAGE_CHANGED="pageChanged";
+		PlatformEvents.CLOSE_PAGE="closePage";
+		PlatformEvents.OPEN_PAGE="openPAGE";
+		PlatformEvents.FOCUS_DESIGN="Focus_design";
+		PlatformEvents.DESIGN_DATACHANGED="DESIGN_DATACHANGED";
+		PlatformEvents.FRESH_CURVIEW="FRESH_CurView";
 		PlatformEvents.SHOW_LAYOUTTAB_BY_NAME="SHOW_LayoutTab_By_Name";
 		return PlatformEvents;
 	})()
@@ -1099,7 +1110,7 @@
 			var uiRec;
 			uiRec=new LayoutRec();
 			LayoutRecManager.insert(rec,uiRec,0.8);
-			LayoutRecManager.addPanelToRec(IFrameSprite.I,uiRec);
+			LayoutRecManager.addPanelToRec(EditZone.instance,uiRec);
 			return;
 			var resRec;
 			resRec=new LayoutRec();
@@ -1628,7 +1639,7 @@
 			var tDragBar;
 			for (i=len-1;i >=0;i--){
 				tR=_updaters[i];
-				if(Laya.__typeof(tR.tar,laya.editor.comonents.LayoutDragBar)){
+				if((tR.tar instanceof platform.layout.LayoutDragBar )){
 					tDragBar=tR.tar;
 					if(tDragBar.cusorType=="e-resize"&&RelativePos.getTypeByFun(tR._fun)=="up"){
 						if(this.downSide.findTarType(tDragBar)!=null){
@@ -1660,7 +1671,7 @@
 					maxWidth=tWidth;
 					tSelecteDragBar=dragBarList[i];
 				}
-				if(tWidth+dis>150&&laya.editor.comonents.LayoutDragBar.hasFreeTar((dragBarList [i]).getTarsByType("right"))){
+				if(tWidth+dis>150&&LayoutDragBar.hasFreeTar((dragBarList [i]).getTarsByType("right"))){
 					tSelecteDragBar=dragBarList[i];
 					break ;
 				}
@@ -1719,7 +1730,7 @@
 			var tDragBar;
 			for (i=len-1;i >=0;i--){
 				tR=_updaters[i];
-				if(Laya.__typeof(tR.tar,laya.editor.comonents.LayoutDragBar)){
+				if((tR.tar instanceof platform.layout.LayoutDragBar )){
 					tDragBar=tR.tar;
 					if(tDragBar.cusorType=="n-resize"&&RelativePos.getTypeByFun(tR._fun)=="right"){
 						if(this.leftSide.findTarType(tDragBar)!=null){
@@ -1781,6 +1792,100 @@
 
 
 	/**
+	*编辑区渲染器管理器
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2018-5-25 上午10:45:03
+	*/
+	//class platform.managers.EditRenderManager
+	var EditRenderManager=(function(){
+		function EditRenderManager(){}
+		__class(EditRenderManager,'platform.managers.EditRenderManager');
+		EditRenderManager.regRenderClass=function(extension,clz){
+			EditRenderManager.renderDic[extension]=clz;
+		}
+
+		EditRenderManager.regRender=function(extension,renderPath){
+			EditRenderManager.renderDic[extension]=renderPath;
+		}
+
+		EditRenderManager.regRenderClassByType=function(type,clz){
+			var extension;
+			extension=/*no*/this.TypeManager.getExtension(type);
+			EditRenderManager.regRenderClass(extension,clz);
+		}
+
+		EditRenderManager.getCustomRenderByExtension=function(extension){
+			return EditRenderManager.renderDic[extension];
+		}
+
+		EditRenderManager.hasCustomRenderByPath=function(filePath){
+			if(!filePath)return false;
+			if(! (typeof filePath=='string'))return false;
+			var extension;
+			extension=FileTools.getExtensionName(filePath);
+			return EditRenderManager.renderDic.hasOwnProperty(extension);
+		}
+
+		EditRenderManager.createCustomRenderByPath=function(filePath){
+			var extension;
+			extension=FileTools.getExtensionName(filePath);
+			var extensionPath;
+			extensionPath=EditRenderManager.getCustomRenderByExtension(extension);
+			if(! (typeof extensionPath=='string')){
+				var renderI;
+				var renderClz=EditRenderManager.getCustomRenderByExtension(extension);
+				return new renderClz();
+			};
+			var rst;
+			rst=new CustomIFrameRender();
+			rst.renderPagePath=extensionPath;
+			rst.initIframe();
+			return rst;
+		}
+
+		EditRenderManager.init=function(){
+			EditRenderManager.regIDERenders();
+			var customDesignPath;
+			customDesignPath=FileManager.getAppPath("plugins/");
+			var folders;
+			folders=FileTools.getDirChildDirs(customDesignPath);
+			var i=0,len=0;
+			len=folders.length;
+			for(i=0;i<len;i++){
+				EditRenderManager.addCustomDesignByFolder(folders[i]);
+			}
+		}
+
+		EditRenderManager.regIDERenders=function(){}
+		EditRenderManager.addCustomDesignByFolder=function(folder){
+			if(!FileManager.exists(folder))return;
+			var configPath;
+			configPath=FileManager.getPath(folder,"render.cfg");
+			if (!FileManager.exists(configPath))return;
+			console.log("addCustomDesignByFolder:",configPath);
+			var configO;
+			try{
+				configO=FileManager.readJSONFile(configPath);
+				if(!configO)return;
+				if(configO.extension&&configO.url){
+					var renderPath;
+					renderPath=FileManager.getPath(folder,configO.url);
+					if(FileManager.exists(renderPath)){
+						EditRenderManager.regRender(configO.extension,renderPath);
+					}
+				}
+				}catch(e){
+			}
+		}
+
+		EditRenderManager.renderDic={};
+		return EditRenderManager;
+	})()
+
+
+	/**
 	*
 	*@author ww
 	*@version 1.0
@@ -1815,6 +1920,173 @@
 		LayerManager.minWidth=900;
 		LayerManager.minHeight=700;
 		return LayerManager;
+	})()
+
+
+	/**
+	*本类集中初始化各个模块监听的消息
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-10-26 上午10:39:45
+	*/
+	//class platform.managers.NoticeRouter
+	var NoticeRouter=(function(){
+		function NoticeRouter(){}
+		__class(NoticeRouter,'platform.managers.NoticeRouter');
+		NoticeRouter.init=function(){
+			NoticeRouter._initsList=[];
+			NoticeRouter._initsList.push(ResPanel.instance);
+			NoticeRouter._initsList.push(EditZone.instance);
+			var i=0,len=NoticeRouter._initsList.length;
+			for (i=0;i < len;i++){
+				NoticeRouter._initsList[i].initListener();
+			}
+		}
+
+		NoticeRouter._initsList=null
+		return NoticeRouter;
+	})()
+
+
+	/**
+	*历史状态管理类
+	*@author ww
+	*/
+	//class platform.managers.state.State
+	var State=(function(){
+		function State(){
+			this._stateList=[];
+			this._tI=-1;
+		}
+
+		__class(State,'platform.managers.state.State');
+		var __proto=State.prototype;
+		/**
+		*添加状态 ，直接使用传入的状态值
+		*@param data
+		*
+		*/
+		__proto.add=function(data){
+			this.traceState();
+			if(this._tI!=this._stateList.length-1){
+				this._stateList.length=this._tI+1;
+			}
+			this._stateList.push(data);
+			if(this._stateList.length>150){
+				this._stateList.shift();
+			}
+			this._tI=this._stateList.length-1;
+			this.traceState();
+		}
+
+		__proto.getLastCache=function(){
+			if(this._stateList.length>1){
+				return this._stateList[this._stateList.length-2];
+			}
+			return null;
+		}
+
+		__proto.traceState=function(){}
+		/**
+		*添加状态 ，会拷贝一个副本数据存入
+		*@param data
+		*
+		*/
+		__proto.addE=function(data){
+			this.add(ObjectTools.copyObj(data));
+		}
+
+		/**
+		*获取当前状态
+		*@return
+		*
+		*/
+		__proto.now=function(){
+			return ObjectTools.copyObj(this._stateList[this._tI]);
+		}
+
+		/**
+		*向后回退
+		*@return
+		*
+		*/
+		__proto.back=function(){
+			if(this._tI<=0)return null;
+			this._tI--;
+			this.traceState();
+			return this.now();
+		}
+
+		/**
+		*向前重做
+		*@return
+		*
+		*/
+		__proto.forward=function(){
+			if(this._tI>=this._stateList.length-1)return null;
+			this._tI++;
+			this.traceState();
+			return this.now();
+		}
+
+		State.MaxLen=150;
+		return State;
+	})()
+
+
+	/**
+	*状态管理类
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-10-22 下午7:45:51
+	*/
+	//class platform.managers.StateManager
+	var StateManager=(function(){
+		function StateManager(){}
+		__class(StateManager,'platform.managers.StateManager');
+		StateManager.has=function(sign){
+			return StateManager._stateDic.hasOwnProperty(sign);
+		}
+
+		StateManager.getState=function(sign){
+			if(!StateManager._stateDic[sign])StateManager._stateDic[sign]=new State();
+			return StateManager._stateDic[sign];
+		}
+
+		StateManager.updateState=function(sign,data){
+			StateManager.setChangeState(sign,StateManager.has(sign));
+			StateManager.getState(sign).addE(data);
+		}
+
+		StateManager.removeState=function(sign){
+			delete StateManager._stateDic[sign];
+			delete StateManager._changeDic[sign];
+		}
+
+		StateManager.renameState=function(sign,newSign){
+			if(StateManager._stateDic[sign]){
+				StateManager._stateDic[newSign]=StateManager._stateDic[sign];
+				delete StateManager._stateDic[sign];
+			}
+			if(StateManager._changeDic[sign]){
+				StateManager._changeDic[newSign]=StateManager._changeDic[sign];
+				delete StateManager._changeDic[sign];
+			}
+		}
+
+		StateManager.hasChange=function(sign){
+			return StateManager._changeDic[sign];
+		}
+
+		StateManager.setChangeState=function(sign,changed){
+			StateManager._changeDic[sign]=changed;
+		}
+
+		StateManager._stateDic={};
+		StateManager._changeDic={};
+		return StateManager;
 	})()
 
 
@@ -2133,7 +2405,6 @@
 		*/
 		__proto.hide=function(clearSrc){
 			(clearSrc===void 0)&& (clearSrc=false);
-			Notice.cancel(/*no*/this.IDEEvent.Adpt_IFrames,this,this.adpt);
 			this.setVisible(false);
 			if(clearSrc){
 				this.renderFrame.src="";
@@ -2161,14 +2432,14 @@
 	*...
 	*@author WW
 	*/
-	//class viewRender.ViewRenderBase
-	var ViewRenderBase=(function(){
-		function ViewRenderBase(){
+	//class viewRender.EditorRenderBase
+	var EditorRenderBase=(function(){
+		function EditorRenderBase(){
 			this.initFuns();
 		}
 
-		__class(ViewRenderBase,'viewRender.ViewRenderBase');
-		var __proto=ViewRenderBase.prototype;
+		__class(EditorRenderBase,'viewRender.EditorRenderBase');
+		var __proto=EditorRenderBase.prototype;
 		__proto.initFuns=function(){
 			Browser.window.renderBinds={};
 			Browser.window.renderBinds.setData=Utils.bind(this.setData,this);
@@ -2201,7 +2472,7 @@
 		}
 
 		__proto.firstInit=function(complete,param){}
-		return ViewRenderBase;
+		return EditorRenderBase;
 	})()
 
 
@@ -2302,6 +2573,89 @@
 
 		return DragBar;
 	})(Component)
+
+
+	/**
+	*编辑页基类
+	*@author ww
+	*/
+	//class platform.editzone.SceneBase extends laya.ui.Box
+	var SceneBase=(function(_super){
+		function SceneBase(){
+			this.data=null;
+			this._path=null;
+			this._title=null;
+			this._scaleView=1;
+			this._changed=false;
+			SceneBase.__super.call(this);
+		}
+
+		__class(SceneBase,'platform.editzone.SceneBase',_super);
+		var __proto=SceneBase.prototype;
+		Laya.imps(__proto,{"platform.editzone.IEditViewer":true})
+		__proto.setUp=function(parent){}
+		//trace("SceneBase setUp");
+		__proto.save=function(){}
+		__proto.open=function(){}
+		__proto.clears=function(){}
+		__proto.onActive=function(){}
+		__proto.changeDataO=function(dataO){}
+		__proto.focusDesign=function(){}
+		__proto.removeSelf=function(){
+			return null;
+		}
+
+		__proto.dealAction=function(funName,param){
+			if ((typeof (this[funName])=='function')){
+				this[funName].apply(this,param);
+			}
+		}
+
+		__proto.show=function(){}
+		__proto.renderDragDrop=function(e){}
+		__proto.propChange=function(key,data){}
+		__proto.onResClick=function(data){}
+		__proto.getDesignData=function(){
+			return {};
+		}
+
+		__proto.goBack=function(){}
+		__proto.goForward=function(){}
+		__getset(0,__proto,'pagePath',function(){
+			return this._path;
+			},function(path){
+			this._path=path;
+			this._title=FileTools.getFileName(this._path);
+		});
+
+		__getset(0,__proto,'scaleView',function(){
+			return this._scaleView;
+			},function(value){
+			this._scaleView=value;
+		});
+
+		__getset(0,__proto,'canSetPageInfo',function(){
+			return false;
+		});
+
+		__getset(0,__proto,'useDesignChangeEvent',function(){
+			return false;
+		});
+
+		__getset(0,__proto,'title',function(){
+			return this._title;
+		});
+
+		__getset(0,__proto,'design',function(){
+			return this;
+		});
+
+		__getset(0,__proto,'hasChange',function(){
+			return this._changed;
+		});
+
+		return SceneBase;
+	})(Box)
 
 
 	/**
@@ -2911,6 +3265,155 @@
 	*@author ww
 	*@version 1.0
 	*
+	*@created 2018-5-25 上午10:02:33
+	*/
+	//class platform.editzone.CustomIFrameRender extends platform.editzone.SceneBase
+	var CustomIFrameRender=(function(_super){
+		function CustomIFrameRender(){
+			this.renderPagePath="renders/design3d/index.html";
+			this.iframeSprite=null;
+			CustomIFrameRender.__super.call(this);
+			this.iframeSprite=new EditViewerIFrameSprite();
+			this.iframeSprite.bottom=this.iframeSprite.top=this.iframeSprite.left=this.iframeSprite.right=0;
+			this.addChild(this.iframeSprite);
+			this.iframeSprite.on("loaded",this,this.onIFrameLoaded);
+		}
+
+		__class(CustomIFrameRender,'platform.editzone.CustomIFrameRender',_super);
+		var __proto=CustomIFrameRender.prototype;
+		__proto.initIframe=function(){
+			this.iframeSprite.setUrl(this.renderPagePath);
+		}
+
+		__proto.onIFrameLoaded=function(){
+			this.initPage();
+		}
+
+		__proto.initPage=function(){
+			this._changed=false;
+			var data;
+			if(this.pagePath){
+				if(StateManager.has(this.pagePath)){
+					data=StateManager.getState(this.pagePath).now();
+					}else{
+					try{
+						var jsonStr=FileTools.readFile(this.pagePath);
+						data=ObjectTools.getObj(jsonStr);
+						StateManager.updateState(this.pagePath,data);
+						}catch(e){
+						Alert.show(Sys.lang("读取数据出错，请查看文件是否已损坏:"+this.pagePath));
+						return;
+					}
+				}
+				}else{
+				data=this.iframeSprite.renderItem.getRenderData();
+			}
+			try{
+				Laya.timer.frameOnce(1,this,this.renderByData,[data]);
+			}
+			catch(e){}
+		}
+
+		__proto.save=function(){
+			_super.prototype.save.call(this);
+			if (this.pagePath){
+				this.saveFile(this.pagePath);
+			}
+		}
+
+		__proto.saveFile=function(file){
+			if(file){
+				var data=StateManager.getState(this.pagePath).now();
+				FileManager.createTxtFile(file,JsonTool.getJsonString(data,false));
+				MessageManager.instance.show(Sys.lang("保存成功"));
+				this._changed=false;
+				StateManager.setChangeState(this.pagePath,false);
+				Laya.stage.event("pageSaved");
+				Laya.stage.event(/*no*/this.IDEEvent.PAGE_CHANGED);
+			}
+		}
+
+		__proto.renderByData=function(data){
+			var updateData;
+			updateData={};
+			updateData.type="init";
+			updateData.url=FileTools.getAbsPath(this.pagePath);
+			updateData.base=FileTools.getAbsPath(SystemSetting.assetsPath+FileTools.getSep());
+			updateData.projectPath=SystemSetting.workPath;
+			updateData.data=data;
+			try{
+				this.iframeSprite.renderItem.updateData(updateData);
+				}catch(e){
+			}
+		}
+
+		__proto.goBack=function(){
+			_super.prototype.goBack.call(this);
+			var data=StateManager.getState(this.pagePath).back();
+			if(!data){
+				console.log("当前不可回退");
+				return;
+			};
+			this.setRenderData(data);
+		}
+
+		__proto.goForward=function(){
+			_super.prototype.goForward.call(this);
+			var data=StateManager.getState(this.pagePath).forward();
+			if(!data){
+				console.log("当前不可前进");
+				return;
+			};
+			this.setRenderData(data);
+		}
+
+		__proto.dataChanged=function(){
+			this._changed=true;
+			StateManager.setChangeState(this.pagePath,true);
+			StateManager.updateState(this.pagePath,this.iframeSprite.renderItem.getRenderData());
+			Laya.stage.event("pageChanged");
+		}
+
+		__proto.setRenderData=function(data){
+			this.renderByData(data);
+			this._changed=true;
+			StateManager.setChangeState(this.pagePath,true);
+			Laya.stage.event("pageChanged");
+		}
+
+		__getset(0,__proto,'hasChange',function(){
+			return StateManager.hasChange(this.pagePath);
+		});
+
+		return CustomIFrameRender;
+	})(SceneBase)
+
+
+	//class ui.edit.EditTabUI extends laya.ui.View
+	var EditTabUI=(function(_super){
+		function EditTabUI(){
+			this.btn=null;
+			this.close=null;
+			EditTabUI.__super.call(this);
+		}
+
+		__class(EditTabUI,'ui.edit.EditTabUI',_super);
+		var __proto=EditTabUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(EditTabUI.uiView);
+		}
+
+		EditTabUI.uiView={"type":"View","props":{"scenecolor":"#dddddd"},"child":[{"type":"Button","props":{"y":0,"x":0,"width":75,"var":"btn","skin":"view/tab_uipanel.png","labelMargin":"0,0,15,0","labelColors":"#dddddd,#888888,#e0e0e0","label":"label","height":25}},{"type":"Button","props":{"y":9,"x":59,"var":"close","skin":"view/btn_close1.png","scaleX":0.5,"scaleY":0.5,"stateNum":2}}]};
+		return EditTabUI;
+	})(View)
+
+
+	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
 	*@created 2016-8-12 上午11:35:20
 	*/
 	//class platform.extenddisplay.IFrameSprite extends platform.extenddisplay.HtmlSprite
@@ -2924,8 +3427,10 @@
 		__proto.createHtml=function(){
 			this.div=Browser.createElement("iframe");
 			this.div.style.border="0px";
+			this.div.addEventListener("load",Utils.bind(this.onIFrameLoaded,this),false)
 		}
 
+		__proto.onIFrameLoaded=function(){}
 		__proto.setUrl=function(path){
 			this.div.src=path;
 		}
@@ -3045,6 +3550,126 @@
 		MainViewUI.uiView={"type":"View","props":{"width":400,"height":300},"child":[{"type":"List","props":{"x":5,"width":126,"var":"itemList","vScrollBarSkin":"comp/vscroll.png","top":5,"scrollBarSkin":"comp/vscroll.png","repeatX":1,"bottom":5},"child":[{"type":"MainViewItem","props":{"y":0,"x":0,"runtime":"view.MainViewItem","name":"render"}}]},{"type":"Box","props":{"var":"contentBox","top":5,"skin":"comp/blank.png","right":5,"left":150,"bottom":5}}]};
 		return MainViewUI;
 	})(View)
+
+
+	/**视图标签
+	*@author ww
+	*/
+	//class platform.editzone.EditTab extends ui.edit.EditTabUI
+	var EditTab=(function(_super){
+		function EditTab(viewer,tip){
+			this._uiViewer=null;
+			EditTab.__super.call(this);
+			this._uiViewer=viewer;
+			var comp;
+			comp=viewer;
+			comp.left=comp.right=comp.bottom=0;
+			comp.top=0;
+			if (viewer.useDesignChangeEvent){
+				viewer.design.on("change",this,this.onDesignChange);
+				}else{
+				Laya.stage.on("pageChanged",this,this.onDesignChange);
+			}
+			this.onDesignChange(null);
+			this.close.on("click",this,this.onCloseClick);
+			this.btn.labelAlign="left";
+			this.btn.labelPadding="-2,5,0,5"
+			this.btn.labelColors=StyleConsts.LayoutTabTitleBtnColors;
+			this.toolTip=tip?tip:FileManager.getRelativePath(SystemSetting.assetsPath,viewer.pagePath);
+		}
+
+		__class(EditTab,'platform.editzone.EditTab',_super);
+		var __proto=EditTab.prototype;
+		__proto.onCloseClick=function(e){
+			EditZone.instance.tryToClose(this._uiViewer);
+		}
+
+		//e.stopPropagation();
+		__proto.onDesignChange=function(e){
+			var len=ObjectUtils.getTextField(null,"*"+this._uiViewer.title).width+25;
+			this.btn.width=len;
+			this.close.x=len-this.close.displayWidth-8;
+			this.btn.label=(this._uiViewer.hasChange ? "*" :"")+this._uiViewer.title;
+		}
+
+		__getset(0,__proto,'width',function(){
+			return this.btn.width;
+		},_super.prototype._$set_width);
+
+		__getset(0,__proto,'uiViewer',function(){
+			return this._uiViewer;
+		});
+
+		/**点击处理器(无默认参数)*/
+		__getset(0,__proto,'clickHandler',function(){
+			return this.btn.clickHandler;
+			},function(value){
+			this.btn.clickHandler=value;
+		});
+
+		/**是否是选择状态*/
+		__getset(0,__proto,'selected',function(){
+			return this.btn.selected;
+			},function(value){
+			this.btn.selected=value;
+		});
+
+		return EditTab;
+	})(EditTabUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class platform.editzone.EditViewerIFrameSprite extends platform.extenddisplay.IFrameSprite
+	var EditViewerIFrameSprite=(function(_super){
+		function EditViewerIFrameSprite(){
+			this.renderFrame=null;
+			this.renderItem=null;
+			this.style=null;
+			this.iframeWindow=null;
+			EditViewerIFrameSprite.__super.call(this);
+		}
+
+		__class(EditViewerIFrameSprite,'platform.editzone.EditViewerIFrameSprite',_super);
+		var __proto=EditViewerIFrameSprite.prototype;
+		__proto.onIFrameLoaded=function(){
+			_super.prototype.onIFrameLoaded.call(this);
+			this.iframeWindow=this.div.contentWindow;
+			this.renderItem=this.iframeWindow.renderBinds;
+			if (!this.renderItem)return;
+			Notice.listen("RenderInited",null,this.renderInited);
+			if(this.renderItem)
+				this.renderItem.setNotice(Notice.I);
+			this.event("loaded");
+		}
+
+		__proto.renderInited=function(){
+			console.log("renderInited");
+		}
+
+		return EditViewerIFrameSprite;
+	})(IFrameSprite)
+
+
+	//class ui.edit.EditZoneUI extends platform.layout.DragView
+	var EditZoneUI=(function(_super){
+		function EditZoneUI(){
+			this.tab=null;
+			EditZoneUI.__super.call(this);
+		}
+
+		__class(EditZoneUI,'ui.edit.EditZoneUI',_super);
+		var __proto=EditZoneUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(EditZoneUI.uiView);
+		}
+
+		EditZoneUI.uiView={"type":"DragView","props":{"title":"UI","scenecolor":"#dddddd","recTabSkin":"view/tab_uipanel.png","recBarSkin":"view/bg_uipanel_bar.png","hitTestPrior":true},"child":[{"type":"Image","props":{"y":0,"x":0,"top":0,"skin":"view/bg_uiviewer.png","right":0,"left":0,"bottom":0}},{"type":"Image","props":{"y":0,"x":0,"width":164,"skin":"view/bg_uipanel.png","sizeGrid":"0,3,0,3","right":0,"left":0,"height":25}},{"type":"Tab","props":{"y":0,"x":0,"var":"tab","skin":"view/tab_uipanel.png"}}]};
+		return EditZoneUI;
+	})(DragView)
 
 
 	/**
@@ -3791,34 +4416,6 @@
 	*...
 	*@author ww
 	*/
-	//class view.MainViewItem extends ui.deskplatform.MainViewItemUI
-	var MainViewItem=(function(_super){
-		function MainViewItem(){
-			this._dataO=null;
-			MainViewItem.__super.call(this);
-			this.on("click",this,this.onClick);
-		}
-
-		__class(MainViewItem,'view.MainViewItem',_super);
-		var __proto=MainViewItem.prototype;
-		__proto.initByData=function(dataO){
-			this._dataO=dataO;
-			this.label.text=dataO.name;
-		}
-
-		__proto.onClick=function(){
-			console.log("onClick:",this._dataO);
-			Notice.notify("OPEN_PLUGIN",this._dataO.path);
-		}
-
-		return MainViewItem;
-	})(MainViewItemUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
 	//class view.MainView extends ui.deskplatform.MainViewUI
 	var MainView=(function(_super){
 		function MainView(){
@@ -3869,6 +4466,389 @@
 
 		return MainView;
 	})(MainViewUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class view.MainViewItem extends ui.deskplatform.MainViewItemUI
+	var MainViewItem=(function(_super){
+		function MainViewItem(){
+			this._dataO=null;
+			MainViewItem.__super.call(this);
+			this.on("click",this,this.onClick);
+		}
+
+		__class(MainViewItem,'view.MainViewItem',_super);
+		var __proto=MainViewItem.prototype;
+		__proto.initByData=function(dataO){
+			this._dataO=dataO;
+			this.label.text=dataO.name;
+		}
+
+		__proto.onClick=function(){
+			console.log("onClick:",this._dataO);
+			Notice.notify("OPEN_PLUGIN",this._dataO.path);
+		}
+
+		return MainViewItem;
+	})(MainViewItemUI)
+
+
+	/**编辑区分页管理器
+	*@author ww
+	*/
+	//class platform.editzone.EditZone extends ui.edit.EditZoneUI
+	var EditZone=(function(_super){
+		function EditZone(){
+			this._currViewer=null;
+			this._copyTemp=null;
+			this.tabEx=null;
+			this._menu=null;
+			EditZone.__super.call(this);
+			this._container=new Box();
+			this._mScrollRec=new Rectangle();
+			this.init();
+			this.canClose=false;
+			this.canMix=false;
+			this.tabEx=this.tab;
+			this._container.width=100;
+			this._container.height=100;
+			this._container.top=25;
+			this._container.bottom=0;
+			this._container.left=0;
+			this._container.right=0;
+			this._container.mouseEnabled=true;
+			this.tab.labelColors=StyleConsts.LayoutTabTitleBtnColors;
+			this.addChild(this._container);
+			this.on("mousewheel",this,this.mouseWheel);
+		}
+
+		__class(EditZone,'platform.editzone.EditZone',_super);
+		var __proto=EditZone.prototype;
+		__proto.mouseWheel=function(e){
+			platform.editzone.EditZone.instance.setScale(2*e.delta/100);
+		}
+
+		__proto.initListener=function(){
+			Notice.listen("closePage",this,this.closePage);
+			Notice.listen("openPAGE",this,this.openPage);
+			Notice.listen("Focus_design",this,this.focusDesign);
+			Notice.listen("FRESH_CurView",this,this.refreshCurrView);
+		}
+
+		__proto.init=function(){
+			this.tab.on("change",this,this.onTabChange);
+			this.tab.on("doubleclick",this,this.onTabDoubleClick);
+			this.on("mouseover",this,this.onRollOver);
+			this.initTabMenu();
+		}
+
+		__proto.hasPageOpen=function(){
+			return this.tabEx.items.length>0;
+		}
+
+		__proto.changeSize=function(){
+			laya.ui.Component.prototype.changeSize.call(this);
+			this.tabEx.maxLen=this.width;
+			this.tabEx.updateUI();
+			this._mScrollRec.setTo(0,0,this._container.width,this._container.height);
+			this._container.scrollRect=this._mScrollRec;
+		}
+
+		__proto.onRollOver=function(e){}
+		/**双击关闭页面*/
+		__proto.onTabDoubleClick=function(e){
+			if (this._currViewer){
+				this.tryToClose(this._currViewer);
+			}
+		}
+
+		/**如果内容没有保存，提示保存*/
+		__proto.tryToClose=function(uiViewer){
+			if (uiViewer.hasChange){
+				}else {
+				this.closeBack(uiViewer);
+			}
+		}
+
+		/**保存后关闭*/
+		__proto.saveBack=function(uiViewer){
+			uiViewer.save();
+			this.closePage(uiViewer.pagePath);
+		}
+
+		/**处理页面关闭*/
+		__proto.closeBack=function(uiViewer){
+			if(uiViewer==this._currViewer){
+				this.clearPanelsData();
+			}
+			this.closePage(uiViewer.pagePath);
+		}
+
+		__proto.clearPanelsData=function(){}
+		/**切换标签时刷新页面*/
+		__proto.onTabChange=function(e){
+			if (this._currViewer){
+				this._currViewer.removeSelf();
+				this._currViewer=null;
+			}
+			this.clearPanelsData();
+			if (this.tab.selectedIndex !=-1){
+				this._currViewer=(this.tab.selection).uiViewer;
+				if(this._currViewer){
+					this._container.addChild(this._currViewer);
+					this._currViewer.onActive();
+				}
+			}
+		}
+
+		/**初始化右键菜单*/
+		__proto.initTabMenu=function(){
+			var menu=ContextMenu$1.createMenu("关闭","关闭其他","关闭全部");
+			menu.on("select",this,this.onEmunSelect);
+			this._menu=menu;
+			this.tab.on("rightmousedown",this,this.onTabRightMouseDown);
+		}
+
+		__proto.onTabRightMouseDown=function(e){
+			for (var i=0,n=this.tab.numChildren;i < n;i++){
+				var viewTab=this.tab.getChildAt(i);
+				if (viewTab && e.target.parent==viewTab){
+					if(this.tab.selectedIndex!=i)
+						this.tab.selectedIndex=i;
+					this._menu.show();
+					break ;
+				}
+			}
+		}
+
+		__proto.onEmunSelect=function(name){
+			switch (name){
+				case "关闭":
+					this.closePage(this._currViewer.pagePath);
+					break ;
+				case "关闭其他":
+					this.closeAll(null,null,this.tab.selectedIndex);
+					break ;
+				case "关闭全部":
+					this.closeAll();
+					break ;
+				}
+		}
+
+		/**关闭页面*/
+		__proto.closePage=function(pagePath){
+			pagePath=FileManager.adptToCommonUrl(pagePath);
+			StateManager.removeState(pagePath);
+			StateManager.setChangeState(pagePath,false);
+			var index=this.getTabIndex(pagePath);
+			if (index !=-1){
+				if(this.tab.items[index]){
+					var viewTab=this.tab.items [index];
+					if(viewTab&&viewTab.uiViewer&&viewTab.uiViewer.clears!=null){
+						viewTab.uiViewer.clears();
+					}
+				}
+				this.tab.delItem(this.tab.items[index]);
+				this.onTabChange(null);
+				if (this.tab.items.length==0){}
+					return true;
+			}
+			return false;
+		}
+
+		/**获得页面索引*/
+		__proto.getTabIndex=function(pagePath){
+			for (var i=0,n=this.tab.items.length;i < n;i++){
+				var viewTab=this.tab.items [i];
+				if (pagePath==viewTab.uiViewer.pagePath){
+					return i;
+				}
+			}
+			return-1;
+		}
+
+		/**显示页面*/
+		__proto.openPage=function(pagePath,title){
+			pagePath=FileManager.adptToCommonUrl(pagePath);
+			var index=this.getTabIndex(pagePath);
+			var viewTab;
+			var viewer;
+			if (index==-1){
+				if(EditRenderManager.hasCustomRenderByPath(pagePath)){
+					var customIFrameRender;
+					customIFrameRender=EditRenderManager.createCustomRenderByPath(pagePath);
+					viewer=customIFrameRender;
+					viewer.pagePath=pagePath;
+					viewTab=new EditTab(viewer);
+					index=this.tab.addItem(viewTab);
+					}else{
+					return;
+				}
+			}
+			this.tab.selectedIndex=index;
+		}
+
+		/**保存当前页面*/
+		__proto.save=function(){
+			if (this._currViewer !=null){
+				this._currViewer.save();
+			}
+		}
+
+		/**刷新当前视图*/
+		__proto.refreshCurrView=function(){
+			if (this._currViewer !=null){
+				this.stage.focus=this._currViewer.design;
+				this._currViewer.dealAction("refresh");
+			}
+		}
+
+		/**恢复*/
+		__proto.goBack=function(){
+			if (this._currViewer !=null){
+				this._currViewer.dealAction("goBack");
+			}
+		}
+
+		/**重置*/
+		__proto.goForward=function(){
+			if (this._currViewer !=null){
+				this._currViewer.dealAction("goForward");
+			}
+		}
+
+		/**保存所有*/
+		__proto.saveAll=function(){
+			var viewTab;
+			for(var $each_viewTab in this.tab.items){
+				viewTab=this.tab.items[$each_viewTab];
+				viewTab.uiViewer.save();
+			}
+		}
+
+		__proto.hasNotSavedFile=function(){
+			for (var j=0;j < this.tab.items.length;j++){
+				var viewTab=this.tab.items [j];
+				if (viewTab.uiViewer.hasChange){
+					return true;
+				}
+			}
+			return false;
+		}
+
+		/**关闭所有*/
+		__proto.closeAll=function(complete,args,exceptIndex){
+			var _$this=this;
+			(exceptIndex===void 0)&& (exceptIndex=-1);
+			for (var j=0;j < this.tab.items.length;j++){
+				if (j !=exceptIndex){
+					var viewTab=this.tab.items [j];
+					if (viewTab.uiViewer.hasChange){
+						return;
+					}
+				}
+			}
+			closeAllBack();
+			function saveAllBack (){
+				_$this.saveAll();
+				closeAllBack();
+			}
+			function closeAllBack (){
+				for (var i=_$this.tab.items.length-1;i >-1;i--){
+					if (i !=exceptIndex){
+						var view=/*no*/this.ViewTab(_$this.tab.items[i]).uiViewer;
+						_$this.closePage(view.pagePath);
+					}
+				}
+				if (complete !=null){
+					complete.apply(null,args);
+				}
+			}
+		}
+
+		/**关闭当前页面*/
+		__proto.closeCurrPage=function(){
+			this.onTabDoubleClick(null);
+		}
+
+		/**更改同层先后顺序*/
+		__proto.sortComp=function(up){
+			(up===void 0)&& (up=true);
+			if (this._currViewer !=null){
+				this._currViewer.dealAction("sortComp",[up]);
+			}
+		}
+
+		/**改变层*/
+		__proto.moveLayer=function(up){
+			(up===void 0)&& (up=true);
+			if (this._currViewer !=null){
+				this._currViewer.dealAction("moveLayer",[up]);
+			}
+		}
+
+		/**获得ui视图*/
+		__proto.getUIViewer=function(pagePath){
+			pagePath=FileManager.adptToCommonUrl(pagePath);
+			var viewTab;
+			for(var $each_viewTab in this.tab.items){
+				viewTab=this.tab.items[$each_viewTab];
+				if (viewTab.uiViewer.pagePath==pagePath){
+					return viewTab.uiViewer;
+				}
+			}
+			return null;
+		}
+
+		/**设置焦点*/
+		__proto.focusDesign=function(){
+			if (this._currViewer !=null){
+				if(! (this._currViewer instanceof laya.display.Sprite )){
+					Laya.stage.focus=this;
+				}
+				this._currViewer.focusDesign();
+			}
+		}
+
+		__getset(0,__proto,'currViewer',function(){
+			return this._currViewer;
+		});
+
+		/**是否有变化*/
+		__getset(0,__proto,'hasChange',function(){
+			var viewTab;
+			for(var $each_viewTab in this.tab.items){
+				viewTab=this.tab.items[$each_viewTab];
+				if (viewTab.uiViewer.design&&viewTab.uiViewer.design.hasChange){
+					return true;
+				}
+			}
+			return false;
+		});
+
+		/**打开的页面*/
+		__getset(0,__proto,'openPages',function(){
+			var arr=[];
+			var viewTab;
+			for(var $each_viewTab in this.tab.items){
+				viewTab=this.tab.items[$each_viewTab];
+				arr.push(viewTab.uiViewer.pagePath);
+			}
+			return arr;
+		});
+
+		__getset(1,EditZone,'instance',function(){
+			return EditZone._instance ? EditZone._instance :EditZone._instance=new EditZone();
+		},ui.edit.EditZoneUI._$SET_instance);
+
+		EditZone._instance=null
+		EditZone.borderWidth=1;
+		EditZone.topLen=25;
+		return EditZone;
+	})(EditZoneUI)
 
 
 	/**资源面板
@@ -4363,7 +5343,9 @@
 		}
 
 		__proto.onResTreeDoubleClick=function(e){
-			if (e.target.parent==this.resTree.list.content){
+			if (e.target.parent==this.resTree.list.content && this.resTree.selectedItem){
+				debugger;
+				Notice.notify("openPAGE",[this.resTree.selectedItem.path]);
 			}
 		}
 
@@ -4459,7 +5441,7 @@
 
 
 	/**提示框
-	*@author yung
+	*@author ww
 	*/
 	//class view.Alert extends ui.deskplatform.AlertUI
 	var Alert=(function(_super){
@@ -4481,7 +5463,7 @@
 		Alert.show=function(msg,title){
 			(title===void 0)&& (title="提示");
 			if(title=="提示"){
-				title=/*no*/this.Sys.lang("提示");
+				title=Sys.lang("提示");
 			}
 			Alert.instance.start(msg,title);
 		}
@@ -4492,7 +5474,7 @@
 
 
 	/**确认框
-	*@author yung
+	*@author ww
 	*/
 	//class view.Confirm extends ui.deskplatform.ConfirmUI
 	var Confirm=(function(_super){
@@ -4542,8 +5524,8 @@
 		},ui.deskplatform.ConfirmUI._$SET_instance);
 
 		Confirm.show=function(msg,title,handler,args,okName,cancelName){
-			if(!okName)okName=/*no*/this.Sys.lang("确定");
-			if(!cancelName)cancelName=/*no*/this.Sys.lang("取消");
+			if(!okName)okName=Sys.lang("确定");
+			if(!cancelName)cancelName=Sys.lang("取消");
 			Confirm.instance.okBtn.label=okName;
 			Confirm.instance.cancelBtn.label=cancelName;
 			Confirm.instance.start(msg,title,handler,args);
@@ -4555,7 +5537,7 @@
 
 
 	/**重命名资源
-	*@author yung
+	*@author ww
 	*/
 	//class view.RenameRes extends ui.deskplatform.RenameResUI
 	var RenameRes=(function(_super){
@@ -4583,13 +5565,13 @@
 		__proto.close=function(type){
 			if (type=="sure"){
 				if(StringTool.isOkFileName(this.nameTxt.text)){
-					if(/*no*/this.FileTools.isPathSame(this.nameTxt.text,this.resLbl.text)){
-						laya.editor.comonents.Alert.show(/*no*/this.Sys.lang("文件名不能相同！！"));
+					if(FileTools.isPathSame(this.nameTxt.text,this.resLbl.text)){
+						Alert.show(/*no*/this.Sys.lang("文件名不能相同！！"));
 						return;
 					}
 					laya.ui.Dialog.prototype.close.call(this,type);
 					}else{
-					laya.editor.comonents.Alert.show(/*no*/this.Sys.lang("文件名不合法"));
+					Alert.show(/*no*/this.Sys.lang("文件名不合法"));
 				}
 				}else{
 				laya.ui.Dialog.prototype.close.call(this,type);
