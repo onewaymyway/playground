@@ -207,9 +207,14 @@ package electrontools.menus {
 		}
 		
 		public function show(posX:Number = -999, posY:Number = -999):void {
-			showMenu(this, posX, posY);
-			//Laya.timer.once(50, this, nativeMenu.popup, [Laya.stage.mouseX, Laya.stage.mouseY]);
-			//nativeMenu.popup(Laya.stage.mouseX, Laya.stage.mouseY);
+			//showMenu(this, posX, posY);
+			//Laya.timer.once(50, nativeMenu, nativeMenu.popup, [Laya.stage.mouseX, Laya.stage.mouseY]);
+			var paramO:Object;
+			paramO = { };
+			paramO.x = Laya.stage.mouseX;
+			paramO.y = Laya.stage.mouseY;
+			//nativeMenu.popup(paramO);
+			Laya.timer.once(50, nativeMenu, nativeMenu.popup, [paramO]);
 		}	
 	}
 }
