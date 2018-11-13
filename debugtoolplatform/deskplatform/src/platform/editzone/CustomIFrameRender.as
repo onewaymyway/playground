@@ -121,7 +121,7 @@ package platform.editzone
 				StateManager.setChangeState(pagePath,false);
 				Laya.stage.event("pageSaved");
 				//Laya.stage.event("pageChanged");
-				Laya.stage.event(IDEEvent.PAGE_CHANGED);
+				Laya.stage.event(PlatformEvents.PAGE_CHANGED);
 			}
 		}
 		
