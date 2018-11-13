@@ -29,9 +29,14 @@ package viewRender
 			Browser.window.renderBinds.getRenderData = Utils.bind(getRenderData, this);
 			Browser.window.renderBinds.getStage = Utils.bind(getStage,this);
 			Browser.window.renderBinds.setNotice = Utils.bind(setNotice, this);
-			Browser.window.renderBinds.firstInit = Utils.bind(firstInit,this);
+			Browser.window.renderBinds.firstInit = Utils.bind(firstInit, this);
+			Browser.window.renderBinds.setPagePath = Utils.bind(setPagePath,this);
 		}
 		
+		public function setPagePath(pagePath:String):void
+		{
+			
+		}
 		public function getRenderData():Object
 		{
 			return null;
