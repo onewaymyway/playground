@@ -135,8 +135,8 @@
 		}
 
 		__proto.initApp=function(){
-			NoticeRouter.init();
 			EditRenderManager.init();
+			NoticeRouter.init();
 			CursorManager.init();
 			SystemSetting.assetsPath=FileManager.getAppPath("files");;
 			ResPanel.instance.init(SystemSetting.assetsPath);
@@ -260,6 +260,11 @@
 		PlatformEvents.DESIGN_DATACHANGED="DESIGN_DATACHANGED";
 		PlatformEvents.FRESH_CURVIEW="FRESH_CurView";
 		PlatformEvents.SHOW_LAYOUTTAB_BY_NAME="SHOW_LayoutTab_By_Name";
+		PlatformEvents.WebViewReady="WebViewReady";
+		PlatformEvents.OPEN_ADDDIR="open_adddir";
+		PlatformEvents.ADD_DIR="adddir";
+		PlatformEvents.OPEN_ADD_COMMON_RES_DIALOG="OPEN_ADD_COMMON_RES_DIALOG";
+		PlatformEvents.ADD_COMMON_RES="ADD_COMMON_RES";
 		return PlatformEvents;
 	})()
 
@@ -273,7 +278,7 @@
 		function PlatformVars(){}
 		__class(PlatformVars,'platform.interfaces.PlatformVars');
 		PlatformVars.isDragingLayout=false;
-		PlatformVars.disableTabDrag=false;
+		PlatformVars.disableTabDrag=true;
 		return PlatformVars;
 	})()
 
@@ -1876,11 +1881,28 @@
 						EditRenderManager.regRender(configO.extension,renderPath);
 					}
 				}
+				if (configO.createMenus){
+					EditRenderManager.addCreateMenus(folder,configO.createMenus);
+				}
 				}catch(e){
 			}
 		}
 
+		EditRenderManager.addCreateMenus=function(rootPath,menus){
+			var i=0,len=0;
+			len=menus.length;
+			for (i=0;i < len;i++){
+				EditRenderManager.addCreateMenu(rootPath,menus[i]);
+			}
+		}
+
+		EditRenderManager.addCreateMenu=function(rootPath,menuO){
+			menuO.tplFile=FileManager.getPath(rootPath,menuO.file);
+			EditRenderManager._createMenuS.push(menuO);
+		}
+
 		EditRenderManager.renderDic={};
+		EditRenderManager._createMenuS=[];
 		return EditRenderManager;
 	})()
 
@@ -1938,6 +1960,8 @@
 			NoticeRouter._initsList=[];
 			NoticeRouter._initsList.push(ResPanel.instance);
 			NoticeRouter._initsList.push(EditZone.instance);
+			NoticeRouter._initsList.push(AddDirectory.instance);
+			NoticeRouter._initsList.push(AddResCommomDialog.instance);
 			var i=0,len=NoticeRouter._initsList.length;
 			for (i=0;i < len;i++){
 				NoticeRouter._initsList[i].initListener();
@@ -2601,10 +2625,6 @@
 		__proto.onActive=function(){}
 		__proto.changeDataO=function(dataO){}
 		__proto.focusDesign=function(){}
-		__proto.removeSelf=function(){
-			return null;
-		}
-
 		__proto.dealAction=function(funName,param){
 			if ((typeof (this[funName])=='function')){
 				this[funName].apply(this,param);
@@ -3879,15 +3899,15 @@
 				case "right":
 				case "left":
 					focusWidth=0.5*this.width;
-					/*no*/this.FocusManager.showBorder(this,type,true,null,focusWidth);
+					FocusManager.showBorder(this,type,true,null,focusWidth);
 					break ;
 				case "up":
 				case "down":
 					focusWidth=0.5*this.height;
-					/*no*/this.FocusManager.showBorder(this,type,true,null,focusWidth);
+					FocusManager.showBorder(this,type,true,null,focusWidth);
 					break ;
 				case "center":
-					/*no*/this.FocusManager.showFocus(this);
+					FocusManager.showFocus(this);
 					break ;
 				}
 			DisControlTool.setTop(this);
@@ -4214,7 +4234,7 @@
 		}
 
 		__proto.onBtnDown=function(e){
-			if(laya.ide.managers.LayoutRecManager.popLocked())return;
+			if(LayoutRecManager.popLocked())return;
 			if(this._rec&&!this._rec.canDragMe)return;
 			if(PlatformVars.disableTabDrag)return;
 			var clip=new Clip(/*no*/this.SkinDefines.LayoutTabDragIcon,1,3);
@@ -4347,6 +4367,27 @@
 		ResPanelUI.uiView={"type":"DragView","props":{"width":200,"title":"资源","scenecolor":"#dddddd","hitTestPrior":true,"height":300},"child":[{"type":"Image","props":{"y":48,"x":415,"width":200,"top":0,"skin":"view/bg_panel.png","right":0,"left":0,"height":300,"bottom":0}},{"type":"TreeEx","props":{"y":552,"x":173,"width":196,"var":"resTree","top":112,"scrollBarSkin":"comp/vscroll.png","right":2,"left":2,"hitTestPrior":true,"height":136,"bottom":29},"child":[{"type":"Box","props":{"right":0,"name":"render","left":0},"child":[{"type":"Clip","props":{"y":0,"x":13,"skin":"comp/clip_selectBox.png","right":0,"name":"selectBox","left":9,"height":25,"clipY":2}},{"type":"Image","props":{"y":4,"x":14,"skin":"comp/folder.png","name":"icon","width":16,"height":16}},{"type":"Label","props":{"y":1,"width":150,"text":"label","right":0,"padding":"4,0,0,0","name":"label","left":38,"height":22,"color":"#d8d8d8"}},{"type":"Clip","props":{"y":6,"x":0,"skin":"comp/clip_tree.png","name":"arrow","clipY":2,"width":11,"height":12}}]}]},{"type":"Image","props":{"y":3,"x":222,"width":198,"var":"resViewer","right":1,"left":1,"height":100}},{"type":"Image","props":{"y":106,"x":2,"skin":"comp/line.png","right":0,"left":0,"height":1}},{"type":"Box","props":{"y":271,"x":1,"width":198,"var":"opBox","right":0,"left":0,"height":28,"bottom":0},"child":[{"type":"Image","props":{"width":191,"top":0,"skin":"view/bg_panel_bar.png","right":0,"left":0,"bottom":0}},{"type":"TextInput","props":{"y":4,"x":80,"width":148,"var":"fliterTxt","toolTip":"输入关键词过滤","skin":"comp/input_22.png","right":5,"padding":"0,10,0,20","left":80,"color":"#dddddd","sizeGrid":"0,3,0,3","height":22}},{"type":"Button","props":{"y":3,"x":3,"toolTip":"打开所在目录","stateNum":3,"skin":"view/login2.png","name":"openDirBtn","scaleX":0.5,"scaleY":0.5}},{"type":"Button","props":{"y":3,"x":29,"toolTip":"设置默认属性","stateNum":3,"skin":"view/settings2.png","name":"setPropBtn","scaleX":0.5,"scaleY":0.5}},{"type":"Button","props":{"y":4,"x":55,"toolTip":"刷新资源树","stateNum":3,"skin":"view/refresh2.png","name":"refreshBtn","scaleX":0.5,"scaleY":0.5}},{"type":"Clip","props":{"y":7,"x":82,"skin":"view/search.png","clipY":1,"index":0,"scaleX":0.5,"scaleY":0.5}},{"type":"Button","props":{"y":12,"var":"clearSearchBtn","skin":"view/btn_close1.png","right":9,"scaleX":0.5,"scaleY":0.5,"stateNum":2}}]},{"type":"Label","props":{"y":82,"x":6,"width":162,"var":"sizeTxt","text":"512*512","padding":"4,0,0,0","name":"label","height":19,"color":"#d8d8d8","align":"left"}}]};
 		return ResPanelUI;
 	})(DragView)
+
+
+	//class ui.deskplatform.AddDirectoryUI extends laya.ui.Dialog
+	var AddDirectoryUI=(function(_super){
+		function AddDirectoryUI(){
+			this.titleTxt=null;
+			this.nameTip=null;
+			this.nameTxt=null;
+			AddDirectoryUI.__super.call(this);
+		}
+
+		__class(AddDirectoryUI,'ui.deskplatform.AddDirectoryUI',_super);
+		var __proto=AddDirectoryUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(AddDirectoryUI.uiView);
+		}
+
+		AddDirectoryUI.uiView={"type":"Dialog","props":{"width":500,"scenecolor":"#dddddd","height":250},"child":[{"type":"Image","props":{"y":0,"x":0,"width":500,"skin":"view/bg_dialog.png","height":250,"sizeGrid":"47,20,22,37"}},{"type":"Button","props":{"skin":"view/btn_close.png","name":"close","scaleX":0.5,"scaleY":0.5,"right":11,"y":7}},{"type":"Image","props":{"y":7,"x":9,"width":438,"skin":"comp/blank_title_dragrec.png","name":"drag","height":36}},{"type":"Label","props":{"x":28,"width":140,"var":"titleTxt","text":"新增目录","styleSkin":"comp/label_panel_title.png","height":18,"fontSize":14,"align":"center","color":"#ffffff","centerX":0,"y":16}},{"type":"Label","props":{"y":86,"x":51,"width":92,"var":"nameTip","text":"目录名称：","styleSkin":"comp/label_intro.png","height":18,"fontSize":14,"color":"#C8C8C8"}},{"type":"TextInput","props":{"y":117,"x":51,"width":400,"var":"nameTxt","skin":"comp/input_32.png","color":"#dddddd","sizeGrid":"0,3,0,3","fontSize":14,"padding":"0,4,0,4","height":32}},{"type":"Button","props":{"y":175,"x":190,"skin":"comp/button.png","name":"sure","label":"新增","labelColors":"#FFFFFF,#FFFFFF,#FFFFFF,#c5c5c5","labelSize":16,"sizeGrid":"0,4,0,4"}}]};
+		return AddDirectoryUI;
+	})(Dialog)
 
 
 	//class ui.deskplatform.AlertUI extends laya.ui.Dialog
@@ -4567,6 +4608,7 @@
 
 		/**如果内容没有保存，提示保存*/
 		__proto.tryToClose=function(uiViewer){
+			console.log("tryToClose");
 			if (uiViewer.hasChange){
 				}else {
 				this.closeBack(uiViewer);
@@ -4688,6 +4730,7 @@
 					return;
 				}
 			}
+			this._currViewer=viewer;
 			this.tab.selectedIndex=index;
 		}
 
@@ -4852,7 +4895,7 @@
 
 
 	/**资源面板
-	*@author yung
+	*@author ww
 	*/
 	//class view.ResPanel extends ui.deskplatform.ResPanelUI
 	var ResPanel=(function(_super){
@@ -4878,7 +4921,11 @@
 			this.refresh(null,false,false);
 		}
 
-		__proto.initListener=function(){}
+		__proto.initListener=function(){
+			Notice.listen("ADD_COMMON_RES",this,this.onCreateNewResBack);
+			Notice.listen("adddir",this,this.addDirectory);
+		}
+
 		/**刷新资源树*/
 		__proto.init=function(resPath,complete){
 			var force=false;
@@ -4974,12 +5021,13 @@
 			this.resTree.on("doubleclick",this,this.onResTreeDoubleClick);
 			this.resTree.on("rightclick",this,this.onResTreeRightMouseDown);
 			this.resTree.mouseHandler=new Handler(this,this.onResTreeMouse);
-			var menu=ContextMenu$1.createMenu("设置默认属性","打开所在目录","查找引用","替换选中对象","","重命名","删除");
+			var menu=ContextMenu$1.createMenu("打开所在目录","","重命名","删除","新建目录");
 			menu.on("select",this,this.onEmunSelect);
 			this._menu=menu;
-			this._menuDir=ContextMenu$1.createMenu("设置默认属性","打开所在目录","","重命名","删除");
+			menu.nativeMenu.append(this.createNewMenu());
+			this._menuDir=ContextMenu$1.createMenu("打开所在目录","","重命名","删除");
 			this._menuDir.on("select",this,this.onEmunSelect);
-			this._mutiMenu=ContextMenu$1.createMenu("设置默认属性","删除");
+			this._mutiMenu=ContextMenu$1.createMenu("删除");
 			this._mutiMenu.on("select",this,this.onEmunSelect);
 			this.fliterTxt.on("input",this,this.onFliterTxtChange);
 			this.fliterTxt.color=StyleConsts.TextInputColor;
@@ -4991,6 +5039,62 @@
 			this.resTree.on("keydown",this,this.onTreeKeyDown);
 			this.on("click",this,this.onClick);
 			this.clearSearchBtn.on("mousedown",this,this.onClearSearch);
+		}
+
+		__proto.createNewMenu=function(){
+			const remote=require("electron").remote;;
+			const Menu=remote.Menu;;
+			const MenuItem=remote.MenuItem;
+			var MenuClz;
+			MenuClz=Menu;
+			var MenuItemClz;
+			MenuItemClz=MenuItem;
+			var menus;
+			menus=EditRenderManager._createMenuS;
+			var i=0,len=0;
+			len=menus.length;
+			debugger;
+			var scriptList;
+			scriptList=[];
+			var tDataO;
+			for(i=0;i<len;i++){
+				tDataO=menus[i];
+				tDataO.name=tDataO.title;
+				scriptList.push(tDataO);
+			}
+			scriptList.sort(MathUtil.sortByKey("name",false,false));
+			len=scriptList.length;
+			var tMenu;
+			var mainMenu;
+			mainMenu=new MenuClz({label:"New"});
+			var menuList;
+			menuList=[];
+			var _menuClick;
+			_menuClick=Utils.bind(this.onCreateNewMenu,this);
+			var tFilePath;
+			for(i=0;i<len;i++){
+				tDataO=scriptList[i];
+				tMenu=new MenuItemClz({label:tDataO.name,click:_menuClick,dataO:tDataO});
+				mainMenu.append(tMenu);
+			}
+			tMenu=new MenuItemClz({label:"New",submenu:mainMenu});
+			return tMenu;
+		}
+
+		__proto.onCreateNewMenu=function(dataO){
+			dataO=dataO.dataO;
+			Notice.notify("OPEN_ADD_COMMON_RES_DIALOG",dataO);
+		}
+
+		__proto.onCreateNewResBack=function(dataO){
+			var folder;
+			folder=this.currDirectory;
+			var sourcePath;
+			sourcePath=dataO.tplFile;
+			var tarPath;
+			tarPath=FileManager.getPath(folder,dataO.fileName+"."+dataO.extension);
+			FileManager.copyFile(sourcePath,tarPath);
+			this.refresh(null,true,false);
 		}
 
 		__proto.onClearSearch=function(){
@@ -5205,6 +5309,19 @@
 			FileTools.openItem(this.currDirectory);
 		}
 
+		/**增加目录*/
+		__proto.addDirectory=function(name){
+			if (!Boolean(name)){
+				return Alert.show(Sys.lang("新建目录名称不能为空"));
+			};
+			var path=FileManager.getPath(this.currDirectory,name);
+			if (this.hasFile(path)){
+				return Alert.show(Sys.lang("已经此名字的目录了，请换个名字试试"),Sys.lang("命名重复"));
+			}
+			FileManager.createDirectory(path);
+			this.refresh();
+		}
+
 		__proto.openCurrPath=function(){
 			var directory=this._resPath;
 			if (this.resTree.selectedItem !=null){
@@ -5231,6 +5348,9 @@
 					break ;
 				case "删除":
 					this.deleteRes();
+					break ;
+				case "新建目录":
+					Notice.notify("open_adddir");
 					break ;
 				}
 		}
@@ -5327,6 +5447,7 @@
 		}
 
 		__proto.onResTreeRightMouseDown=function(e){
+			console.log("onResTreeRightMouseDown");
 			if(this.resTree.mList.selectItems&&this.resTree.mList.selectItems.length>1){
 				this._mutiMenu.show();
 				return;
@@ -5438,6 +5559,102 @@
 		ResPanel._instance=null
 		return ResPanel;
 	})(ResPanelUI)
+
+
+	/**添加目录
+	*@author ww
+	*/
+	//class view.AddDirectory extends ui.deskplatform.AddDirectoryUI
+	var AddDirectory=(function(_super){
+		function AddDirectory(){AddDirectory.__super.call(this);;
+		};
+
+		__class(AddDirectory,'view.AddDirectory',_super);
+		var __proto=AddDirectory.prototype;
+		__proto.initListener=function(){
+			Notice.listen("open_adddir",this,this.start);
+		}
+
+		__proto.start=function(){
+			this.nameTxt.restrict=StyleConsts.fileNameRestrict;
+			this.nameTxt.text="";
+			this.popup();
+			this.nameTxt.focus=true;
+		}
+
+		__proto.close=function(type){
+			if (type=="sure"){
+				if (this.nameTxt.text){
+					laya.ui.Dialog.prototype.close.call(this,type);
+					Notice.notify("adddir",[this.nameTxt.text]);
+					}else {
+					Alert.show(Sys.lang("目录名称不能为空"));
+				}
+				}else{
+				laya.ui.Dialog.prototype.close.call(this,type);
+			}
+		}
+
+		__getset(1,AddDirectory,'instance',function(){
+			return AddDirectory._instance ? AddDirectory._instance :AddDirectory._instance=new AddDirectory();
+		},ui.deskplatform.AddDirectoryUI._$SET_instance);
+
+		AddDirectory._instance=null
+		return AddDirectory;
+	})(AddDirectoryUI)
+
+
+	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2017-10-23 下午8:59:35
+	*/
+	//class view.AddResCommomDialog extends ui.deskplatform.AddDirectoryUI
+	var AddResCommomDialog=(function(_super){
+		function AddResCommomDialog(){
+			this.dataO=null;
+			AddResCommomDialog.__super.call(this);
+		}
+
+		__class(AddResCommomDialog,'view.AddResCommomDialog',_super);
+		var __proto=AddResCommomDialog.prototype;
+		__proto.initListener=function(){
+			Notice.listen("OPEN_ADD_COMMON_RES_DIALOG",this,this.start);
+		}
+
+		__proto.start=function(dataO){
+			if(!dataO)return;
+			this.dataO=dataO;
+			this.titleTxt.text=Sys.lang("新建");
+			this.nameTip.text=Sys.lang("名称：");
+			this.nameTxt.text="";
+			this.popup();
+			this.nameTxt.focus=true;
+		}
+
+		__proto.close=function(type){
+			if (type=="sure"){
+				if (this.nameTxt.text){
+					laya.ui.Dialog.prototype.close.call(this,type);
+					this.dataO.fileName=this.nameTxt.text;
+					Notice.notify("ADD_COMMON_RES",[this.dataO]);
+					}else {
+					Alert.show(Sys.lang("名称不能为空"));
+				}
+				}else{
+				laya.ui.Dialog.prototype.close.call(this,type);
+			}
+		}
+
+		__getset(1,AddResCommomDialog,'instance',function(){
+			return AddResCommomDialog._instance ? AddResCommomDialog._instance :AddResCommomDialog._instance=new AddResCommomDialog();
+		},ui.deskplatform.AddDirectoryUI._$SET_instance);
+
+		AddResCommomDialog._instance=null
+		return AddResCommomDialog;
+	})(AddDirectoryUI)
 
 
 	/**提示框

@@ -34282,7 +34282,11 @@ var Laya=window.Laya=(function(window,document){
 		__proto.show=function(posX,posY){
 			(posX===void 0)&& (posX=-999);
 			(posY===void 0)&& (posY=-999);
-			ContextMenu.showMenu(this,posX,posY);
+			var paramO;
+			paramO={};
+			paramO.x=Laya.stage.mouseX;
+			paramO.y=Laya.stage.mouseY;
+			Laya.timer.once(50,this.nativeMenu,this.nativeMenu.popup,[paramO]);
 		}
 
 		ContextMenu.init=function(){
@@ -39254,6 +39258,25 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
+	var FindNodeSmall=(function(_super){
+		function FindNodeSmall(){
+			FindNodeSmall.__super.call(this);
+			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
+			this.createView(FindNodeSmallUI.uiView);
+		}
+
+		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
+		var __proto=FindNodeSmall.prototype;
+		__proto.createChildren=function(){}
+		return FindNodeSmall;
+	})(FindNodeSmallUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class laya.debug.view.nodeInfo.nodetree.FindNode extends laya.debug.ui.debugui.FindNodeUI
 	var FindNode=(function(_super){
 		function FindNode(){
@@ -39270,25 +39293,6 @@ var Laya=window.Laya=(function(window,document){
 
 		return FindNode;
 	})(FindNodeUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
-	var FindNodeSmall=(function(_super){
-		function FindNodeSmall(){
-			FindNodeSmall.__super.call(this);
-			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
-			this.createView(FindNodeSmallUI.uiView);
-		}
-
-		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
-		var __proto=FindNodeSmall.prototype;
-		__proto.createChildren=function(){}
-		return FindNodeSmall;
-	})(FindNodeSmallUI)
 
 
 	/**
@@ -40499,7 +40503,7 @@ var Laya=window.Laya=(function(window,document){
 	})(Tab)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,Render,View,Timer,GraphicAnimation,Browser,LocalStorage]);
+	Laya.__init([EventDispatcher,LoaderManager,Render,View,Timer,Browser,LocalStorage,GraphicAnimation]);
 })(window,document,Laya);
 
 
@@ -40513,19 +40517,16 @@ var Laya=window.Laya=(function(window,document){
 7 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 8 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 9 file:///D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/drags/DragEvent.as (84):warning:SystemSetting.assetsPath This variable is not defined.
-10 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/CustomIFrameRender.as (103):warning:IDEEvent.PAGE_CHANGED This variable is not defined.
+10 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/CustomIFrameRender.as (108):warning:IDEEvent.PAGE_CHANGED This variable is not defined.
 11 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as (60):warning:_getOneCell This variable is not defined.
 12 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as (87):warning:_createItems This variable is not defined.
 13 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/NodeTree.as (49):warning:_treeData This variable is not defined.
-14 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (273):warning:IDEVars.disableTabDrag This variable is not defined.
-15 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (328):warning:FocusManager.showBorder This variable is not defined.
-16 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (333):warning:FocusManager.showBorder This variable is not defined.
-17 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (337):warning:FocusManager.showFocus This variable is not defined.
-18 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (472):warning:UIPanel. This variable is not defined.
-19 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (29):warning:HtmlSprite. This variable is not defined.
-20 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (70):warning:SkinDefines.LayoutTabDragIcon This variable is not defined.
-21 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/EditZone.as (336):warning:ViewTab This variable is not defined.
-22 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as (594):warning:compType This variable is not defined.
-23 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (43):warning:Sys.lang This variable is not defined.
-24 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (49):warning:Sys.lang This variable is not defined.
+14 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (274):warning:IDEVars.disableTabDrag This variable is not defined.
+15 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (473):warning:UIPanel. This variable is not defined.
+16 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (28):warning:HtmlSprite. This variable is not defined.
+17 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (69):warning:SkinDefines.LayoutTabDragIcon This variable is not defined.
+18 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/EditZone.as (338):warning:ViewTab This variable is not defined.
+19 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as (647):warning:compType This variable is not defined.
+20 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (43):warning:Sys.lang This variable is not defined.
+21 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (49):warning:Sys.lang This variable is not defined.
 */
