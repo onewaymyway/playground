@@ -16,6 +16,7 @@ package view {
 	import laya.display.Sprite;
 	import laya.events.Event;
 	import laya.events.Keyboard;
+	import laya.maths.MathUtil;
 	import laya.maths.Point;
 	import laya.resource.Texture;
 	import laya.ui.Box;
@@ -33,12 +34,13 @@ package view {
 	import nodetools.devices.SystemSetting;
 	import platform.interfaces.PlatformEvents;
 	import platform.interfaces.SkinDefines;
+	import platform.managers.EditRenderManager;
 	import platform.tools.Notice;
 	import ui.deskplatform.ResPanelUI;
 	
 	
 	/**资源面板
-	 * @author yung
+	 * @author ww
 	 */
 	public class ResPanel extends ResPanelUI {
 		private static var _instance:ResPanel;
@@ -73,7 +75,8 @@ package view {
 		
 		public function initListener():void
 		{
-
+			Notice.listen(PlatformEvents.ADD_COMMON_RES, this, onCreateNewResBack);
+			Notice.listen(PlatformEvents.ADD_DIR, this, addDirectory);
 		}
 		/**刷新资源树*/
 		public function init(resPath:String, complete:Handler = null):void {
@@ -193,14 +196,15 @@ package view {
 
 			resTree.on(Event.RIGHT_CLICK, this,onResTreeRightMouseDown);
 			resTree.mouseHandler = new Handler(this,onResTreeMouse);
-			var menu:ContextMenu = ContextMenu.createMenu("设置默认属性", "打开所在目录","查找引用","替换选中对象", "", "重命名", "删除");
+			var menu:ContextMenu = ContextMenu.createMenu("打开所在目录", "", "重命名", "删除","新建目录");
 			menu.on(Event.SELECT, this,onEmunSelect);
-			_menu=menu;
+			_menu = menu;
+			menu.nativeMenu.append(createNewMenu());
 			
 //			_menuDir=ContextMenu.createMenu("设置默认属性", "打开所在目录","重新打包", "", "重命名", "删除");
-			_menuDir=ContextMenu.createMenu("设置默认属性", "打开所在目录", "", "重命名", "删除");
+			_menuDir=ContextMenu.createMenu("打开所在目录", "", "重命名", "删除");
 			_menuDir.on(Event.SELECT, this,onEmunSelect);
-			_mutiMenu= ContextMenu.createMenu("设置默认属性","删除");
+			_mutiMenu= ContextMenu.createMenu("删除");
 			_mutiMenu.on(Event.SELECT, this,onEmunSelect);
 		
 			//筛选
@@ -226,6 +230,72 @@ package view {
 			//点击取消页面选择
 			on(Event.CLICK, this, onClick);
 			clearSearchBtn.on(Event.MOUSE_DOWN,this,onClearSearch);
+		}
+		
+		private function createNewMenu():*
+		{
+			__JS__('const remote = require("electron").remote;');
+			__JS__('const Menu = remote.Menu;');
+			__JS__('const MenuItem = remote.MenuItem');
+			var MenuClz:Class;
+			__JS__("MenuClz=Menu");
+			var MenuItemClz:Class;
+			__JS__("MenuItemClz=MenuItem");
+			var menus:Array;
+			menus = EditRenderManager._createMenuS;
+			var i:int, len:int;
+			len = menus.length;
+			debugger;
+			var scriptList:Array;
+			scriptList=[];
+			var tDataO:Object;
+			for(i=0;i<len;i++)
+			{
+				tDataO=menus[i];
+				tDataO.name=tDataO.title;
+				scriptList.push(tDataO);
+			}
+			
+			scriptList.sort(MathUtil.sortByKey("name",false,false));
+			
+			len=scriptList.length;
+			var tMenu:*;
+			var mainMenu:*;
+			mainMenu=new MenuClz({label:"New"});
+			var menuList:Array;
+			menuList=[];
+			var _menuClick:Function;
+			_menuClick = Utils.bind(onCreateNewMenu,this);
+			var tFilePath:String;
+			for(i=0;i<len;i++)
+			{
+				tDataO=scriptList[i];
+				tMenu=new MenuItemClz({label:tDataO.name,click:_menuClick,dataO:tDataO});
+				mainMenu.append(tMenu);
+			}
+			tMenu=new MenuItemClz({label:"New",submenu:mainMenu});
+			return tMenu;
+		}
+		
+		private function onCreateNewMenu(dataO:Object):void
+		{
+			//debugger;
+			dataO = dataO.dataO;
+			Notice.notify(PlatformEvents.OPEN_ADD_COMMON_RES_DIALOG, dataO);
+		}
+		
+		private function onCreateNewResBack(dataO:Object):void
+		{
+			
+			var folder:String;
+			folder = currDirectory;
+			//debugger;
+			var sourcePath:String;
+			sourcePath = dataO.tplFile;
+			var tarPath:String;
+			tarPath = FileManager.getPath(folder, dataO.fileName + "." + dataO.extension);
+			FileManager.copyFile(sourcePath, tarPath);
+			refresh(null,true,false);
 		}
 		
 		private function onClearSearch():void
@@ -517,6 +587,22 @@ package view {
 			}
 			return directory;
 		}
+		
+		/**增加目录*/
+		public function addDirectory(name:String):void
+		{
+			if (!Boolean(name))
+			{
+				return Alert.show(Sys.lang("新建目录名称不能为空"));
+			}
+			var path:String = FileManager.getPath(currDirectory, name);
+			if (hasFile(path))
+			{
+				return Alert.show(Sys.lang("已经此名字的目录了，请换个名字试试"), Sys.lang("命名重复"));
+			}
+			FileManager.createDirectory(path);
+			refresh();
+		}
 		private function openCurrPath():void
 		{
 			var directory:String = _resPath;
@@ -549,6 +635,9 @@ package view {
 					break;
 				case "删除": 
 					deleteRes();
+					break;
+				case "新建目录": 
+					Notice.notify(PlatformEvents.OPEN_ADDDIR);
 					break;
 				
 			}
@@ -663,6 +752,7 @@ package view {
 		}
 		
 		private function onResTreeRightMouseDown(e:Event):void {
+			trace("onResTreeRightMouseDown");
 			if(resTree.mList.selectItems&&resTree.mList.selectItems.length>1)
 			{
 				_mutiMenu.show();

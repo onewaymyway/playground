@@ -11,6 +11,8 @@ package platform.managers
 	import laya.events.Event;
 	import laya.events.Keyboard;
 	import platform.editzone.EditZone;
+	import view.AddDirectory;
+	import view.AddResCommomDialog;
 	import view.ResPanel;
 
 	
@@ -32,6 +34,8 @@ package platform.managers
 			_initsList = [];
 			_initsList.push(ResPanel.instance);
 			_initsList.push(EditZone.instance);
+			_initsList.push(AddDirectory.instance);
+			_initsList.push(AddResCommomDialog.instance);
 			
 			var i:int, len:int = _initsList.length;
 			for (i = 0; i < len; i++)

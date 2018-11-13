@@ -34282,7 +34282,11 @@ var Laya=window.Laya=(function(window,document){
 		__proto.show=function(posX,posY){
 			(posX===void 0)&& (posX=-999);
 			(posY===void 0)&& (posY=-999);
-			ContextMenu.showMenu(this,posX,posY);
+			var paramO;
+			paramO={};
+			paramO.x=Laya.stage.mouseX;
+			paramO.y=Laya.stage.mouseY;
+			Laya.timer.once(50,this.nativeMenu,this.nativeMenu.popup,[paramO]);
 		}
 
 		ContextMenu.init=function(){
@@ -39254,6 +39258,25 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
+	var FindNodeSmall=(function(_super){
+		function FindNodeSmall(){
+			FindNodeSmall.__super.call(this);
+			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
+			this.createView(FindNodeSmallUI.uiView);
+		}
+
+		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
+		var __proto=FindNodeSmall.prototype;
+		__proto.createChildren=function(){}
+		return FindNodeSmall;
+	})(FindNodeSmallUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class laya.debug.view.nodeInfo.nodetree.FindNode extends laya.debug.ui.debugui.FindNodeUI
 	var FindNode=(function(_super){
 		function FindNode(){
@@ -39270,25 +39293,6 @@ var Laya=window.Laya=(function(window,document){
 
 		return FindNode;
 	})(FindNodeUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
-	var FindNodeSmall=(function(_super){
-		function FindNodeSmall(){
-			FindNodeSmall.__super.call(this);
-			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
-			this.createView(FindNodeSmallUI.uiView);
-		}
-
-		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
-		var __proto=FindNodeSmall.prototype;
-		__proto.createChildren=function(){}
-		return FindNodeSmall;
-	})(FindNodeSmallUI)
 
 
 	/**
@@ -39393,26 +39397,6 @@ var Laya=window.Laya=(function(window,document){
 		__proto.createChildren=function(){}
 		return NodeTool;
 	})(NodeToolUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class laya.debug.view.nodeInfo.nodetree.NodeTreeSetting extends laya.debug.ui.debugui.NodeTreeSettingUI
-	var NodeTreeSetting=(function(_super){
-		function NodeTreeSetting(){
-			NodeTreeSetting.__super.call(this);
-			Base64AtlasManager.replaceRes(NodeTreeSettingUI.uiView);
-			this.createView(NodeTreeSettingUI.uiView);
-		}
-
-		__class(NodeTreeSetting,'laya.debug.view.nodeInfo.nodetree.NodeTreeSetting',_super);
-		var __proto=NodeTreeSetting.prototype;
-		//inits();
-		__proto.createChildren=function(){}
-		return NodeTreeSetting;
-	})(NodeTreeSettingUI)
 
 
 	/**
@@ -39656,6 +39640,26 @@ var Laya=window.Laya=(function(window,document){
 		]);
 		return NodeTree;
 	})(NodeTreeUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.view.nodeInfo.nodetree.NodeTreeSetting extends laya.debug.ui.debugui.NodeTreeSettingUI
+	var NodeTreeSetting=(function(_super){
+		function NodeTreeSetting(){
+			NodeTreeSetting.__super.call(this);
+			Base64AtlasManager.replaceRes(NodeTreeSettingUI.uiView);
+			this.createView(NodeTreeSettingUI.uiView);
+		}
+
+		__class(NodeTreeSetting,'laya.debug.view.nodeInfo.nodetree.NodeTreeSetting',_super);
+		var __proto=NodeTreeSetting.prototype;
+		//inits();
+		__proto.createChildren=function(){}
+		return NodeTreeSetting;
+	})(NodeTreeSettingUI)
 
 
 	/**
@@ -40499,7 +40503,7 @@ var Laya=window.Laya=(function(window,document){
 	})(Tab)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,Render,View,Timer,GraphicAnimation,Browser,LocalStorage]);
+	Laya.__init([LoaderManager,EventDispatcher,Render,View,Timer,GraphicAnimation,Browser,LocalStorage]);
 })(window,document,Laya);
 
 
@@ -40522,7 +40526,7 @@ var Laya=window.Laya=(function(window,document){
 16 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (28):warning:HtmlSprite. This variable is not defined.
 17 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (69):warning:SkinDefines.LayoutTabDragIcon This variable is not defined.
 18 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/EditZone.as (338):warning:ViewTab This variable is not defined.
-19 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as (594):warning:compType This variable is not defined.
+19 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as (681):warning:compType This variable is not defined.
 20 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (43):warning:Sys.lang This variable is not defined.
 21 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (49):warning:Sys.lang This variable is not defined.
 */

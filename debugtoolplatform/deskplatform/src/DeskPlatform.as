@@ -102,8 +102,9 @@ package
 		
 		private function initApp():void
 		{
-			NoticeRouter.init();
 			EditRenderManager.init();
+			NoticeRouter.init();
+			
 			CursorManager.init();
 			//SystemSetting.assetsPath = "D:/codes/playground.git/trunk/debugtoolplatform/deskplatform";
 			SystemSetting.assetsPath = FileManager.getAppPath("files");;

@@ -45,7 +45,25 @@ package platform.interfaces
 		 */
 		public static const SHOW_LAYOUTTAB_BY_NAME:String = "SHOW_LayoutTab_By_Name";
 		
-		public static const WebViewReady:String="WebViewReady";
+		public static const WebViewReady:String = "WebViewReady";
+		
+		/**
+		 * 打开添加文件夹面板 
+		 */
+		public static const OPEN_ADDDIR:String="open_adddir";
+		/**
+		 * 添加文件夹操作 [name:String]
+		 */
+		public static const ADD_DIR:String = "adddir";
+		
+		/**
+		 * 打开添加资源面板 
+		 */
+		public static const OPEN_ADD_COMMON_RES_DIALOG:String="OPEN_ADD_COMMON_RES_DIALOG";
+		/**
+		 * 添加资源
+		 */
+		public static const ADD_COMMON_RES:String="ADD_COMMON_RES";
 	}
 
 }

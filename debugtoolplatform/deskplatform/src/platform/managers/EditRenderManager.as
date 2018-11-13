@@ -118,11 +118,33 @@ package platform.managers
 						regRender(configO.extension,renderPath);
 					}
 				}
+				if (configO.createMenus)
+				{
+					addCreateMenus(folder,configO.createMenus);
+				}
 			}catch(e:*)
 			{
 				
 			}
 			
+		}
+		
+		private static function addCreateMenus(rootPath:String, menus:Array):void
+		{
+			var i:int, len:int;
+			len = menus.length;
+			for (i = 0; i < len; i++)
+			{
+				addCreateMenu(rootPath, menus[i]);
+			}
+		}
+		
+		
+		public static var _createMenuS:Array = [];
+		private static function addCreateMenu(rootPath:String, menuO:Object):void
+		{
+			menuO.tplFile = FileManager.getPath(rootPath, menuO.file);
+			_createMenuS.push(menuO);
 		}
 	}
 }
