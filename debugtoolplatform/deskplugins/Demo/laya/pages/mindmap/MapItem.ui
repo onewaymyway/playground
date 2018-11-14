@@ -2,8 +2,8 @@
     "x":0,
     "type":"View",
     "selectedBox":1,
-    "selecteID":3,
-    "props":{"width":98,"sceneWidth":98,"sceneHeight":21,"sceneColor":"#000000","height":21},
+    "selecteID":2,
+    "props":{"width":129,"sceneWidth":129,"sceneHeight":23,"sceneColor":"#000000","height":23},
     "nodeParent":-1,
     "label":"View",
     "isOpen":true,
@@ -14,14 +14,14 @@
     "child":[
         {
             "x":15,
-            "type":"Label",
-            "props":{"y":0,"x":0,"width":98,"var":"label","text":"label","styleSkin":"comp/label.png","height":21,"color":"#d2201d"},
+            "type":"TextInput",
+            "props":{"var":"text","text":"TextInput","skin":"comp/textinput.png","color":"#93eedf","align":"center"},
             "nodeParent":1,
-            "label":"Label(label)",
+            "label":"TextInput(text)",
             "isDirectory":false,
             "isAniNode":true,
             "hasChild":false,
-            "compId":3,
+            "compId":2,
             "child":[
                 ]
         }],

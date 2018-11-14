@@ -1,6 +1,13 @@
 package  
 {
+	import laya.debug.DebugPanel;
+	import laya.debug.uicomps.ContextMenu;
+	import laya.debug.uicomps.ContextMenuItem;
+	import laya.display.Stage;
 	import laya.display.Text;
+	import laya.net.Loader;
+	import laya.utils.Handler;
+	import mindmap.MindMapEditor;
 	import viewRender.EditorRenderBase;
 	/**
 	 * ...
@@ -12,9 +19,19 @@ package
 		public function TestDemo() 
 		{
 			Laya.init(1000, 900);
-			test();
+			Laya.stage.scaleMode = Stage.SCALE_FULL;
+			ContextMenu.init();
+			ContextMenuItem.labelColors = "#ffffff,#ffffff,#ffffff,#ffffff";
+			ContextMenuItem.btnSkin = "comp/button.png";
+			var resList:Array;
+			resList = [ { "url":"res/atlas/comp.json", "type":Loader.ATLAS } ];
+			//resList.push( { "url":"res/atlas/view.json", "type":Loader.ATLAS } );
+			//resList.push({"url":"res/atlas/play.json","type":Loader.ATLAS});
+			Laya.loader.load(resList, new Handler(this, test));
+			DebugPanel.init();
 		}
 		private var text:Text;
+		private var mindMapEditor:MindMapEditor;
 		private function test():void
 		{
 			
@@ -24,6 +41,10 @@ package
 			text.fontSize = 20;
 			text.pos(100, 100);
 			Laya.stage.addChild(text);
+			
+			mindMapEditor = new MindMapEditor();
+			mindMapEditor.left = mindMapEditor.right = mindMapEditor.top = mindMapEditor.bottom = 2;
+			Laya.stage.addChild(mindMapEditor);
 		}
 		
 		private var _data:Object;
@@ -49,6 +70,7 @@ package
 		
 		private function updateUIContent():void
 		{
+			mindMapEditor.setData(_data);
 			text.text = JSON.stringify(_data);
 		}
 	}
