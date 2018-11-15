@@ -94,6 +94,7 @@
 			this._dataO=null;
 			MindMapEditor.__super.call(this);
 			this._menu=ContextMenu.createMenuByArray(["新建"]);
+			this._menu.on("select",this,this.onSelect);
 			this.on("rightmouseup",this,this.onRightClick);
 		}
 
@@ -101,6 +102,15 @@
 		var __proto=MindMapEditor.prototype;
 		__proto.onRightClick=function(){
 			this._menu.show();
+		}
+
+		__proto.onSelect=function(dataO){
+			console.log("onMenuSelect:",dataO);
+			var label;
+			label=dataO.target.data;
+			console.log("Menu:",label);
+			switch(label){
+				}
 		}
 
 		__proto.setData=function(dataO){
