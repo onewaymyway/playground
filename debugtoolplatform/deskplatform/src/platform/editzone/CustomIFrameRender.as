@@ -60,6 +60,7 @@ package platform.editzone
 			if(pagePath)
 			{
 				//				trace("dataFromFile:",pagePath);
+				iframeSprite.renderItem.setPagePath(pagePath);
 				if(StateManager.has(pagePath))
 				{
 					data=StateManager.getState(pagePath).now();

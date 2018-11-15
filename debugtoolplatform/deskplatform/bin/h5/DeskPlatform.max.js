@@ -4457,6 +4457,34 @@
 	*...
 	*@author ww
 	*/
+	//class view.MainViewItem extends ui.deskplatform.MainViewItemUI
+	var MainViewItem=(function(_super){
+		function MainViewItem(){
+			this._dataO=null;
+			MainViewItem.__super.call(this);
+			this.on("click",this,this.onClick);
+		}
+
+		__class(MainViewItem,'view.MainViewItem',_super);
+		var __proto=MainViewItem.prototype;
+		__proto.initByData=function(dataO){
+			this._dataO=dataO;
+			this.label.text=dataO.name;
+		}
+
+		__proto.onClick=function(){
+			console.log("onClick:",this._dataO);
+			Notice.notify("OPEN_PLUGIN",this._dataO.path);
+		}
+
+		return MainViewItem;
+	})(MainViewItemUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class view.MainView extends ui.deskplatform.MainViewUI
 	var MainView=(function(_super){
 		function MainView(){
@@ -4507,34 +4535,6 @@
 
 		return MainView;
 	})(MainViewUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class view.MainViewItem extends ui.deskplatform.MainViewItemUI
-	var MainViewItem=(function(_super){
-		function MainViewItem(){
-			this._dataO=null;
-			MainViewItem.__super.call(this);
-			this.on("click",this,this.onClick);
-		}
-
-		__class(MainViewItem,'view.MainViewItem',_super);
-		var __proto=MainViewItem.prototype;
-		__proto.initByData=function(dataO){
-			this._dataO=dataO;
-			this.label.text=dataO.name;
-		}
-
-		__proto.onClick=function(){
-			console.log("onClick:",this._dataO);
-			Notice.notify("OPEN_PLUGIN",this._dataO.path);
-		}
-
-		return MainViewItem;
-	})(MainViewItemUI)
 
 
 	/**编辑区分页管理器
