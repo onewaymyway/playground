@@ -17,7 +17,7 @@ package mindmap
 		{
 			_menu = ContextMenu.createMenuByArray(["新建"]);
 			_menu.on(Event.SELECT, this, onSelect);
-			this.on(Event.RIGHT_MOUSE_UP, this, onRightClick);
+			//this.on(Event.RIGHT_MOUSE_UP, this, onRightClick);
 			nodeContainer = new Box();
 			nodeContainer.left = nodeContainer.right = nodeContainer.top = nodeContainer.bottom = 0;
 			this.addChild(nodeContainer);
@@ -58,7 +58,7 @@ package mindmap
 			var root:MindMapItem;
 			root = createMapView(mapNodeData);
 			debugger;
-			root.pos(200, 200);
+			root.pos(this.width*0.5, this.height*0.5);
 			root.layoutAsCenter();
 		}
 		

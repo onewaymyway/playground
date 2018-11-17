@@ -1,7 +1,8 @@
 package mindmap 
 {
+	import laya.events.Event;
 	import ui.mindmap.MapItemUI;
-	
+	import laya.debug.uicomps.ContextMenu;
 	/**
 	 * ...
 	 * @author ww
@@ -12,10 +13,31 @@ package mindmap
 		public static var XSpace:Number = 20;
 		public var nodeData:MindMapNodeData;
 		
-		public var childNodes:Array=[];
+		public var childNodes:Array = [];
+		private var _menu:ContextMenu;
 		public function MindMapItem() 
 		{
-			
+			_menu = ContextMenu.createMenuByArray(["新建同级"]);
+			_menu.on(Event.SELECT, this, onSelect);
+			this.on(Event.RIGHT_MOUSE_UP, this, onRightMouseUp);
+		}
+		private function onSelect(dataO:Object):void
+		{
+			trace("onMenuSelect:", dataO);
+			var label:String;
+			label = dataO.target.data;
+			trace("Menu:",label);
+			switch(label)
+			{
+				case "":
+					break;
+			}
+		}
+		
+		private function onRightMouseUp():void
+		{
+			trace("mindmapitem rightmouseup");
+			_menu.show();
 		}
 		
 		public function freshUI():void
