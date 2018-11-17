@@ -13,6 +13,7 @@ package mindmap
 		}
 		public var _mapData:Object;
 		private var _nodeList:Array;
+		private var _idDic:Object = { };
 		public function initByObj(obj:Object):void
 		{
 			_mapData = obj;
@@ -24,7 +25,7 @@ package mindmap
 			_nodeList = _mapData.nodeList;
 		}
 		
-		public function addNode():void
+		public function addNode(node:Object):void
 		{
 			
 		}
