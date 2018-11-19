@@ -202,7 +202,8 @@ package view {
 			menu.nativeMenu.append(createNewMenu());
 			
 //			_menuDir=ContextMenu.createMenu("设置默认属性", "打开所在目录","重新打包", "", "重命名", "删除");
-			_menuDir=ContextMenu.createMenu("打开所在目录", "", "重命名", "删除");
+			_menuDir = ContextMenu.createMenu("打开所在目录", "", "重命名", "删除");
+			_menuDir.nativeMenu.append(createNewMenu());
 			_menuDir.on(Event.SELECT, this,onEmunSelect);
 			_mutiMenu= ContextMenu.createMenu("删除");
 			_mutiMenu.on(Event.SELECT, this,onEmunSelect);
