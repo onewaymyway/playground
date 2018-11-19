@@ -16791,6 +16791,55 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*...
+	*@author ww
+	*/
+	//class nodetools.devices.CSVTools
+	var CSVTools=(function(){
+		function CSVTools(){}
+		__class(CSVTools,'nodetools.devices.CSVTools');
+		CSVTools.objListToCsv=function(list){
+			var i=0,len=0;
+			len=list.length;
+			var keys;
+			keys=CSVTools.getKeysFromObj(list[0]);
+			var tVArr;
+			var rstList;
+			rstList=[];
+			rstList.push(keys.join(","));
+			tVArr=[];
+			tVArr.length=keys.length;
+			var tData;
+			var j=0,jLen=0;
+			jLen=keys.length;
+			console.log("keys",keys);
+			console.log("dataLen:",list.length);
+			for (i=0;i < len;i++){
+				tData=list[i];
+				for (j=0;j < jLen;j++){
+					tVArr[j]=tData[keys[j]];
+				}
+				rstList.push(tVArr.join(","));
+			}
+			return rstList.join("\n");
+		}
+
+		CSVTools.getKeysFromObj=function(obj){
+			var key;
+			var keys;
+			keys=[];
+			for (key in obj){
+				keys.push(key);
+			}
+			keys.sort();
+			return keys;
+		}
+
+		return CSVTools;
+	})()
+
+
+	/**
 	*封装所有驱动级接口
 	*@author yung
 	*/
@@ -16806,15 +16855,19 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		Device.require=function(mod){
-			var rst;
-			rst=require(mod);
-			return rst;
+			try{
+				var rst;
+				rst=require(mod);
+				return rst;
+			}catch(e){}
 		}
 
 		Device.requireRemote=function(mod){
-			if (!Device.remote)return Device.require(mod);
-			return Device.remote[mod];
-			return Device.remote.require(mod);
+			try{
+				if (!Device.remote)return Device.require(mod);
+				return Device.remote[mod];
+				return Device.remote.require(mod);
+			}catch(e){}
 		}
 
 		Device.app=null
@@ -16830,6 +16883,94 @@ var Laya=window.Laya=(function(window,document){
 		Device.electron=null
 		Device.win=null
 		return Device;
+	})()
+
+
+	/**
+	*本类封装弹出本地对话框
+	*@author ww
+	*/
+	//class nodetools.devices.DialogTools
+	var DialogTools=(function(){
+		function DialogTools(){}
+		__class(DialogTools,'nodetools.devices.DialogTools');
+		DialogTools.init=function(){
+			DialogTools.dialog=Device.requireRemote("dialog");
+		}
+
+		DialogTools.showOpenDialog=function(win,options,callBack){
+			DialogTools.dialog.showOpenDialog(win,options,callBack);
+		}
+
+		DialogTools.showSaveDialog=function(win,options,callBack){
+			DialogTools.dialog.showSaveDialog(win,options,callBack);
+		}
+
+		DialogTools.showSave=function(title,fileName,callBack){
+			var option={
+				title:title,
+				defaultPath:fileName,
+				filters:[],
+				properties:[]
+			};
+			DialogTools.showSaveDialog(null,option,callBack);
+		}
+
+		DialogTools.showMessageBox=function(win,options,callBack){
+			return DialogTools.dialog.showMessageBox(win,options,callBack);
+		}
+
+		DialogTools.showErrorBox=function(title,content){
+			DialogTools.dialog.showErrorBox(title,content);
+		}
+
+		DialogTools.getOpenDirO=function(title,defaultPath){
+			(title===void 0)&& (title="open Dir");
+			var rst;
+			rst={title:title,properties:["openDirectory"]};
+			if(defaultPath!=null){
+				rst.defaultPath=defaultPath;
+			}
+			return rst;
+		}
+
+		DialogTools.getOpenProO=function(title,extension){
+			(title===void 0)&& (title="open Project");
+			(extension===void 0)&& (extension="laya");
+			return {title:title,filters:[{name:'*.'+extension,extensions:[extension]}]};
+		}
+
+		DialogTools.showOpenDir=function(title,callBack,defaultPath){
+			(title===void 0)&& (title="open Dir");
+			DialogTools.showOpenDialog(null,DialogTools.getOpenDirO(title,defaultPath),callBack);
+		}
+
+		DialogTools.showOpenFile=function(title,callBack,filter,defaultPath){
+			(title===void 0)&& (title="open file");
+			if (!filter)filter=DialogTools.filterO;
+			filter.title=title;
+			if(defaultPath){
+				filter.defaultPath=defaultPath;
+			}
+			DialogTools.showOpenDialog(null,filter,callBack);
+		}
+
+		DialogTools.getOpenParticleO=function(title){
+			(title===void 0)&& (title="open Particle");
+			return {title:title,filters:[{name:'*.json',extensions:['json']}]};
+		}
+
+		DialogTools.dialog=null
+		__static(DialogTools,
+		['tempOptionO',function(){return this.tempOptionO={
+				title:"",
+				defaultPath:null,
+				filters:[],
+				properties:[]
+		};},'imgFilterO',function(){return this.imgFilterO={title:"open Img",filters:[{name:'Images',extensions:['jpg','png']}]};},'filterO',function(){return this.filterO={title:"open file",filters:[{name:'Images',extensions:['jpg','png','gif']},{name:'Movies',extensions:['mkv','avi','mp4']},{name:'Custom File Type',extensions:['as']},{name:'All Files',extensions:['*']}]};}
+
+		]);
+		return DialogTools;
 	})()
 
 
@@ -17610,6 +17751,68 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class nodetools.devices.NodeJSTools
+	var NodeJSTools=(function(){
+		function NodeJSTools(){}
+		__class(NodeJSTools,'nodetools.devices.NodeJSTools');
+		NodeJSTools.init=function(){
+			Device.Buffer=Buffer;
+			SystemSetting.isCMDVer=true;
+			OSInfo.init();
+			Browser.userAgent=OSInfo.type;
+			FileTools.init2();
+			CMDShell.init();
+			CMDShell.childProcess=Device.requireRemote("child_process");
+		}
+
+		NodeJSTools.require=function(str){
+			return require(str);;
+		}
+
+		NodeJSTools.getArgv=function(){
+			var argv;
+			argv=process.argv;;
+			console.log("argv:",argv);
+			return argv;
+		}
+
+		NodeJSTools.parseArgToObj=function(args,start,target){
+			(start===void 0)&& (start=0);
+			var i=0,len=0;
+			len=args.length;
+			var tParam;
+			var pArr;
+			for (i=start;i < len;i++){
+				tParam=args[i];
+				if (tParam.indexOf("=")> 0){
+					pArr=tParam.split("=");
+					if (target[pArr[0]] && typeof(target[pArr[0]])=="number"){
+						pArr[1]=Sys.mParseFloat(pArr[1]);
+					}
+					console.log(pArr);
+					target[pArr[0]]=pArr[1];
+				}
+			}
+		}
+
+		NodeJSTools.getMyPath=function(){
+			return __dirname;
+		}
+
+		NodeJSTools.getAbsPath=function(path,root){
+			if (path.indexOf(":")>=0)return path;
+			if (!root)root=NodeJSTools.getMyPath();
+			return FileManager.getPath(root,path);
+		}
+
+		return NodeJSTools;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class nodetools.devices.OSInfo
 	var OSInfo=(function(){
 		function OSInfo(){}
@@ -17780,6 +17983,62 @@ var Laya=window.Laya=(function(window,document){
 		SystemSetting.toCodeModeWhenPublicEnd=false;
 		SystemSetting.isCMDVer=false;
 		return SystemSetting;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nodetools.NodeJSTools
+	var NodeJSTools$1=(function(){
+		function NodeJSTools(){}
+		__class(NodeJSTools,'nodetools.NodeJSTools',null,'NodeJSTools$1');
+		NodeJSTools.require=function(str){
+			return require(str);;
+		}
+
+		NodeJSTools.getArgv=function(){
+			var argv;
+			argv=process.argv;;
+			console.log("argv:",argv);
+			return argv;
+		}
+
+		NodeJSTools.parseArgToObj=function(args,start,target){
+			(start===void 0)&& (start=0);
+			var i=0,len=0;
+			len=args.length;
+			var tParam;
+			var pArr;
+			for (i=start;i < len;i++){
+				tParam=args[i];
+				if (tParam.indexOf("=")> 0){
+					pArr=tParam.split("=");
+					if (target[pArr[0]] && typeof(target[pArr[0]])=="number"){
+						pArr[1]=/*no*/this.Sys.mParseFloat(pArr[1]);
+					}
+					console.log(pArr);
+					target[pArr[0]]=pArr[1];
+				}
+			}
+		}
+
+		NodeJSTools.getMyPath=function(){
+			return __dirname;
+		}
+
+		NodeJSTools.eval=function(codeStr){
+			return eval(codeStr);
+		}
+
+		NodeJSTools.getAbsPath=function(path,root){
+			if (path.indexOf(":")>=0)return path;
+			if (!root)root=NodeJSTools.getMyPath();
+			return FileManager.getPath(root,path);
+		}
+
+		return NodeJSTools;
 	})()
 
 
@@ -34484,11 +34743,11 @@ var Laya=window.Laya=(function(window,document){
 				this.label="------";
 				this.height=5;
 				this.mouseEnabled=false;
-				this.img.skin=Base64AtlasManager.base64.getAdptUrl("comp/line2.png");
+				this.img.skin=ContextMenuItem.lineSkin||Base64AtlasManager.base64.getAdptUrl("comp/line2.png");
 				this.img.sizeGrid="0,2,0,2";
 				this.addChild(this.img);
 			}
-			this.labelColors="#000000,#000000,#000000,#000000";
+			this.labelColors=this.labelColors||"#000000,#000000,#000000,#000000";
 			this._text.x=10;
 			this._text.padding=[-2,0,0,0];
 			this._text.align="left";
@@ -34496,7 +34755,7 @@ var Laya=window.Laya=(function(window,document){
 			this._text.typeset();
 			this.width=this._text.width+25;
 			this.sizeGrid="3,3,3,3";
-			this.skin=Base64AtlasManager.base64.getAdptUrl("comp/button1.png");
+			this.skin=ContextMenuItem.btnSkin||Base64AtlasManager.base64.getAdptUrl("comp/button1.png");
 		}
 
 		__class(ContextMenuItem,'laya.debug.uicomps.ContextMenuItem',_super);
@@ -34507,6 +34766,9 @@ var Laya=window.Laya=(function(window,document){
 			this.img.x=0;
 		});
 
+		ContextMenuItem.lineSkin=null
+		ContextMenuItem.btnSkin=null
+		ContextMenuItem.labelColors=null
 		return ContextMenuItem;
 	})(Button)
 
@@ -36688,103 +36950,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
-	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
-	*
-	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
-	*package
-	*{
-		*import laya.ui.HSlider;
-		*import laya.ui.VSlider;
-		*import laya.utils.Handler;
-		*public class VSlider_Example
-		*{
-			*private var vSlider:VSlider;
-			*public function VSlider_Example()
-			*{
-				*Laya.init(640,800);//设置游戏画布宽高。
-				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
-				*}
-			*private function onLoadComplete():void
-			*{
-				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-				*vSlider.min=0;//设置 vSlider 最低位置值。
-				*vSlider.max=10;//设置 vSlider 最高位置值。
-				*vSlider.value=2;//设置 vSlider 当前位置值。
-				*vSlider.tick=1;//设置 vSlider 刻度值。
-				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
-				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-				*}
-			*private function onChange(value:Number):void
-			*{
-				*trace("滑块的位置： value="+value);
-				*}
-			*}
-		*}
-	*@example
-	*Laya.init(640,800);//设置游戏画布宽高
-	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
-	*var vSlider;
-	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
-	*function onLoadComplete(){
-		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-		*vSlider.min=0;//设置 vSlider 最低位置值。
-		*vSlider.max=10;//设置 vSlider 最高位置值。
-		*vSlider.value=2;//设置 vSlider 当前位置值。
-		*vSlider.tick=1;//设置 vSlider 刻度值。
-		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
-		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-		*}
-	*function onChange(value){
-		*console.log("滑块的位置： value="+value);
-		*}
-	*@example
-	*import HSlider=laya.ui.HSlider;
-	*import VSlider=laya.ui.VSlider;
-	*import Handler=laya.utils.Handler;
-	*class VSlider_Example {
-		*private vSlider:VSlider;
-		*constructor(){
-			*Laya.init(640,800);//设置游戏画布宽高。
-			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
-			*}
-		*private onLoadComplete():void {
-			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-			*this.vSlider.min=0;//设置 vSlider 最低位置值。
-			*this.vSlider.max=10;//设置 vSlider 最高位置值。
-			*this.vSlider.value=2;//设置 vSlider 当前位置值。
-			*this.vSlider.tick=1;//设置 vSlider 刻度值。
-			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
-			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
-			*}
-		*private onChange(value:number):void {
-			*console.log("滑块的位置： value="+value);
-			*}
-		*}
-	*@see laya.ui.Slider
-	*/
-	//class laya.ui.VSlider extends laya.ui.Slider
-	var VSlider=(function(_super){
-		function VSlider(){VSlider.__super.call(this);;
-		};
-
-		__class(VSlider,'laya.ui.VSlider',_super);
-		return VSlider;
-	})(Slider)
-
-
-	/**
 	*<code>TextInput</code> 类用于创建显示对象以显示和输入文本。
 	*
 	*@example <caption>以下示例代码，创建了一个 <code>TextInput</code> 实例。</caption>
@@ -37105,6 +37270,103 @@ var Laya=window.Laya=(function(window,document){
 
 		return TextInput;
 	})(Label)
+
+
+	/**
+	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
+	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
+	*
+	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
+	*package
+	*{
+		*import laya.ui.HSlider;
+		*import laya.ui.VSlider;
+		*import laya.utils.Handler;
+		*public class VSlider_Example
+		*{
+			*private var vSlider:VSlider;
+			*public function VSlider_Example()
+			*{
+				*Laya.init(640,800);//设置游戏画布宽高。
+				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
+				*}
+			*private function onLoadComplete():void
+			*{
+				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+				*vSlider.min=0;//设置 vSlider 最低位置值。
+				*vSlider.max=10;//设置 vSlider 最高位置值。
+				*vSlider.value=2;//设置 vSlider 当前位置值。
+				*vSlider.tick=1;//设置 vSlider 刻度值。
+				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
+				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+				*}
+			*private function onChange(value:Number):void
+			*{
+				*trace("滑块的位置： value="+value);
+				*}
+			*}
+		*}
+	*@example
+	*Laya.init(640,800);//设置游戏画布宽高
+	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
+	*var vSlider;
+	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
+	*function onLoadComplete(){
+		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+		*vSlider.min=0;//设置 vSlider 最低位置值。
+		*vSlider.max=10;//设置 vSlider 最高位置值。
+		*vSlider.value=2;//设置 vSlider 当前位置值。
+		*vSlider.tick=1;//设置 vSlider 刻度值。
+		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
+		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+		*}
+	*function onChange(value){
+		*console.log("滑块的位置： value="+value);
+		*}
+	*@example
+	*import HSlider=laya.ui.HSlider;
+	*import VSlider=laya.ui.VSlider;
+	*import Handler=laya.utils.Handler;
+	*class VSlider_Example {
+		*private vSlider:VSlider;
+		*constructor(){
+			*Laya.init(640,800);//设置游戏画布宽高。
+			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
+			*}
+		*private onLoadComplete():void {
+			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+			*this.vSlider.min=0;//设置 vSlider 最低位置值。
+			*this.vSlider.max=10;//设置 vSlider 最高位置值。
+			*this.vSlider.value=2;//设置 vSlider 当前位置值。
+			*this.vSlider.tick=1;//设置 vSlider 刻度值。
+			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
+			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
+			*}
+		*private onChange(value:number):void {
+			*console.log("滑块的位置： value="+value);
+			*}
+		*}
+	*@see laya.ui.Slider
+	*/
+	//class laya.ui.VSlider extends laya.ui.Slider
+	var VSlider=(function(_super){
+		function VSlider(){VSlider.__super.call(this);;
+		};
+
+		__class(VSlider,'laya.ui.VSlider',_super);
+		return VSlider;
+	})(Slider)
 
 
 	/**
@@ -40503,7 +40765,7 @@ var Laya=window.Laya=(function(window,document){
 	})(Tab)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,Render,View,Timer,Browser,LocalStorage,GraphicAnimation]);
+	Laya.__init([EventDispatcher,LoaderManager,Render,View,Timer,GraphicAnimation,Browser,LocalStorage]);
 })(window,document,Laya);
 
 
@@ -40516,8 +40778,8 @@ var Laya=window.Laya=(function(window,document){
 6 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
 7 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 8 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
-9 file:///D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/drags/DragEvent.as (84):warning:SystemSetting.assetsPath This variable is not defined.
-10 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/CustomIFrameRender.as (108):warning:IDEEvent.PAGE_CHANGED This variable is not defined.
+9 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/NodeJSTools.as (37):warning:Sys.mParseFloat This variable is not defined.
+10 file:///D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/drags/DragEvent.as (84):warning:SystemSetting.assetsPath This variable is not defined.
 11 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as (60):warning:_getOneCell This variable is not defined.
 12 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as (87):warning:_createItems This variable is not defined.
 13 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/NodeTree.as (49):warning:_treeData This variable is not defined.
@@ -40526,7 +40788,7 @@ var Laya=window.Laya=(function(window,document){
 16 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (28):warning:HtmlSprite. This variable is not defined.
 17 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (69):warning:SkinDefines.LayoutTabDragIcon This variable is not defined.
 18 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/EditZone.as (338):warning:ViewTab This variable is not defined.
-19 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as (647):warning:compType This variable is not defined.
+19 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as (681):warning:compType This variable is not defined.
 20 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (43):warning:Sys.lang This variable is not defined.
 21 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (49):warning:Sys.lang This variable is not defined.
 */
