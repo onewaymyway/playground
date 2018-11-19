@@ -4,6 +4,7 @@ package mindmap
 	import laya.events.Event;
 	import laya.ui.Box;
 	import laya.utils.Handler;
+	import nodetools.devices.FileManager;
 	import ui.mindmap.MindMapEditorUI;
 	
 	/**
@@ -41,7 +42,8 @@ package mindmap
 			{
 				case "save":
 					debugger;
-					
+					trace("save:",_dataO.url, mapNodeData);
+					FileManager.createJSONFile(_dataO.url, mapNodeData);
 					break;
 			}
 		}
@@ -88,7 +90,7 @@ package mindmap
 		public function setData(dataO:Object):void
 		{
 			this._dataO = dataO;
-			mapNodeData = MindMapNodeData.createByObj(dataO);
+			mapNodeData = MindMapNodeData.createByObj(dataO.data,true);
 			freshUI();
 		}
 		

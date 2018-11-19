@@ -7,9 +7,10 @@ Project configuration:D:\codes\playground.git\trunk\debugtoolplatform\deskplugin
 1,0.00,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/Demo/src,0,Collect
 1,0.00,D:/codes/playground.git/trunk/libs/laya/src,0,Collect
 1,0.00,D:/codes/playground.git/trunk/libs/editor/src,0,Collect
+1,0.00,D:/codes/playground.git/trunk/libs/platformapi/src,0,Collect
 1,2.00,,0,read class message
 1,89.94,,0,Disable Flash3D D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/Demo/src/TestDemo.as
-12,89.94,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/Demo/bin/h5/Demo.max.js,14600,
+12,89.94,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/Demo/bin/h5/Demo.max.js,14778,
 12,89.94,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/Demo/bin/h5/laya.js,1227121,
 11,89.94,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/Demo/bin/h5/Demo.max.html,838,
 ******************************************************************************

@@ -171,7 +171,7 @@
 		}
 
 		__proto.updateUIContent=function(){
-			if (!this._data)return;
+			if (!this._data||!this.mindMapEditor)return;
 			this.mindMapEditor.setData(this._data);
 			this.text.text=JSON.stringify(this._data);
 		}
@@ -253,6 +253,8 @@
 			switch(type){
 				case "save":
 					debugger;
+					console.log("save:",this._dataO.url,this.mapNodeData);
+					nodetools.devices.FileManager.createJSONFile(this._dataO.url,this.mapNodeData);
 					break ;
 				}
 		}
@@ -291,7 +293,7 @@
 
 		__proto.setData=function(dataO){
 			this._dataO=dataO;
-			this.mapNodeData=MindMapNodeData.createByObj(dataO);
+			this.mapNodeData=MindMapNodeData.createByObj(dataO.data,true);
 			this.freshUI();
 		}
 

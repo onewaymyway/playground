@@ -72,7 +72,7 @@ package
 		
 		private function updateUIContent():void
 		{
-			if (!_data) return;
+			if (!_data||!mindMapEditor) return;
 			mindMapEditor.setData(_data);
 			text.text = JSON.stringify(_data);
 		}
