@@ -2,6 +2,7 @@ package platform.editzone
 {
 	import laya.events.Event;
 	import platform.extenddisplay.IFrameSprite;
+	import platform.tools.IFrameAPIInsertTool;
 	import platform.tools.Notice;
 	import platform.tools.Notices;
 	import viewRender.EditorRenderBase;
@@ -27,6 +28,7 @@ package platform.editzone
 			iframeWindow=div.contentWindow;
 			renderItem = iframeWindow.renderBinds;
 			if (!renderItem) return;
+			IFrameAPIInsertTool.insertAPI(iframeWindow);
 			Notice.listen(Notices.RENDER_INITED,null,renderInited);
 			if(renderItem)
 				renderItem.setNotice(Notice.I);	
