@@ -1,6 +1,5 @@
-package nodetools.devices 
+/*[IF-FLASH]*/package nodetools 
 {
-	import laya.utils.Browser;
 	/**
 	 * ...
 	 * @author ww
@@ -11,17 +10,6 @@ package nodetools.devices
 		public function NodeJSTools() 
 		{
 			
-		}
-		public static function init():void
-		{
-			Device.Buffer = __JS__("Buffer");
-			SystemSetting.isCMDVer = true;
-			OSInfo.init();
-			Browser.userAgent = OSInfo.type;
-			//初始化文件系统
-			FileTools.init2();
-			CMDShell.init();
-			CMDShell.childProcess = Device.requireRemote("child_process");
 		}
 		public static function require(str:String):*
 		{
@@ -34,7 +22,7 @@ package nodetools.devices
 			trace("argv:", argv);
 			return argv;
 		}
-		public static function parseArgToObj(args:Array, start:int = 0, target:Object=null):void
+		public static function parseArgToObj(args:Array, start:int = 0, target:Object):void
 		{
 			var i:int, len:int;
 			len = args.length;
@@ -53,17 +41,13 @@ package nodetools.devices
 				}
 			}
 		}
-		
 		public static function getMyPath():String
 		{
 			return __JS__("__dirname");
 		}
-		
-		public static function getAbsPath(path:String,root:String=null):String
+		public static function eval(codeStr:String):*
 		{
-			if (path.indexOf(":") >= 0) return path;
-			if (!root) root = getMyPath();
-			return FileManager.getPath(root, path);
+			return __JS__("eval(codeStr)");
 		}
 	}
 

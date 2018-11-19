@@ -1,4 +1,4 @@
-package nodetools.devices {
+/*[IF-FLASH]*/package nodetools.devices {
 
 	/**
 	 * 封装所有驱动级接口
@@ -32,23 +32,15 @@ package nodetools.devices {
 		public static function require(mod:String):*
 		{
 			//trace("require:",mod);
-			try
-			{
-				var rst:*;
-				__JS__("rst=require(mod)");
-				return rst;
-			}catch(e:*){}
-			
+			var rst:*;
+			__JS__("rst=require(mod)");
+			return rst;
 		}
 		public static function requireRemote(mod:String):*
 		{
-			try
-			{
-					if (!remote) return require(mod);
-					return remote[mod];
-					return remote.require(mod);
-			}catch(e:*){}
-		
+			if (!remote) return require(mod);
+			return remote[mod];
+			return remote.require(mod);
 		}
 	}
 }

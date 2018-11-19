@@ -1,5 +1,6 @@
 package nodetools 
 {
+	import nodetools.devices.FileManager;
 	/**
 	 * ...
 	 * @author ww
@@ -48,6 +49,13 @@ package nodetools
 		public static function eval(codeStr:String):*
 		{
 			return __JS__("eval(codeStr)");
+		}
+		
+		public static function getAbsPath(path:String,root:String=null):String
+		{
+			if (path.indexOf(":") >= 0) return path;
+			if (!root) root = getMyPath();
+			return FileManager.getPath(root, path);
 		}
 	}
 
