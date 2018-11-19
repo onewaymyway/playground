@@ -89,7 +89,15 @@ package mindmap
 				leftItem = childItem;
 				rightItem = parentItem;
 			}
-			sprite.graphics.drawLine(leftItem.x + leftItem.width, leftItem.y, rightItem.x, rightItem.y,"#ff0000");
+			var lx:Number, ly:Number;
+			var rx:Number, ry:Number;
+			lx = leftItem.x + leftItem.width;
+			ly = leftItem.y;
+			rx = rightItem.x;
+			ry = rightItem.y;
+			//sprite.graphics.drawCurves(0, 0, [lx, ly, (lx + rx) / 2, (ly + ry) / 2, rx, ry], "#ff0000");
+			sprite.graphics.drawCurves(0, 0, [lx,ly,(lx+rx)/2,ly,rx,ry], "#ff0000");
+			//sprite.graphics.drawLine(leftItem.x + leftItem.width, leftItem.y, rightItem.x, rightItem.y,"#ff0000");
 		}
 		
 		public function get ID():int
