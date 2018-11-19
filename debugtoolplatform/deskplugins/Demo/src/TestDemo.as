@@ -28,10 +28,11 @@ package
 			//resList.push( { "url":"res/atlas/view.json", "type":Loader.ATLAS } );
 			//resList.push({"url":"res/atlas/play.json","type":Loader.ATLAS});
 			Laya.loader.load(resList, new Handler(this, test));
-			DebugPanel.init();
+			//DebugPanel.init();
 		}
 		private var text:Text;
 		private var mindMapEditor:MindMapEditor;
+		
 		private function test():void
 		{
 			
@@ -45,6 +46,7 @@ package
 			mindMapEditor = new MindMapEditor();
 			mindMapEditor.left = mindMapEditor.right = mindMapEditor.top = mindMapEditor.bottom = 2;
 			Laya.stage.addChild(mindMapEditor);
+			updateUIContent();
 		}
 		
 		private var _data:Object;
@@ -70,6 +72,7 @@ package
 		
 		private function updateUIContent():void
 		{
+			if (!_data) return;
 			mindMapEditor.setData(_data);
 			text.text = JSON.stringify(_data);
 		}

@@ -9,7 +9,7 @@ package mindmap
 		public var id:int;
 		public var label:String;
 		public var parent:int;
-		public var childs:Array;
+		public var childs:Array=[];
 		public var isOpen:Boolean = false;
 		public function MindMapNodeData() 
 		{
@@ -68,7 +68,7 @@ package mindmap
 		public static function createByLabel(label:String):MindMapNodeData
 		{
 			var rst:MindMapNodeData;
-			rst = new MindMapData();
+			rst = new MindMapNodeData();
 			rst.label = label;
 			return rst;
 		}
