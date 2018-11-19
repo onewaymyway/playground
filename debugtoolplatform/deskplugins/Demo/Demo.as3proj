@@ -18,6 +18,7 @@
     <class path="src" />
     <class path="..\..\..\libs\laya\src" />
     <class path="..\..\..\libs\editor\src" />
+    <class path="..\..\..\libs\platformapi\src" />
   </classpaths>
   <!-- Build options -->
   <build>

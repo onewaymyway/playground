@@ -24,8 +24,9 @@ def copyFiles(sourceDir,  targetDir):
         if os.path.isfile(sourceFile): 
             if not os.path.exists(targetDir):  
                 os.makedirs(targetDir)  
-            if not os.path.exists(targetFile) or(os.path.exists(targetFile) and (os.path.getsize(targetFile) != os.path.getsize(sourceFile))):  
-                    open(targetFile, "wb").write(open(sourceFile, "rb").read()) 
+            #if not os.path.exists(targetFile) or(os.path.exists(targetFile) and (os.path.getsize(targetFile) != os.path.getsize(sourceFile))):  
+                    #open(targetFile, "wb").write(open(sourceFile, "rb").read())
+            open(targetFile, "wb").write(open(sourceFile, "rb").read()) 
         if os.path.isdir(sourceFile): 
             First_Directory = False 
             copyFiles(sourceFile, targetFile)

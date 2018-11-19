@@ -15,9 +15,9 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"top":5,"skin":"comp/button.png","right":5,"label":"保存"},
+            "props":{"var":"saveBtn","top":5,"skin":"comp/button.png","right":5,"label":"保存"},
             "nodeParent":1,
-            "label":"Button",
+            "label":"Button(saveBtn)",
             "isDirectory":false,
             "isAniNode":true,
             "hasChild":false,

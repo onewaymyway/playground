@@ -15,6 +15,7 @@ package mindmap
 		private var _menu:ContextMenu;
 		private var nodeContainer:Box;
 		private var onMenuSelectHandler:Handler;
+		private var _userChanged:Boolean = false;
 		public function MindMapEditor() 
 		{
 			_menu = ContextMenu.createMenuByArray(["新建"]);
@@ -22,11 +23,44 @@ package mindmap
 			onMenuSelectHandler = new Handler(this, onSelect);
 			//this.on(Event.RIGHT_MOUSE_UP, this, onRightClick);
 			nodeContainer = new Box();
+			nodeContainer.size(1, 1);
 			nodeContainer.hitTestPrior = false;
-			nodeContainer.left = nodeContainer.right = nodeContainer.top = nodeContainer.bottom = 0;
+			//nodeContainer.left = nodeContainer.right = nodeContainer.top = nodeContainer.bottom = 0;
 			this.addChild(nodeContainer);
+			this.on(Event.RESIZE, this, onResize);
+			onResize();
+			this.on(Event.RIGHT_MOUSE_DOWN, this, onRightDown);
+			this.on(Event.RIGHT_MOUSE_UP, this, onRightUp);
+			
+			saveBtn.on(Event.CLICK, this, onActionBtn, ["save"]);
 		}
 		
+		private function onActionBtn(type:String):void
+		{
+			switch(type)
+			{
+				case "save":
+					debugger;
+					
+					break;
+			}
+		}
+		private function onRightDown(e:Event):void
+		{
+			if (nodeContainer.contains(e.target)&&e.target!=nodeContainer) return;
+			nodeContainer.startDrag();
+			_userChanged = true;
+		}
+		
+		private function onRightUp(e:Event):void
+		{
+			nodeContainer.stopDrag();
+		}
+		private function onResize():void
+		{
+			if (_userChanged) return;
+			nodeContainer.pos(this.width*0.5,this.height*0.5);
+		}
 		
 		private function onRightClick():void
 		{
@@ -65,7 +99,7 @@ package mindmap
 			var root:MindMapItem;
 			root = createMapView(mapNodeData);
 			//debugger;
-			root.pos(this.width*0.5, this.height*0.5);
+			root.pos(0, 0);
 			root.layoutAsCenter();
 			nodeContainer.graphics.clear();
 			root.drawConnections(nodeContainer);
