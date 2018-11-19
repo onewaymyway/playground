@@ -3,8 +3,9 @@
 	var __un=Laya.un,__uns=Laya.uns,__static=Laya.static,__class=Laya.class,__getset=Laya.getset,__newvec=Laya.__newvec;
 
 	var Box=laya.ui.Box,Browser=laya.utils.Browser,Button=laya.ui.Button,CMDShell=nodetools.devices.CMDShell;
-	var CheckBox=laya.ui.CheckBox,ClassTool=laya.debug.tools.ClassTool,Clip=laya.ui.Clip,Component=laya.ui.Component;
-	var ContextMenu$1=electrontools.menus.ContextMenu,Device=nodetools.devices.Device,Dialog=laya.ui.Dialog,DisControlTool=laya.debug.tools.DisControlTool;
+	var CSVTools=nodetools.devices.CSVTools,CheckBox=laya.ui.CheckBox,ClassTool=laya.debug.tools.ClassTool,Clip=laya.ui.Clip;
+	var Component=laya.ui.Component,ContextMenu$1=electrontools.menus.ContextMenu,Device=nodetools.devices.Device;
+	var Dialog=laya.ui.Dialog,DialogTools=nodetools.devices.DialogTools,DisControlTool=laya.debug.tools.DisControlTool;
 	var DisResizer=laya.debug.tools.resizer.DisResizer,DisTools=electrontools.DisTools,DragEvent=electrontools.drags.DragEvent;
 	var DragManager=electrontools.drags.DragManager,Ease=laya.utils.Ease,Event=laya.events.Event,EventDispatcher=laya.events.EventDispatcher;
 	var File=nodetools.devices.File,FileManager=nodetools.devices.FileManager,FileTools=nodetools.devices.FileTools;
@@ -12,14 +13,14 @@
 	var IDTools=laya.debug.tools.IDTools,Image=laya.ui.Image,Input=laya.display.Input,JSTools=laya.debug.tools.JSTools;
 	var JsonTool=laya.debug.tools.JsonTool,KeyManager=extendui.KeyManager,Keyboard=laya.events.Keyboard,Label=laya.ui.Label;
 	var List=laya.ui.List,ListBase$1=extendui.ui.ListBase,ListEx=extendui.ui.ListEx,Loader=laya.net.Loader,MathUtil=laya.maths.MathUtil;
-	var MessageManager=electrontools.MessageManager,Node=laya.display.Node,NodeTree$1=extendui.ui.NodeTree,NodeUtils=laya.debug.view.nodeInfo.NodeUtils;
-	var OSInfo=nodetools.devices.OSInfo,ObjectTools=laya.debug.tools.ObjectTools,Paths$1=nodetools.devices.Paths;
-	var Point=laya.maths.Point,PythonTools=nodetools.devices.PythonTools,Rectangle=laya.maths.Rectangle,RelativePos=extendui.layout.RelativePos;
-	var Render=laya.renders.Render,RenderContext=laya.renders.RenderContext,Sprite=laya.display.Sprite,Stage=laya.display.Stage;
-	var StringTool=laya.debug.tools.StringTool,Styles=laya.ui.Styles,Sys=nodetools.devices.Sys,SystemDragOverManager=electrontools.drags.SystemDragOverManager;
-	var SystemSetting=nodetools.devices.SystemSetting,Tab=laya.ui.Tab,TabEx=extendui.ui.TabEx,TextField=extendui.ui.TextField;
-	var TextInput=laya.ui.TextInput,TreeBase$1=extendui.ui.TreeBase,TreeEx=extendui.ui.TreeEx,Tween=laya.utils.Tween;
-	var UIConfig=Laya.UIConfig,Utils=laya.utils.Utils,View=laya.ui.View;
+	var MessageManager=electrontools.MessageManager,Node=laya.display.Node,NodeJSTools$1=nodetools.NodeJSTools;
+	var NodeTree$1=extendui.ui.NodeTree,NodeUtils=laya.debug.view.nodeInfo.NodeUtils,OSInfo=nodetools.devices.OSInfo;
+	var ObjectTools=laya.debug.tools.ObjectTools,Paths$1=nodetools.devices.Paths,Point=laya.maths.Point,PythonTools=nodetools.devices.PythonTools;
+	var Rectangle=laya.maths.Rectangle,RelativePos=extendui.layout.RelativePos,Render=laya.renders.Render,RenderContext=laya.renders.RenderContext;
+	var Sprite=laya.display.Sprite,Stage=laya.display.Stage,StringTool=laya.debug.tools.StringTool,Styles=laya.ui.Styles;
+	var Sys=nodetools.devices.Sys,SystemDragOverManager=electrontools.drags.SystemDragOverManager,SystemSetting=nodetools.devices.SystemSetting;
+	var Tab=laya.ui.Tab,TabEx=extendui.ui.TabEx,TextField=extendui.ui.TextField,TextInput=laya.ui.TextInput,TreeBase$1=extendui.ui.TreeBase;
+	var TreeEx=extendui.ui.TreeEx,Tween=laya.utils.Tween,UIConfig=Laya.UIConfig,Utils=laya.utils.Utils,View=laya.ui.View;
 	Laya.interface('platform.editzone.IEditViewer');
 	/**
 	*IDE可视化编辑样式
@@ -2119,6 +2120,57 @@
 	*@author ww
 	*@version 1.0
 	*
+	*@created 2018-5-28 下午4:54:05
+	*/
+	//class platform.tools.IFrameAPIInsertTool
+	var IFrameAPIInsertTool=(function(){
+		function IFrameAPIInsertTool(){}
+		__class(IFrameAPIInsertTool,'platform.tools.IFrameAPIInsertTool');
+		IFrameAPIInsertTool.insertClassList=function(clsList,tarWindow){
+			if(!tarWindow)tarWindow=window;
+			var i=0,len=0;
+			len=clsList.length;
+			var tClz;
+			for(i=0;i<len;i++){
+				tClz=clsList[i];
+				IFrameAPIInsertTool.insertClass(tClz,tarWindow);
+			}
+		}
+
+		IFrameAPIInsertTool.insertClass=function(clz,tarWindow){
+			if(!tarWindow)tarWindow=window;
+			var tName;
+			tName=clz.__className;
+			var pathList
+			pathList=tName.split(".");
+			var i=0,len=0;
+			len=pathList.length;
+			var tPath;
+			var tO;
+			tO=tarWindow;
+			for(i=0;i<len-1;i++){
+				tPath=pathList[i];
+				if(!tO[tPath])tO[tPath]={};
+				tO=tO[tPath];
+			}
+			tO[pathList[len-1]]=clz;
+		}
+
+		IFrameAPIInsertTool.insertAPI=function(tarWindow){
+			var clzList;
+			clzList=[CMDShell,CSVTools,Device,DialogTools,File,FileManager,FileTools,NodeJSTools$1,OSInfo,Paths$1,PythonTools,Sys,SystemSetting,NodeJSTools$1];
+			IFrameAPIInsertTool.insertClassList(clzList,tarWindow);
+		}
+
+		return IFrameAPIInsertTool;
+	})()
+
+
+	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
 	*@created 2015-11-16 下午1:26:53
 	*/
 	//class platform.tools.Notices
@@ -2475,8 +2527,10 @@
 			Browser.window.renderBinds.getStage=Utils.bind(this.getStage,this);
 			Browser.window.renderBinds.setNotice=Utils.bind(this.setNotice,this);
 			Browser.window.renderBinds.firstInit=Utils.bind(this.firstInit,this);
+			Browser.window.renderBinds.setPagePath=Utils.bind(this.setPagePath,this);
 		}
 
+		__proto.setPagePath=function(pagePath){}
 		__proto.getRenderData=function(){
 			return null;
 		}
@@ -3313,6 +3367,7 @@
 			this._changed=false;
 			var data;
 			if(this.pagePath){
+				this.iframeSprite.renderItem.setPagePath(this.pagePath);
 				if(StateManager.has(this.pagePath)){
 					data=StateManager.getState(this.pagePath).now();
 					}else{
@@ -3349,7 +3404,7 @@
 				this._changed=false;
 				StateManager.setChangeState(this.pagePath,false);
 				Laya.stage.event("pageSaved");
-				Laya.stage.event(/*no*/this.IDEEvent.PAGE_CHANGED);
+				Laya.stage.event("pageChanged");
 			}
 		}
 
@@ -3659,6 +3714,7 @@
 			this.iframeWindow=this.div.contentWindow;
 			this.renderItem=this.iframeWindow.renderBinds;
 			if (!this.renderItem)return;
+			IFrameAPIInsertTool.insertAPI(this.iframeWindow);
 			Notice.listen("RenderInited",null,this.renderInited);
 			if(this.renderItem)
 				this.renderItem.setNotice(Notice.I);
@@ -4457,34 +4513,6 @@
 	*...
 	*@author ww
 	*/
-	//class view.MainViewItem extends ui.deskplatform.MainViewItemUI
-	var MainViewItem=(function(_super){
-		function MainViewItem(){
-			this._dataO=null;
-			MainViewItem.__super.call(this);
-			this.on("click",this,this.onClick);
-		}
-
-		__class(MainViewItem,'view.MainViewItem',_super);
-		var __proto=MainViewItem.prototype;
-		__proto.initByData=function(dataO){
-			this._dataO=dataO;
-			this.label.text=dataO.name;
-		}
-
-		__proto.onClick=function(){
-			console.log("onClick:",this._dataO);
-			Notice.notify("OPEN_PLUGIN",this._dataO.path);
-		}
-
-		return MainViewItem;
-	})(MainViewItemUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
 	//class view.MainView extends ui.deskplatform.MainViewUI
 	var MainView=(function(_super){
 		function MainView(){
@@ -4535,6 +4563,34 @@
 
 		return MainView;
 	})(MainViewUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class view.MainViewItem extends ui.deskplatform.MainViewItemUI
+	var MainViewItem=(function(_super){
+		function MainViewItem(){
+			this._dataO=null;
+			MainViewItem.__super.call(this);
+			this.on("click",this,this.onClick);
+		}
+
+		__class(MainViewItem,'view.MainViewItem',_super);
+		var __proto=MainViewItem.prototype;
+		__proto.initByData=function(dataO){
+			this._dataO=dataO;
+			this.label.text=dataO.name;
+		}
+
+		__proto.onClick=function(){
+			console.log("onClick:",this._dataO);
+			Notice.notify("OPEN_PLUGIN",this._dataO.path);
+		}
+
+		return MainViewItem;
+	})(MainViewItemUI)
 
 
 	/**编辑区分页管理器
