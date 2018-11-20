@@ -5082,6 +5082,7 @@
 			this._menu=menu;
 			menu.nativeMenu.append(this.createNewMenu());
 			this._menuDir=ContextMenu$1.createMenu("打开所在目录","","重命名","删除");
+			this._menuDir.nativeMenu.append(this.createNewMenu());
 			this._menuDir.on("select",this,this.onEmunSelect);
 			this._mutiMenu=ContextMenu$1.createMenu("删除");
 			this._mutiMenu.on("select",this,this.onEmunSelect);

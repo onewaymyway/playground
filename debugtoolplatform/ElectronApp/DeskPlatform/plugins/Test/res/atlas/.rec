@@ -19,6 +19,7 @@ P 9B271CB4 combo_22.png
 P 23AAF566 combo_24.png
 P D10DB595 combo_32.png
 P 404A0225 combobox.png
+P F4E800C9 down.png
 P 81DAD6F8 folder.png
 P 096E97FF gridset.png
 P 14547D0C hscroll$bar.png
@@ -49,12 +50,14 @@ P 3FD78E12 progress.png
 P D8821485 prop.png
 P BF898D6A radio.png
 P BF898D6A radiogroup.png
+P BF898D6A selectbtn.png
 P C4161339 skinres.png
 P BE59F88C sound.png
 P 1CC9879B tab.png
 P 3975AED1 tab3.png
 P F8380BD7 textarea.png
 P 2F54EFDB textinput.png
+P 908843F0 up.png
 P 02FC2942 vscroll$bar.png
 P F4E800C9 vscroll$down.png
 P 908843F0 vscroll$up.png
