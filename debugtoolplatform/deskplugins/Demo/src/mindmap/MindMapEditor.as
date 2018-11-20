@@ -16,12 +16,15 @@ package mindmap
 		private var _menu:ContextMenu;
 		private var nodeContainer:Box;
 		private var onMenuSelectHandler:Handler;
+		private var onItemActionHandler:Handler;
 		private var _userChanged:Boolean = false;
+		private var _selectItem:MindMapItem;
 		public function MindMapEditor() 
 		{
 			_menu = ContextMenu.createMenuByArray(["新建"]);
 			_menu.on(Event.SELECT, this, onSelect);
 			onMenuSelectHandler = new Handler(this, onSelect);
+			onItemActionHandler = new Handler(this, onItemAction);
 			//this.on(Event.RIGHT_MOUSE_UP, this, onRightClick);
 			nodeContainer = new Box();
 			nodeContainer.size(1, 1);
@@ -32,7 +35,7 @@ package mindmap
 			onResize();
 			this.on(Event.RIGHT_MOUSE_DOWN, this, onRightDown);
 			this.on(Event.RIGHT_MOUSE_UP, this, onRightUp);
-			
+			saveBtn.zOrder = 99;
 			saveBtn.on(Event.CLICK, this, onActionBtn, ["save"]);
 		}
 		
@@ -74,12 +77,80 @@ package mindmap
 			trace("onMenuSelect:", dataO,target);
 			var label:String;
 			label = dataO.target.data;
-			trace("Menu:",label);
-			switch(label)
+			trace("Menu:", label);
+			onItemAction(label, target);
+		}
+		
+		private function onItemAction(action:String, target:MindMapItem):void
+		{
+			var parentNode:MindMapItem;
+			parentNode = target.parentNode;
+			switch(action)
 			{
 				case "新建子":
 					target.nodeData.addChild(MindMapNodeData.createByLabel("new"));
 					freshUI();
+					break;
+				case "新建同级":
+					if (parentNode)
+					{
+						parentNode.nodeData.addChild(MindMapNodeData.createByLabel("new"));
+						freshUI();
+					}
+					
+					break;
+				case "删除":
+					if (parentNode)
+					{
+						if (target == _selectItem)
+						{
+							_selectItem = null;
+						}
+						parentNode.nodeData.removeChild(target.nodeData);
+						freshUI();
+					}
+					break;
+				case "up":
+					if (parentNode)
+					{
+						parentNode.nodeData.moveChild(target.nodeData, -1);
+						parentNode.updateNodesToDataOrder();
+						freshLayout();
+					}
+					
+					//freshUI();
+					break;
+				case "down":
+					if (parentNode)
+					{
+						parentNode.nodeData.moveChild(target.nodeData, 1);
+						parentNode.updateNodesToDataOrder();
+						freshLayout();
+					}
+					
+					//freshUI();
+					break;
+				case "select":
+					if (target == _selectItem)
+					{
+						if (!target.isSelect())
+						{
+							_selectItem = null;
+							return;
+						}
+					}
+					if (!_selectItem)
+					{
+						_selectItem = target;
+					}else
+					{
+						target.setSelect(false);
+						_selectItem.setSelect(false);
+						_selectItem.parentNode.removeChildNode(_selectItem);
+						target.addChildNode(_selectItem,true);
+						_selectItem = null;
+						freshLayout();
+					}
 					break;
 			}
 		}
@@ -94,14 +165,38 @@ package mindmap
 			freshUI();
 		}
 		
-		
+		private function clearPreItems():void
+		{
+			_selectItem = null;
+			mindMapItems.length = 0;
+			var i:int, len:int;
+			len = nodeContainer.numChildren;
+			var tChild:MindMapItem;
+			for (i = 0; i < len; i++)
+			{
+				tChild = nodeContainer.getChildAt(i);
+				if (tChild is MindMapItem)
+				{
+					tChild.recover();
+				}
+			}
+			nodeContainer.removeChildren();
+		}
+		private var root:MindMapItem;
+		private var mindMapItems:Array=[];
 		private function freshUI():void
 		{
-			nodeContainer.removeChildren();
-			var root:MindMapItem;
+			clearPreItems();
+			
 			root = createMapView(mapNodeData);
-			//debugger;
 			root.pos(0, 0);
+			//debugger;
+			freshLayout();
+		}
+		
+		private function freshLayout():void
+		{
+			if (!root) return;
 			root.layoutAsCenter();
 			nodeContainer.graphics.clear();
 			root.drawConnections(nodeContainer);
@@ -112,6 +207,7 @@ package mindmap
 		
 		public function createMapView(nodeData:MindMapNodeData):MindMapNodeData
 		{
+			mindMapItems.length = 0;
 			var rst:MindMapItem;
 			rst = createMapItem(nodeData);
 			var childs:Array;
@@ -156,6 +252,8 @@ package mindmap
 			rst = MindMapItem.createByData(nodeData);
 			nodeContainer.addChild(rst);
 			rst.onMenuSelectHandler = onMenuSelectHandler;
+			rst.onItemActionHandler = onItemActionHandler;
+			mindMapItems.push(rst);
 			return rst;
 		}
 	}

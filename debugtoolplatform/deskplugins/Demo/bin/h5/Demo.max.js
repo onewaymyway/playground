@@ -4,8 +4,8 @@
 
 	var Box=laya.ui.Box,Button=laya.ui.Button,ContextMenu=laya.debug.uicomps.ContextMenu,ContextMenuItem=laya.debug.uicomps.ContextMenuItem;
 	var EditorRenderBase=viewRender.EditorRenderBase,Event=laya.events.Event,Handler=laya.utils.Handler,Loader=laya.net.Loader;
-	var Sprite=laya.display.Sprite,Stage=laya.display.Stage,Text=laya.display.Text,TextInput=laya.ui.TextInput;
-	var View=laya.ui.View;
+	var Pool=laya.utils.Pool,Radio=laya.ui.Radio,Sprite=laya.display.Sprite,Stage=laya.display.Stage,Text=laya.display.Text;
+	var TextInput=laya.ui.TextInput,View=laya.ui.View;
 	/**
 	*...
 	*@author ww
@@ -64,6 +64,22 @@
 
 		__class(MindMapNodeData,'mindmap.MindMapNodeData');
 		var __proto=MindMapNodeData.prototype;
+		__proto.moveChild=function(child,d){
+			(d===void 0)&& (d=1);
+			var index=0;
+			index=this.childs.indexOf(child);
+			if (index >=0){
+				var tarIndex=0;
+				tarIndex=index+d;
+				var temp;
+				if (this.childs[tarIndex]){
+					temp=child;
+					this.childs[index]=this.childs[tarIndex];
+					this.childs[tarIndex]=temp;
+				}
+			}
+		}
+
 		__proto.addChild=function(child){
 			this.childs.push(child);
 			child.parent=this.id;
@@ -73,7 +89,7 @@
 			var i=0,len=0;
 			len=this.childs.length;
 			for (i=0;i < len;i++){
-				if (this.childs[i].id==child.id){
+				if (this.childs[i]==child){
 					this.childs.splice(i,1);
 					return;
 				}
@@ -203,6 +219,9 @@
 	var MapItemUI=(function(_super){
 		function MapItemUI(){
 			this.text=null;
+			this.downBtn=null;
+			this.upBtn=null;
+			this.selectBtn=null;
 			MapItemUI.__super.call(this);
 		}
 
@@ -213,7 +232,7 @@
 			this.createView(MapItemUI.uiView);
 		}
 
-		MapItemUI.uiView={"type":"View","props":{"width":129,"height":23},"child":[{"type":"TextInput","props":{"var":"text","text":"TextInput","skin":"comp/textinput.png","color":"#93eedf","align":"center"}}]};
+		MapItemUI.uiView={"type":"View","props":{"width":162,"height":22},"child":[{"type":"TextInput","props":{"var":"text","text":"TextInput","skin":"comp/textinput.png","color":"#93eedf","align":"center"}},{"type":"Button","props":{"y":11,"x":131,"var":"downBtn","skin":"comp/down.png"}},{"type":"Button","props":{"y":-1,"x":131,"var":"upBtn","skin":"comp/up.png"}},{"type":"Radio","props":{"y":4,"x":147,"var":"selectBtn","skin":"comp/selectbtn.png"}}]};
 		return MapItemUI;
 	})(View)
 
@@ -228,14 +247,19 @@
 			this._menu=null;
 			this.nodeContainer=null;
 			this.onMenuSelectHandler=null;
+			this.onItemActionHandler=null;
 			this._userChanged=false;
+			this._selectItem=null;
 			this._dataO=null;
 			this.mapData=null;
 			this.mapNodeData=null;
+			this.root=null;
+			this.mindMapItems=[];
 			MindMapEditor.__super.call(this);
 			this._menu=ContextMenu.createMenuByArray(["新建"]);
 			this._menu.on("select",this,this.onSelect);
 			this.onMenuSelectHandler=new Handler(this,this.onSelect);
+			this.onItemActionHandler=new Handler(this,this.onItemAction);
 			this.nodeContainer=new Box();
 			this.nodeContainer.size(1,1);
 			this.nodeContainer.hitTestPrior=false;
@@ -244,6 +268,7 @@
 			this.onResize();
 			this.on("rightmousedown",this,this.onRightDown);
 			this.on("rightmouseup",this,this.onRightUp);
+			this.saveBtn.zOrder=99;
 			this.saveBtn.on("click",this,this.onActionBtn,["save"]);
 		}
 
@@ -283,10 +308,63 @@
 			var label;
 			label=dataO.target.data;
 			console.log("Menu:",label);
-			switch(label){
+			this.onItemAction(label,target);
+		}
+
+		__proto.onItemAction=function(action,target){
+			var parentNode;
+			parentNode=target.parentNode;
+			switch(action){
 				case "新建子":
 					target.nodeData.addChild(MindMapNodeData.createByLabel("new"));
 					this.freshUI();
+					break ;
+				case "新建同级":
+					if (parentNode){
+						parentNode.nodeData.addChild(MindMapNodeData.createByLabel("new"));
+						this.freshUI();
+					}
+					break ;
+				case "删除":
+					if (parentNode){
+						if (target==this._selectItem){
+							this._selectItem=null;
+						}
+						parentNode.nodeData.removeChild(target.nodeData);
+						this.freshUI();
+					}
+					break ;
+				case "up":
+					if (parentNode){
+						parentNode.nodeData.moveChild(target.nodeData,-1);
+						parentNode.updateNodesToDataOrder();
+						this.freshLayout();
+					}
+					break ;
+				case "down":
+					if (parentNode){
+						parentNode.nodeData.moveChild(target.nodeData,1);
+						parentNode.updateNodesToDataOrder();
+						this.freshLayout();
+					}
+					break ;
+				case "select":
+					if (target==this._selectItem){
+						if (!target.isSelect()){
+							this._selectItem=null;
+							return;
+						}
+					}
+					if (!this._selectItem){
+						this._selectItem=target;
+						}else{
+						target.setSelect(false);
+						this._selectItem.setSelect(false);
+						this._selectItem.parentNode.removeChildNode(this._selectItem);
+						target.addChildNode(this._selectItem,true);
+						this._selectItem=null;
+						this.freshLayout();
+					}
 					break ;
 				}
 		}
@@ -297,18 +375,38 @@
 			this.freshUI();
 		}
 
-		__proto.freshUI=function(){
+		__proto.clearPreItems=function(){
+			this._selectItem=null;
+			this.mindMapItems.length=0;
+			var i=0,len=0;
+			len=this.nodeContainer.numChildren;
+			var tChild;
+			for (i=0;i < len;i++){
+				tChild=this.nodeContainer.getChildAt(i);
+				if ((tChild instanceof mindmap.MindMapItem )){
+					tChild.recover();
+				}
+			}
 			this.nodeContainer.removeChildren();
-			var root;
-			root=this.createMapView(this.mapNodeData);
-			root.pos(0,0);
-			root.layoutAsCenter();
+		}
+
+		__proto.freshUI=function(){
+			this.clearPreItems();
+			this.root=this.createMapView(this.mapNodeData);
+			this.root.pos(0,0);
+			this.freshLayout();
+		}
+
+		__proto.freshLayout=function(){
+			if (!this.root)return;
+			this.root.layoutAsCenter();
 			this.nodeContainer.graphics.clear();
-			root.drawConnections(this.nodeContainer);
-			console.log("data:",root.nodeData);
+			this.root.drawConnections(this.nodeContainer);
+			console.log("data:",this.root.nodeData);
 		}
 
 		__proto.createMapView=function(nodeData){
+			this.mindMapItems.length=0;
 			var rst;
 			rst=this.createMapItem(nodeData);
 			var childs;
@@ -347,6 +445,8 @@
 			rst=MindMapItem.createByData(nodeData);
 			this.nodeContainer.addChild(rst);
 			rst.onMenuSelectHandler=this.onMenuSelectHandler;
+			rst.onItemActionHandler=this.onItemActionHandler;
+			this.mindMapItems.push(rst);
 			return rst;
 		}
 
@@ -365,17 +465,54 @@
 			this.childNodes=[];
 			this._menu=null;
 			this.onMenuSelectHandler=null;
+			this.onItemActionHandler=null;
+			this.parentNode=null;
 			MindMapItem.__super.call(this);
-			this._menu=ContextMenu.createMenuByArray(["新建同级","新建子"]);
+			this.hitTestPrior=false;
+			this._menu=ContextMenu.createMenuByArray(["新建同级","新建子","删除"]);
 			this._menu.on("select",this,this.onSelect);
 			this.on("rightmouseup",this,this.onRightMouseUp);
 			this.text.editable=true;
 			this.text.on("blur",this,this.onInputBlur);
 			this.on("mousedown",this,this.onDoubleClick);
+			this.downBtn.on("click",this,this.onBtnAction,["down"]);
+			this.upBtn.on("click",this,this.onBtnAction,["up"]);
+			this.selectBtn.on("click",this,this.onBtnAction,["select"]);
+			this.selectBtn.selected=false;
 		}
 
 		__class(MindMapItem,'mindmap.MindMapItem',_super);
 		var __proto=MindMapItem.prototype;
+		__proto.setSelect=function(isSelect){
+			this.selectBtn.selected=isSelect;
+		}
+
+		__proto.isSelect=function(){
+			return this.selectBtn.selected;
+		}
+
+		__proto.reset=function(){
+			this.parentNode=null;
+			this.childNodes=[];
+			this.selectBtn.selected=false;
+		}
+
+		__proto.updateNodesToDataOrder=function(){
+			this.childNodes.sort(this.sortChildFun.bind(this));
+		}
+
+		__proto.sortChildFun=function(nodeA,nodeB){
+			var childs;
+			childs=this.nodeData.childs;
+			return childs.indexOf(nodeA.nodeData)-childs.indexOf(nodeB.nodeData);
+		}
+
+		__proto.onBtnAction=function(action){
+			if (this.onItemActionHandler){
+				this.onItemActionHandler.runWith([action,this]);
+			}
+		}
+
 		__proto.onDoubleClick=function(){
 			this.text.focus=true;
 		}
@@ -517,6 +654,7 @@
 		__proto.addChildNode=function(node,addToData){
 			(addToData===void 0)&& (addToData=false);
 			this.childNodes.push(node);
+			node.parentNode=this;
 			if(addToData)
 				this.nodeData.addChild(node.nodeData);
 		}
@@ -526,13 +664,19 @@
 			len=this.childNodes.length;
 			var tChild;
 			for (i=0;i < len;i++){
-				tChild=this.childNodes.length;
-				if (tChild.ID==node.ID){
+				tChild=this.childNodes[i];
+				if (tChild==node){
 					this.childNodes.splice(i,1);
+					node.parentNode=null;
 					this.nodeData.removeChild(node.nodeData);
 					return;
 				}
 			}
+		}
+
+		__proto.recover=function(){
+			this.reset();
+			Pool.recover("MindMapItem",this);
 		}
 
 		//sprite.graphics.drawLine(leftItem.x+leftItem.width,leftItem.y,rightItem.x,rightItem.y,"#ff0000");
@@ -543,10 +687,14 @@
 		MindMapItem.createByData=function(mindMapNodeData,autoBuildTree){
 			(autoBuildTree===void 0)&& (autoBuildTree=false);
 			var rst;
-			rst=new MindMapItem();
+			rst=MindMapItem.create();
 			rst.nodeData=mindMapNodeData;
 			rst.freshUI();
 			return rst;
+		}
+
+		MindMapItem.create=function(){
+			return Pool.getItemByClass("MindMapItem",MindMapItem);
 		}
 
 		MindMapItem.YSpace=20;

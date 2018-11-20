@@ -1,0 +1,5 @@
+<res>
+   <item name="comp/up.png" type="Button" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
+   <item name="comp/down.png" type="Button" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
+   <item name="comp/selectbtn.png" type="Radio" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
+</res>

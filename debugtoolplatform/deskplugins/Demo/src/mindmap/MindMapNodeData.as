@@ -15,7 +15,23 @@ package mindmap
 		{
 			
 		}
-		
+		public function moveChild(child:MindMapNodeData,d:int=1):void
+		{
+			var index:int;
+			index = childs.indexOf(child);
+			if (index >= 0)
+			{
+				var tarIndex:int;
+				tarIndex = index+d;
+				var temp:MindMapNodeData;
+				if (childs[tarIndex])
+				{
+					temp = child;
+					childs[index] = childs[tarIndex];
+					childs[tarIndex]=temp;
+				}
+			}
+		}
 		public function addChild(child:MindMapNodeData):void
 		{
 			childs.push(child);
@@ -27,7 +43,7 @@ package mindmap
 			len = childs.length;
 			for (i = 0; i < len; i++)
 			{
-				if (childs[i].id == child.id)
+				if (childs[i] == child)
 				{
 					childs.splice(i, 1);
 					return;

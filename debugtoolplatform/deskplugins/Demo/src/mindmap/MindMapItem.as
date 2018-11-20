@@ -3,6 +3,7 @@ package mindmap
 	import laya.display.Sprite;
 	import laya.events.Event;
 	import laya.utils.Handler;
+	import laya.utils.Pool;
 	import ui.mindmap.MapItemUI;
 	import laya.debug.uicomps.ContextMenu;
 	/**
@@ -17,15 +18,55 @@ package mindmap
 		
 		public var childNodes:Array = [];
 		private var _menu:ContextMenu;
-		private var onMenuSelectHandler:Handler;
+		public var onMenuSelectHandler:Handler;
+		public var onItemActionHandler:Handler;
+		public var parentNode:MindMapItem;
 		public function MindMapItem() 
 		{
-			_menu = ContextMenu.createMenuByArray(["新建同级","新建子"]);
+			this.hitTestPrior = false;
+			_menu = ContextMenu.createMenuByArray(["新建同级","新建子","删除"]);
 			_menu.on(Event.SELECT, this, onSelect);
 			this.on(Event.RIGHT_MOUSE_UP, this, onRightMouseUp);
 			text.editable = true;
 			text.on(Event.BLUR, this, onInputBlur);
 			this.on(Event.MOUSE_DOWN, this, onDoubleClick);
+			downBtn.on(Event.CLICK, this, onBtnAction, ["down"]);
+			upBtn.on(Event.CLICK, this, onBtnAction, ["up"]);
+			selectBtn.on(Event.CLICK, this, onBtnAction, ["select"]);
+			selectBtn.selected = false;
+		}
+		
+		public function setSelect(isSelect:Boolean):void
+		{
+			selectBtn.selected = isSelect;
+		}
+		public function isSelect():Boolean
+		{
+			return selectBtn.selected;
+		}
+		public function reset():void
+		{
+			parentNode = null;
+			childNodes = [];
+			selectBtn.selected = false;
+		}
+		public function updateNodesToDataOrder():void
+		{
+			childNodes.sort(sortChildFun.bind(this));
+		}
+		
+		private function sortChildFun(nodeA:MindMapItem, nodeB:MindMapItem):int
+		{
+			var childs:Array;
+			childs = nodeData.childs;
+			return childs.indexOf(nodeA.nodeData) - childs.indexOf(nodeB.nodeData);
+		}
+		private function onBtnAction(action:String):void
+		{
+			if (onItemActionHandler)
+			{
+				onItemActionHandler.runWith([action,this]);
+			}
 		}
 		private function onDoubleClick():void
 		{
@@ -206,6 +247,7 @@ package mindmap
 		public function addChildNode(node:MindMapItem,addToData:Boolean=false):void
 		{
 			childNodes.push(node);
+			node.parentNode = this;
 			if(addToData)
 			nodeData.addChild(node.nodeData);
 		}
@@ -217,10 +259,11 @@ package mindmap
 			var tChild:MindMapItem;
 			for (i = 0; i < len; i++)
 			{
-				tChild = childNodes.length;
-				if (tChild.ID == node.ID)
+				tChild = childNodes[i];
+				if (tChild == node)
 				{
-					childNodes.splice(i,1);
+					childNodes.splice(i, 1);
+					node.parentNode = null;
 					nodeData.removeChild(node.nodeData);
 					return;
 				}
@@ -230,10 +273,20 @@ package mindmap
 		public static function createByData(mindMapNodeData:MindMapNodeData,autoBuildTree:Boolean=false):MindMapItem
 		{
 			var rst:MindMapItem;
-			rst = new MindMapItem();
+			rst = create();
 			rst.nodeData = mindMapNodeData;
 			rst.freshUI();
 			return rst;
+		}
+		
+		public static function create():MindMapItem
+		{
+			return Pool.getItemByClass("MindMapItem",MindMapItem );
+		}
+		public function recover():void
+		{
+			reset();
+			Pool.recover("MindMapItem", this);
 		}
 	}
 
