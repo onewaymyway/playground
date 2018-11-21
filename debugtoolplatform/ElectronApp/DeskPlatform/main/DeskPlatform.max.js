@@ -9,18 +9,20 @@
 	var DisResizer=laya.debug.tools.resizer.DisResizer,DisTools=electrontools.DisTools,DragEvent=electrontools.drags.DragEvent;
 	var DragManager=electrontools.drags.DragManager,Ease=laya.utils.Ease,Event=laya.events.Event,EventDispatcher=laya.events.EventDispatcher;
 	var File=nodetools.devices.File,FileManager=nodetools.devices.FileManager,FileTools=nodetools.devices.FileTools;
-	var FocusManager=extendui.FocusManager,Graphics=laya.display.Graphics,Handler=laya.utils.Handler,HitArea=laya.utils.HitArea;
-	var IDTools=laya.debug.tools.IDTools,Image=laya.ui.Image,Input=laya.display.Input,JSTools=laya.debug.tools.JSTools;
-	var JsonTool=laya.debug.tools.JsonTool,KeyManager=extendui.KeyManager,Keyboard=laya.events.Keyboard,Label=laya.ui.Label;
-	var List=laya.ui.List,ListBase$1=extendui.ui.ListBase,ListEx=extendui.ui.ListEx,Loader=laya.net.Loader,MathUtil=laya.maths.MathUtil;
-	var MessageManager=electrontools.MessageManager,Node=laya.display.Node,NodeJSTools$1=nodetools.NodeJSTools;
-	var NodeTree$1=extendui.ui.NodeTree,NodeUtils=laya.debug.view.nodeInfo.NodeUtils,OSInfo=nodetools.devices.OSInfo;
-	var ObjectTools=laya.debug.tools.ObjectTools,Paths$1=nodetools.devices.Paths,Point=laya.maths.Point,PythonTools=nodetools.devices.PythonTools;
-	var Rectangle=laya.maths.Rectangle,RelativePos=extendui.layout.RelativePos,Render=laya.renders.Render,RenderContext=laya.renders.RenderContext;
-	var Sprite=laya.display.Sprite,Stage=laya.display.Stage,StringTool=laya.debug.tools.StringTool,Styles=laya.ui.Styles;
-	var Sys=nodetools.devices.Sys,SystemDragOverManager=electrontools.drags.SystemDragOverManager,SystemSetting=nodetools.devices.SystemSetting;
-	var Tab=laya.ui.Tab,TabEx=extendui.ui.TabEx,TextField=extendui.ui.TextField,TextInput=laya.ui.TextInput,TreeBase$1=extendui.ui.TreeBase;
-	var TreeEx=extendui.ui.TreeEx,Tween=laya.utils.Tween,UIConfig=Laya.UIConfig,Utils=laya.utils.Utils,View=laya.ui.View;
+	var FocusManager=extendui.FocusManager,Graphics=laya.display.Graphics,HTMLCanvas=laya.resource.HTMLCanvas;
+	var Handler=laya.utils.Handler,HitArea=laya.utils.HitArea,IDTools=laya.debug.tools.IDTools,Image=laya.ui.Image;
+	var Input=laya.display.Input,JSTools=laya.debug.tools.JSTools,JsonTool=laya.debug.tools.JsonTool,KeyManager=extendui.KeyManager;
+	var Keyboard=laya.events.Keyboard,Label=laya.ui.Label,List=laya.ui.List,ListBase$1=extendui.ui.ListBase,ListEx=extendui.ui.ListEx;
+	var Loader=laya.net.Loader,MathUtil=laya.maths.MathUtil,Matrix=laya.maths.Matrix,MessageManager=electrontools.MessageManager;
+	var Node=laya.display.Node,NodeJSTools$1=nodetools.NodeJSTools,NodeTree$1=extendui.ui.NodeTree,NodeUtils=laya.debug.view.nodeInfo.NodeUtils;
+	var OSInfo=nodetools.devices.OSInfo,ObjectTools=laya.debug.tools.ObjectTools,Paths$1=nodetools.devices.Paths;
+	var Point=laya.maths.Point,Pool=laya.utils.Pool,PythonTools=nodetools.devices.PythonTools,Rectangle=laya.maths.Rectangle;
+	var RelativePos=extendui.layout.RelativePos,Render=laya.renders.Render,RenderContext=laya.renders.RenderContext;
+	var RenderSprite=laya.renders.RenderSprite,Sprite=laya.display.Sprite,Stage=laya.display.Stage,Stat=laya.utils.Stat;
+	var StringTool=laya.debug.tools.StringTool,Styles=laya.ui.Styles,Sys=nodetools.devices.Sys,SystemDragOverManager=electrontools.drags.SystemDragOverManager;
+	var SystemSetting=nodetools.devices.SystemSetting,Tab=laya.ui.Tab,TabEx=extendui.ui.TabEx,TextField=extendui.ui.TextField;
+	var TextInput=laya.ui.TextInput,TreeBase$1=extendui.ui.TreeBase,TreeEx=extendui.ui.TreeEx,Tween=laya.utils.Tween;
+	var UIConfig=Laya.UIConfig,Utils=laya.utils.Utils,View=laya.ui.View;
 	Laya.interface('platform.editzone.IEditViewer');
 	/**
 	*IDE可视化编辑样式
@@ -91,6 +93,8 @@
 			View.regComponent("Tree",TreeBase$1);
 			View.regComponent("ListEx",ListEx);
 			this.init();
+			DialogHook.I.hookDialog();
+			CanvasSprite.parentNode=Browser.container;
 			var resList;
 			resList=[ {"url":"res/atlas/comp.json","type":"atlas" }];
 			resList.push({"url":"res/atlas/view.json","type":"atlas" });
@@ -2120,6 +2124,87 @@
 	*@author ww
 	*@version 1.0
 	*
+	*@created 2016-8-10 下午4:21:23
+	*/
+	//class platform.rendercanvas.HtmlZIndexManager
+	var HtmlZIndexManager$1=(function(){
+		function HtmlZIndexManager(){}
+		__class(HtmlZIndexManager,'platform.rendercanvas.HtmlZIndexManager',null,'HtmlZIndexManager$1');
+		HtmlZIndexManager.init=function(){
+			Laya.stage.on("mousedown",null,HtmlZIndexManager.onMouseDown);
+			Laya.stage.on("mouseup",null,HtmlZIndexManager.onMouseUp);
+		}
+
+		HtmlZIndexManager.onMouseDown=function(){
+			HtmlZIndexManager.isMouseDown=true;
+			HtmlZIndexManager.prePos.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
+			HtmlZIndexManager.isDrag=false;
+			Laya.stage.on("mousemove",null,HtmlZIndexManager.onMouseMove);
+		}
+
+		HtmlZIndexManager.onMouseMove=function(){
+			if(Math.abs(HtmlZIndexManager.prePos.x-Laya.stage.mouseX)+Math.abs(HtmlZIndexManager.prePos.y-Laya.stage.mouseY)>5){
+				Notice.notify("DisableOverlays");
+				HtmlZIndexManager.setHtmlEnable(false);
+				HtmlZIndexManager.isDrag=true;
+				Laya.stage.off("mousemove",null,HtmlZIndexManager.onMouseMove);
+			}
+		}
+
+		HtmlZIndexManager.onMouseUp=function(){
+			HtmlZIndexManager.isMouseDown=false;
+			Laya.stage.off("mousemove",null,HtmlZIndexManager.onMouseMove);
+			if(!HtmlZIndexManager.preValue){
+				Notice.notify("EnableOverlays");
+				HtmlZIndexManager.setHtmlEnable(true);
+			}
+			HtmlZIndexManager.isDrag=false;
+		}
+
+		HtmlZIndexManager.setHtmlEnable=function(enable){
+			HtmlZIndexManager.preValue=enable;
+			var i=0,len=0;
+			len=HtmlZIndexManager.htmlList.length;
+			for(i=0;i<len;i++){
+				if(HtmlZIndexManager.htmlList[i].disableAutoControl)continue ;
+				JSTools.setMouseEnable(HtmlZIndexManager.htmlList[i],enable);
+			}
+		}
+
+		HtmlZIndexManager.addHtml=function(html){
+			if(!html)return;
+			if(!HtmlZIndexManager.htmlList.indexOf(html)>=0){
+				HtmlZIndexManager.htmlList.push(html);
+			}
+		}
+
+		HtmlZIndexManager.removeHtml=function(html){
+			if(!html)return;
+			var index=0;
+			index=HtmlZIndexManager.htmlList.indexOf(html);
+			if(index>=0){
+				HtmlZIndexManager.htmlList.splice(index,1);
+			}
+		}
+
+		HtmlZIndexManager.DisableOverlays="DisableOverlays";
+		HtmlZIndexManager.EnableOverlays="EnableOverlays";
+		HtmlZIndexManager.isDrag=false;
+		HtmlZIndexManager.isMouseDown=false;
+		HtmlZIndexManager.preValue=true;
+		HtmlZIndexManager.htmlList=[];
+		__static(HtmlZIndexManager,
+		['prePos',function(){return this.prePos=new Point();}
+		]);
+		return HtmlZIndexManager;
+	})()
+
+
+	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
 	*@created 2018-5-28 下午4:54:05
 	*/
 	//class platform.tools.IFrameAPIInsertTool
@@ -2586,6 +2671,106 @@
 	})(EventDispatcher)
 
 
+	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2016-8-3 下午5:34:23
+	*/
+	//class platform.rendercanvas.DialogHook extends laya.display.Sprite
+	var DialogHook=(function(_super){
+		function DialogHook(){
+			this._centerDialog=null;
+			this._checkMask=null;
+			this.popupEffect=null;
+			DialogHook.__super.call(this);
+			this.dialogLayer=new Sprite();
+			this.modalLayer=new Sprite();
+			this.maskLayer=new Sprite();
+		}
+
+		__class(DialogHook,'platform.rendercanvas.DialogHook',_super);
+		var __proto=DialogHook.prototype;
+		__proto.hookDialog=function(){
+			Dialog.manager["open"]=this.open;
+			Dialog.manager.closeEffect=null;
+			Dialog.manager.popupEffect=null;
+			Dialog.manager.closeEffectHandler=null;
+			Dialog.manager.popupEffectHandler=null;
+		}
+
+		/**
+		*显示对话框(非模式窗口类型)。
+		*@param dialog 需要显示的对象框 <code>Dialog</code> 实例。
+		*@param closeOther 是否关闭其它对话框，若值为ture，则关闭其它的对话框。
+		*/
+		__proto.open=function(dialog,closeOther){
+			(closeOther===void 0)&& (closeOther=false);
+			if (closeOther)this.removeChildren();
+			CanvasSprite.setSpriteCanvasRender(dialog,101);
+			DialogHook.tZorder++;
+			dialog.zOrder=DialogHook.tZorder;
+			if (dialog.popupCenter)this._centerDialog(dialog);
+			this.addChild(dialog);
+			if (dialog.isModal || this._$P["hasZorder"])this.timer.callLater(this,this._checkMask);
+			this.popupEffect && this.popupEffect(dialog);
+			this.event("open");
+		}
+
+		/**
+		*关闭对话框。
+		*@param dialog 需要关闭的对象框 <code>Dialog</code> 实例。
+		*/
+		__proto.close=function(dialog){
+			try{
+				dialog.removeSelf();
+				if (this.modalLayer.numChildren < 2){
+					this.maskLayer.removeSelf();
+					}else {
+					this.modalLayer.setChildIndex(this.maskLayer,this.modalLayer.numChildren-2);
+				}
+			}catch(e){}
+			this.event("close");
+		}
+
+		/**
+		*显示对话框(非模式窗口类型)。
+		*@param dialog 需要显示的对象框 <code>Dialog</code> 实例。
+		*@param closeOther 是否关闭其它对话框，若值为ture，则关闭其它的对话框。
+		*/
+		__proto.show=function(dialog,closeOther){
+			(closeOther===void 0)&& (closeOther=false);
+			CanvasSprite.setSpriteCanvasRender(dialog,101);
+			if (closeOther)this.dialogLayer.removeChildren();
+			if (dialog.popupCenter)this._centerDialog(dialog);
+			this.dialogLayer.addChild(dialog);
+			this.event("open");
+		}
+
+		/**
+		*显示对话框(模式窗口类型)。
+		*@param dialog 需要显示的对象框 <code>Dialog</code> 实例。
+		*@param closeOther 是否关闭其它对话框，若值为ture，则关闭其它的对话框。
+		*/
+		__proto.popup=function(dialog,closeOther){
+			(closeOther===void 0)&& (closeOther=false);
+			CanvasSprite.setSpriteCanvasRender(dialog,101);
+			if (closeOther)this.modalLayer.removeChildren();
+			if (dialog.popupCenter)this._centerDialog(dialog);
+			this.modalLayer.addChild(dialog);
+			this.addChild(this.modalLayer);
+			this.event("open");
+		}
+
+		DialogHook.tZorder=1;
+		__static(DialogHook,
+		['I',function(){return this.I=new DialogHook();}
+		]);
+		return DialogHook;
+	})(Sprite)
+
+
 	/**拖动条
 	*@author ww
 	*/
@@ -2840,6 +3025,197 @@
 		HtmlSprite.testDiv="";
 		HtmlSprite.parentNode=null
 		return HtmlSprite;
+	})(Box)
+
+
+	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2016-8-3 下午2:43:22
+	*/
+	//class platform.rendercanvas.CanvasSprite extends laya.ui.Box
+	var CanvasSprite=(function(_super){
+		function CanvasSprite(){
+			this.canvas=null;
+			this._context=null;
+			this.clearWhenRemove=false;
+			this.mat=null;
+			this.tar=null;
+			CanvasSprite.__super.call(this);
+			this.rate
+			this.prePoint=new Point();
+			this.canvas=HTMLCanvas.create('2D');
+			this._context=new RenderContext(100,100,this.canvas);
+			JSTools.setZIndex(this.canvas.source,100);
+			this.rate=Browser.pixelRatio;
+			if(this.rate<1)this.rate=1;
+			if (this.rate!=1){
+				this.mat=new Matrix();
+				this.mat.scale(1 / this.rate,1 / this.rate);
+				JSTools.setTransform(this.canvas.source,this.mat);
+			}
+			this.canvas.source.addEventListener("mouseup",this.passEvent);
+			this.canvas.source.addEventListener("mousemove",this.passEvent);
+			this.canvas.source.addEventListener("mousedown",this.passEvent);
+			this.canvas.source.addEventListener('mousewheel',this.passEvent);
+		}
+
+		__class(CanvasSprite,'platform.rendercanvas.CanvasSprite',_super);
+		var __proto=CanvasSprite.prototype;
+		// Laya.timer.loop(1,this,updateCanvas);
+		__proto.passEvent=function(e){
+			var evt;
+			evt=Browser.document.createEvent("Events");
+			evt.initEvent(e.type,true,true);
+			var key;
+			for(key in e){
+				if(!((typeof (e[key])=='function'))){
+					evt[key]=e[key];
+				}
+			}
+			Render.canvas.dispatchEvent(evt);
+		}
+
+		__proto.setTarget=function(tar){
+			this.tar=tar;
+			tar["render"]=Utils.bind(this.newRender,this);
+			tar.on("display",this,this._$5__onDisplay);
+			tar.on("undisplay",this,this._$5__onDisplay);
+			this.canvas.source.id=ClassTool.getNodeClassAndName(tar);
+			tar["_repaint"]=1;
+		}
+
+		__proto.canvasMouseOver=function(){}
+		// JSTools.setMouseEnable(canvas.source,false);
+		__proto.tarMouseOut=function(){
+			if(HtmlZIndexManager$1.isMouseDown)return;
+			JSTools.setMouseEnable(this.canvas.source,true);
+		}
+
+		__proto.clearMe=function(){
+			if(this.tar){
+				this.tar.off("display",this,this._$5__onDisplay);
+				this.tar.off("undisplay",this,this._$5__onDisplay);
+				this.tar.off("mouseout",this,this.tarMouseOut);
+				var canvasSprite;
+				canvasSprite=this.tar["canvasSprite"];
+				if(canvasSprite){
+					delete this.tar["canvasSprite"];
+					JSTools.removeElement(this.canvas.source);
+				}
+			}
+			Pool.recover("CanvasSprite",this);
+		}
+
+		/**@private */
+		__proto._$5__onDisplay=function(){
+			if(!this.tar)return;
+			if(this.tar.displayedInStage){
+				}else{
+				JSTools.removeElement(this.canvas.source);
+				if (this.clearWhenRemove){
+					this.clearMe();
+				}
+			}
+		}
+
+		__proto.renderOld=function(context,x,y){
+			Stat.spriteCount++;
+			RenderSprite.renders[this.tar._renderType]._fun(this.tar,context,x,y);
+			this.tar["_repaint"]=0;
+		}
+
+		__proto.newRender=function(context,x,y){
+			this.updateCanvas(x,y);
+		}
+
+		__proto.updateCanvas=function(x,y){
+			if(this.tar.displayedInStage){
+				if(this.tar["prerenderhook"]){
+					this.tar["prerenderhook"]();
+				};
+				var point;
+				point=NodeUtils.getGPos(this.tar);
+				if(!JSTools.isElementInDom(this.canvas.source)){
+					JSTools.showToParent(this.canvas.source,point.x,point.y,CanvasSprite.parentNode);
+					this.prePoint.setTo(point.x,point.y);
+					}else{
+					if(this.prePoint.x!=point.x||this.prePoint.y!=point.y){
+						JSTools.setPos(this.canvas.source,point.x,point.y);
+						this.prePoint.setTo(point.x,point.y);
+					}
+				}
+				if(this.tar["_repaint"]==0)return;
+				var gRec;
+				gRec=this.tar.getSelfBounds();
+				var dW=2;
+				gRec.x-=dW;
+				gRec.y-=dW;
+				gRec.width+=dW*2;
+				gRec.height+=dW*2;
+				this.canvas.size(gRec.width*this.rate,gRec.height*this.rate);
+				this.canvas.clear();
+				if (this.rate !=1){
+					this.canvas.context.save();
+					this.canvas.context.scale(this.rate,this.rate);
+					this.renderOld(this._context,0,0);
+					this.canvas.context.restore();
+					}else{
+					this.renderOld(this._context,0,0);
+				}
+				}else{
+				JSTools.removeElement(this.canvas.source);
+			}
+		}
+
+		CanvasSprite.setSpriteCanvasRender=function(tar,index,autoClear){
+			(index===void 0)&& (index=100);
+			(autoClear===void 0)&& (autoClear=false);
+			if(!CanvasSprite.enableCanvasSprite)return;
+			if(tar["canvasSprite"])return;
+			var canvasSprite;
+			canvasSprite=Pool.getItemByClass("CanvasSprite",CanvasSprite);
+			canvasSprite.clearWhenRemove=autoClear;
+			canvasSprite.setTarget(tar);
+			tar["canvasSprite"]=canvasSprite;
+			CanvasSprite.setSpriteCanvasIndex(tar,index);
+		}
+
+		CanvasSprite.setSpriteCanvasIndex=function(tar,index){
+			var canvasSprite;
+			canvasSprite=tar["canvasSprite"];
+			if(canvasSprite){
+				JSTools.setZIndex(canvasSprite.canvas.source,index);
+			}
+		}
+
+		CanvasSprite.removeSpriteCanvas=function(tar){
+			var canvasSprite;
+			canvasSprite=tar["canvasSprite"];
+			if(canvasSprite){
+				canvasSprite.clearMe();
+				delete tar["canvasSprite"];
+			}
+		}
+
+		CanvasSprite.inits=function(){
+			CanvasSprite.hookDialog();
+		}
+
+		CanvasSprite.hookDialog=function(){
+			DialogHook.I.hookDialog();
+		}
+
+		CanvasSprite.setSpriteRenderEmpty=function(tar){
+			tar["render"]=CanvasSprite.renderEmpty;
+		}
+
+		CanvasSprite.renderEmpty=function(){}
+		CanvasSprite.parentNode=null
+		CanvasSprite.enableCanvasSprite=true;
+		return CanvasSprite;
 	})(Box)
 
 
