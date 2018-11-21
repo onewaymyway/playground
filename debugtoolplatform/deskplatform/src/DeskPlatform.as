@@ -12,6 +12,7 @@ package
 	import laya.net.Loader;
 	import laya.ui.Styles;
 	import laya.ui.View;
+	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import nodetools.devices.CMDShell;
 	import nodetools.devices.Device;
@@ -26,6 +27,8 @@ package
 	import platform.managers.EditRenderManager;
 	import platform.managers.LayerManager;
 	import platform.managers.NoticeRouter;
+	import platform.rendercanvas.CanvasSprite;
+	import platform.rendercanvas.DialogHook;
 	import view.MainView;
 	import view.ResPanel;
 	/**
@@ -49,6 +52,9 @@ package
 			View.regComponent("Tree", TreeBase);
 			View.regComponent("ListEx", ListEx);
 			init();
+			
+			DialogHook.I.hookDialog();
+			CanvasSprite.parentNode=Browser.container;
 			var resList:Array;
 			resList = [ { "url":"res/atlas/comp.json", "type":Loader.ATLAS } ];
 			resList.push( { "url":"res/atlas/view.json", "type":Loader.ATLAS } );

@@ -9,28 +9,28 @@ Project configuration:D:\codes\playground.git\trunk\debugtoolplatform\deskplatfo
 1,0.00,D:/codes/playground.git/trunk/libs/nodetools/src,0,Collect
 1,2.00,,0,read class message
 7,50.92,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/EditZone.as,338,ViewTab This variable is not defined.
-7,51.49,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,274,IDEVars.disableTabDrag This variable is not defined.
-7,51.49,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,473,UIPanel. This variable is not defined.
-7,51.54,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1158,CompPanel.instance This variable is not defined.
-7,51.54,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1164,PropPanel.instance This variable is not defined.
-7,51.54,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1171,DisplayTreePanel.instance This variable is not defined.
-7,51.64,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as,28,HtmlSprite. This variable is not defined.
-7,51.64,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as,69,SkinDefines.LayoutTabDragIcon This variable is not defined.
-7,51.79,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/managers/EditRenderManager.as,35,TypeManager.getExtension This variable is not defined.
-7,53.12,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as,43,Sys.lang This variable is not defined.
-7,53.12,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as,49,Sys.lang This variable is not defined.
-7,53.18,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as,682,compType This variable is not defined.
-7,88.05,D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/drags/DragEvent.as,84,SystemSetting.assetsPath This variable is not defined.
-7,88.67,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as,60,_getOneCell This variable is not defined.
-7,88.67,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as,87,_createItems This variable is not defined.
-7,88.77,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/NodeTree.as,49,_treeData This variable is not defined.
-7,89.33,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as,225,XMLElement This variable is not defined.
-7,89.33,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as,237,XMLElement This variable is not defined.
+7,51.48,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,274,IDEVars.disableTabDrag This variable is not defined.
+7,51.48,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,473,UIPanel. This variable is not defined.
+7,51.53,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1158,CompPanel.instance This variable is not defined.
+7,51.53,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1164,PropPanel.instance This variable is not defined.
+7,51.53,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1171,DisplayTreePanel.instance This variable is not defined.
+7,51.63,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as,28,HtmlSprite. This variable is not defined.
+7,51.63,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as,69,SkinDefines.LayoutTabDragIcon This variable is not defined.
+7,51.78,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/managers/EditRenderManager.as,35,TypeManager.getExtension This variable is not defined.
+7,53.31,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as,43,Sys.lang This variable is not defined.
+7,53.31,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as,49,Sys.lang This variable is not defined.
+7,53.36,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as,682,compType This variable is not defined.
+7,88.06,D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/drags/DragEvent.as,84,SystemSetting.assetsPath This variable is not defined.
+7,88.68,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as,60,_getOneCell This variable is not defined.
+7,88.68,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as,87,_createItems This variable is not defined.
+7,88.78,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/NodeTree.as,49,_treeData This variable is not defined.
+7,89.34,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as,225,XMLElement This variable is not defined.
+7,89.34,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as,237,XMLElement This variable is not defined.
 7,89.39,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
 7,89.39,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
-7,89.74,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/NodeJSTools.as,37,Sys.mParseFloat This variable is not defined.
+7,89.75,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/NodeJSTools.as,37,Sys.mParseFloat This variable is not defined.
 1,89.95,,0,Disable Flash3D D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/DeskPlatform.as
-12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.js,171417,
+12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.js,182931,
 12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/laya.js,1335196,
 11,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.html,799,
 ******************************************************************************
