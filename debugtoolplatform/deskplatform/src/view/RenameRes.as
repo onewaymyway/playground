@@ -4,6 +4,7 @@ package view {
 	import laya.debug.tools.StringTool;
 	import nodetools.devices.FileManager;
 	import nodetools.devices.FileTools;
+	import nodetools.devices.Sys;
 	import ui.deskplatform.RenameResUI;
 
 	
@@ -45,7 +46,7 @@ package view {
 						return;
 					}
 					//Notice.notify(IDEEvent.RENAME_RES,[_oldPath,nameTxt.text, updateCheck.selected]);
-//					ResPanel.instance.rename(_oldPath,nameTxt.text, updateCheck.selected);
+					ResPanel.instance.rename(_oldPath,nameTxt.text, updateCheck.selected);
 					super.close(type);
 				}else
 				{
