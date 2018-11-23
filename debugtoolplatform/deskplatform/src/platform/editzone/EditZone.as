@@ -254,7 +254,7 @@ package platform.editzone {
 				}
 				
 			}
-			_currViewer = viewer;
+			
 			tab.selectedIndex = index;
 		}
 		
