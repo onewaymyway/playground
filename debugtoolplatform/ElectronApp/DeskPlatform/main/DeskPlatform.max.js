@@ -5162,7 +5162,6 @@
 					return;
 				}
 			}
-			this._currViewer=viewer;
 			this.tab.selectedIndex=index;
 		}
 
@@ -6216,12 +6215,13 @@
 			if (type=="sure"){
 				if(StringTool.isOkFileName(this.nameTxt.text)){
 					if(FileTools.isPathSame(this.nameTxt.text,this.resLbl.text)){
-						Alert.show(/*no*/this.Sys.lang("文件名不能相同！！"));
+						Alert.show(Sys.lang("文件名不能相同！！"));
 						return;
 					}
+					ResPanel.instance.rename(this._oldPath,this.nameTxt.text,this.updateCheck.selected);
 					laya.ui.Dialog.prototype.close.call(this,type);
 					}else{
-					Alert.show(/*no*/this.Sys.lang("文件名不合法"));
+					Alert.show(Sys.lang("文件名不合法"));
 				}
 				}else{
 				laya.ui.Dialog.prototype.close.call(this,type);
