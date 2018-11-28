@@ -180,8 +180,10 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
         print("do_login:",username,pwd)
         if not username in userConfig:
             self.sendErr("user not found")
+            return
         if not userConfig[username]==pwd:
             self.sendErr("pwd wrong")
+            return
 
         rst={};
         rst["token"]=getTokenForUser(username,pwd)

@@ -25,7 +25,7 @@ package filetoolkit
 			dataO = { };
 			dataO.action = "login";
 			dataO.username = username;
-			dataO.pwd = pwd;
+			dataO.pwd = SMD5.md5(pwd,username);
 			HttpRequestTool.request(root, dataO,Handler.create(this,onLogin));
 		}
 		
