@@ -433,10 +433,17 @@ var Laya=window.Laya=(function(window,document){
 				root=dataO.root;
 				var childs;
 				childs=dataO.childs;
-				if (childs && childs[0]){
-					var filePath;
-					filePath=root+childs[0];
-					this.fileKit.getFile(filePath,Handler.create(this,this.onGetFile));
+				if (childs){
+					var i=0,len=0;
+					len=childs.length;
+					var tFileO;
+					for (i=0;i < len;i++){
+						tFileO=childs[i];
+						if (!tFileO.isFolder){
+							this.fileKit.getFile(tFileO.path,Handler.create(this,this.onGetFile));
+							return;
+						}
+					}
 				}
 			}
 		}

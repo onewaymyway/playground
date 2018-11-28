@@ -17,10 +17,12 @@ import http
 import threading
 import json
 import os
+import time
 import shutil
 import sys
 import re
 import win32api
+import hashlib
 from socketserver import ThreadingMixIn
 from http.server import BaseHTTPRequestHandler, HTTPServer, SimpleHTTPRequestHandler
 
@@ -44,10 +46,18 @@ class UserClient():
         rst["childs"]=[]
         if os.path.exists(tfolder):
             files=os.listdir(tfolder)
-            
-            rst["childs"]=files
+            flist=[]
             for file in files:
-                print(file)
+                sourceFile = os.path.join(tfolder,  file)
+                fileO={}
+                fileO["path"]=os.path.join(folder,file)
+                if os.path.isfile(sourceFile):
+                    fileO["isFolder"]=False
+                else:
+                    fileO["isFolder"]=True
+                flist.append(fileO)
+            rst["childs"]=flist
+            
         return rst
         
 
@@ -174,7 +184,7 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
             self.sendErr("pwd wrong")
 
         rst={};
-        rst["token"]=getTokenForUser(username)
+        rst["token"]=getTokenForUser(username,pwd)
         tokenDic[rst["token"]]=UserClient(username)
         self.sendSuccess(rst)
         
@@ -212,8 +222,22 @@ def writeJsonFile(path,dataO):
 def getAbsPath(rpath):
     return os.path.normpath(os.path.join(myRoot,  rpath))
 
-def getTokenForUser(username):
-    token="666666"
+def t_stamp():
+    t = time.time()
+    t_stamp = int(t)
+    print('当前时间戳:', t_stamp)
+    return t_stamp
+
+def getToken(msg):
+    time_stamp =str(t_stamp())  #int型的时间戳必须转化为str型，否则运行时会报错
+    hl = hashlib.md5()  # 创建md5对象，由于MD5模块在python3中被移除，在python3中使用hashlib模块进行md5操作
+    strs = msg+time_stamp # 根据token加密规则，生成待加密信息
+    hl.update(strs.encode("utf8"))  # 此处必须声明encode， 若为hl.update(str)  报错为： Unicode-objects must be encoded before hashing
+    token=hl.hexdigest()  #获取十六进制数据字符串值
+    return token
+
+def getTokenForUser(username,pwd):
+    token=getToken(username+""+pwd+"dddssefser")
     return token
 
 def getUserByToken(token):

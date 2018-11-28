@@ -41,11 +41,23 @@ package
 				root = dataO.root;
 				var childs:Array;
 				childs = dataO.childs;
-				if (childs && childs[0])
+				if (childs)
 				{
-					var filePath:String;
-					filePath = root + childs[0];
-					fileKit.getFile(filePath, Handler.create(this, onGetFile));
+					var i:int, len:int;
+					len = childs.length;
+					var tFileO:Object;
+					for (i = 0; i < len; i++)
+					{
+						tFileO = childs[i];
+						if (!tFileO.isFolder)
+						{
+							fileKit.getFile(tFileO.path, Handler.create(this, onGetFile));
+							return;
+						}
+					}
+					//var filePath:String;
+					//filePath = root + childs[0];
+					//fileKit.getFile(filePath, Handler.create(this, onGetFile));
 				}
 				
 			}
