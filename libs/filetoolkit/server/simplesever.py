@@ -64,6 +64,12 @@ class UserClient():
     def getPath(self,rpath):
         return os.path.normpath(os.path.join(self.rootPath,  rpath))
 
+    def checkPath(self,rpath):
+        fullPath=self.getPath(rpath)
+        return fullPath.startswith(self.rootPath)
+        return True
+        
+
     def deleteFile(self,fPath):
         fPath=self.getPath(fPath)
         print("deleteFile:",fPath)
@@ -120,6 +126,19 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
         userData=self.getUserDataByToken(token)
         if userData==None:
             return;
+
+        curPath=form.getvalue("path")
+        if curPath==None:
+            self.sendErr("path not found")
+            return
+
+        isOKPath=userData.checkPath(curPath)
+        print("isOKPath:",isOKPath)
+        if not isOKPath:
+            self.sendErr("path not ok")
+            return
+
+        
 
         if action=="getFileList":
             self.sendSuccess(userData.getFiles(form.getvalue("path")))

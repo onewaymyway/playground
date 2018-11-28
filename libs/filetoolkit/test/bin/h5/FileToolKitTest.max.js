@@ -456,7 +456,10 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.onAddFile=function(dataO){
 			console.log("onAddFile:",dataO);
-			this.fileKit.getFile(this.addPath,Handler.create(this,this.onGetAddedFile));
+			if (dataO.success){
+				this.fileKit.getFile(this.addPath,Handler.create(this,this.onGetAddedFile));
+				}else{
+			}
 		}
 
 		__proto.onGetAddedFile=function(dataO){

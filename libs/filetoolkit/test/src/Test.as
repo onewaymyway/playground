@@ -74,7 +74,14 @@ package
 		private function onAddFile(dataO:Object):void
 		{
 			trace("onAddFile:", dataO);
-			fileKit.getFile(addPath, Handler.create(this, onGetAddedFile));
+			if (dataO.success)
+			{
+				fileKit.getFile(addPath, Handler.create(this, onGetAddedFile));
+			}else
+			{
+				
+			}
+			
 		}
 		
 		private function onGetAddedFile(dataO:Object):void
