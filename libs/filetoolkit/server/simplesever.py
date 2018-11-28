@@ -26,14 +26,57 @@ from http.server import BaseHTTPRequestHandler, HTTPServer, SimpleHTTPRequestHan
 
 myRoot=sys.path[0].replace("\\","/")+"/"
 print(myRoot)
+userRoot=os.path.normpath(os.path.join(myRoot,  "user"))
 userConfig={}
+tokenDic={}
 
-def htc(m):
-    return chr(int(m.group(1),16))
- 
-def urldecode(url):
-    rex=re.compile('%([0-9a-hA-H][0-9a-hA-H])',re.M)
-    return rex.sub(htc,url)
+class UserClient():
+
+    def __init__(self,userName):
+        self.user=userName
+        self.rootPath=os.path.normpath(os.path.join(userRoot,  userName))
+        
+    def getFiles(self,folder):
+        tfolder=self.getPath(folder)
+        print("getFiles:",tfolder)
+        rst={}
+        rst["root"]=folder
+        rst["childs"]=[]
+        if os.path.exists(tfolder):
+            files=os.listdir(tfolder)
+            
+            rst["childs"]=files
+            for file in files:
+                print(file)
+        return rst
+        
+
+    def getPath(self,rpath):
+        return os.path.normpath(os.path.join(self.rootPath,  rpath))
+
+    def deleteFile(self,fPath):
+        fPath=self.getPath(fPath)
+        print("deleteFile:",fPath)
+        if os.path.exists(folder):
+            os.remove(folder)
+            return True
+
+    def addFile(self,fPath,content):
+        fPath=self.getPath(fPath)
+        print("addFile:",fPath)
+        folder=os.path.dirname(fPath)
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+        writeFile(fPath,content)
+
+    def getFile(self,fPath):
+        fPath=self.getPath(fPath)
+        #print("getFile:",fPath)
+        if os.path.exists(fPath):
+            #print("fileExists")
+            return readFile(fPath)
+        return None
+    
 
 class CORSRequestHandler(SimpleHTTPRequestHandler):
     def _set_headers(self):
@@ -42,18 +85,12 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', '*')
         SimpleHTTPRequestHandler.end_headers(self)
         # self.end_headers()
-
     def do_GET(self):
         self._set_headers()
         self.wfile.write(("<html><body><h1>mini Python Server is working</h1></body></html>").encode())
 
     def do_POST(self):
-        print(self.rfile)
-        print(self.headers);
-        #datas = self.rfile.read(int(self.headers['content-length']))
-        #print(datas)
-        #cc=urldecode(datas.decode("utf-8"))
-        #print(cc)
+
         form = cgi.FieldStorage(self.rfile,
         headers=self.headers,
         environ={'REQUEST_METHOD':'POST',
@@ -62,13 +99,33 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
         # 获取 POST 过来的 Value
         value = form.getvalue("key")
         action=form.getvalue("action")
+        token=form.getvalue("token")
         self._set_headers()
-        print(form)
-        for key in form:
-            print(key)
+        #print(form)
+
         if action=="login":
             self.do_login(form)
-        
+            return
+
+        userData=self.getUserDataByToken(token)
+        if userData==None:
+            return;
+
+        if action=="getFileList":
+            self.sendSuccess(userData.getFiles(form.getvalue("path")))
+        elif action=="getFile":
+            datas=userData.getFile(form.getvalue("path"))
+            print("getFile datas:",datas)
+            dataO={}
+            if datas==None:
+                dataO["success"]=False
+            else:
+                dataO["success"]=True
+                dataO["content"]=datas
+            self.sendSuccess(dataO)
+        elif action=="addFile":
+            userData.addFile(form.getvalue("path"),form.getvalue("content"))
+            self.sendSuccess({})
 
         
         #self.wfile.write(value.encode())
@@ -99,13 +156,27 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
         data["success"]=True
         self.sendJson(data)
 
-    
+    def getUserDataByToken(self,token):
+        userData=getUserByToken(token)
+        if userData==None:
+            self.sendErr("need login")
+            return
+        return userData
+
         
     def do_login(self,form):
         username=form.getvalue("username")
         pwd=form.getvalue("pwd")
         print("do_login:",username,pwd)
-        self.sendErr("user not found")
+        if not username in userConfig:
+            self.sendErr("user not found")
+        if not userConfig[username]==pwd:
+            self.sendErr("pwd wrong")
+
+        rst={};
+        rst["token"]=getTokenForUser(username)
+        tokenDic[rst["token"]]=UserClient(username)
+        self.sendSuccess(rst)
         
 
 
@@ -140,7 +211,16 @@ def writeJsonFile(path,dataO):
 
 def getAbsPath(rpath):
     return os.path.normpath(os.path.join(myRoot,  rpath))
-    
+
+def getTokenForUser(username):
+    token="666666"
+    return token
+
+def getUserByToken(token):
+    if token in tokenDic:
+        return tokenDic[token]
+    return None
+
 def initConfigs():
     global userConfig
     userConfig=readJsonFile("user/userinfo.json")

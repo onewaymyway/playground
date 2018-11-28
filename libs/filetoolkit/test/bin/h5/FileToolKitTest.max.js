@@ -404,6 +404,8 @@ var Laya=window.Laya=(function(window,document){
 	//class Test
 	var Test=(function(){
 		function Test(){
+			this.fileKit=null;
+			this.addPath="bb/cc.abc";
 			Laya.init(1000,900);
 			this.test();
 		}
@@ -411,14 +413,50 @@ var Laya=window.Laya=(function(window,document){
 		__class(Test,'Test');
 		var __proto=Test.prototype;
 		__proto.test=function(){
-			var fileKit;
-			fileKit=new FileKit();
+			this.fileKit=new FileKit();
 			FileKit.root="http://127.0.0.1:8081";
-			fileKit.username="test";
-			fileKit.pwd="test123";
-			fileKit.login();
+			this.fileKit.username="test";
+			this.fileKit.pwd="test123";
+			this.fileKit.on("Logined",this,this.onLogin);
+			this.fileKit.login();
 		}
 
+		__proto.onLogin=function(){
+			this.fileKit.getFileList("./",Handler.create(this,this.onGetFileList));
+		}
+
+		__proto.onGetFileList=function(dataO){
+			debugger;
+			if (dataO.success){
+				dataO=dataO.data;
+				var root;
+				root=dataO.root;
+				var childs;
+				childs=dataO.childs;
+				if (childs && childs[0]){
+					var filePath;
+					filePath=root+childs[0];
+					this.fileKit.getFile(filePath,Handler.create(this,this.onGetFile));
+				}
+			}
+		}
+
+		__proto.onGetFile=function(dataO){
+			debugger;
+			console.log("onGetFile",dataO);
+			this.fileKit.addFile(this.addPath,"hello1",Handler.create(this,this.onAddFile));
+		}
+
+		__proto.onAddFile=function(dataO){
+			console.log("onAddFile:",dataO);
+			this.fileKit.getFile(this.addPath,Handler.create(this,this.onGetAddedFile));
+		}
+
+		__proto.onGetAddedFile=function(dataO){
+			console.log("onGetAddedFile:",dataO);
+		}
+
+		__proto.onClick=function(){}
 		return Test;
 	})()
 
@@ -8447,34 +8485,6 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class filetoolkit.FileKit
-	var FileKit=(function(){
-		function FileKit(){
-			this.username=null;
-			this.pwd=null;
-			this.token=null;
-		}
-
-		__class(FileKit,'filetoolkit.FileKit');
-		var __proto=FileKit.prototype;
-		__proto.login=function(){
-			var dataO;
-			dataO={};
-			dataO.action="login";
-			dataO.username=this.username;
-			dataO.pwd=this.pwd;
-			HttpRequestTool.request(FileKit.root,dataO);
-		}
-
-		FileKit.root="";
-		return FileKit;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
 	//class filetoolkit.HttpRequestTool
 	var HttpRequestTool=(function(){
 		function HttpRequestTool(){}
@@ -10931,6 +10941,91 @@ var Laya=window.Laya=(function(window,document){
 		Texture._rect1=new Rectangle();
 		Texture._rect2=new Rectangle();
 		return Texture;
+	})(EventDispatcher)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class filetoolkit.FileKit extends laya.events.EventDispatcher
+	var FileKit=(function(_super){
+		function FileKit(){
+			this.username=null;
+			this.pwd=null;
+			this.token=null;
+			FileKit.__super.call(this);
+		}
+
+		__class(FileKit,'filetoolkit.FileKit',_super);
+		var __proto=FileKit.prototype;
+		__proto.login=function(){
+			var dataO;
+			dataO={};
+			dataO.action="login";
+			dataO.username=this.username;
+			dataO.pwd=this.pwd;
+			HttpRequestTool.request(FileKit.root,dataO,Handler.create(this,this.onLogin));
+		}
+
+		__proto.onLogin=function(dataO){
+			if (dataO.success){
+				this.token=dataO.data.token;
+				this.event("Logined")
+				}else{
+				this.event("LoginFail");
+			}
+		}
+
+		__proto.getFileList=function(path,completeHandler){
+			var dataO;
+			dataO={};
+			dataO.action="getFileList";
+			dataO.token=this.token;
+			dataO.path=path;
+			HttpRequestTool.request(FileKit.root,dataO,completeHandler);
+		}
+
+		__proto.getFile=function(path,completeHandler,isJson){
+			(isJson===void 0)&& (isJson=false);
+			var dataO;
+			dataO={};
+			dataO.action="getFile";
+			dataO.token=this.token;
+			dataO.path=path;
+			HttpRequestTool.request(FileKit.root,dataO,Handler.create(this,this.onGetFileComplete,[completeHandler,isJson]));
+		}
+
+		__proto.onGetFileComplete=function(completHandler,isJson,dataO){
+			if (dataO.success&&dataO.data.success){
+				var content;
+				content=dataO.data.content;
+				if (isJson){
+					content=JSON.parse(content);
+				}
+				completHandler.runWith(content);
+				}else{
+				completHandler.runWith(null);
+			}
+		}
+
+		__proto.addFile=function(path,content,completeHandler){
+			if ((typeof content=='object')){
+				content=JSON.stringify(content);
+			};
+			var dataO;
+			dataO={};
+			dataO.action="addFile";
+			dataO.token=this.token;
+			dataO.path=path;
+			dataO.content=content;
+			HttpRequestTool.request(FileKit.root,dataO,completeHandler);
+		}
+
+		FileKit.Logined="Logined";
+		FileKit.LoginFail="LoginFail";
+		FileKit.root="";
+		return FileKit;
 	})(EventDispatcher)
 
 
