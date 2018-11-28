@@ -154,6 +154,9 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
         elif action=="addFile":
             userData.addFile(form.getvalue("path"),form.getvalue("content"))
             self.sendSuccess({})
+        elif action=="deleteFile":
+            userData.deleteFile(form.getvalue("path"))
+            self.sendSuccess({})
 
         
         #self.wfile.write(value.encode())
