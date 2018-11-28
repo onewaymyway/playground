@@ -20,8 +20,8 @@ package
 			
 			fileKit = new FileKit();
 			FileKit.root = "http://127.0.0.1:8081";
-			fileKit.username = "test";
-			fileKit.pwd = "test123";
+			fileKit.username = "deathnote";
+			fileKit.pwd = "deathnotefilekit";
 			fileKit.on(FileKit.Logined,this,onLogin);
 			fileKit.login();
 		}
