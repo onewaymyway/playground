@@ -21,7 +21,6 @@ import time
 import shutil
 import sys
 import re
-import win32api
 import hashlib
 from socketserver import ThreadingMixIn
 from http.server import BaseHTTPRequestHandler, HTTPServer, SimpleHTTPRequestHandler
@@ -216,11 +215,11 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
         No further content needed, don't touch this. """
 
 
-def run(server_class=HTTPServer, handler_class=CORSRequestHandler, port=8081):
+def run(server_class=HTTPServer, handler_class=CORSRequestHandler, port=9953):
     initConfigs()
     server_address = ('', port)
     httpd = ThreadedHTTPServer(server_address, handler_class)
-    print('Starting httpd on 8081...')
+    print('Starting httpd on ',port,'...')
     httpd.serve_forever()
 
 def readFile(path):

@@ -414,7 +414,7 @@ var Laya=window.Laya=(function(window,document){
 		var __proto=Test.prototype;
 		__proto.test=function(){
 			this.fileKit=new FileKit();
-			FileKit.root="http://127.0.0.1:8081";
+			FileKit.root="http://stk.orzooo.com:9953";
 			this.fileKit.username="deathnote";
 			this.fileKit.pwd="deathnotefilekit";
 			this.fileKit.on("Logined",this,this.onLogin);
