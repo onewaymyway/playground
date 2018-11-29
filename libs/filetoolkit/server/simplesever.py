@@ -41,19 +41,23 @@ class UserClient():
         tfolder=self.getPath(folder)
         print("getFiles:",tfolder)
         rst={}
-        rst["root"]=folder
+        rst["path"]=folder
+        rst["label"]=os.path.basename(tfolder)
+        rst["isFolder"]=True
         rst["childs"]=[]
         if os.path.exists(tfolder):
             files=os.listdir(tfolder)
             flist=[]
             for file in files:
                 sourceFile = os.path.join(tfolder,  file)
-                fileO={}
-                fileO["path"]=os.path.join(folder,file)
+                
                 if os.path.isfile(sourceFile):
+                    fileO={}
+                    fileO["path"]=os.path.join(folder,file)
+                    fileO["label"]=os.path.basename(sourceFile)
                     fileO["isFolder"]=False
                 else:
-                    fileO["isFolder"]=True
+                    fileO=self.getFiles(os.path.join(folder,file))
                 flist.append(fileO)
             rst["childs"]=flist
             
@@ -72,8 +76,11 @@ class UserClient():
     def deleteFile(self,fPath):
         fPath=self.getPath(fPath)
         print("deleteFile:",fPath)
-        if os.path.exists(folder):
-            os.remove(folder)
+        if os.path.exists(fPath):
+            if os.path.isfile(fPath):
+                os.remove(fPath)
+            else:
+                shutil.rmtree(fPath)
             return True
 
     def addFile(self,fPath,content):
@@ -83,6 +90,13 @@ class UserClient():
         if not os.path.exists(folder):
             os.makedirs(folder)
         writeFile(fPath,content)
+
+    def addFolder(self,fPath):
+        fPath=self.getPath(fPath)
+        print("addFile:",fPath)
+        folder=fPath
+        if not os.path.exists(folder):
+            os.makedirs(folder)
 
     def getFile(self,fPath):
         fPath=self.getPath(fPath)
@@ -156,6 +170,9 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
             self.sendSuccess({})
         elif action=="deleteFile":
             userData.deleteFile(form.getvalue("path"))
+            self.sendSuccess({})
+        elif action=="addFolder":
+            userData.addFolder(form.getvalue("path"))
             self.sendSuccess({})
 
         

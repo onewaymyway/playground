@@ -20,6 +20,7 @@ package
 			
 			fileKit = new FileKit();
 			FileKit.root = "http://stk.orzooo.com:9953";
+			FileKit.root = "http://127.0.0.1:9953";
 			fileKit.username = "deathnote";
 			fileKit.pwd = "deathnotefilekit";
 			fileKit.on(FileKit.Logined,this,onLogin);
@@ -38,7 +39,7 @@ package
 			{
 				dataO = dataO.data;
 				var root:String;
-				root = dataO.root;
+				root = dataO.path;
 				var childs:Array;
 				childs = dataO.childs;
 				if (childs)

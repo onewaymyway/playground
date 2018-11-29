@@ -95,6 +95,20 @@ package filetoolkit
 			dataO.content = content;
 			HttpRequestTool.request(root, dataO,completeHandler);
 		}
+		
+		public function addFolder(path:String, completeHandler:Handler):void
+		{
+			if (content is Object)
+			{
+				content = JSON.stringify(content);
+			}
+			var dataO:Object;
+			dataO = { };
+			dataO.action = "addFolder";
+			dataO.token = token;
+			dataO.path = path;
+			HttpRequestTool.request(root, dataO,completeHandler);
+		}
 	}
 
 }

@@ -415,6 +415,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.test=function(){
 			this.fileKit=new FileKit();
 			FileKit.root="http://stk.orzooo.com:9953";
+			FileKit.root="http://127.0.0.1:9953";
 			this.fileKit.username="deathnote";
 			this.fileKit.pwd="deathnotefilekit";
 			this.fileKit.on("Logined",this,this.onLogin);
@@ -430,7 +431,7 @@ var Laya=window.Laya=(function(window,document){
 			if (dataO.success){
 				dataO=dataO.data;
 				var root;
-				root=dataO.root;
+				root=dataO.path;
 				var childs;
 				childs=dataO.childs;
 				if (childs){
@@ -11258,6 +11259,18 @@ var Laya=window.Laya=(function(window,document){
 			HttpRequestTool.request(FileKit.root,dataO,completeHandler);
 		}
 
+		__proto.addFolder=function(path,completeHandler){
+			if ((typeof /*no*/this.content=='object')){
+				/*no*/this.content=JSON.stringify(/*no*/this.content);
+			};
+			var dataO;
+			dataO={};
+			dataO.action="addFolder";
+			dataO.token=this.token;
+			dataO.path=path;
+			HttpRequestTool.request(FileKit.root,dataO,completeHandler);
+		}
+
 		FileKit.Logined="Logined";
 		FileKit.LoginFail="LoginFail";
 		FileKit.root="";
@@ -16024,3 +16037,10 @@ var Laya=window.Laya=(function(window,document){
 	new Test();
 
 })(window,document,Laya);
+
+
+/*
+1 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (99):warning:content This variable is not defined.
+2 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (101):warning:content This variable is not defined.
+3 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (101):warning:content This variable is not defined.
+*/
