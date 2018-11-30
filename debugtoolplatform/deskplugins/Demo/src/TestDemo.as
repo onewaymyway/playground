@@ -8,6 +8,7 @@ package
 	import laya.net.Loader;
 	import laya.utils.Handler;
 	import mindmap.MindMapEditor;
+	import nodetools.devices.FileManager;
 	import viewRender.EditorRenderBase;
 	/**
 	 * ...
@@ -45,8 +46,14 @@ package
 			
 			mindMapEditor = new MindMapEditor();
 			mindMapEditor.left = mindMapEditor.right = mindMapEditor.top = mindMapEditor.bottom = 2;
+			mindMapEditor.on(MindMapEditor.Save, this, onMindMapSave);
 			Laya.stage.addChild(mindMapEditor);
 			updateUIContent();
+		}
+		
+		private function onMindMapSave():void
+		{
+			FileManager.createJSONFile(mindMapEditor.data.url, mindMapEditor.mapNodeData);
 		}
 		
 		private var _data:Object;

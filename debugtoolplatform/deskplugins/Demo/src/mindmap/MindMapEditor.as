@@ -2,9 +2,9 @@ package mindmap
 {
 	import laya.debug.uicomps.ContextMenu;
 	import laya.events.Event;
+	import laya.maths.Rectangle;
 	import laya.ui.Box;
 	import laya.utils.Handler;
-	import nodetools.devices.FileManager;
 	import ui.mindmap.MindMapEditorUI;
 	
 	/**
@@ -13,6 +13,7 @@ package mindmap
 	 */
 	public class MindMapEditor extends MindMapEditorUI 
 	{
+		public static const Save:String = "Save";
 		private var _menu:ContextMenu;
 		private var nodeContainer:Box;
 		private var onMenuSelectHandler:Handler;
@@ -39,6 +40,7 @@ package mindmap
 			saveBtn.on(Event.CLICK, this, onActionBtn, ["save"]);
 		}
 		
+		
 		private function onActionBtn(type:String):void
 		{
 			switch(type)
@@ -46,7 +48,8 @@ package mindmap
 				case "save":
 					debugger;
 					trace("save:",_dataO.url, mapNodeData);
-					FileManager.createJSONFile(_dataO.url, mapNodeData);
+					
+					event(Save);
 					break;
 			}
 		}
@@ -63,6 +66,10 @@ package mindmap
 		}
 		private function onResize():void
 		{
+			var rec:Rectangle;
+			rec = this.scrollRect || new Rectangle();
+			rec.setTo(0, 0, this.width, this.height);
+			this.scrollRect = rec;
 			if (_userChanged) return;
 			nodeContainer.pos(this.width*0.5,this.height*0.5);
 		}
@@ -156,13 +163,17 @@ package mindmap
 		}
 		
 		private var _dataO:Object;
-		private var mapData:MindMapData;
-		private var mapNodeData:MindMapNodeData;
+		public var mapNodeData:MindMapNodeData;
 		public function setData(dataO:Object):void
 		{
 			this._dataO = dataO;
-			mapNodeData = MindMapNodeData.createByObj(dataO.data,true);
+			mapNodeData = MindMapNodeData.createByObj(dataO.data||dataO,true);
 			freshUI();
+		}
+		
+		public function get data():Object
+		{
+			return _dataO;
 		}
 		
 		private function clearPreItems():void
