@@ -34,8 +34,8 @@ package mindmap
 			this.addChild(nodeContainer);
 			this.on(Event.RESIZE, this, onResize);
 			onResize();
-			this.on(Event.RIGHT_MOUSE_DOWN, this, onRightDown);
-			this.on(Event.RIGHT_MOUSE_UP, this, onRightUp);
+			this.on(Event.MOUSE_DOWN, this, onRightDown);
+			this.on(Event.MOUSE_UP, this, onRightUp);
 			saveBtn.zOrder = 99;
 			saveBtn.on(Event.CLICK, this, onActionBtn, ["save"]);
 		}
@@ -167,6 +167,8 @@ package mindmap
 		public function setData(dataO:Object):void
 		{
 			this._dataO = dataO;
+			_userChanged = false;
+			onResize();
 			mapNodeData = MindMapNodeData.createByObj(dataO.data||dataO,true);
 			freshUI();
 		}
