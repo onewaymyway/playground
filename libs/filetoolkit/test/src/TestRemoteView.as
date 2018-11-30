@@ -39,8 +39,8 @@ package
 		private var tree:RemoteTreeView;
 		private function initFileToolKit():void
 		{
-			FileKit.root = "http://stk.orzooo.com:9953";
-			FileKit.root = "http://127.0.0.1:9953";
+			FileKit.root = "https://stk.orzooo.com:9953";
+			//FileKit.root = "http://127.0.0.1:9953";
 			fileKit = new FileKit();
 			//fileKit.username = "deathnote";
 			//fileKit.pwd = "deathnotefilekit";

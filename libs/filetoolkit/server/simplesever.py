@@ -22,6 +22,7 @@ import shutil
 import sys
 import re
 import hashlib
+import ssl
 from socketserver import ThreadingMixIn
 from http.server import BaseHTTPRequestHandler, HTTPServer, SimpleHTTPRequestHandler
 
@@ -251,7 +252,13 @@ def run(server_class=HTTPServer, handler_class=CORSRequestHandler, port=9953):
     initConfigs()
     visitor=UserClient(visitorUser,True)
     server_address = ('', port)
+    #context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+    #context.load_cert_chain("full_chain.pem","private.key")#自己添加
+    
+    
     httpd = ThreadedHTTPServer(server_address, handler_class)
+    #httpd.socket = context.wrap_socket(httpd.socket, server_side = True)
+    httpd.socket = ssl.wrap_socket(httpd.socket, certfile='full_chain.pem', keyfile='private.key',server_side=True) 
     print('Starting httpd on ',port,'...')
     httpd.serve_forever()
 

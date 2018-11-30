@@ -734,8 +734,7 @@ var Laya=window.Laya=(function(window,document){
 		__class(TestRemoteView,'TestRemoteView');
 		var __proto=TestRemoteView.prototype;
 		__proto.initFileToolKit=function(){
-			FileKit.root="http://stk.orzooo.com:9953";
-			FileKit.root="http://127.0.0.1:9953";
+			FileKit.root="https://stk.orzooo.com:9953";
 			this.fileKit=new FileKit();
 			this.fileKit.on("Logined",this,this.onLogin);
 			this.test();
@@ -27700,7 +27699,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(RemoteTreeUI.uiView);
 		}
 
-		RemoteTreeUI.uiView={"type":"View","props":{"width":200,"title":"资源","scenecolor":"#dddddd","hitTestPrior":true,"height":300},"child":[{"type":"Image","props":{"y":48,"x":415,"width":200,"top":0,"skin":"view/bg_panel.png","right":0,"left":0,"height":300,"bottom":0}},{"type":"TreeEx","props":{"x":173,"width":196,"var":"resTree","top":2,"scrollBarSkin":"comp/vscroll.png","runtime":"filetoolkit.FileTree","right":2,"left":2,"hitTestPrior":true,"height":136,"bottom":29},"child":[{"type":"Box","props":{"right":0,"name":"render","left":0},"child":[{"type":"Clip","props":{"y":0,"x":13,"skin":"comp/clip_selectBox.png","right":0,"name":"selectBox","left":9,"height":25,"clipY":2}},{"type":"Image","props":{"y":4,"x":14,"skin":"comp/folder.png","name":"icon","width":16,"height":16}},{"type":"Label","props":{"y":1,"width":150,"text":"label","right":0,"padding":"4,0,0,0","name":"label","left":38,"height":22,"color":"#d8d8d8"}},{"type":"Clip","props":{"y":6,"x":0,"skin":"comp/clip_tree.png","name":"arrow","clipY":2,"width":11,"height":12}}]}]},{"type":"Box","props":{"y":271,"x":1,"width":198,"var":"opBox","right":0,"left":0,"height":28,"bottom":0},"child":[{"type":"Image","props":{"width":191,"top":0,"skin":"view/bg_panel_bar.png","right":0,"left":0,"bottom":0}},{"type":"TextInput","props":{"y":4,"x":80,"width":148,"var":"fliterTxt","toolTip":"输入关键词过滤","skin":"comp/input_22.png","right":5,"padding":"0,10,0,20","left":80,"color":"#dddddd","sizeGrid":"0,3,0,3","height":22}},{"type":"Button","props":{"y":3,"x":3,"toolTip":"打开所在目录","stateNum":3,"skin":"view/login2.png","name":"openDirBtn","scaleX":0.5,"scaleY":0.5}},{"type":"Button","props":{"y":3,"x":29,"toolTip":"设置默认属性","stateNum":3,"skin":"view/settings2.png","name":"setPropBtn","scaleX":0.5,"scaleY":0.5}},{"type":"Button","props":{"y":4,"x":55,"toolTip":"刷新资源树","stateNum":3,"skin":"view/refresh2.png","name":"refreshBtn","scaleX":0.5,"scaleY":0.5}},{"type":"Clip","props":{"y":7,"x":82,"skin":"view/search.png","clipY":1,"index":0,"scaleX":0.5,"scaleY":0.5}},{"type":"Button","props":{"y":12,"var":"clearSearchBtn","skin":"view/btn_close1.png","right":9,"scaleX":0.5,"scaleY":0.5,"stateNum":2}}]}]};
+		RemoteTreeUI.uiView={"type":"View","props":{"width":200,"title":"资源","scenecolor":"#dddddd","hitTestPrior":true,"height":300},"child":[{"type":"Image","props":{"y":48,"x":415,"width":200,"top":0,"skin":"view/bg_panel.png","right":0,"left":0,"height":300,"bottom":0}},{"type":"TreeEx","props":{"x":173,"width":196,"var":"resTree","top":2,"scrollBarSkin":"comp/vscroll.png","runtime":"filetoolkit.FileTree","right":2,"left":2,"hitTestPrior":true,"height":136,"bottom":29},"child":[{"type":"Box","props":{"right":0,"name":"render","left":0},"child":[{"type":"Clip","props":{"y":0,"x":13,"skin":"comp/clip_selectBox.png","right":0,"name":"selectBox","left":9,"height":25,"clipY":2}},{"type":"Image","props":{"y":4,"x":14,"skin":"comp/folder.png","name":"icon","width":16,"height":16}},{"type":"Label","props":{"y":1,"width":150,"text":"label","right":0,"padding":"4,0,0,0","name":"label","left":38,"height":22,"color":"#d8d8d8"}},{"type":"Clip","props":{"y":6,"x":0,"skin":"comp/clip_tree.png","name":"arrow","clipY":2,"width":11,"height":12}}]}]},{"type":"Box","props":{"y":271,"x":1,"width":198,"var":"opBox","right":0,"left":0,"height":28,"bottom":0},"child":[{"type":"Image","props":{"width":191,"top":0,"skin":"view/bg_panel_bar.png","right":0,"left":0,"bottom":0}},{"type":"TextInput","props":{"y":4,"var":"fliterTxt","toolTip":"输入关键词过滤","skin":"comp/input_22.png","right":5,"padding":"0,10,0,20","left":60,"height":22,"color":"#dddddd","sizeGrid":"0,3,0,3"}},{"type":"Button","props":{"y":3,"x":5,"toolTip":"设置默认属性","stateNum":3,"skin":"view/settings2.png","name":"setPropBtn","scaleX":0.5,"scaleY":0.5}},{"type":"Button","props":{"y":4,"x":31,"toolTip":"刷新资源树","stateNum":3,"skin":"view/refresh2.png","name":"refreshBtn","scaleX":0.5,"scaleY":0.5}},{"type":"Clip","props":{"y":7,"x":66,"skin":"view/search.png","clipY":1,"index":0,"scaleX":0.5,"scaleY":0.5}},{"type":"Button","props":{"y":12,"var":"clearSearchBtn","skin":"view/btn_close1.png","right":9,"scaleX":0.5,"scaleY":0.5,"stateNum":2}}]}]};
 		return RemoteTreeUI;
 	})(View)
 
@@ -28401,8 +28400,8 @@ var Laya=window.Laya=(function(window,document){
 			this.addChild(this.nodeContainer);
 			this.on("resize",this,this.onResize);
 			this.onResize();
-			this.on("rightmousedown",this,this.onRightDown);
-			this.on("rightmouseup",this,this.onRightUp);
+			this.on("mousedown",this,this.onRightDown);
+			this.on("mouseup",this,this.onRightUp);
 			this.saveBtn.zOrder=99;
 			this.saveBtn.on("click",this,this.onActionBtn,["save"]);
 		}
@@ -28510,6 +28509,8 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.setData=function(dataO){
 			this._dataO=dataO;
+			this._userChanged=false;
+			this.onResize();
 			this.mapNodeData=MindMapNodeData.createByObj(dataO.data||dataO,true);
 			this.freshUI();
 		}

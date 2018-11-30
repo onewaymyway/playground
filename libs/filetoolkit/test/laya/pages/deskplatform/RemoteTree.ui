@@ -2,7 +2,7 @@
     "x":0,
     "type":"View",
     "selectedBox":1,
-    "selecteID":3,
+    "selecteID":11,
     "props":{"width":200,"title":"资源","scenecolor":"#dddddd","sceneColor":null,"layers":"1,1,0,0,第 1 层","hitTestPrior":true,"height":300},
     "nodeParent":-1,
     "label":"View",
@@ -126,7 +126,7 @@
                 {
                     "x":30,
                     "type":"TextInput",
-                    "props":{"y":4,"x":80,"width":148,"var":"fliterTxt","toolTip":"输入关键词过滤","skin":"comp/input_22.png","right":5,"padding":"0,10,0,20","left":80,"layer":1,"color":"#dddddd"},
+                    "props":{"y":4,"var":"fliterTxt","toolTip":"输入关键词过滤","skin":"comp/input_22.png","right":5,"padding":"0,10,0,20","left":60,"layer":1,"height":22,"color":"#dddddd"},
                     "nodeParent":11,
                     "label":"TextInput(fliterTxt)",
                     "isDirectory":false,
@@ -139,20 +139,7 @@
                 {
                     "x":30,
                     "type":"Button",
-                    "props":{"y":3,"x":3,"toolTip":"打开所在目录","stateNum":3,"skin":"view/login2.png","name":"openDirBtn","layer":1},
-                    "nodeParent":11,
-                    "label":"Button(openDirBtn)",
-                    "isDirectory":false,
-                    "isAniNode":true,
-                    "hasChild":false,
-                    "compId":14,
-                    "child":[
-                        ]
-                },
-                {
-                    "x":30,
-                    "type":"Button",
-                    "props":{"y":3,"x":29,"toolTip":"设置默认属性","stateNum":3,"skin":"view/settings2.png","name":"setPropBtn","layer":1},
+                    "props":{"y":3,"x":5,"toolTip":"设置默认属性","stateNum":3,"skin":"view/settings2.png","name":"setPropBtn","layer":1},
                     "nodeParent":11,
                     "label":"Button(setPropBtn)",
                     "isDirectory":false,
@@ -165,7 +152,7 @@
                 {
                     "x":30,
                     "type":"Button",
-                    "props":{"y":4,"x":55,"toolTip":"刷新资源树","stateNum":3,"skin":"view/refresh2.png","name":"refreshBtn","layer":1},
+                    "props":{"y":4,"x":31,"toolTip":"刷新资源树","stateNum":3,"skin":"view/refresh2.png","name":"refreshBtn","layer":1},
                     "nodeParent":11,
                     "label":"Button(refreshBtn)",
                     "isDirectory":false,
@@ -178,7 +165,7 @@
                 {
                     "x":30,
                     "type":"Clip",
-                    "props":{"y":7,"x":82,"skin":"view/search.png","layer":1},
+                    "props":{"y":7,"x":66,"skin":"view/search.png","layer":1},
                     "nodeParent":11,
                     "label":"Clip",
                     "isDirectory":false,
