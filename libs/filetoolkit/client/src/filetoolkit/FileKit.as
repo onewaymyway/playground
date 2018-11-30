@@ -15,6 +15,7 @@ package filetoolkit
 		public var pwd:String;
 		public var token:String;
 		public var isLogined:Boolean = false;
+		public static var I:FileKit;
 		public function FileKit() 
 		{
 			

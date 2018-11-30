@@ -768,6 +768,11 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.onSaveBack=function(dataO){
 			console.log("onSaveBack:",dataO);
+			if (dataO.success){
+				MessageManager.I.show("保存成功");
+				}else{
+				MessageManager.I.show("保存失败");
+			}
 		}
 
 		__proto.onOpenFile=function(dataO){

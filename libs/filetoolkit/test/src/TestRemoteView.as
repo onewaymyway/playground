@@ -1,6 +1,7 @@
 package  
 {
 	import consts.Msgs;
+	import electrontools.MessageManager;
 	import filekit.RemoteTreeView;
 	import filetoolkit.FileKit;
 	import filetoolkit.FileTree;
@@ -82,7 +83,14 @@ package
 		}
 		private function onSaveBack(dataO:Object):void
 		{
-			trace("onSaveBack:",dataO);
+			trace("onSaveBack:", dataO);
+			if (dataO.success)
+			{
+				MessageManager.I.show("保存成功");
+			}else
+			{
+				MessageManager.I.show("保存失败");
+			}
 		}
 		
 		private var tFile:String;
