@@ -28889,15 +28889,45 @@ var Laya=window.Laya=(function(window,document){
 	var RemoteTreeView=(function(_super){
 		function RemoteTreeView(){
 			this.fileKit=null;
+			this._menu=null;
+			this._mutiMenu=null;
+			this._menuDir=null;
 			RemoteTreeView.__super.call(this);
 			this.opBox.on("click",this,this.onOpBoxClick);
 			this.resTree.rootNode=null;
 			this.resTree.renderHandler=new Handler(this,this.resTreeRender);
 			this.resTree.on("doubleclick",this,this.onResTreeDoubleClick);
+			this.resTree.on("rightclick",this,this.onResTreeRightMouseDown);
+			var menu=ContextMenu.createMenuByArray(["新建","","重命名","删除","新建目录"]);
+			menu.on("select",this,this.onEmunSelect);
+			this._menu=menu;
+			this._menuDir=ContextMenu.createMenuByArray(["新建","","重命名","删除"]);
+			this._menuDir.on("select",this,this.onEmunSelect);
+			this._mutiMenu=ContextMenu.createMenuByArray(["删除"]);
+			this._mutiMenu.on("select",this,this.onEmunSelect);
 		}
 
 		__class(RemoteTreeView,'filekit.RemoteTreeView',_super);
 		var __proto=RemoteTreeView.prototype;
+		__proto.onEmunSelect=function(dataO){
+			console.log("onMenuSelect:",dataO);
+			var label;
+			label=dataO.target.data;
+			console.log("Menu:",label);
+			switch (label){
+				case "设置默认属性":
+					break ;
+				case "打开所在目录":
+					break ;
+				case "重命名":
+					break ;
+				case "删除":
+					break ;
+				case "新建目录":
+					break ;
+				}
+		}
+
 		__proto.onOpBoxClick=function(e){
 			var btn=e.target;
 			if (btn){
@@ -28910,6 +28940,19 @@ var Laya=window.Laya=(function(window,document){
 						break ;
 					}
 			}
+		}
+
+		__proto.onResTreeRightMouseDown=function(e){
+			console.log("onResTreeRightMouseDown");
+			var comp=e.target;
+			if (comp && comp.dataSource){
+				this.resTree.selectedItem=comp.dataSource;
+			}
+			if(this.resTree.selectedItem&&this.resTree.selectedItem.isFolder){
+				this._menuDir.show();
+				return;
+			}
+			this._menu.show();
 		}
 
 		__proto.resTreeRender=function(cell,index){
@@ -28951,6 +28994,15 @@ var Laya=window.Laya=(function(window,document){
 				this.resTree.rootNode=root;
 			}
 		}
+
+		/**获取当前目录*/
+		__getset(0,__proto,'currDirectory',function(){
+			var directory="";
+			if (this.resTree.selectedItem !=null){
+				var path=this.resTree.selectedItem.path;
+			}
+			return directory;
+		});
 
 		return RemoteTreeView;
 	})(RemoteTreeUI)
