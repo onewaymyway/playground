@@ -14,6 +14,7 @@ package filetoolkit
 		public var username:String;
 		public var pwd:String;
 		public var token:String;
+		public var isLogined:Boolean = false;
 		public function FileKit() 
 		{
 			
@@ -34,6 +35,7 @@ package filetoolkit
 			//debugger;
 			if (dataO.success)
 			{
+				isLogined = true;
 				token = dataO.data.token;
 				event(Logined)
 			}else

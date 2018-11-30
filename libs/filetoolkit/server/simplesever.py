@@ -30,11 +30,13 @@ print(myRoot)
 userRoot=os.path.normpath(os.path.join(myRoot,  "user"))
 userConfig={}
 tokenDic={}
-
+visitorUser="deathnote"
+visitor=None
 class UserClient():
 
-    def __init__(self,userName):
+    def __init__(self,userName,isVisitor):
         self.user=userName
+        self.isVisitor=isVisitor
         self.rootPath=os.path.normpath(os.path.join(userRoot,  userName))
         
     def getFiles(self,folder):
@@ -138,7 +140,8 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
 
         userData=self.getUserDataByToken(token)
         if userData==None:
-            return;
+            userData=visitor
+            #return;
 
         curPath=form.getvalue("path")
         if curPath==None:
@@ -152,7 +155,6 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
             return
 
         
-
         if action=="getFileList":
             self.sendSuccess(userData.getFiles(form.getvalue("path")))
         elif action=="getFile":
@@ -166,12 +168,21 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
                 dataO["content"]=datas
             self.sendSuccess(dataO)
         elif action=="addFile":
+            if userData.isVisitor:
+                self.sendErr("not logined")
+                return
             userData.addFile(form.getvalue("path"),form.getvalue("content"))
             self.sendSuccess({})
         elif action=="deleteFile":
+            if userData.isVisitor:
+                self.sendErr("not logined")
+                return
             userData.deleteFile(form.getvalue("path"))
             self.sendSuccess({})
         elif action=="addFolder":
+            if userData.isVisitor:
+                self.sendErr("not logined")
+                return
             userData.addFolder(form.getvalue("path"))
             self.sendSuccess({})
 
@@ -207,8 +218,8 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
     def getUserDataByToken(self,token):
         userData=getUserByToken(token)
         if userData==None:
-            self.sendErr("need login")
-            return
+            #self.sendErr("need login")
+            return None
         return userData
 
         
@@ -225,7 +236,7 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
 
         rst={};
         rst["token"]=getTokenForUser(username,pwd)
-        tokenDic[rst["token"]]=UserClient(username)
+        tokenDic[rst["token"]]=UserClient(username,False)
         self.sendSuccess(rst)
         
 
@@ -236,7 +247,9 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 
 
 def run(server_class=HTTPServer, handler_class=CORSRequestHandler, port=9953):
+    global visitor
     initConfigs()
+    visitor=UserClient(visitorUser,True)
     server_address = ('', port)
     httpd = ThreadedHTTPServer(server_address, handler_class)
     print('Starting httpd on ',port,'...')

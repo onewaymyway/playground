@@ -42,15 +42,16 @@ package
 			FileKit.root = "http://stk.orzooo.com:9953";
 			FileKit.root = "http://127.0.0.1:9953";
 			fileKit = new FileKit();
-			fileKit.username = "deathnote";
-			fileKit.pwd = "deathnotefilekit";
+			//fileKit.username = "deathnote";
+			//fileKit.pwd = "deathnotefilekit";
 			fileKit.on(FileKit.Logined,this,onLogin);
-			fileKit.login();
+			//fileKit.login();
+			test();
 		}
 		
 		private function onLogin():void
 		{
-			test();
+			mindMapEditor.saveBtn.visible = true;
 		}
 		private function test():void
 		{
@@ -67,6 +68,7 @@ package
 			mindMapEditor.left = tree.x + tree.width + 2;
 			mindMapEditor.right = mindMapEditor.top = mindMapEditor.bottom = 2;
 			mindMapEditor.on(MindMapEditor.Save, this, onMindMapSave);
+			mindMapEditor.saveBtn.visible = false;
 			Laya.stage.addChild(mindMapEditor);
 			
 			Notice.listen(Msgs.Open_File, this, onOpenFile);
@@ -74,9 +76,15 @@ package
 		
 		private function onMindMapSave():void
 		{
-			trace("save:",mindMapEditor.data.url, mindMapEditor.mapNodeData);
+			trace("save:", tFile, mindMapEditor.mapNodeData);
+			fileKit.addFile(tFile, mindMapEditor.mapNodeData,Handler.create(this,onSaveBack) );
+		}
+		private function onSaveBack(dataO:Object):void
+		{
+			trace("onSaveBack:",dataO);
 		}
 		
+		private var tFile:String;
 		private function onOpenFile(dataO:Object):void
 		{
 			var filePath:String;
@@ -87,6 +95,7 @@ package
 		private function onFileGet(filePath:String, dataO:Object):void
 		{
 			trace("onFileGet:", filePath, dataO);
+			tFile = filePath;
 			if (dataO)
 			{
 				mindMapEditor.setData(dataO);

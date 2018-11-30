@@ -716,6 +716,7 @@ var Laya=window.Laya=(function(window,document){
 			this.mindMapEditor=null;
 			this.fileKit=null;
 			this.tree=null;
+			this.tFile=null;
 			Laya.init(800,600);
 			Laya.stage.scaleMode="full";
 			Laya.stage.bgColor="#000000";
@@ -736,14 +737,12 @@ var Laya=window.Laya=(function(window,document){
 			FileKit.root="http://stk.orzooo.com:9953";
 			FileKit.root="http://127.0.0.1:9953";
 			this.fileKit=new FileKit();
-			this.fileKit.username="deathnote";
-			this.fileKit.pwd="deathnotefilekit";
 			this.fileKit.on("Logined",this,this.onLogin);
-			this.fileKit.login();
+			this.test();
 		}
 
 		__proto.onLogin=function(){
-			this.test();
+			this.mindMapEditor.saveBtn.visible=true;
 		}
 
 		__proto.test=function(){
@@ -757,12 +756,18 @@ var Laya=window.Laya=(function(window,document){
 			this.mindMapEditor.left=this.tree.x+this.tree.width+2;
 			this.mindMapEditor.right=this.mindMapEditor.top=this.mindMapEditor.bottom=2;
 			this.mindMapEditor.on("Save",this,this.onMindMapSave);
+			this.mindMapEditor.saveBtn.visible=false;
 			Laya.stage.addChild(this.mindMapEditor);
 			Notice.listen("Open_File",this,this.onOpenFile);
 		}
 
 		__proto.onMindMapSave=function(){
-			console.log("save:",this.mindMapEditor.data.url,this.mindMapEditor.mapNodeData);
+			console.log("save:",this.tFile,this.mindMapEditor.mapNodeData);
+			this.fileKit.addFile(this.tFile,this.mindMapEditor.mapNodeData,Handler.create(this,this.onSaveBack));
+		}
+
+		__proto.onSaveBack=function(dataO){
+			console.log("onSaveBack:",dataO);
 		}
 
 		__proto.onOpenFile=function(dataO){
@@ -773,6 +778,7 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.onFileGet=function(filePath,dataO){
 			console.log("onFileGet:",filePath,dataO);
+			this.tFile=filePath;
 			if (dataO){
 				this.mindMapEditor.setData(dataO);
 				this.mindMapEditor.visible=true;
@@ -13665,6 +13671,7 @@ var Laya=window.Laya=(function(window,document){
 			this.username=null;
 			this.pwd=null;
 			this.token=null;
+			this.isLogined=false;
 			FileKit.__super.call(this);
 		}
 
@@ -13681,6 +13688,7 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.onLogin=function(dataO){
 			if (dataO.success){
+				this.isLogined=true;
 				this.token=dataO.data.token;
 				this.event("Logined")
 				}else{
@@ -28315,13 +28323,34 @@ var Laya=window.Laya=(function(window,document){
 			this.fileKit=null;
 			RemoteTreeView.__super.call(this);
 			this.resTree.rootNode=null;
+			this.resTree.renderHandler=new Handler(this,this.resTreeRender);
 			this.resTree.on("doubleclick",this,this.onResTreeDoubleClick);
 		}
 
 		__class(RemoteTreeView,'filekit.RemoteTreeView',_super);
 		var __proto=RemoteTreeView.prototype;
+		__proto.resTreeRender=function(cell,index){
+			var item=cell.dataSource;
+			var compStr;
+			if (item){
+				var icon=cell.getChildByName("icon");
+				var isDirectory=item.child || item.isFolder;
+				var label=cell.getChildByName("label");
+				if (isDirectory){
+					if(item.isOpen){
+						icon.skin="view/folder_open.png";
+						}else{
+						icon.skin="view/folder_close.png";
+					}
+					}else {
+					icon.skin="view/ui.png";
+				}
+			}
+		}
+
 		__proto.onResTreeDoubleClick=function(e){
 			if (e.target.parent==this.resTree.list.content && this.resTree.selectedItem){
+				if (this.resTree.selectedItem.isFolder)return;
 				Notice.notify("Open_File",[this.resTree.selectedItem]);
 			}
 		}
@@ -28818,14 +28847,14 @@ var Laya=window.Laya=(function(window,document){
 	})(MapItemUI)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,Render,View,Browser,Timer,GraphicAnimation,LocalStorage]);
+	Laya.__init([EventDispatcher,LoaderManager,Render,View,Browser,Timer,GraphicAnimation,LocalStorage]);
 	new TestRemoteView();
 
 })(window,document,Laya);
 
 
 /*
-1 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (99):warning:content This variable is not defined.
-2 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (101):warning:content This variable is not defined.
-3 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (101):warning:content This variable is not defined.
+1 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (101):warning:content This variable is not defined.
+2 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (103):warning:content This variable is not defined.
+3 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (103):warning:content This variable is not defined.
 */
