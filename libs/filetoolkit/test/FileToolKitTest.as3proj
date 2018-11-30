@@ -19,6 +19,7 @@
     <class path="..\..\laya\src" />
     <class path="..\client\src" />
     <class path="..\..\..\debugtoolplatform\deskplugins\Demo\src" />
+    <class path="..\..\nodetools\src" />
   </classpaths>
   <!-- Build options -->
   <build>

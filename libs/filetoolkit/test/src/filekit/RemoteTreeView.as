@@ -5,6 +5,7 @@ package filekit
 	import laya.debug.tools.Notice;
 	import laya.events.Event;
 	import laya.ui.Box;
+	import laya.ui.Button;
 	import laya.ui.Image;
 	import laya.ui.Label;
 	import laya.utils.Handler;
@@ -19,12 +20,26 @@ package filekit
 		public function RemoteTreeView() 
 		{
 			
-			
+			//快捷工具栏
+			opBox.on(Event.CLICK,this, onOpBoxClick);
 			resTree.rootNode = null;
 			resTree.renderHandler = new Handler(this, resTreeRender);
 			resTree.on(Event.DOUBLE_CLICK, this, onResTreeDoubleClick);
 		}
-		
+		private function onOpBoxClick(e:Event):void {
+			var btn:Button = e.target as Button;
+			if (btn) {
+				switch (btn.name) {
+
+					case "setPropBtn": 
+						LoginView.instance.start();
+						break;
+					case "refreshBtn": 
+						refresh();
+						break;
+				}
+			}
+		}
 		
 		private function resTreeRender(cell:Box, index:int):void {
 			var item:Object = cell.dataSource;

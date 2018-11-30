@@ -736,6 +736,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.initFileToolKit=function(){
 			FileKit.root="https://stk.orzooo.com:9953";
 			this.fileKit=new FileKit();
+			FileKit.I=this.fileKit;
 			this.fileKit.on("Logined",this,this.onLogin);
 			this.test();
 		}
@@ -13755,6 +13756,7 @@ var Laya=window.Laya=(function(window,document){
 		FileKit.Logined="Logined";
 		FileKit.LoginFail="LoginFail";
 		FileKit.root="";
+		FileKit.I=null
 		return FileKit;
 	})(EventDispatcher)
 
@@ -18519,6 +18521,244 @@ var Laya=window.Laya=(function(window,document){
 		Stage.FRAME_MOUSE="mouse";
 		Stage.FRAME_SLEEP="sleep";
 		return Stage;
+	})(Sprite)
+
+
+	/**
+	*<code>DialogManager</code> 对话框管理容器，所有的对话框都在该容器内，并且受管理器管理。
+	*任意对话框打开和关闭，都会出发管理类的open和close事件
+	*可以通过UIConfig设置弹出框背景透明度，模式窗口点击边缘是否关闭，点击窗口是否切换层次等
+	*通过设置对话框的zOrder属性，可以更改弹出的层次
+	*/
+	//class laya.ui.DialogManager extends laya.display.Sprite
+	var DialogManager=(function(_super){
+		function DialogManager(){
+			this.lockLayer=null;
+			this.popupEffect=function(dialog){
+				dialog.scale(1,1);
+				Tween.from(dialog,{x:Laya.stage.width / 2,y:Laya.stage.height / 2,scaleX:0,scaleY:0},300,Ease.backOut,Handler.create(this,this.doOpen,[dialog]));
+			}
+			this.closeEffect=function(dialog,type){
+				Tween.to(dialog,{x:Laya.stage.width / 2,y:Laya.stage.height / 2,scaleX:0,scaleY:0},300,Ease.strongOut,Handler.create(this,this.doClose,[dialog,type]));
+			}
+			DialogManager.__super.call(this);
+			this.maskLayer=new Sprite();
+			this.popupEffectHandler=new Handler(this,this.popupEffect);
+			this.closeEffectHandler=new Handler(this,this.closeEffect);
+			this.mouseEnabled=this.maskLayer.mouseEnabled=true;
+			this.zOrder=1000;
+			Laya.stage.addChild(this);
+			Laya.stage.on("resize",this,this._onResize);
+			if (UIConfig.closeDialogOnSide)this.maskLayer.on("click",this,this._closeOnSide);
+			this._onResize(null);
+		}
+
+		__class(DialogManager,'laya.ui.DialogManager',_super);
+		var __proto=DialogManager.prototype;
+		__proto._closeOnSide=function(){
+			var dialog=this.getChildAt(this.numChildren-1);
+			if ((dialog instanceof laya.ui.Dialog ))dialog.close("side");
+		}
+
+		/**设置锁定界面，如果为空则什么都不显示*/
+		__proto.setLockView=function(value){
+			if (!this.lockLayer){
+				this.lockLayer=new Box();
+				this.lockLayer.mouseEnabled=true;
+				this.lockLayer.size(Laya.stage.width,Laya.stage.height);
+			}
+			this.lockLayer.removeChildren();
+			if (value){
+				value.centerX=value.centerY=0;
+				this.lockLayer.addChild(value);
+			}
+		}
+
+		/**@private */
+		__proto._onResize=function(e){
+			var width=this.maskLayer.width=Laya.stage.width;
+			var height=this.maskLayer.height=Laya.stage.height;
+			if (this.lockLayer)this.lockLayer.size(width,height);
+			this.maskLayer.graphics.clear();
+			this.maskLayer.graphics.drawRect(0,0,width,height,UIConfig.popupBgColor);
+			this.maskLayer.alpha=UIConfig.popupBgAlpha;
+			for (var i=this.numChildren-1;i >-1;i--){
+				var item=this.getChildAt(i);
+				if (item.popupCenter)this._centerDialog(item);
+			}
+		}
+
+		__proto._centerDialog=function(dialog){
+			dialog.x=Math.round(((Laya.stage.width-dialog.width)>> 1)+dialog.pivotX);
+			dialog.y=Math.round(((Laya.stage.height-dialog.height)>> 1)+dialog.pivotY);
+		}
+
+		/**
+		*显示对话框(非模式窗口类型)。
+		*@param dialog 需要显示的对象框 <code>Dialog</code> 实例。
+		*@param closeOther 是否关闭其它对话框，若值为ture，则关闭其它的对话框。
+		*/
+		__proto.open=function(dialog,closeOther){
+			(closeOther===void 0)&& (closeOther=false);
+			if (closeOther)this.removeChildren();
+			if (dialog.popupCenter)this._centerDialog(dialog);
+			this.addChild(dialog);
+			if (dialog.isModal || this._$P["hasZorder"])this.timer.callLater(this,this._checkMask);
+			if (dialog.popupEffect !=null)dialog.popupEffect.runWith(dialog);
+			else this.doOpen(dialog);
+			this.event("open");
+		}
+
+		/**
+		*执行打开对话框。
+		*@param dialog 需要关闭的对象框 <code>Dialog</code> 实例。
+		*@param type 关闭的类型，默认为空
+		*/
+		__proto.doOpen=function(dialog){
+			dialog.onOpened();
+		}
+
+		/**
+		*锁定所有层，显示加载条信息，防止双击
+		*/
+		__proto.lock=function(value){
+			if (this.lockLayer){
+				if (value)this.addChild(this.lockLayer);
+				else this.lockLayer.removeSelf();
+			}
+		}
+
+		/**
+		*关闭对话框。
+		*@param dialog 需要关闭的对象框 <code>Dialog</code> 实例。
+		*@param type 关闭的类型，默认为空
+		*/
+		__proto.close=function(dialog,type){
+			if (dialog.closeEffect !=null)dialog.closeEffect.runWith([dialog,type]);
+			else this.doClose(dialog,type);
+			this.event("close");
+		}
+
+		/**
+		*执行关闭对话框。
+		*@param dialog 需要关闭的对象框 <code>Dialog</code> 实例。
+		*@param type 关闭的类型，默认为空
+		*/
+		__proto.doClose=function(dialog,type){
+			dialog.removeSelf();
+			dialog.isModal && this._checkMask();
+			dialog.closeHandler && dialog.closeHandler.runWith(type);
+			dialog.onClosed(type);
+		}
+
+		/**
+		*关闭所有的对话框。
+		*/
+		__proto.closeAll=function(){
+			this.removeChildren();
+			this.event("close");
+		}
+
+		/**
+		*根据组获取所有对话框
+		*@param group 组名称
+		*@return 对话框数组
+		*/
+		__proto.getDialogsByGroup=function(group){
+			var arr=[];
+			for (var i=this.numChildren-1;i >-1;i--){
+				var item=this.getChildAt(i);
+				if (item.group===group){
+					arr.push(item);
+				}
+			}
+			return arr;
+		}
+
+		/**
+		*根据组关闭所有弹出框
+		*@param group 需要关闭的组名称
+		*@return 需要关闭的对话框数组
+		*/
+		__proto.closeByGroup=function(group){
+			var arr=[];
+			for (var i=this.numChildren-1;i >-1;i--){
+				var item=this.getChildAt(i);
+				if (item.group===group){
+					item.close();
+					arr.push(item);
+				}
+			}
+			return arr;
+		}
+
+		/**@private 发生层次改变后，重新检查遮罩层是否正确*/
+		__proto._checkMask=function(){
+			this.maskLayer.removeSelf();
+			for (var i=this.numChildren-1;i >-1;i--){
+				var dialog=this.getChildAt(i);
+				if (dialog && dialog.isModal){
+					this.addChildAt(this.maskLayer,i);
+					return;
+				}
+			}
+		}
+
+		return DialogManager;
+	})(Sprite)
+
+
+	/**消息管理器
+	*/
+	//class electrontools.MessageManager extends laya.display.Sprite
+	var MessageManager=(function(_super){
+		function MessageManager(){
+			this.preTime=0;
+			MessageManager.__super.call(this);
+			this._vbox=new Box();
+			this.addChild(this._vbox);
+			this.setBounds(new Rectangle(0,0,150,150));
+			Laya.stage.addChild(this);
+		}
+
+		__class(MessageManager,'electrontools.MessageManager',_super);
+		var __proto=MessageManager.prototype;
+		__proto.show=function(msg,color,time){
+			(color===void 0)&& (color="#ff0000");
+			(time===void 0)&& (time=1000);
+			var label=new Label();
+			label.fontSize=14;
+			label.text=msg;
+			label.y=100;
+			label.height=30;
+			label.color=color;
+			var delayTime=0;
+			var nowTime=0;
+			var startTime=0;
+			nowTime=Browser.now();
+			startTime=Math.max(this.preTime+500,nowTime);
+			delayTime=startTime-nowTime;
+			this.preTime=startTime;
+			Laya.timer.once(delayTime,this,this.showLabel,[label,time],false);
+		}
+
+		__proto.showLabel=function(label,time){
+			this.pos(Laya.stage.width *0.5-100,20);
+			this._vbox.addChild(label);
+			Tween.to(label,{y:-20},time,Ease.cubicOut,null);
+			Laya.timer.once(time,this,this.clear,[label],false);
+		}
+
+		__proto.clear=function(label){
+			label.removeSelf();
+		}
+
+		__getset(1,MessageManager,'I',function(){
+			return MessageManager._instance ? MessageManager._instance :MessageManager._instance=new MessageManager();
+		},laya.display.Sprite._$SET_I);
+
+		MessageManager._instance=null
+		return MessageManager;
 	})(Sprite)
 
 
@@ -26773,103 +27013,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
-	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
-	*
-	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
-	*package
-	*{
-		*import laya.ui.HSlider;
-		*import laya.ui.VSlider;
-		*import laya.utils.Handler;
-		*public class VSlider_Example
-		*{
-			*private var vSlider:VSlider;
-			*public function VSlider_Example()
-			*{
-				*Laya.init(640,800);//设置游戏画布宽高。
-				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
-				*}
-			*private function onLoadComplete():void
-			*{
-				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-				*vSlider.min=0;//设置 vSlider 最低位置值。
-				*vSlider.max=10;//设置 vSlider 最高位置值。
-				*vSlider.value=2;//设置 vSlider 当前位置值。
-				*vSlider.tick=1;//设置 vSlider 刻度值。
-				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
-				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-				*}
-			*private function onChange(value:Number):void
-			*{
-				*trace("滑块的位置： value="+value);
-				*}
-			*}
-		*}
-	*@example
-	*Laya.init(640,800);//设置游戏画布宽高
-	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
-	*var vSlider;
-	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
-	*function onLoadComplete(){
-		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-		*vSlider.min=0;//设置 vSlider 最低位置值。
-		*vSlider.max=10;//设置 vSlider 最高位置值。
-		*vSlider.value=2;//设置 vSlider 当前位置值。
-		*vSlider.tick=1;//设置 vSlider 刻度值。
-		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
-		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-		*}
-	*function onChange(value){
-		*console.log("滑块的位置： value="+value);
-		*}
-	*@example
-	*import HSlider=laya.ui.HSlider;
-	*import VSlider=laya.ui.VSlider;
-	*import Handler=laya.utils.Handler;
-	*class VSlider_Example {
-		*private vSlider:VSlider;
-		*constructor(){
-			*Laya.init(640,800);//设置游戏画布宽高。
-			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
-			*}
-		*private onLoadComplete():void {
-			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-			*this.vSlider.min=0;//设置 vSlider 最低位置值。
-			*this.vSlider.max=10;//设置 vSlider 最高位置值。
-			*this.vSlider.value=2;//设置 vSlider 当前位置值。
-			*this.vSlider.tick=1;//设置 vSlider 刻度值。
-			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
-			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
-			*}
-		*private onChange(value:number):void {
-			*console.log("滑块的位置： value="+value);
-			*}
-		*}
-	*@see laya.ui.Slider
-	*/
-	//class laya.ui.VSlider extends laya.ui.Slider
-	var VSlider=(function(_super){
-		function VSlider(){VSlider.__super.call(this);;
-		};
-
-		__class(VSlider,'laya.ui.VSlider',_super);
-		return VSlider;
-	})(Slider)
-
-
-	/**
 	*<code>TextInput</code> 类用于创建显示对象以显示和输入文本。
 	*
 	*@example <caption>以下示例代码，创建了一个 <code>TextInput</code> 实例。</caption>
@@ -27190,6 +27333,103 @@ var Laya=window.Laya=(function(window,document){
 
 		return TextInput;
 	})(Label)
+
+
+	/**
+	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
+	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
+	*
+	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
+	*package
+	*{
+		*import laya.ui.HSlider;
+		*import laya.ui.VSlider;
+		*import laya.utils.Handler;
+		*public class VSlider_Example
+		*{
+			*private var vSlider:VSlider;
+			*public function VSlider_Example()
+			*{
+				*Laya.init(640,800);//设置游戏画布宽高。
+				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
+				*}
+			*private function onLoadComplete():void
+			*{
+				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+				*vSlider.min=0;//设置 vSlider 最低位置值。
+				*vSlider.max=10;//设置 vSlider 最高位置值。
+				*vSlider.value=2;//设置 vSlider 当前位置值。
+				*vSlider.tick=1;//设置 vSlider 刻度值。
+				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
+				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+				*}
+			*private function onChange(value:Number):void
+			*{
+				*trace("滑块的位置： value="+value);
+				*}
+			*}
+		*}
+	*@example
+	*Laya.init(640,800);//设置游戏画布宽高
+	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
+	*var vSlider;
+	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
+	*function onLoadComplete(){
+		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+		*vSlider.min=0;//设置 vSlider 最低位置值。
+		*vSlider.max=10;//设置 vSlider 最高位置值。
+		*vSlider.value=2;//设置 vSlider 当前位置值。
+		*vSlider.tick=1;//设置 vSlider 刻度值。
+		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
+		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+		*}
+	*function onChange(value){
+		*console.log("滑块的位置： value="+value);
+		*}
+	*@example
+	*import HSlider=laya.ui.HSlider;
+	*import VSlider=laya.ui.VSlider;
+	*import Handler=laya.utils.Handler;
+	*class VSlider_Example {
+		*private vSlider:VSlider;
+		*constructor(){
+			*Laya.init(640,800);//设置游戏画布宽高。
+			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
+			*}
+		*private onLoadComplete():void {
+			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+			*this.vSlider.min=0;//设置 vSlider 最低位置值。
+			*this.vSlider.max=10;//设置 vSlider 最高位置值。
+			*this.vSlider.value=2;//设置 vSlider 当前位置值。
+			*this.vSlider.tick=1;//设置 vSlider 刻度值。
+			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
+			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
+			*}
+		*private onChange(value:number):void {
+			*console.log("滑块的位置： value="+value);
+			*}
+		*}
+	*@see laya.ui.Slider
+	*/
+	//class laya.ui.VSlider extends laya.ui.Slider
+	var VSlider=(function(_super){
+		function VSlider(){VSlider.__super.call(this);;
+		};
+
+		__class(VSlider,'laya.ui.VSlider',_super);
+		return VSlider;
+	})(Slider)
 
 
 	/**
@@ -27679,6 +27919,309 @@ var Laya=window.Laya=(function(window,document){
 
 		return GraphicAnimation;
 	})(FrameAnimation)
+
+
+	/**
+	*<code>Dialog</code> 组件是一个弹出对话框，实现对话框弹出，拖动，模式窗口功能。
+	*可以通过UIConfig设置弹出框背景透明度，模式窗口点击边缘是否关闭等
+	*通过设置zOrder属性，可以更改弹出的层次
+	*通过设置popupEffect和closeEffect可以设置弹出效果和关闭效果，如果不想有任何弹出关闭效果，可以设置前述属性为空
+	*
+	*@example <caption>以下示例代码，创建了一个 <code>Dialog</code> 实例。</caption>
+	*package
+	*{
+		*import laya.ui.Dialog;
+		*import laya.utils.Handler;
+		*public class Dialog_Example
+		*{
+			*private var dialog:Dialog_Instance;
+			*public function Dialog_Example()
+			*{
+				*Laya.init(640,800);//设置游戏画布宽高、渲染模式。
+				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+				*Laya.loader.load("resource/ui/btn_close.png",Handler.create(this,onLoadComplete));//加载资源。
+				*}
+			*private function onLoadComplete():void
+			*{
+				*dialog=new Dialog_Instance();//创建一个 Dialog_Instance 类的实例对象 dialog。
+				*dialog.dragArea="0,0,150,50";//设置 dialog 的拖拽区域。
+				*dialog.show();//显示 dialog。
+				*dialog.closeHandler=new Handler(this,onClose);//设置 dialog 的关闭函数处理器。
+				*}
+			*private function onClose(name:String):void
+			*{
+				*if (name==Dialog.CLOSE)
+				*{
+					*trace("通过点击 name 为"+name+"的组件，关闭了dialog。");
+					*}
+				*}
+			*}
+		*}
+	*import laya.ui.Button;
+	*import laya.ui.Dialog;
+	*import laya.ui.Image;
+	*class Dialog_Instance extends Dialog
+	*{
+		*function Dialog_Instance():void
+		*{
+			*var bg:Image=new Image("resource/ui/bg.png");
+			*bg.sizeGrid="40,10,5,10";
+			*bg.width=150;
+			*bg.height=250;
+			*addChild(bg);
+			*var image:Image=new Image("resource/ui/image.png");
+			*addChild(image);
+			*var button:Button=new Button("resource/ui/btn_close.png");
+			*button.name=Dialog.CLOSE;//设置button的name属性值。
+			*button.x=0;
+			*button.y=0;
+			*addChild(button);
+			*}
+		*}
+	*@example
+	*Laya.init(640,800);//设置游戏画布宽高、渲染模式
+	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
+	*var dialog;
+	*Laya.loader.load("resource/ui/btn_close.png",laya.utils.Handler.create(this,loadComplete));//加载资源
+	*(function (_super){//新建一个类Dialog_Instance继承自laya.ui.Dialog。
+		*function Dialog_Instance(){
+			*Dialog_Instance.__super.call(this);//初始化父类
+			*var bg=new laya.ui.Image("resource/ui/bg.png");//新建一个 Image 类的实例 bg 。
+			*bg.sizeGrid="10,40,10,5";//设置 bg 的网格信息。
+			*bg.width=150;//设置 bg 的宽度。
+			*bg.height=250;//设置 bg 的高度。
+			*this.addChild(bg);//将 bg 添加到显示列表。
+			*var image=new laya.ui.Image("resource/ui/image.png");//新建一个 Image 类的实例 image 。
+			*this.addChild(image);//将 image 添加到显示列表。
+			*var button=new laya.ui.Button("resource/ui/btn_close.png");//新建一个 Button 类的实例 bg 。
+			*button.name=laya.ui.Dialog.CLOSE;//设置 button 的 name 属性值。
+			*button.x=0;//设置 button 对象的属性 x 的值，用于控制 button 对象的显示位置。
+			*button.y=0;//设置 button 对象的属性 y 的值，用于控制 button 对象的显示位置。
+			*this.addChild(button);//将 button 添加到显示列表。
+			*};
+		*Laya.class(Dialog_Instance,"mypackage.dialogExample.Dialog_Instance",_super);//注册类Dialog_Instance。
+		*})(laya.ui.Dialog);
+	*function loadComplete(){
+		*console.log("资源加载完成！");
+		*dialog=new mypackage.dialogExample.Dialog_Instance();//创建一个 Dialog_Instance 类的实例对象 dialog。
+		*dialog.dragArea="0,0,150,50";//设置 dialog 的拖拽区域。
+		*dialog.show();//显示 dialog。
+		*dialog.closeHandler=new laya.utils.Handler(this,onClose);//设置 dialog 的关闭函数处理器。
+		*}
+	*function onClose(name){
+		*if (name==laya.ui.Dialog.CLOSE){
+			*console.log("通过点击 name 为"+name+"的组件，关闭了dialog。");
+			*}
+		*}
+	*@example
+	*import Dialog=laya.ui.Dialog;
+	*import Handler=laya.utils.Handler;
+	*class Dialog_Example {
+		*private dialog:Dialog_Instance;
+		*constructor(){
+			*Laya.init(640,800);//设置游戏画布宽高。
+			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+			*Laya.loader.load("resource/ui/btn_close.png",Handler.create(this,this.onLoadComplete));//加载资源。
+			*}
+		*private onLoadComplete():void {
+			*this.dialog=new Dialog_Instance();//创建一个 Dialog_Instance 类的实例对象 dialog。
+			*this.dialog.dragArea="0,0,150,50";//设置 dialog 的拖拽区域。
+			*this.dialog.show();//显示 dialog。
+			*this.dialog.closeHandler=new Handler(this,this.onClose);//设置 dialog 的关闭函数处理器。
+			*}
+		*private onClose(name:string):void {
+			*if (name==Dialog.CLOSE){
+				*console.log("通过点击 name 为"+name+"的组件，关闭了dialog。");
+				*}
+			*}
+		*}
+	*import Button=laya.ui.Button;
+	*class Dialog_Instance extends Dialog {
+		*Dialog_Instance():void {
+			*var bg:laya.ui.Image=new laya.ui.Image("resource/ui/bg.png");
+			*bg.sizeGrid="40,10,5,10";
+			*bg.width=150;
+			*bg.height=250;
+			*this.addChild(bg);
+			*var image:laya.ui.Image=new laya.ui.Image("resource/ui/image.png");
+			*this.addChild(image);
+			*var button:Button=new Button("resource/ui/btn_close.png");
+			*button.name=Dialog.CLOSE;//设置button的name属性值。
+			*button.x=0;
+			*button.y=0;
+			*this.addChild(button);
+			*}
+		*}
+	*/
+	//class laya.ui.Dialog extends laya.ui.View
+	var Dialog=(function(_super){
+		function Dialog(){
+			this.popupCenter=true;
+			this.closeHandler=null;
+			this.popupEffect=null;
+			this.closeEffect=null;
+			this.group=null;
+			this.isModal=false;
+			this._dragArea=null;
+			Dialog.__super.call(this);
+		}
+
+		__class(Dialog,'laya.ui.Dialog',_super);
+		var __proto=Dialog.prototype;
+		/**@inheritDoc */
+		__proto.initialize=function(){
+			this.popupEffect=Dialog.manager.popupEffectHandler;
+			this.closeEffect=Dialog.manager.closeEffectHandler;
+			this._dealDragArea();
+			this.on("click",this,this._onClick);
+		}
+
+		/**@private */
+		__proto._dealDragArea=function(){
+			var dragTarget=this.getChildByName("drag");
+			if (dragTarget){
+				this.dragArea=dragTarget.x+","+dragTarget.y+","+dragTarget.width+","+dragTarget.height;
+				dragTarget.removeSelf();
+			}
+		}
+
+		/**
+		*@private (protected)
+		*对象的 <code>Event.CLICK</code> 点击事件侦听处理函数。
+		*/
+		__proto._onClick=function(e){
+			var btn=e.target;
+			if (btn){
+				switch (btn.name){
+					case "close":
+					case "cancel":
+					case "sure":
+					case "no":
+					case "ok":
+					case "yes":
+						this.close(btn.name);
+						break ;
+					}
+			}
+		}
+
+		/**
+		*显示对话框（以非模式窗口方式显示）。
+		*@param closeOther 是否关闭其它的对话框。若值为true则关闭其它对话框。
+		*/
+		__proto.show=function(closeOther){
+			(closeOther===void 0)&& (closeOther=false);
+			this._open(false,closeOther);
+		}
+
+		/**
+		*显示对话框（以模式窗口方式显示）。
+		*@param closeOther 是否关闭其它的对话框。若值为true则关闭其它对话框。
+		*/
+		__proto.popup=function(closeOther){
+			(closeOther===void 0)&& (closeOther=false);
+			this._open(true,closeOther);
+		}
+
+		/**@private */
+		__proto._open=function(modal,closeOther){
+			Dialog.manager.lock(false);
+			this.isModal=modal;
+			Dialog.manager.open(this,closeOther);
+		}
+
+		/**打开完成后，调用此方法（如果有弹出动画，则在动画完成后执行）*/
+		__proto.onOpened=function(){}
+		/**
+		*关闭对话框。
+		*@param type 如果是点击默认关闭按钮触发，则传入关闭按钮的名字(name)，否则为null。
+		*/
+		__proto.close=function(type){
+			Dialog.manager.close(this,type);
+		}
+
+		/**关闭完成后，调用此方法（如果有关闭动画，则在动画完成后执行）
+		*@param type 如果是点击默认关闭按钮触发，则传入关闭按钮的名字(name)，否则为null。
+		*/
+		__proto.onClosed=function(type){}
+		/**@private */
+		__proto._onMouseDown=function(e){
+			var point=this.getMousePoint();
+			if (this._dragArea.contains(point.x,point.y))this.startDrag();
+			else this.stopDrag();
+		}
+
+		/**
+		*用来指定对话框的拖拽区域。默认值为"0,0,0,0"。
+		*<p><b>格式：</b>构成一个矩形所需的 x,y,width,heith 值，用逗号连接为字符串。
+		*例如："0,0,100,200"。
+		*</p>
+		*
+		*@see #includeExamplesSummary 请参考示例
+		*/
+		__getset(0,__proto,'dragArea',function(){
+			if (this._dragArea)return this._dragArea.toString();
+			return null;
+			},function(value){
+			if (value){
+				var a=UIUtils.fillArray([0,0,0,0],value,Number);
+				this._dragArea=new Rectangle(a[0],a[1],a[2],a[3]);
+				this.on("mousedown",this,this._onMouseDown);
+				}else {
+				this._dragArea=null;
+				this.off("mousedown",this,this._onMouseDown);
+			}
+		});
+
+		/**
+		*弹出框的显示状态；如果弹框处于显示中，则为true，否则为false;
+		*/
+		__getset(0,__proto,'isPopup',function(){
+			return this.parent !=null;
+		});
+
+		__getset(0,__proto,'zOrder',_super.prototype._$get_zOrder,function(value){
+			_super.prototype._$set_zOrder.call(this,value);
+			Dialog.manager._checkMask();
+		});
+
+		/**对话框管理容器，所有的对话框都在该容器内，并且受管理器管，可以自定义自己的管理器，来更改窗口管理的流程。
+		*任意对话框打开和关闭，都会触发管理类的open和close事件*/
+		__getset(1,Dialog,'manager',function(){
+			return Dialog._manager=Dialog._manager|| new DialogManager();
+			},function(value){
+			Dialog._manager=value;
+		});
+
+		Dialog.setLockView=function(view){
+			Dialog.manager.setLockView(view);
+		}
+
+		Dialog.lock=function(value){
+			Dialog.manager.lock(value);
+		}
+
+		Dialog.closeAll=function(){
+			Dialog.manager.closeAll();
+		}
+
+		Dialog.getDialogsByGroup=function(group){
+			return Dialog.manager.getDialogsByGroup(group);
+		}
+
+		Dialog.closeByGroup=function(group){
+			return Dialog.manager.closeByGroup(group);
+		}
+
+		Dialog.CLOSE="close";
+		Dialog.CANCEL="cancel";
+		Dialog.SURE="sure";
+		Dialog.NO="no";
+		Dialog.OK="ok";
+		Dialog.YES="yes";
+		Dialog._manager=null
+		return Dialog;
+	})(View)
 
 
 	//class ui.deskplatform.RemoteTreeUI extends laya.ui.View
@@ -28312,6 +28855,27 @@ var Laya=window.Laya=(function(window,document){
 	})(TextInput)
 
 
+	//class ui.deskplatform.LoginViewUI extends laya.ui.Dialog
+	var LoginViewUI=(function(_super){
+		function LoginViewUI(){
+			this.nameTxt=null;
+			this.loginBtn=null;
+			this.pwdTxt=null;
+			LoginViewUI.__super.call(this);
+		}
+
+		__class(LoginViewUI,'ui.deskplatform.LoginViewUI',_super);
+		var __proto=LoginViewUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(LoginViewUI.uiView);
+		}
+
+		LoginViewUI.uiView={"type":"Dialog","props":{"width":500,"scenecolor":"#dddddd","height":250},"child":[{"type":"Image","props":{"y":0,"x":0,"width":500,"skin":"view/bg_dialog.png","height":250,"sizeGrid":"47,20,22,37"}},{"type":"Button","props":{"skin":"view/btn_close.png","name":"close","scaleX":0.5,"scaleY":0.5,"right":11,"y":7}},{"type":"Image","props":{"y":7,"x":9,"width":439,"skin":"comp/blank_title_dragrec.png","name":"drag","height":36}},{"type":"Label","props":{"x":28,"text":"登录","styleSkin":"comp/label_panel_title.png","fontSize":14,"align":"center","color":"#ffffff","centerX":0,"y":16}},{"type":"Label","props":{"y":80,"x":13,"width":114,"text":"用户名：","styleSkin":"comp/label_intro.png","height":18,"align":"right","fontSize":14,"color":"#C8C8C8"}},{"type":"TextInput","props":{"y":74,"x":128,"width":304,"var":"nameTxt","text":5,"skin":"comp/input_32.png","height":32,"sizeGrid":"0,3,0,3","color":"#CCCCCC","fontSize":14,"padding":"0,4,0,4"}},{"type":"Button","props":{"y":176,"x":190,"width":146,"var":"loginBtn","skin":"comp/button.png","label":"登录","height":24,"labelColors":"#FFFFFF,#FFFFFF,#FFFFFF,#c5c5c5","labelSize":16,"sizeGrid":"0,4,0,4"}},{"type":"Label","props":{"y":131,"x":2,"width":125,"text":"密码：","styleSkin":"comp/label_intro.png","height":18,"align":"right","fontSize":14,"color":"#C8C8C8"}},{"type":"TextInput","props":{"y":124,"x":128,"width":302,"var":"pwdTxt","type":"password","text":8,"skin":"comp/input_32.png","height":32,"sizeGrid":"0,3,0,3","color":"#CCCCCC","fontSize":14,"padding":"0,4,0,4"}}]};
+		return LoginViewUI;
+	})(Dialog)
+
+
 	/**
 	*...
 	*@author ww
@@ -28321,6 +28885,7 @@ var Laya=window.Laya=(function(window,document){
 		function RemoteTreeView(){
 			this.fileKit=null;
 			RemoteTreeView.__super.call(this);
+			this.opBox.on("click",this,this.onOpBoxClick);
 			this.resTree.rootNode=null;
 			this.resTree.renderHandler=new Handler(this,this.resTreeRender);
 			this.resTree.on("doubleclick",this,this.onResTreeDoubleClick);
@@ -28328,6 +28893,20 @@ var Laya=window.Laya=(function(window,document){
 
 		__class(RemoteTreeView,'filekit.RemoteTreeView',_super);
 		var __proto=RemoteTreeView.prototype;
+		__proto.onOpBoxClick=function(e){
+			var btn=e.target;
+			if (btn){
+				switch (btn.name){
+					case "setPropBtn":
+						LoginView.instance.start();
+						break ;
+					case "refreshBtn":
+						this.refresh();
+						break ;
+					}
+			}
+		}
+
 		__proto.resTreeRender=function(cell,index){
 			var item=cell.dataSource;
 			var compStr;
@@ -28848,6 +29427,52 @@ var Laya=window.Laya=(function(window,document){
 	})(MapItemUI)
 
 
+	/**
+	*...
+	*@author ww
+	*/
+	//class filekit.LoginView extends ui.deskplatform.LoginViewUI
+	var LoginView=(function(_super){
+		function LoginView(){
+			LoginView.__super.call(this);
+			this.loginBtn.on("click",this,this.onLoginBtn);
+			FileKit.I.on("Logined",this,this.onLoginSuccess);
+			FileKit.I.on("LoginFail",this,this.onLoginFail);
+		}
+
+		__class(LoginView,'filekit.LoginView',_super);
+		var __proto=LoginView.prototype;
+		__proto.start=function(){
+			this.nameTxt.text="";
+			this.pwdTxt.text="";
+			this.nameTxt.focus=true;
+			this.popup();
+		}
+
+		__proto.onLoginBtn=function(){
+			FileKit.I.username=this.nameTxt.text;
+			FileKit.I.pwd=this.pwdTxt.text;
+			FileKit.I.login();
+		}
+
+		__proto.onLoginFail=function(){
+			MessageManager.I.show("登录失败");
+		}
+
+		__proto.onLoginSuccess=function(){
+			MessageManager.I.show("登录成功");
+			this.close();
+		}
+
+		__getset(1,LoginView,'instance',function(){
+			return LoginView._instance ? LoginView._instance :LoginView._instance=new LoginView();
+		},ui.deskplatform.LoginViewUI._$SET_instance);
+
+		LoginView._instance=null
+		return LoginView;
+	})(LoginViewUI)
+
+
 	Laya.__init([EventDispatcher,LoaderManager,Render,View,Browser,Timer,GraphicAnimation,LocalStorage]);
 	new TestRemoteView();
 
@@ -28855,7 +29480,7 @@ var Laya=window.Laya=(function(window,document){
 
 
 /*
-1 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (101):warning:content This variable is not defined.
-2 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (103):warning:content This variable is not defined.
-3 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (103):warning:content This variable is not defined.
+1 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (102):warning:content This variable is not defined.
+2 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (104):warning:content This variable is not defined.
+3 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (104):warning:content This variable is not defined.
 */

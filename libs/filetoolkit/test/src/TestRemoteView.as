@@ -42,6 +42,7 @@ package
 			FileKit.root = "https://stk.orzooo.com:9953";
 			//FileKit.root = "http://127.0.0.1:9953";
 			fileKit = new FileKit();
+			FileKit.I = fileKit;
 			//fileKit.username = "deathnote";
 			//fileKit.pwd = "deathnotefilekit";
 			fileKit.on(FileKit.Logined,this,onLogin);
