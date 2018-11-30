@@ -1,0 +1,118 @@
+<res>
+   <item name="comp/panel.png" compress="0" quality="80" props="sizeGrid=35,4,4,4 width=200 height=300"/>
+   <item name="comp/bg.png" compress="0" quality="80" props="sizeGrid=4,4,4,4"/>
+   <item name="comp/button.png" compress="0" quality="80" props="labelColors=#FFFFFF,#FFFFFF,#FFFFFF,#c5c5c5@@!@@labelSize=16@@!@@sizeGrid=0,4,0,4" type="Button" pack="0" picType="0" scale="0"/>
+   <item name="comp/bg2.png" compress="0" quality="80" props="sizeGrid=4,4,4,4"/>
+   <item name="comp/tab.png" compress="0" quality="80" props="labelColors=#aaaaaa,#aaaaaa,#aaaaaa"/>
+   <item name="comp/btn_menu2.png" compress="0" quality="80" props="labelColors=#aaaaaa,#aaaaaa,#aaaaaa"/>
+   <item name="comp/label.png" compress="0" quality="80" props="color=#aaaaaa"/>
+   <item name="comp/tree.png" compress="0" quality="80" props="clipY=2"/>
+   <item name="comp/clip_tree.png" compress="0" quality="80" props="clipY=2 width=11 height=12" type="Clip"/>
+   <item name="comp/clip_folder.png" compress="0" quality="80" props="clipY=3" type="Clip"/>
+   <item name="comp/clip_selectBox.png" compress="0" quality="80" props="clipY=2" type="null" pack="0" picType="1" scale="0"/>
+   <item name="comp/combobox.png" compress="0" quality="80" props="sizeGrid=0,20,0,4 labelColors=#c5c5c5,#c5c5c5,#c5c5c5,#c5c5c5" type="ComboBox"/>
+   <item name="comp/textinput.png" compress="0" quality="80" props="color=#c5c5c5 sizeGrid=3,3,3,3 padding=0,5,0,5" type="TextInput"/>
+   <item name="comp/textarea.png" compress="0" quality="80" props="color=#CCCCCC@@!@@scrollBarSkin=comp/vscroll.png@@!@@padding=5,5,5,5@@!@@sizeGrid=3,3,3,3@@!@@fontSize=14" type="TextArea" pack="0" picType="0" scale="0"/>
+   <item name="comp/checkbox.png" compress="0" quality="80" props="labelColors=#CCCCCC,#CCCCCC,#CCCCCC,#c5c5c5" type="CheckBox" pack="0" picType="0" scale="0"/>
+   <item name="comp/bg_menu.png" compress="0" quality="80" props="sizeGrid=3,3,3,3"/>
+   <item name="comp/bg_body.png" compress="0" quality="80" props="sizeGrid=3,3,3,3"/>
+   <item name="other/clip_hide.png" compress="0" quality="80" props="clipY=2"/>
+   <item name="other/clip_lock.png" compress="0" quality="80" props="clipY=2"/>
+   <item name="other/tab.png" compress="0" quality="80" props="sizeGrid=2,2,2,2"/>
+   <item name="comp/panel2.png" compress="0" quality="80" props="sizeGrid=40,12,6,6"/>
+   <item name="view/bg_body.png" type="Image" compress="0" quality="80" props="sizeGrid=4,4,4,4"/>
+   <item name="view/bg_panel.png" type="Image" compress="0" quality="80" props="" pack="0" picType="1" scale="0"/>
+   <item name="play/back.png" type="Image" compress="0" quality="80" props=""/>
+   <item name="view/bg_tab.png" type="Image" compress="0" quality="80" props="sizeGrid=4,4,4,4"/>
+   <item name="view/tab2.png" type="Image" compress="0" quality="80" props="sizeGrid=0,4,0,4"/>
+   <item name="view/bg_panel_bar.png" type="Image" compress="0" quality="80" props="" pack="0" picType="1" scale="0"/>
+   <item name="view/search.png" type="Clip" compress="0" quality="80" props="clipY=1@@!@@index=0@@!@@scaleX=0.5@@!@@scaleY=0.5" pack="0" picType="0" scale="0"/>
+   <item name="comp/referback.png" type="Button" compress="0" quality="80" props=""/>
+   <item name="view/codeswitch.png" type="Clip" compress="0" quality="80" props="width=70 height=18"/>
+   <item name="view/bg_dialog.png" type="Image" compress="0" quality="80" props="sizeGrid=47,20,22,37" pack="0" picType="1" scale="0"/>
+   <item name="components/Label.png" type="Label" compress="0" quality="80" props="color=#ff0000"/>
+   <item name="comp/label_common.png" type="Label" compress="0" quality="80" props="color=#CCCCCC" pack="0" picType="0" scale="0"/>
+   <item name="comp/btn.png" type="Button" compress="0" quality="80" props="labelColors=#FFFFFF,#FFFFFF,#FFFFFF,#c5c5c5@@!@@labelSize=16@@!@@sizeGrid=0,4,0,4" pack="0" picType="0" scale="0"/>
+   <item name="comp/tab3.png" type="Image" compress="0" quality="80" props="labelColors=#CCCCCC,#c5c5c5,#FFFFFF,#c5c5c5" pack="0" picType="0" scale="0"/>
+   <item name="comp/input_24.png" type="TextInput" compress="0" quality="80" props="sizeGrid=0,3,0,3 color=#c5c5c5 height=24"/>
+   <item name="comp/btn_browser.png" type="Button" compress="0" quality="80" props="labelColors=#CCCCCC,#CCCCCC,#CCCCCC@@!@@labelSize=14" pack="0" picType="0" scale="0"/>
+   <item name="comp/input_32.png" type="TextInput" compress="0" quality="80" props="sizeGrid=0,3,0,3@@!@@color=#CCCCCC@@!@@fontSize=14@@!@@padding=0,4,0,4@@!@@height=32" pack="0" picType="0" scale="0"/>
+   <item name="comp/combo_dialog.png" type="ComboBox" compress="0" quality="80" props="sizeGrid=0,20,0,4 labelColors=#c5c5c5,#c5c5c5,#c5c5c5,#c5c5c5"/>
+   <item name="comp/input_22.png" type="TextInput" compress="0" quality="80" props="sizeGrid=0,3,0,3 height=22 color=#c5c5c5"/>
+   <item name="comp/input_filter.png" type="TextInput" compress="0" quality="80" props="sizeGrid=0,3,0,3"/>
+   <item name="comp/combo_22.png" type="ComboBox" compress="0" quality="80" props="sizeGrid=0,20,0,3 labelColors=#c5c5c5,#c5c5c5,#c5c5c5,#c5c5c5 height=22"/>
+   <item name="comp/combo_24.png" type="ComboBox" compress="0" quality="80" props="sizeGrid=0,20,0,3 labelColors=#c5c5c5,#c5c5c5,#c5c5c5,#c5c5c5 height=24"/>
+   <item name="comp/combo_32.png" type="ComboBox" compress="0" quality="80" props="sizeGrid=0,20,0,3@@!@@labelColors=#CCCCCC,#CCCCCC,#CCCCCC,#c5c5c5@@!@@height=32@@!@@labelSize=14" pack="0" picType="0" scale="0"/>
+   <item name="view/bg_panel4.png" type="Image" compress="0" quality="80" props="sizeGrid=4,4,4,4"/>
+   <item name="view/bg_content.png" type="Image" compress="0" quality="80" props="sizeGrid=5,5,5,5"/>
+   <item name="view/refresh2.png" type="Image" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="view/login2.png" type="Image" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="view/settings2.png" type="Image" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="view/btn_close.png" type="Button" compress="0" quality="80" props="scaleX=0.5@@!@@scaleY=0.5@@!@@right=11@@!@@y=7@@!@@" pack="0" picType="0" scale="0"/>
+   <item name="view/btn_close1.png" type="Button" compress="0" quality="80" props="scaleX=0.5@@!@@scaleY=0.5@@!@@stateNum=2" pack="0" picType="0" scale="0"/>
+   <item name="view/clip_hide.png" type="Clip" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="comp/infoicon.png" type="Image" compress="0" quality="80" props="width=14 height=14"/>
+   <item name="comp/folder.png" type="Image" compress="0" quality="80" props="width=16 height=16"/>
+   <item name="play/btn_add.png" type="Button" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="play/btn_back.png" type="Button" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="play/btn_begin.png" type="Button" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="play/btn_clone.png" type="Button" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="play/btn_del.png" type="Button" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="play/btn_end.png" type="Button" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="play/btn_forward.png" type="Button" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="play/btn_play.png" type="Button" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="play/btn_replay.png" type="Button" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="play/btn_stop.png" type="Button" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="view/clip_lock.png" type="Clip" compress="0" quality="80" props="scaleX=0.5@@!@@scaleY=0.5" pack="0" picType="0" scale="0"/>
+   <item name="view/clip_hide1.png" type="Clip" compress="0" quality="80" props=""/>
+   <item name="view/clip_lock1.png" type="Clip" compress="0" quality="80" props=""/>
+   <item name="comp/color.png" type="Image" compress="0" quality="80" props="scaleX=0.5 scaleY=0.5"/>
+   <item name="view/question.png" type="Image" compress="0" quality="80" props=""/>
+   <item name="comp/iconhelp.png" type="Image" compress="0" quality="80" props="scaleX=0.5@@!@@scaleY=0.5" pack="0" picType="0" scale="0"/>
+   <item name="comp/Label1.png" type="Label" compress="0" quality="80" props="color=#999999"/>
+   <item name="comp/tab_bg.png" type="Image" compress="0" quality="80" props="" pack="0" picType="1" scale="0"/>
+   <item name="view/bg_panel_layoutrec.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/bg_dialog2.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/align_top.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/align_middle.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/align_bottom.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="comp/combo_20.png" type="ComboBox" compress="0" pack="0" quality="80" props="sizeGrid=0,20,0,3@@!@@labelColors=#CCCCCC,#CCCCCC,#CCCCCC,#c5c5c5" picType="0" scale="0"/>
+   <item name="view/bg_timeline.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/bg_uiviewer.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/white03.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/backmain.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="comp/line.png" type="null" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="comp/clip_selectBox2.png" type="Clip" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="comp/hslider.png" type="HSlider" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/displaytreebar.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/timelinebar.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="comp/input_20.png" type="TextInput" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="comp/input_20_selected.png" type="TextInput" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="comp/tab4.png" type="Image" compress="0" pack="0" quality="80" props="direction=vertical@@!@@space=6@@!@@labelColors=#CCCCCC,#ffffff,#ffffff@@!@@labelSize=14" picType="1" scale="0"/>
+   <item name="comp/label_panel_title.png" type="Label" compress="0" pack="0" quality="80" props="fontSize=14@@!@@align=center@@!@@color=#ffffff@@!@@centerX=0@@!@@y=16" picType="0" scale="0"/>
+   <item name="view/tab_displaypanel.png" type="Tab" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/tab_panel.png" type="Tab" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/tab_projectpanel.png" type="Tab" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/tab_proppanel.png" type="Tab" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/tab_timelinepanel.png" type="Tab" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/tab_uipanel.png" type="Tab" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/bg_menu.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/tool_bg.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/bg_projectpanel.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/bg_uipanel.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/saveprefab.png" type="Image" compress="0" pack="0" quality="80" props="scaleX=0.5@@!@@scaleY=0.5" picType="0" scale="0"/>
+   <item name="comp/label_intro.png" type="Label" compress="0" pack="0" quality="80" props="fontSize=14@@!@@color=#C8C8C8" picType="0" scale="0"/>
+   <item name="comp/label_tips.png" type="Label" compress="0" pack="0" quality="80" props="fontSize=14@@!@@color=#606060" picType="0" scale="0"/>
+   <item name="comp/input_32_selected.png" type="TextInput" compress="0" pack="0" quality="80" props="" picType="0" scale="0"/>
+   <item name="comp/checkbox_16.png" type="CheckBox" compress="0" pack="0" quality="80" props="labelColors=#CCCCCC@@!@@labelSize=14@@!@@labelPadding=0,0,0,6" picType="0" scale="0"/>
+   <item name="view/pagesetting.png" type="Image" compress="0" pack="0" quality="80" props="scaleX=0.5@@!@@scaleY=0.5" picType="0" scale="0"/>
+   <item name="comp/blank_title_dragrec.png" type="Image" compress="0" pack="0" quality="80" props="y=7" picType="0" scale="0"/>
+   <item name="comp/label_highlight.png" type="Label" compress="0" pack="0" quality="80" props="fontSize=14@@!@@color=#cccc00" picType="0" scale="0"/>
+   <item name="comp/label_timeline.png" type="Label" compress="0" pack="0" quality="80" props="color=#CCCCCC" picType="0" scale="0"/>
+   <item name="comp/btn_addcomp.png" type="Button" compress="0" pack="0" quality="80" props="labelColors=#FFFFFF,#FFFFFF,#FFFFFF" picType="0" scale="0"/>
+   <item name="view/pagesetpreload.png" type="Image" compress="0" pack="0" quality="80" props="scaleX=0.5@@!@@scaleY=0.5" picType="0" scale="0"/>
+   <item name="comp/combotimeline_20.png" type="ComboBox" compress="0" pack="0" quality="80" props="sizeGrid=0,20,0,3@@!@@labelColors=#CCCCCC,#CCCCCC,#CCCCCC,#c5c5c5" picType="0" scale="0"/>
+   <item name="view/bg_proppanel_bar.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="view/bg_biglogo.png" type="Image" compress="0" pack="0" quality="80" props="" picType="1" scale="0"/>
+   <item name="comp/comboselectani_20.png" type="Image" compress="0" pack="0" quality="80" props="sizeGrid=0,20,0,3@@!@@labelColors=#CCCCCC,#CCCCCC,#CCCCCC,#c5c5c5" picType="0" scale="0"/>
+</res>

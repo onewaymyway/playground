@@ -18,6 +18,7 @@
     <class path="src" />
     <class path="..\..\laya\src" />
     <class path="..\client\src" />
+    <class path="..\..\..\debugtoolplatform\deskplugins\Demo\src" />
   </classpaths>
   <!-- Build options -->
   <build>
@@ -74,7 +75,7 @@
   </library>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
-    <compile path="src\Test.as" />
+    <compile path="src\TestRemoteView.as" />
   </compileTargets>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>

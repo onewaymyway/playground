@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<uiComp>
+	
+        <DragView className="laya.ide.ui.DragView" inherit="View" icon="View" groups="公用,常用,宽高及位置" drag="3">
+		<prop name="minHeight" tips="选择的颜色" type="int" default="100" group="常用" />
+		<prop name="minWidth" tips="面板背景颜色" type="int" default="100" group="常用" />
+                <prop name="title" tips="标题" type="string" default="" group="常用" />
+                <prop name="recBarSkin" tips="顶部条图片" accept="res" type="string" default="" group="常用" />
+                <prop name="recTabSkin" tips="Tab图片" accept="res" type="string" default="" group="常用" />
+                <prop name="recActionType" tips="动作类型"  type="string" default="" group="常用" />
+	</DragView>
+        <TreeEx className="laya.editorUI.Tree" inherit="Tree" defaultValue="width='100' height='100'" icon="Tree" groups="公用,常用,宽高及位置" drag="3">
+	</TreeEx>
+        <ListEx className="laya.editorUI.List" inherit="List" defaultValue="width='100' height='100'" icon="Tree" groups="公用,常用,宽高及位置" drag="3">
+	</ListEx>
+</uiComp>

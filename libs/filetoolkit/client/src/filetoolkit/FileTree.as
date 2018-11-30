@@ -24,10 +24,12 @@ package filetoolkit
 		{
 			var arr:Array;
 			arr = [];
-			getDisplayItem(_source, arr);
+			if(_rootNode)
+			getDisplayItem(_rootNode, arr);
+			return arr;
 		}
 		
-		private function getDisplayItem(node:Object, arr:Array):void
+		private function getDisplayItem(node:Object, arr:Array,depth:int=0):void
 		{
 			
 			var childs:Array;
@@ -41,12 +43,13 @@ package filetoolkit
 			for (i = 0; i < len; i++)
 			{
 				tChild = childs[i];
+				tChild.x = _spaceLeft * depth;
 				arr.push(tChild);
 				if (tChild.isFolder)
 				{
 					
 					
-					getDisplayItem(tChild, arr);
+					getDisplayItem(tChild, arr,depth+1);
 				}else
 				{
 					
