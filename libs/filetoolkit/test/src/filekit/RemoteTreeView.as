@@ -1,6 +1,7 @@
 package filekit 
 {
 	import consts.Msgs;
+	import electrontools.MessageManager;
 	import filetoolkit.FileKit;
 	import laya.debug.tools.Notice;
 	import laya.debug.uicomps.ContextMenu;
@@ -12,6 +13,8 @@ package filekit
 	import laya.ui.Label;
 	import laya.utils.Handler;
 	import ui.deskplatform.RemoteTreeUI;
+	import view.AddResCommomDialog;
+	import webfile.FilePathUtils;
 	/**
 	 * ...
 	 * @author ww
@@ -54,6 +57,13 @@ package filekit
 			{
 				var path:String = resTree.selectedItem.path;
 				//trace("path:"+path);
+				if (resTree.selectedItem.isFolder)
+				{
+					directory = path;
+				}else
+				{
+					directory = FilePathUtils.getParent(path);
+				}
 				//return FileTools.getFileDir(path);
 			}
 			return directory;
@@ -81,14 +91,30 @@ package filekit
 				case "新建目录": 
 					//Notice.notify(PlatformEvents.OPEN_ADDDIR);
 					break;
-				
+				case "新建":
+					createNew();
+					break;
 			}
 			
 		}
 		
 		private function createNew():void
 		{
-			
+			var dataO:Object;
+			dataO = { };
+			dataO.dir = currDirectory;
+			AddResCommomDialog.instance.start(dataO,Handler.create(this,onAddNew));
+		}
+		private function onAddNew(dataO:Object):void
+		{
+			debugger;
+			fileKit.addFile(dataO.dir + "/" + dataO.fileName + ".demorender", "{}",Handler.create(this,onAddFileSuccess));
+		}
+		
+		private function onAddFileSuccess():void
+		{
+			MessageManager.I.show("添加文件成功");
+			refresh();
 		}
 		
 		private function onOpBoxClick(e:Event):void {
@@ -113,6 +139,7 @@ package filekit
 				//_mutiMenu.show();
 				//return;
 			//}
+			if (!FileKit.I.isLogined) return;
 			var comp:Component = e.target as Component;
 			if (comp && comp.dataSource) {
 				resTree.selectedItem = comp.dataSource;

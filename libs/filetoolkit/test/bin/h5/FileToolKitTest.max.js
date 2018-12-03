@@ -729,6 +729,7 @@ var Laya=window.Laya=(function(window,document){
 			resList.push({"url":"res/atlas/view.json","type":"atlas" });
 			resList.push({"url":"res/atlas/play.json","type":"atlas"});
 			Laya.loader.load(resList,new Handler(this,this.initFileToolKit));
+			MindMapEditor.isEditorMode=false;
 		}
 
 		__class(TestRemoteView,'TestRemoteView');
@@ -743,6 +744,7 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.onLogin=function(){
 			this.mindMapEditor.saveBtn.visible=true;
+			MindMapEditor.isEditorMode=true;
 		}
 
 		__proto.test=function(){
@@ -10985,6 +10987,127 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		return MindMapNodeData;
+	})()
+
+
+	/**
+	*编辑器全局静态入口
+	*@author ww
+	*/
+	//class nodetools.devices.Sys
+	var Sys=(function(){
+		function Sys(){};
+		__class(Sys,'nodetools.devices.Sys');
+		Sys.mParseFloat=function(v){
+			v=parseFloat(v);
+			if (isNaN(v))return 0;
+			return v;
+		}
+
+		Sys.log=function(__args){
+			var args=arguments;
+			Sys.print("log",args,"#0080C0");
+		}
+
+		Sys.error=function(__args){
+			var args=arguments;
+			Sys.print("error",args,"#FF0000");
+		}
+
+		Sys.warn=function(__args){
+			var args=arguments;
+			Sys.print("warn",args,"#9B9B00");
+		}
+
+		Sys.plugin=function(__args){
+			var args=arguments;
+			Sys.print("plugin",args,"#007300");
+		}
+
+		Sys.print=function(type,args,color){
+			var msg="";
+			for (var i=0;i < args.length;i++){
+				msg+=args[i]+" ";
+			}
+			console.log("%c ["+type+"]"+msg,"color: "+color+"");
+		}
+
+		Sys.alert=function(msg){
+			console.log(msg);
+		}
+
+		Sys.lang=function(body,__args){
+			var args=[];for(var i=1,sz=arguments.length;i<sz;i++)args.push(arguments[i]);
+			var i=0,len=0;
+			len=args.length;
+			for (i=0;i < len;i++){
+				body=body.replace("{"+i+"}",args[i]);
+			}
+			return body;
+		}
+
+		return Sys;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class webfile.FilePathUtils
+	var FilePathUtils=(function(){
+		function FilePathUtils(){}
+		__class(FilePathUtils,'webfile.FilePathUtils');
+		FilePathUtils.isAbsPath=function(path){
+			if(!path)return false;
+			if(path.indexOf(":")>0)return true;
+			if(path.substr(0,1)=="/")return true;
+			return false;
+		}
+
+		FilePathUtils.getExtensionName=function(path){
+			if (path==null)
+				return null;
+			var a=path.split(".");
+			var file=a[a.length-1];
+			return file;
+		}
+
+		FilePathUtils.getFileNameWithExtension=function(path){
+			if (path==null)
+				return null;
+			path=FilePathUtils.adptToCommonUrl(path);
+			var a=path.split("/");
+			var file=a[a.length-1];
+			return file;
+		}
+
+		FilePathUtils.adptToCommonUrl=function(url){
+			return StringTool.getReplace(url,"\\\\","/");
+		}
+
+		FilePathUtils.getParent=function(url){
+			url=FilePathUtils.adptToCommonUrl(url);
+			var a;
+			a=url.split("/");
+			a.pop();
+			return a.join("/");
+		}
+
+		return FilePathUtils;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.consts.CommonUIConsts
+	var CommonUIConsts=(function(){
+		function CommonUIConsts(){}
+		__class(CommonUIConsts,'commonui.consts.CommonUIConsts');
+		CommonUIConsts.fileNameRestrict="0-9a-zA-Z_";
+		return CommonUIConsts;
 	})()
 
 
@@ -27018,6 +27141,103 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
+	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
+	*
+	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
+	*package
+	*{
+		*import laya.ui.HSlider;
+		*import laya.ui.VSlider;
+		*import laya.utils.Handler;
+		*public class VSlider_Example
+		*{
+			*private var vSlider:VSlider;
+			*public function VSlider_Example()
+			*{
+				*Laya.init(640,800);//设置游戏画布宽高。
+				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
+				*}
+			*private function onLoadComplete():void
+			*{
+				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+				*vSlider.min=0;//设置 vSlider 最低位置值。
+				*vSlider.max=10;//设置 vSlider 最高位置值。
+				*vSlider.value=2;//设置 vSlider 当前位置值。
+				*vSlider.tick=1;//设置 vSlider 刻度值。
+				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
+				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+				*}
+			*private function onChange(value:Number):void
+			*{
+				*trace("滑块的位置： value="+value);
+				*}
+			*}
+		*}
+	*@example
+	*Laya.init(640,800);//设置游戏画布宽高
+	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
+	*var vSlider;
+	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
+	*function onLoadComplete(){
+		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+		*vSlider.min=0;//设置 vSlider 最低位置值。
+		*vSlider.max=10;//设置 vSlider 最高位置值。
+		*vSlider.value=2;//设置 vSlider 当前位置值。
+		*vSlider.tick=1;//设置 vSlider 刻度值。
+		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
+		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+		*}
+	*function onChange(value){
+		*console.log("滑块的位置： value="+value);
+		*}
+	*@example
+	*import HSlider=laya.ui.HSlider;
+	*import VSlider=laya.ui.VSlider;
+	*import Handler=laya.utils.Handler;
+	*class VSlider_Example {
+		*private vSlider:VSlider;
+		*constructor(){
+			*Laya.init(640,800);//设置游戏画布宽高。
+			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
+			*}
+		*private onLoadComplete():void {
+			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+			*this.vSlider.min=0;//设置 vSlider 最低位置值。
+			*this.vSlider.max=10;//设置 vSlider 最高位置值。
+			*this.vSlider.value=2;//设置 vSlider 当前位置值。
+			*this.vSlider.tick=1;//设置 vSlider 刻度值。
+			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
+			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
+			*}
+		*private onChange(value:number):void {
+			*console.log("滑块的位置： value="+value);
+			*}
+		*}
+	*@see laya.ui.Slider
+	*/
+	//class laya.ui.VSlider extends laya.ui.Slider
+	var VSlider=(function(_super){
+		function VSlider(){VSlider.__super.call(this);;
+		};
+
+		__class(VSlider,'laya.ui.VSlider',_super);
+		return VSlider;
+	})(Slider)
+
+
+	/**
 	*<code>TextInput</code> 类用于创建显示对象以显示和输入文本。
 	*
 	*@example <caption>以下示例代码，创建了一个 <code>TextInput</code> 实例。</caption>
@@ -27338,103 +27558,6 @@ var Laya=window.Laya=(function(window,document){
 
 		return TextInput;
 	})(Label)
-
-
-	/**
-	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
-	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
-	*
-	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
-	*package
-	*{
-		*import laya.ui.HSlider;
-		*import laya.ui.VSlider;
-		*import laya.utils.Handler;
-		*public class VSlider_Example
-		*{
-			*private var vSlider:VSlider;
-			*public function VSlider_Example()
-			*{
-				*Laya.init(640,800);//设置游戏画布宽高。
-				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
-				*}
-			*private function onLoadComplete():void
-			*{
-				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-				*vSlider.min=0;//设置 vSlider 最低位置值。
-				*vSlider.max=10;//设置 vSlider 最高位置值。
-				*vSlider.value=2;//设置 vSlider 当前位置值。
-				*vSlider.tick=1;//设置 vSlider 刻度值。
-				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
-				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-				*}
-			*private function onChange(value:Number):void
-			*{
-				*trace("滑块的位置： value="+value);
-				*}
-			*}
-		*}
-	*@example
-	*Laya.init(640,800);//设置游戏画布宽高
-	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
-	*var vSlider;
-	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
-	*function onLoadComplete(){
-		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-		*vSlider.min=0;//设置 vSlider 最低位置值。
-		*vSlider.max=10;//设置 vSlider 最高位置值。
-		*vSlider.value=2;//设置 vSlider 当前位置值。
-		*vSlider.tick=1;//设置 vSlider 刻度值。
-		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
-		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-		*}
-	*function onChange(value){
-		*console.log("滑块的位置： value="+value);
-		*}
-	*@example
-	*import HSlider=laya.ui.HSlider;
-	*import VSlider=laya.ui.VSlider;
-	*import Handler=laya.utils.Handler;
-	*class VSlider_Example {
-		*private vSlider:VSlider;
-		*constructor(){
-			*Laya.init(640,800);//设置游戏画布宽高。
-			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
-			*}
-		*private onLoadComplete():void {
-			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-			*this.vSlider.min=0;//设置 vSlider 最低位置值。
-			*this.vSlider.max=10;//设置 vSlider 最高位置值。
-			*this.vSlider.value=2;//设置 vSlider 当前位置值。
-			*this.vSlider.tick=1;//设置 vSlider 刻度值。
-			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
-			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
-			*}
-		*private onChange(value:number):void {
-			*console.log("滑块的位置： value="+value);
-			*}
-		*}
-	*@see laya.ui.Slider
-	*/
-	//class laya.ui.VSlider extends laya.ui.Slider
-	var VSlider=(function(_super){
-		function VSlider(){VSlider.__super.call(this);;
-		};
-
-		__class(VSlider,'laya.ui.VSlider',_super);
-		return VSlider;
-	})(Slider)
 
 
 	/**
@@ -28925,7 +29048,27 @@ var Laya=window.Laya=(function(window,document){
 					break ;
 				case "新建目录":
 					break ;
+				case "新建":
+					this.createNew();
+					break ;
 				}
+		}
+
+		__proto.createNew=function(){
+			var dataO;
+			dataO={};
+			dataO.dir=this.currDirectory;
+			AddResCommomDialog.instance.start(dataO,Handler.create(this,this.onAddNew));
+		}
+
+		__proto.onAddNew=function(dataO){
+			debugger;
+			this.fileKit.addFile(dataO.dir+"/"+dataO.fileName+".demorender","{}",Handler.create(this,this.onAddFileSuccess));
+		}
+
+		__proto.onAddFileSuccess=function(){
+			MessageManager.I.show("添加文件成功");
+			this.refresh();
 		}
 
 		__proto.onOpBoxClick=function(e){
@@ -28944,6 +29087,7 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.onResTreeRightMouseDown=function(e){
 			console.log("onResTreeRightMouseDown");
+			if (!FileKit.I.isLogined)return;
 			var comp=e.target;
 			if (comp && comp.dataSource){
 				this.resTree.selectedItem=comp.dataSource;
@@ -29000,12 +29144,58 @@ var Laya=window.Laya=(function(window,document){
 			var directory="";
 			if (this.resTree.selectedItem !=null){
 				var path=this.resTree.selectedItem.path;
+				if (this.resTree.selectedItem.isFolder){
+					directory=path;
+					}else{
+					directory=FilePathUtils.getParent(path);
+				}
 			}
 			return directory;
 		});
 
 		return RemoteTreeView;
 	})(RemoteTreeUI)
+
+
+	//class commonui.ui.AddDirectoryUI extends laya.ui.Dialog
+	var AddDirectoryUI=(function(_super){
+		function AddDirectoryUI(){
+			this.titleTxt=null;
+			this.nameTip=null;
+			this.nameTxt=null;
+			AddDirectoryUI.__super.call(this);
+		}
+
+		__class(AddDirectoryUI,'commonui.ui.AddDirectoryUI',_super);
+		var __proto=AddDirectoryUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(AddDirectoryUI.uiView);
+		}
+
+		AddDirectoryUI.uiView={"type":"Dialog","props":{"width":500,"scenecolor":"#dddddd","height":250},"child":[{"type":"Image","props":{"y":0,"x":0,"width":500,"skin":"view/bg_dialog.png","height":250,"sizeGrid":"47,20,22,37"}},{"type":"Button","props":{"skin":"view/btn_close.png","name":"close","scaleX":0.5,"scaleY":0.5,"right":11,"y":7}},{"type":"Image","props":{"y":7,"x":9,"width":438,"skin":"comp/blank_title_dragrec.png","name":"drag","height":36}},{"type":"Label","props":{"x":28,"width":140,"var":"titleTxt","text":"新增目录","styleSkin":"comp/label_panel_title.png","height":18,"fontSize":14,"align":"center","color":"#ffffff","centerX":0,"y":16}},{"type":"Label","props":{"y":86,"x":51,"width":92,"var":"nameTip","text":"目录名称：","styleSkin":"comp/label_intro.png","height":18,"fontSize":14,"color":"#C8C8C8"}},{"type":"TextInput","props":{"y":117,"x":51,"width":400,"var":"nameTxt","skin":"comp/input_32.png","color":"#dddddd","sizeGrid":"0,3,0,3","fontSize":14,"padding":"0,4,0,4","height":32}},{"type":"Button","props":{"y":175,"x":190,"skin":"comp/button.png","name":"sure","label":"新增","labelColors":"#FFFFFF,#FFFFFF,#FFFFFF,#c5c5c5","labelSize":16,"sizeGrid":"0,4,0,4"}}]};
+		return AddDirectoryUI;
+	})(Dialog)
+
+
+	//class commonui.ui.AlertUI extends laya.ui.Dialog
+	var AlertUI=(function(_super){
+		function AlertUI(){
+			this.titleLbl=null;
+			this.msgLbl=null;
+			AlertUI.__super.call(this);
+		}
+
+		__class(AlertUI,'commonui.ui.AlertUI',_super);
+		var __proto=AlertUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(AlertUI.uiView);
+		}
+
+		AlertUI.uiView={"type":"Dialog","props":{"width":500,"scenecolor":"#dddddd","height":250},"child":[{"type":"Image","props":{"y":0,"x":0,"width":500,"skin":"view/bg_dialog.png","height":250,"sizeGrid":"47,20,22,37"}},{"type":"Button","props":{"x":404,"skin":"view/btn_close.png","name":"close","scaleX":0.5,"scaleY":0.5,"right":11,"y":7}},{"type":"Image","props":{"y":7,"x":9,"width":442,"skin":"comp/blank_title_dragrec.png","name":"drag","height":36}},{"type":"Label","props":{"x":28,"var":"titleLbl","text":"提示","styleSkin":"comp/label_panel_title.png","fontSize":14,"align":"center","color":"#ffffff","centerX":0,"y":16}},{"type":"Label","props":{"y":80,"x":39,"wordWrap":true,"width":422,"var":"msgLbl","valign":"middle","text":"确认内容","styleSkin":"comp/label_intro.png","multiline":true,"mouseEnabled":false,"mouseChildren":false,"isHtml":true,"height":65,"align":"center","fontSize":14,"color":"#C8C8C8"}},{"type":"Button","props":{"y":173,"x":190,"skin":"comp/button.png","name":"sure","label":"确定","labelColors":"#FFFFFF,#FFFFFF,#FFFFFF,#c5c5c5","labelSize":16,"sizeGrid":"0,4,0,4"}}]};
+		return AlertUI;
+	})(Dialog)
 
 
 	/**
@@ -29086,6 +29276,7 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.onItemAction=function(action,target){
+			if (!mindmap.MindMapEditor.isEditorMode)return;
 			var parentNode;
 			parentNode=target.parentNode;
 			switch(action){
@@ -29231,6 +29422,7 @@ var Laya=window.Laya=(function(window,document){
 		});
 
 		MindMapEditor.Save="Save";
+		MindMapEditor.isEditorMode=true;
 		return MindMapEditor;
 	})(MindMapEditorUI)
 
@@ -29315,10 +29507,12 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.onRightMouseUp=function(){
 			console.log("mindmapitem rightmouseup");
+			if (!MindMapEditor.isEditorMode)return;
 			this._menu.show();
 		}
 
 		__proto.freshUI=function(){
+			this.text.editable=MindMapEditor.isEditorMode;
 			this.text.text=this.nodeData.label||"";
 		}
 
@@ -29528,6 +29722,91 @@ var Laya=window.Laya=(function(window,document){
 		LoginView._instance=null
 		return LoginView;
 	})(LoginViewUI)
+
+
+	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2017-10-23 下午8:59:35
+	*/
+	//class view.AddResCommomDialog extends commonui.ui.AddDirectoryUI
+	var AddResCommomDialog=(function(_super){
+		function AddResCommomDialog(){
+			this.dataO=null;
+			this._complete=null;
+			AddResCommomDialog.__super.call(this);
+		}
+
+		__class(AddResCommomDialog,'view.AddResCommomDialog',_super);
+		var __proto=AddResCommomDialog.prototype;
+		__proto.start=function(dataO,complete){
+			if (!dataO)return;
+			this._complete=complete;
+			this.dataO=dataO;
+			this.titleTxt.text=Sys.lang("新建");
+			this.nameTip.text=Sys.lang("名称：");
+			this.nameTxt.restrict="0-9a-zA-Z_";
+			this.nameTxt.text="";
+			this.popup();
+			this.nameTxt.focus=true;
+		}
+
+		__proto.close=function(type){
+			if (type=="sure"){
+				if (this.nameTxt.text){
+					laya.ui.Dialog.prototype.close.call(this,type);
+					this.dataO.fileName=this.nameTxt.text;
+					this._complete.runWith(this.dataO);
+					}else {
+					Alert.show(Sys.lang("名称不能为空"));
+				}
+				}else{
+				laya.ui.Dialog.prototype.close.call(this,type);
+			}
+		}
+
+		__getset(1,AddResCommomDialog,'instance',function(){
+			return AddResCommomDialog._instance ? AddResCommomDialog._instance :AddResCommomDialog._instance=new AddResCommomDialog();
+		},commonui.ui.AddDirectoryUI._$SET_instance);
+
+		AddResCommomDialog._instance=null
+		return AddResCommomDialog;
+	})(AddDirectoryUI)
+
+
+	/**提示框
+	*@author ww
+	*/
+	//class view.Alert extends commonui.ui.AlertUI
+	var Alert=(function(_super){
+		function Alert(){Alert.__super.call(this);;
+		};
+
+		__class(Alert,'view.Alert',_super);
+		var __proto=Alert.prototype;
+		__proto.start=function(msg,title){
+			this.titleLbl.text=title;
+			this.msgLbl.text=msg;
+			this.popup();
+		}
+
+		__getset(1,Alert,'instance',function(){
+			return Alert._instance?Alert._instance:Alert._instance=new Alert();
+		},commonui.ui.AlertUI._$SET_instance);
+
+		Alert.show=function(msg,title){
+			(title===void 0)&& (title="提示");
+			if(title=="提示"){
+				title=Sys.lang("提示");
+			}
+			Alert.instance.start(msg,title);
+		}
+
+		Alert._instance=null
+		return Alert;
+	})(AlertUI)
 
 
 	Laya.__init([EventDispatcher,LoaderManager,Render,View,Browser,Timer,GraphicAnimation,LocalStorage]);

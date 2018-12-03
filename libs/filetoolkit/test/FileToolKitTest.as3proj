@@ -20,6 +20,7 @@
     <class path="..\client\src" />
     <class path="..\..\..\debugtoolplatform\deskplugins\Demo\src" />
     <class path="..\..\nodetools\src" />
+    <class path="..\..\commonui\src" />
   </classpaths>
   <!-- Build options -->
   <build>

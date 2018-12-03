@@ -34,6 +34,7 @@ package
 			resList.push( { "url":"res/atlas/view.json", "type":Loader.ATLAS } );
 			resList.push({"url":"res/atlas/play.json","type":Loader.ATLAS});
 			Laya.loader.load(resList, new Handler(this, initFileToolKit));
+			MindMapEditor.isEditorMode = false;
 		}
 		private var mindMapEditor:MindMapEditor;
 		public var fileKit:FileKit;
@@ -54,6 +55,7 @@ package
 		private function onLogin():void
 		{
 			mindMapEditor.saveBtn.visible = true;
+			MindMapEditor.isEditorMode = true;
 		}
 		private function test():void
 		{
