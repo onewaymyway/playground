@@ -34,6 +34,7 @@ package mindmap
 			upBtn.on(Event.CLICK, this, onBtnAction, ["up"]);
 			selectBtn.on(Event.CLICK, this, onBtnAction, ["select"]);
 			selectBtn.selected = false;
+			
 		}
 		
 		public function setSelect(isSelect:Boolean):void
@@ -96,11 +97,13 @@ package mindmap
 		private function onRightMouseUp():void
 		{
 			trace("mindmapitem rightmouseup");
+			if (!MindMapEditor.isEditorMode) return;
 			_menu.show();
 		}
 		
 		public function freshUI():void
 		{
+			text.editable = MindMapEditor.isEditorMode;
 			text.text = nodeData.label||"";
 		}
 		

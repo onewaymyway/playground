@@ -20,6 +20,7 @@ package mindmap
 		private var onItemActionHandler:Handler;
 		private var _userChanged:Boolean = false;
 		private var _selectItem:MindMapItem;
+		public static var isEditorMode:Boolean = true;
 		public function MindMapEditor() 
 		{
 			_menu = ContextMenu.createMenuByArray(["新建"]);
@@ -90,6 +91,7 @@ package mindmap
 		
 		private function onItemAction(action:String, target:MindMapItem):void
 		{
+			if (!MindMapEditor.isEditorMode) return;
 			var parentNode:MindMapItem;
 			parentNode = target.parentNode;
 			switch(action)
