@@ -2,15 +2,18 @@ package
 {
 	import consts.Msgs;
 	import electrontools.MessageManager;
+	import extendui.ui.PixelRatioBox;
 	import filekit.RemoteTreeView;
 	import filetoolkit.FileKit;
 	import filetoolkit.FileTree;
 	import laya.debug.tools.Notice;
 	import laya.debug.uicomps.ContextMenu;
 	import laya.debug.uicomps.ContextMenuItem;
+	import laya.display.Sprite;
 	import laya.display.Stage;
 	import laya.net.Loader;
 	import laya.ui.View;
+	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import mindmap.MindMapEditor;
 	/**
@@ -60,11 +63,21 @@ package
 		private function test():void
 		{
 			
+			
+			var container:Sprite;
+			if (Browser.pixelRatio > 1)
+			{
+				container = new PixelRatioBox();
+				Laya.stage.addChild(container);
+			}else
+			{
+				container = Laya.stage;
+			}
 			tree = new RemoteTreeView();
 			tree.top = tree.bottom = 5;
 			tree.fileKit = fileKit;
 			tree.refresh();
-			Laya.stage.addChild(tree);
+			container.addChild(tree);
 			
 			
 			mindMapEditor = new MindMapEditor();
@@ -73,7 +86,7 @@ package
 			mindMapEditor.right = mindMapEditor.top = mindMapEditor.bottom = 2;
 			mindMapEditor.on(MindMapEditor.Save, this, onMindMapSave);
 			mindMapEditor.saveBtn.visible = false;
-			Laya.stage.addChild(mindMapEditor);
+			container.addChild(mindMapEditor);
 			
 			Notice.listen(Msgs.Open_File, this, onOpenFile);
 		}
