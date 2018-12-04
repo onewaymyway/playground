@@ -413,6 +413,7 @@ var Laya=window.Laya=(function(window,document){
 			this.tFile=null;
 			Laya.init(800,600);
 			Laya.stage.scaleMode="full";
+			Laya.stage.screenMode="horizontal";
 			Laya.stage.bgColor="#000000";
 			ContextMenu.init();
 			ContextMenuItem.labelColors="#ffffff,#ffffff,#ffffff,#ffffff";
@@ -29504,22 +29505,36 @@ var Laya=window.Laya=(function(window,document){
 			this.onMenuSelectHandler=null;
 			this.onItemActionHandler=null;
 			this.parentNode=null;
+			this._downTime=NaN;
 			MindMapItem.__super.call(this);
 			this.hitTestPrior=false;
 			this._menu=ContextMenu.createMenuByArray(["新建同级","新建子","删除"]);
 			this._menu.on("select",this,this.onSelect);
 			this.on("rightmouseup",this,this.onRightMouseUp);
 			this.text.editable=true;
+			this.text.mouseEnabled=false;
 			this.text.on("blur",this,this.onInputBlur);
-			this.on("mousedown",this,this.onDoubleClick);
+			this.on("doubleclick",this,this.onDoubleClick);
 			this.downBtn.on("click",this,this.onBtnAction,["down"]);
 			this.upBtn.on("click",this,this.onBtnAction,["up"]);
 			this.selectBtn.on("click",this,this.onBtnAction,["select"]);
 			this.selectBtn.selected=false;
+			this.on("mousedown",this,this.onMyMouseDown);
+			this.on("mouseup",this,this.onMyMouseUp);
 		}
 
 		__class(MindMapItem,'mindmap.MindMapItem',_super);
 		var __proto=MindMapItem.prototype;
+		__proto.onMyMouseDown=function(){
+			this._downTime=Browser.now();
+		}
+
+		__proto.onMyMouseUp=function(){
+			if (Browser.now()-this._downTime > 500){
+				this.onRightMouseUp();
+			}
+		}
+
 		__proto.setSelect=function(isSelect){
 			this.selectBtn.selected=isSelect;
 		}
@@ -29551,10 +29566,12 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.onDoubleClick=function(){
+			this.text.editable=true;
 			this.text.focus=true;
 		}
 
 		__proto.onInputBlur=function(){
+			this.text.editable=false;
 			this.nodeData.label=this.text.text;
 			this.freshUI();
 		}

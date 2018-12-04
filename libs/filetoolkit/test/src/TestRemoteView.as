@@ -27,6 +27,7 @@ package
 		{
 			Laya.init(800, 600);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
+			Laya.stage.screenMode = Stage.SCREEN_HORIZONTAL;
 			Laya.stage.bgColor = "#000000";
 			ContextMenu.init();
 			ContextMenuItem.labelColors = "#ffffff,#ffffff,#ffffff,#ffffff";
