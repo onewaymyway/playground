@@ -2,6 +2,7 @@ package mindmap
 {
 	import laya.display.Sprite;
 	import laya.events.Event;
+	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import laya.utils.Pool;
 	import ui.mindmap.MapItemUI;
@@ -28,13 +29,31 @@ package mindmap
 			_menu.on(Event.SELECT, this, onSelect);
 			this.on(Event.RIGHT_MOUSE_UP, this, onRightMouseUp);
 			text.editable = true;
+			text.mouseEnabled = false;
 			text.on(Event.BLUR, this, onInputBlur);
-			this.on(Event.MOUSE_DOWN, this, onDoubleClick);
+			this.on(Event.DOUBLE_CLICK, this, onDoubleClick);
 			downBtn.on(Event.CLICK, this, onBtnAction, ["down"]);
 			upBtn.on(Event.CLICK, this, onBtnAction, ["up"]);
 			selectBtn.on(Event.CLICK, this, onBtnAction, ["select"]);
 			selectBtn.selected = false;
+			this.on(Event.MOUSE_DOWN, this, onMyMouseDown);
+			this.on(Event.MOUSE_UP, this, onMyMouseUp);
 			
+		}
+		
+		private var _downTime:Number;
+		
+		private function onMyMouseDown():void
+		{
+			_downTime = Browser.now();
+		}
+		
+		private function onMyMouseUp():void
+		{
+			if (Browser.now() - _downTime > 500)
+			{
+				onRightMouseUp();
+			}
 		}
 		
 		public function setSelect(isSelect:Boolean):void
@@ -71,13 +90,14 @@ package mindmap
 		}
 		private function onDoubleClick():void
 		{
-			//text.editable = true;
+			text.editable = true;
+			
 			text.focus = true;
 		}
 		
 		private function onInputBlur():void
 		{
-			//text.editable = false;
+			text.editable = false;
 			nodeData.label = text.text;
 			freshUI();
 		}
