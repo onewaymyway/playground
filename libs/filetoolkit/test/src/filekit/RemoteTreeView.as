@@ -90,12 +90,27 @@ package filekit
 					break;
 				case "新建目录": 
 					//Notice.notify(PlatformEvents.OPEN_ADDDIR);
+					createDir();
 					break;
 				case "新建":
 					createNew();
 					break;
 			}
 			
+		}
+		
+		
+		private function createDir():void
+		{
+			var dataO:Object;
+			dataO = { };
+			dataO.dir = currDirectory;
+			AddResCommomDialog.instance.start(dataO,Handler.create(this,onAddNewDir));
+		}
+		
+		private function onAddNewDir(dataO:Object):void
+		{
+			fileKit.addFolder(dataO.dir + "/" + dataO.fileName,Handler.create(this, onAddFileSuccess));
 		}
 		
 		private function createNew():void
