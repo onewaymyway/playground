@@ -851,6 +851,51 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*...
+	*@author dongketao
+	*/
+	//class PathFinding.core.Node
+	var Node$1=(function(){
+		function Node(x,y,walkable){
+			this.x=0;
+			this.y=0;
+			this.g=0;
+			this.f=0;
+			this.h=0;
+			this.by=0;
+			this.parent=null;
+			this.opened=null;
+			this.closed=null;
+			this.tested=null;
+			this.retainCount=null;
+			this.walkable=false;
+			(walkable===void 0)&& (walkable=true);
+			this.x=x;
+			this.y=y;
+			this.walkable=walkable;
+		}
+
+		__class(Node,'PathFinding.core.Node',null,'Node$1');
+		return Node;
+	})()
+
+
+	/**全局配置*/
+	//class UIConfig
+	var UIConfig=(function(){
+		function UIConfig(){};
+		__class(UIConfig,'UIConfig');
+		UIConfig.touchScrollEnable=true;
+		UIConfig.mouseWheelEnable=true;
+		UIConfig.showButtons=true;
+		UIConfig.popupBgColor="#000000";
+		UIConfig.popupBgAlpha=0.5;
+		UIConfig.closeDialogOnSide=true;
+		return UIConfig;
+	})()
+
+
+	/**
 	*<code>Graphics</code> 类用于创建绘图显示对象。Graphics可以同时绘制多个位图或者矢量图，还可以结合save，restore，transform，scale，rotate，translate，alpha等指令对绘图效果进行变化。
 	*Graphics以命令流方式存储，可以通过cmds属性访问所有命令流。Graphics是比Sprite更轻量级的对象，合理使用能提高应用性能(比如把大量的节点绘图改为一个节点的Graphics命令集合，能减少大量节点创建消耗)。
 	*@see laya.display.Sprite#graphics
@@ -1726,307 +1771,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*
-	*@author ww
-	*@version 1.0
-	*
-	*@created 2015-9-25 下午7:19:44
-	*/
-	//class laya.debug.tools.DisControlTool
-	var DisControlTool=(function(){
-		function DisControlTool(){}
-		__class(DisControlTool,'laya.debug.tools.DisControlTool');
-		DisControlTool.getObjectsUnderPoint=function(sprite,x,y,rst,filterFun){
-			rst=rst?rst:[];
-			if(filterFun!=null&&!filterFun(sprite))return rst;
-			if (sprite.getBounds().contains(x,y)){
-				var tS;
-				var tempP=new Point();
-				tempP.setTo(x,y);
-				tempP=sprite.fromParentPoint(tempP);
-				x=tempP.x;
-				y=tempP.y;
-				var childList;
-				childList=sprite._childs||sprite._children;
-				for (var i=childList.length-1;i >-1;i--){
-					var child=childList[i];
-					if((child instanceof laya.display.Sprite ))
-						DisControlTool.getObjectsUnderPoint(child,x,y,rst,filterFun);
-				}
-				rst.push(sprite);
-			}
-			return rst;
-		}
-
-		DisControlTool.getObjectsUnderGlobalPoint=function(sprite,filterFun,point){
-			if(!point){
-				point=new Point();
-				point.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
-			}
-			if(sprite.parent)
-				point=(sprite.parent).globalToLocal(point);
-			return DisControlTool.getObjectsUnderPoint(sprite,point.x,point.y,null,filterFun);
-		}
-
-		DisControlTool.findFirstObjectsUnderGlobalPoint=function(){
-			var disList;
-			disList=DisControlTool.getObjectsUnderGlobalPoint(Laya.stage);
-			if (!disList)return null;
-			var i=0,len=0;
-			var tDis;
-			len=disList.length;
-			for (i=len-1;i>=0;i--){
-				tDis=disList[i];
-				if (tDis && tDis.numChildren < 1){
-					return tDis;
-				}
-			}
-			return tDis;
-		}
-
-		DisControlTool.visibleAndEnableObjFun=function(tar){
-			return tar.visible&&tar.mouseEnabled;
-		}
-
-		DisControlTool.visibleObjFun=function(tar){
-			return tar.visible;
-		}
-
-		DisControlTool.getMousePoint=function(sprite){
-			var point=new Point();
-			point.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
-			point=sprite.globalToLocal(point);
-			return point;
-		}
-
-		DisControlTool.isChildE=function(parent,child){
-			if (!parent)return false;
-			while (child){
-				if (child.parent==parent)return true;
-				child=child.parent;
-			}
-			return false;
-		}
-
-		DisControlTool.isInTree=function(pNode,child){
-			return pNode==child || DisControlTool.isChildE(pNode,child);
-		}
-
-		DisControlTool.setTop=function(tar){
-			if(tar&&tar.parent){
-				var tParent;
-				tParent=tar.parent;
-				tParent.setChildIndex(tar,tParent.numChildren-1);
-			}
-		}
-
-		DisControlTool.clearItemRelativeInfo=function(item){
-			var Nan="NaN";
-			item.getLayout().left=Nan;
-			item.getLayout().right=Nan;
-			item.getLayout().top=Nan;
-			item.getLayout().bottom=Nan;
-		}
-
-		DisControlTool.swap=function(tarA,tarB){
-			if (tarA==tarB)return;
-			var iA=0;
-			iA=tarA.parent.getChildIndex(tarA);
-			var iB=0;
-			iB=tarB.parent.getChildIndex(tarB);
-			var bP;
-			bP=tarB.parent;
-			tarA.parent.addChildAt(tarB,iA);
-			bP.addChildAt(tarA,iB);
-		}
-
-		DisControlTool.insertToTarParent=function(tarA,tars,after){
-			(after===void 0)&& (after=false);
-			var tIndex=0;
-			var parent;
-			if(!tarA)return;
-			parent=tarA.parent;
-			if(!parent)return;
-			tIndex=parent.getChildIndex(tarA);
-			if(after)tIndex++;
-			DisControlTool.insertToParent(parent,tars,tIndex);
-		}
-
-		DisControlTool.insertToParent=function(parent,tars,index){
-			(index===void 0)&& (index=-1);
-			if(!parent)return;
-			if(index<0)index=parent.numChildren;
-			var i=0,len=0;
-			len=tars.length;
-			for(i=0;i<len;i++){
-				DisControlTool.transParent(tars[i],parent);
-				parent.addChildAt(tars[i],index);
-			}
-		}
-
-		DisControlTool.transParent=function(tar,newParent){
-			if(!tar||!newParent)return;
-			if(!tar.parent)return;
-			var preParent;
-			preParent=tar.parent;
-			var pos;
-			pos=new Point(tar.x,tar.y);
-			pos=preParent.localToGlobal(pos);
-			pos=newParent.globalToLocal(pos);
-			tar.pos(pos.x,pos.y);
-		}
-
-		DisControlTool.transPoint=function(nowParent,tarParent,point){
-			point=nowParent.localToGlobal(point);
-			point=tarParent.globalToLocal(point);
-			return point;
-		}
-
-		DisControlTool.removeItems=function(itemList){
-			var i=0,len=0;
-			len=itemList.length;
-			for (i=0;i < len;i++){
-				(itemList [i]).removeSelf();
-			}
-		}
-
-		DisControlTool.addItems=function(itemList,parent){
-			var i=0,len=0;
-			len=itemList.length;
-			for (i=0;i < len;i++){
-				parent.addChild(itemList[i]);
-			}
-		}
-
-		DisControlTool.getAllChild=function(tar){
-			if(!tar)return [];
-			var i=0;
-			var len=0;
-			var rst=[];
-			len=tar.numChildren;
-			for(i=0;i<len;i++){
-				rst.push(tar.getChildAt(i));
-			}
-			return rst;
-		}
-
-		DisControlTool.upDis=function(child){
-			if(child&&child.parent){
-				var tParent;
-				tParent=child.parent;
-				var newIndex=0;
-				newIndex=tParent.getChildIndex(child)+1;
-				if(newIndex>=tParent.numChildren){
-					newIndex=tParent.numChildren-1;
-				}
-				console.log("setChildIndex:"+newIndex);
-				tParent.setChildIndex(child,newIndex);
-			}
-		}
-
-		DisControlTool.downDis=function(child){
-			if(child&&child.parent){
-				var tParent;
-				tParent=child.parent;
-				var newIndex=0;
-				newIndex=tParent.getChildIndex(child)-1;
-				if(newIndex<0)newIndex=0;
-				console.log("setChildIndex:"+newIndex);
-				tParent.setChildIndex(child,newIndex);
-			}
-		}
-
-		DisControlTool.setResizeAbleEx=function(node){
-			var clickItem;
-			clickItem=node.getChildByName("resizeBtn");
-			if (clickItem){
-				SimpleResizer.setResizeAble(clickItem,node);
-			}
-		}
-
-		DisControlTool.setResizeAble=function(node){
-			node.on("click",null,DisControlTool.resizeHandler,[node]);
-		}
-
-		DisControlTool.resizeHandler=function(tar){
-			DisResizer.setUp(tar);
-		}
-
-		DisControlTool.setDragingItem=function(dragBar,tar){
-			dragBar.on("mousedown",null,DisControlTool.dragingHandler,[tar]);
-			tar.on("dragend",null,DisControlTool.dragingEnd,[tar]);
-		}
-
-		DisControlTool.dragingHandler=function(tar){
-			if (tar){
-				tar.startDrag();
-			}
-		}
-
-		DisControlTool.dragingEnd=function(tar){
-			DisControlTool.intFyDisPos(tar);
-			console.log(tar.x,tar.y);
-		}
-
-		DisControlTool.showToStage=function(dis,offX,offY){
-			(offX===void 0)&& (offX=0);
-			(offY===void 0)&& (offY=0);
-			var rec=dis.getBounds();
-			var parent;
-			parent=dis.parent || Laya.stage;
-			dis.x=parent.mouseX+offX;
-			dis.y=parent.mouseY+offY;
-			if (dis.x+rec.width > parent.width){
-				dis.x-=rec.width+offX;
-			}
-			if (dis.y+rec.height > parent.height){
-				dis.y-=rec.height+offY;
-			}
-			DisControlTool.intFyDisPos(dis);
-		}
-
-		DisControlTool.intFyDisPos=function(dis){
-			if (!dis)return;
-			dis.x=Math.round(dis.x);
-			dis.y=Math.round(dis.y);
-		}
-
-		DisControlTool.showOnly=function(disList,showItem){
-			var i=0,len=0;
-			len=disList.length;
-			for (i=0;i < len;i++){
-				disList[i].visible=disList[i]==showItem;
-			}
-		}
-
-		DisControlTool.showOnlyByIndex=function(disList,index){
-			DisControlTool.showOnly(disList,disList[index]);
-		}
-
-		DisControlTool.addOnly=function(disList,showItem,parent){
-			var i=0,len=0;
-			len=disList.length;
-			for (i=0;i < len;i++){
-				if (disList[i] !=showItem){
-					disList[i].removeSelf();
-					}else{
-					parent.addChild(disList[i]);
-				}
-			}
-		}
-
-		DisControlTool.addOnlyByIndex=function(disList,index,parent){
-			DisControlTool.addOnly(disList,disList[index],parent);
-		}
-
-		__static(DisControlTool,
-		['tempP',function(){return this.tempP=new Point();}
-		]);
-		return DisControlTool;
-	})()
-
-
-	/**
 	*本类提供obj相关的一些操作
 	*@author ww
 	*@version 1.0
@@ -2425,240 +2169,6 @@ var Laya=window.Laya=(function(window,document){
 
 		ObjectTools.sign="_";
 		return ObjectTools;
-	})()
-
-
-	/**
-	*本类用于调整对象的宽高以及坐标
-	*@author ww
-	*/
-	//class laya.debug.tools.resizer.DisResizer
-	var DisResizer=(function(){
-		function DisResizer(){}
-		__class(DisResizer,'laya.debug.tools.resizer.DisResizer');
-		DisResizer.init=function(){
-			if (DisResizer._up)return;
-			DisResizer._up=new AutoFillRec("T");
-			DisResizer._up.height=2;
-			DisResizer._up.type=0;
-			DisResizer._down=new AutoFillRec("T");
-			DisResizer._down.height=2;
-			DisResizer._down.type=0;
-			DisResizer._left=new AutoFillRec("R");
-			DisResizer._left.width=2;
-			DisResizer._left.type=1;
-			DisResizer._right=new AutoFillRec("R");
-			DisResizer._right.width=2;
-			DisResizer._right.type=1;
-			DisResizer._barList=[DisResizer._up,DisResizer._down,DisResizer._left,DisResizer._right];
-			DisResizer.addEvent();
-		}
-
-		DisResizer.stageDown=function(e){
-			var target;
-			target=e.target;
-			if (DisResizer._tar && DisControlTool.isInTree(DisResizer._tar,target)){
-				return;
-			}
-			DisResizer.clear();
-		}
-
-		DisResizer.clear=function(){
-			DisResizer._tar=null;
-			Laya.stage.off("mouseup",null,DisResizer.stageDown);
-			DisControlTool.removeItems(DisResizer._barList);
-			DisResizer.clearDragEvents();
-		}
-
-		DisResizer.addEvent=function(){
-			var i=0,len=0;
-			var tBar;
-			len=DisResizer._barList.length;
-			for (i=0;i < len;i++){
-				tBar=DisResizer._barList[i];
-				tBar.on("mousedown",null,DisResizer.barDown);
-			}
-		}
-
-		DisResizer.barDown=function(e){
-			DisResizer.clearDragEvents();
-			DisResizer.tBar=e.target;
-			if (!DisResizer.tBar)return;
-			var area;
-			area=new Rectangle();
-			if (DisResizer.tBar.type==0){
-				area.x=DisResizer.tBar.x;
-				area.width=0;
-				area.y=DisResizer.tBar.y-200;
-				area.height=400;
-				}else{
-				area.x=DisResizer.tBar.x-200;
-				area.width=400;
-				area.y=0;
-				area.height=0;
-			};
-			var option;
-			option={};
-			option.area=area;
-			DisResizer.tBar.record();
-			DisResizer.tBar.startDrag(area);
-			DisResizer.tBar.on("dragmove",null,DisResizer.draging);
-			DisResizer.tBar.on("dragend",null,DisResizer.dragEnd);
-		}
-
-		DisResizer.draging=function(e){
-			console.log("draging");
-			if (!DisResizer.tBar)return;
-			if (!DisResizer._tar)return;
-			switch(DisResizer.tBar){
-				case DisResizer._left:
-					DisResizer._tar.x+=DisResizer.tBar.getDx();
-					DisResizer._tar.width-=DisResizer.tBar.getDx();
-					DisResizer._up.width-=DisResizer.tBar.getDx();
-					DisResizer._down.width-=DisResizer.tBar.getDx();
-					DisResizer._right.x-=DisResizer.tBar.getDx();
-					DisResizer.tBar.x-=DisResizer.tBar.getDx();
-					break ;
-				case DisResizer._right:
-					DisResizer._tar.width+=DisResizer.tBar.getDx();
-					DisResizer._up.width+=DisResizer.tBar.getDx();
-					DisResizer._down.width+=DisResizer.tBar.getDx();
-					break ;
-				case DisResizer._up:
-					DisResizer._tar.y+=DisResizer.tBar.getDy();
-					DisResizer._tar.height-=DisResizer.tBar.getDy();
-					DisResizer._right.height-=DisResizer.tBar.getDy();
-					DisResizer._left.height-=DisResizer.tBar.getDy();
-					DisResizer._down.y-=DisResizer.tBar.getDy();
-					DisResizer.tBar.y-=DisResizer.tBar.getDy();
-					break ;
-				case DisResizer._down:
-					DisResizer._tar.height+=DisResizer.tBar.getDy();
-					DisResizer._right.height+=DisResizer.tBar.getDy();
-					DisResizer._left.height+=DisResizer.tBar.getDy();
-					break ;
-				}
-			DisResizer.tBar.record();
-		}
-
-		DisResizer.dragEnd=function(e){
-			console.log("dragEnd");
-			DisResizer.clearDragEvents();
-			DisResizer.updates();
-		}
-
-		DisResizer.clearDragEvents=function(){
-			if (!DisResizer.tBar)return;
-			DisResizer.tBar.off("dragmove",null,DisResizer.draging);
-			DisResizer.tBar.off("dragend",null,DisResizer.dragEnd);
-		}
-
-		DisResizer.setUp=function(dis,force){
-			(force===void 0)&& (force=false);
-			if (force && dis==DisResizer._tar){
-				return;
-			};
-			DisControlTool.removeItems(DisResizer._barList);
-			if (DisResizer._tar==dis){
-				DisResizer._tar=null;
-				DisResizer.clearDragEvents();
-				if(!force)
-					return;
-			}
-			DisResizer._tar=dis;
-			DisResizer.updates();
-			DisControlTool.addItems(DisResizer._barList,dis);
-			Laya.stage.off("mouseup",null,DisResizer.stageDown);
-			Laya.stage.on("mouseup",null,DisResizer.stageDown);
-		}
-
-		DisResizer.updates=function(){
-			var dis;
-			dis=DisResizer._tar;
-			if(!dis)return;
-			var bounds;
-			bounds=new Rectangle(0,0,dis.width,dis.height);
-			DisResizer._up.x=bounds.x;
-			DisResizer._up.y=bounds.y;
-			DisResizer._up.width=bounds.width;
-			DisResizer._down.x=bounds.x;
-			DisResizer._down.y=bounds.y+bounds.height-2;
-			DisResizer._down.width=bounds.width;
-			DisResizer._left.x=bounds.x;
-			DisResizer._left.y=bounds.y;
-			DisResizer._left.height=bounds.height;
-			DisResizer._right.x=bounds.x+bounds.width-2;
-			DisResizer._right.y=bounds.y;
-			DisResizer._right.height=bounds.height;
-		}
-
-		DisResizer.Side=2;
-		DisResizer.Vertical=1;
-		DisResizer.Horizon=0;
-		DisResizer._up=null
-		DisResizer._down=null
-		DisResizer._left=null
-		DisResizer._right=null
-		DisResizer._barList=null
-		DisResizer._tar=null
-		DisResizer.barWidth=2;
-		DisResizer.useGetBounds=false;
-		DisResizer.tBar=null
-		return DisResizer;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class laya.debug.tools.resizer.SimpleResizer
-	var SimpleResizer=(function(){
-		function SimpleResizer(){}
-		__class(SimpleResizer,'laya.debug.tools.resizer.SimpleResizer');
-		SimpleResizer.setResizeAble=function(clickItem,tar,minWidth,minHeight){
-			(minWidth===void 0)&& (minWidth=150);
-			(minHeight===void 0)&& (minHeight=150);
-			clickItem.on("mousedown",null,SimpleResizer.onMouseDown,[tar,minWidth,minHeight]);
-		}
-
-		SimpleResizer.onMouseDown=function(tar,minWidth,minHeight,e){
-			SimpleResizer.clearEvents();
-			if (!tar)return;
-			SimpleResizer.preMousePoint.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
-			SimpleResizer.preTarSize.setTo(tar.width,tar.height);
-			SimpleResizer.preScale.setTo(1,1);
-			var rTar;
-			rTar=tar;
-			while (rTar&&rTar!=Laya.stage){
-				SimpleResizer.preScale.x *=rTar.scaleX;
-				SimpleResizer.preScale.y *=rTar.scaleY;
-				rTar=rTar.parent;
-			}
-			Laya.stage.on("mouseup",null,SimpleResizer.onMouseMoveEnd);
-			Laya.timer.loop(100,null,SimpleResizer.onMouseMoving,[tar,minWidth,minHeight]);
-		}
-
-		SimpleResizer.onMouseMoving=function(tar,minWidth,minHeight,e){
-			var tWidth=(Laya.stage.mouseX-SimpleResizer.preMousePoint.x)/ SimpleResizer.preScale.x+SimpleResizer.preTarSize.x;
-			var tHeight=(Laya.stage.mouseY-SimpleResizer.preMousePoint.y)/SimpleResizer.preScale.y+SimpleResizer.preTarSize.y;
-			tar.width=tWidth > minWidth?tWidth:minWidth;
-			tar.height=tHeight>minHeight?tHeight:minHeight;
-		}
-
-		SimpleResizer.onMouseMoveEnd=function(e){
-			SimpleResizer.clearEvents();
-		}
-
-		SimpleResizer.clearEvents=function(){
-			Laya.timer.clear(null,SimpleResizer.onMouseMoving);
-			Laya.stage.off("mouseup",null,SimpleResizer.onMouseMoveEnd);
-		}
-
-		__static(SimpleResizer,
-		['preMousePoint',function(){return this.preMousePoint=new Point();},'preTarSize',function(){return this.preTarSize=new Point();},'preScale',function(){return this.preScale=new Point();}
-		]);
-		return SimpleResizer;
 	})()
 
 
@@ -3204,6 +2714,541 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*本类用于调整对象的宽高以及坐标
+	*@author ww
+	*/
+	//class laya.debug.tools.resizer.DisResizer
+	var DisResizer=(function(){
+		function DisResizer(){}
+		__class(DisResizer,'laya.debug.tools.resizer.DisResizer');
+		DisResizer.init=function(){
+			if (DisResizer._up)return;
+			DisResizer._up=new AutoFillRec("T");
+			DisResizer._up.height=2;
+			DisResizer._up.type=0;
+			DisResizer._down=new AutoFillRec("T");
+			DisResizer._down.height=2;
+			DisResizer._down.type=0;
+			DisResizer._left=new AutoFillRec("R");
+			DisResizer._left.width=2;
+			DisResizer._left.type=1;
+			DisResizer._right=new AutoFillRec("R");
+			DisResizer._right.width=2;
+			DisResizer._right.type=1;
+			DisResizer._barList=[DisResizer._up,DisResizer._down,DisResizer._left,DisResizer._right];
+			DisResizer.addEvent();
+		}
+
+		DisResizer.stageDown=function(e){
+			var target;
+			target=e.target;
+			if (DisResizer._tar && DisControlTool.isInTree(DisResizer._tar,target)){
+				return;
+			}
+			DisResizer.clear();
+		}
+
+		DisResizer.clear=function(){
+			DisResizer._tar=null;
+			Laya.stage.off("mouseup",null,DisResizer.stageDown);
+			DisControlTool.removeItems(DisResizer._barList);
+			DisResizer.clearDragEvents();
+		}
+
+		DisResizer.addEvent=function(){
+			var i=0,len=0;
+			var tBar;
+			len=DisResizer._barList.length;
+			for (i=0;i < len;i++){
+				tBar=DisResizer._barList[i];
+				tBar.on("mousedown",null,DisResizer.barDown);
+			}
+		}
+
+		DisResizer.barDown=function(e){
+			DisResizer.clearDragEvents();
+			DisResizer.tBar=e.target;
+			if (!DisResizer.tBar)return;
+			var area;
+			area=new Rectangle();
+			if (DisResizer.tBar.type==0){
+				area.x=DisResizer.tBar.x;
+				area.width=0;
+				area.y=DisResizer.tBar.y-200;
+				area.height=400;
+				}else{
+				area.x=DisResizer.tBar.x-200;
+				area.width=400;
+				area.y=0;
+				area.height=0;
+			};
+			var option;
+			option={};
+			option.area=area;
+			DisResizer.tBar.record();
+			DisResizer.tBar.startDrag(area);
+			DisResizer.tBar.on("dragmove",null,DisResizer.draging);
+			DisResizer.tBar.on("dragend",null,DisResizer.dragEnd);
+		}
+
+		DisResizer.draging=function(e){
+			console.log("draging");
+			if (!DisResizer.tBar)return;
+			if (!DisResizer._tar)return;
+			switch(DisResizer.tBar){
+				case DisResizer._left:
+					DisResizer._tar.x+=DisResizer.tBar.getDx();
+					DisResizer._tar.width-=DisResizer.tBar.getDx();
+					DisResizer._up.width-=DisResizer.tBar.getDx();
+					DisResizer._down.width-=DisResizer.tBar.getDx();
+					DisResizer._right.x-=DisResizer.tBar.getDx();
+					DisResizer.tBar.x-=DisResizer.tBar.getDx();
+					break ;
+				case DisResizer._right:
+					DisResizer._tar.width+=DisResizer.tBar.getDx();
+					DisResizer._up.width+=DisResizer.tBar.getDx();
+					DisResizer._down.width+=DisResizer.tBar.getDx();
+					break ;
+				case DisResizer._up:
+					DisResizer._tar.y+=DisResizer.tBar.getDy();
+					DisResizer._tar.height-=DisResizer.tBar.getDy();
+					DisResizer._right.height-=DisResizer.tBar.getDy();
+					DisResizer._left.height-=DisResizer.tBar.getDy();
+					DisResizer._down.y-=DisResizer.tBar.getDy();
+					DisResizer.tBar.y-=DisResizer.tBar.getDy();
+					break ;
+				case DisResizer._down:
+					DisResizer._tar.height+=DisResizer.tBar.getDy();
+					DisResizer._right.height+=DisResizer.tBar.getDy();
+					DisResizer._left.height+=DisResizer.tBar.getDy();
+					break ;
+				}
+			DisResizer.tBar.record();
+		}
+
+		DisResizer.dragEnd=function(e){
+			console.log("dragEnd");
+			DisResizer.clearDragEvents();
+			DisResizer.updates();
+		}
+
+		DisResizer.clearDragEvents=function(){
+			if (!DisResizer.tBar)return;
+			DisResizer.tBar.off("dragmove",null,DisResizer.draging);
+			DisResizer.tBar.off("dragend",null,DisResizer.dragEnd);
+		}
+
+		DisResizer.setUp=function(dis,force){
+			(force===void 0)&& (force=false);
+			if (force && dis==DisResizer._tar){
+				return;
+			};
+			DisControlTool.removeItems(DisResizer._barList);
+			if (DisResizer._tar==dis){
+				DisResizer._tar=null;
+				DisResizer.clearDragEvents();
+				if(!force)
+					return;
+			}
+			DisResizer._tar=dis;
+			DisResizer.updates();
+			DisControlTool.addItems(DisResizer._barList,dis);
+			Laya.stage.off("mouseup",null,DisResizer.stageDown);
+			Laya.stage.on("mouseup",null,DisResizer.stageDown);
+		}
+
+		DisResizer.updates=function(){
+			var dis;
+			dis=DisResizer._tar;
+			if(!dis)return;
+			var bounds;
+			bounds=new Rectangle(0,0,dis.width,dis.height);
+			DisResizer._up.x=bounds.x;
+			DisResizer._up.y=bounds.y;
+			DisResizer._up.width=bounds.width;
+			DisResizer._down.x=bounds.x;
+			DisResizer._down.y=bounds.y+bounds.height-2;
+			DisResizer._down.width=bounds.width;
+			DisResizer._left.x=bounds.x;
+			DisResizer._left.y=bounds.y;
+			DisResizer._left.height=bounds.height;
+			DisResizer._right.x=bounds.x+bounds.width-2;
+			DisResizer._right.y=bounds.y;
+			DisResizer._right.height=bounds.height;
+		}
+
+		DisResizer.Side=2;
+		DisResizer.Vertical=1;
+		DisResizer.Horizon=0;
+		DisResizer._up=null
+		DisResizer._down=null
+		DisResizer._left=null
+		DisResizer._right=null
+		DisResizer._barList=null
+		DisResizer._tar=null
+		DisResizer.barWidth=2;
+		DisResizer.useGetBounds=false;
+		DisResizer.tBar=null
+		return DisResizer;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.tools.resizer.SimpleResizer
+	var SimpleResizer=(function(){
+		function SimpleResizer(){}
+		__class(SimpleResizer,'laya.debug.tools.resizer.SimpleResizer');
+		SimpleResizer.setResizeAble=function(clickItem,tar,minWidth,minHeight){
+			(minWidth===void 0)&& (minWidth=150);
+			(minHeight===void 0)&& (minHeight=150);
+			clickItem.on("mousedown",null,SimpleResizer.onMouseDown,[tar,minWidth,minHeight]);
+		}
+
+		SimpleResizer.onMouseDown=function(tar,minWidth,minHeight,e){
+			SimpleResizer.clearEvents();
+			if (!tar)return;
+			SimpleResizer.preMousePoint.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
+			SimpleResizer.preTarSize.setTo(tar.width,tar.height);
+			SimpleResizer.preScale.setTo(1,1);
+			var rTar;
+			rTar=tar;
+			while (rTar&&rTar!=Laya.stage){
+				SimpleResizer.preScale.x *=rTar.scaleX;
+				SimpleResizer.preScale.y *=rTar.scaleY;
+				rTar=rTar.parent;
+			}
+			Laya.stage.on("mouseup",null,SimpleResizer.onMouseMoveEnd);
+			Laya.timer.loop(100,null,SimpleResizer.onMouseMoving,[tar,minWidth,minHeight]);
+		}
+
+		SimpleResizer.onMouseMoving=function(tar,minWidth,minHeight,e){
+			var tWidth=(Laya.stage.mouseX-SimpleResizer.preMousePoint.x)/ SimpleResizer.preScale.x+SimpleResizer.preTarSize.x;
+			var tHeight=(Laya.stage.mouseY-SimpleResizer.preMousePoint.y)/SimpleResizer.preScale.y+SimpleResizer.preTarSize.y;
+			tar.width=tWidth > minWidth?tWidth:minWidth;
+			tar.height=tHeight>minHeight?tHeight:minHeight;
+		}
+
+		SimpleResizer.onMouseMoveEnd=function(e){
+			SimpleResizer.clearEvents();
+		}
+
+		SimpleResizer.clearEvents=function(){
+			Laya.timer.clear(null,SimpleResizer.onMouseMoving);
+			Laya.stage.off("mouseup",null,SimpleResizer.onMouseMoveEnd);
+		}
+
+		__static(SimpleResizer,
+		['preMousePoint',function(){return this.preMousePoint=new Point();},'preTarSize',function(){return this.preTarSize=new Point();},'preScale',function(){return this.preScale=new Point();}
+		]);
+		return SimpleResizer;
+	})()
+
+
+	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-9-25 下午7:19:44
+	*/
+	//class laya.debug.tools.DisControlTool
+	var DisControlTool=(function(){
+		function DisControlTool(){}
+		__class(DisControlTool,'laya.debug.tools.DisControlTool');
+		DisControlTool.getObjectsUnderPoint=function(sprite,x,y,rst,filterFun){
+			rst=rst?rst:[];
+			if(filterFun!=null&&!filterFun(sprite))return rst;
+			if (sprite.getBounds().contains(x,y)){
+				var tS;
+				var tempP=new Point();
+				tempP.setTo(x,y);
+				tempP=sprite.fromParentPoint(tempP);
+				x=tempP.x;
+				y=tempP.y;
+				var childList;
+				childList=sprite._childs||sprite._children;
+				for (var i=childList.length-1;i >-1;i--){
+					var child=childList[i];
+					if((child instanceof laya.display.Sprite ))
+						DisControlTool.getObjectsUnderPoint(child,x,y,rst,filterFun);
+				}
+				rst.push(sprite);
+			}
+			return rst;
+		}
+
+		DisControlTool.getObjectsUnderGlobalPoint=function(sprite,filterFun,point){
+			if(!point){
+				point=new Point();
+				point.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
+			}
+			if(sprite.parent)
+				point=(sprite.parent).globalToLocal(point);
+			return DisControlTool.getObjectsUnderPoint(sprite,point.x,point.y,null,filterFun);
+		}
+
+		DisControlTool.findFirstObjectsUnderGlobalPoint=function(){
+			var disList;
+			disList=DisControlTool.getObjectsUnderGlobalPoint(Laya.stage);
+			if (!disList)return null;
+			var i=0,len=0;
+			var tDis;
+			len=disList.length;
+			for (i=len-1;i>=0;i--){
+				tDis=disList[i];
+				if (tDis && tDis.numChildren < 1){
+					return tDis;
+				}
+			}
+			return tDis;
+		}
+
+		DisControlTool.visibleAndEnableObjFun=function(tar){
+			return tar.visible&&tar.mouseEnabled;
+		}
+
+		DisControlTool.visibleObjFun=function(tar){
+			return tar.visible;
+		}
+
+		DisControlTool.getMousePoint=function(sprite){
+			var point=new Point();
+			point.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
+			point=sprite.globalToLocal(point);
+			return point;
+		}
+
+		DisControlTool.isChildE=function(parent,child){
+			if (!parent)return false;
+			while (child){
+				if (child.parent==parent)return true;
+				child=child.parent;
+			}
+			return false;
+		}
+
+		DisControlTool.isInTree=function(pNode,child){
+			return pNode==child || DisControlTool.isChildE(pNode,child);
+		}
+
+		DisControlTool.setTop=function(tar){
+			if(tar&&tar.parent){
+				var tParent;
+				tParent=tar.parent;
+				tParent.setChildIndex(tar,tParent.numChildren-1);
+			}
+		}
+
+		DisControlTool.clearItemRelativeInfo=function(item){
+			var Nan="NaN";
+			item.getLayout().left=Nan;
+			item.getLayout().right=Nan;
+			item.getLayout().top=Nan;
+			item.getLayout().bottom=Nan;
+		}
+
+		DisControlTool.swap=function(tarA,tarB){
+			if (tarA==tarB)return;
+			var iA=0;
+			iA=tarA.parent.getChildIndex(tarA);
+			var iB=0;
+			iB=tarB.parent.getChildIndex(tarB);
+			var bP;
+			bP=tarB.parent;
+			tarA.parent.addChildAt(tarB,iA);
+			bP.addChildAt(tarA,iB);
+		}
+
+		DisControlTool.insertToTarParent=function(tarA,tars,after){
+			(after===void 0)&& (after=false);
+			var tIndex=0;
+			var parent;
+			if(!tarA)return;
+			parent=tarA.parent;
+			if(!parent)return;
+			tIndex=parent.getChildIndex(tarA);
+			if(after)tIndex++;
+			DisControlTool.insertToParent(parent,tars,tIndex);
+		}
+
+		DisControlTool.insertToParent=function(parent,tars,index){
+			(index===void 0)&& (index=-1);
+			if(!parent)return;
+			if(index<0)index=parent.numChildren;
+			var i=0,len=0;
+			len=tars.length;
+			for(i=0;i<len;i++){
+				DisControlTool.transParent(tars[i],parent);
+				parent.addChildAt(tars[i],index);
+			}
+		}
+
+		DisControlTool.transParent=function(tar,newParent){
+			if(!tar||!newParent)return;
+			if(!tar.parent)return;
+			var preParent;
+			preParent=tar.parent;
+			var pos;
+			pos=new Point(tar.x,tar.y);
+			pos=preParent.localToGlobal(pos);
+			pos=newParent.globalToLocal(pos);
+			tar.pos(pos.x,pos.y);
+		}
+
+		DisControlTool.transPoint=function(nowParent,tarParent,point){
+			point=nowParent.localToGlobal(point);
+			point=tarParent.globalToLocal(point);
+			return point;
+		}
+
+		DisControlTool.removeItems=function(itemList){
+			var i=0,len=0;
+			len=itemList.length;
+			for (i=0;i < len;i++){
+				(itemList [i]).removeSelf();
+			}
+		}
+
+		DisControlTool.addItems=function(itemList,parent){
+			var i=0,len=0;
+			len=itemList.length;
+			for (i=0;i < len;i++){
+				parent.addChild(itemList[i]);
+			}
+		}
+
+		DisControlTool.getAllChild=function(tar){
+			if(!tar)return [];
+			var i=0;
+			var len=0;
+			var rst=[];
+			len=tar.numChildren;
+			for(i=0;i<len;i++){
+				rst.push(tar.getChildAt(i));
+			}
+			return rst;
+		}
+
+		DisControlTool.upDis=function(child){
+			if(child&&child.parent){
+				var tParent;
+				tParent=child.parent;
+				var newIndex=0;
+				newIndex=tParent.getChildIndex(child)+1;
+				if(newIndex>=tParent.numChildren){
+					newIndex=tParent.numChildren-1;
+				}
+				console.log("setChildIndex:"+newIndex);
+				tParent.setChildIndex(child,newIndex);
+			}
+		}
+
+		DisControlTool.downDis=function(child){
+			if(child&&child.parent){
+				var tParent;
+				tParent=child.parent;
+				var newIndex=0;
+				newIndex=tParent.getChildIndex(child)-1;
+				if(newIndex<0)newIndex=0;
+				console.log("setChildIndex:"+newIndex);
+				tParent.setChildIndex(child,newIndex);
+			}
+		}
+
+		DisControlTool.setResizeAbleEx=function(node){
+			var clickItem;
+			clickItem=node.getChildByName("resizeBtn");
+			if (clickItem){
+				SimpleResizer.setResizeAble(clickItem,node);
+			}
+		}
+
+		DisControlTool.setResizeAble=function(node){
+			node.on("click",null,DisControlTool.resizeHandler,[node]);
+		}
+
+		DisControlTool.resizeHandler=function(tar){
+			DisResizer.setUp(tar);
+		}
+
+		DisControlTool.setDragingItem=function(dragBar,tar){
+			dragBar.on("mousedown",null,DisControlTool.dragingHandler,[tar]);
+			tar.on("dragend",null,DisControlTool.dragingEnd,[tar]);
+		}
+
+		DisControlTool.dragingHandler=function(tar){
+			if (tar){
+				tar.startDrag();
+			}
+		}
+
+		DisControlTool.dragingEnd=function(tar){
+			DisControlTool.intFyDisPos(tar);
+			console.log(tar.x,tar.y);
+		}
+
+		DisControlTool.showToStage=function(dis,offX,offY){
+			(offX===void 0)&& (offX=0);
+			(offY===void 0)&& (offY=0);
+			var rec=dis.getBounds();
+			var parent;
+			parent=dis.parent || Laya.stage;
+			dis.x=parent.mouseX+offX;
+			dis.y=parent.mouseY+offY;
+			if (dis.x+rec.width > parent.width){
+				dis.x-=rec.width+offX;
+			}
+			if (dis.y+rec.height > parent.height){
+				dis.y-=rec.height+offY;
+			}
+			DisControlTool.intFyDisPos(dis);
+		}
+
+		DisControlTool.intFyDisPos=function(dis){
+			if (!dis)return;
+			dis.x=Math.round(dis.x);
+			dis.y=Math.round(dis.y);
+		}
+
+		DisControlTool.showOnly=function(disList,showItem){
+			var i=0,len=0;
+			len=disList.length;
+			for (i=0;i < len;i++){
+				disList[i].visible=disList[i]==showItem;
+			}
+		}
+
+		DisControlTool.showOnlyByIndex=function(disList,index){
+			DisControlTool.showOnly(disList,disList[index]);
+		}
+
+		DisControlTool.addOnly=function(disList,showItem,parent){
+			var i=0,len=0;
+			len=disList.length;
+			for (i=0;i < len;i++){
+				if (disList[i] !=showItem){
+					disList[i].removeSelf();
+					}else{
+					parent.addChild(disList[i]);
+				}
+			}
+		}
+
+		DisControlTool.addOnlyByIndex=function(disList,index,parent){
+			DisControlTool.addOnly(disList,disList[index],parent);
+		}
+
+		__static(DisControlTool,
+		['tempP',function(){return this.tempP=new Point();}
+		]);
+		return DisControlTool;
+	})()
+
+
+	/**
 	*...
 	*@author ww
 	*/
@@ -3390,6 +3435,311 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		return BitmapFont;
+	})()
+
+
+	/**
+	*@private
+	*Graphic bounds数据类
+	*/
+	//class laya.display.GraphicsBounds
+	var GraphicsBounds=(function(){
+		function GraphicsBounds(){
+			//this._temp=null;
+			//this._bounds=null;
+			//this._rstBoundPoints=null;
+			this._cacheBoundsType=false;
+			//this._graphics=null;
+		}
+
+		__class(GraphicsBounds,'laya.display.GraphicsBounds');
+		var __proto=GraphicsBounds.prototype;
+		/**
+		*销毁
+		*/
+		__proto.destroy=function(){
+			this._graphics=null;
+			this._temp=null;
+			this._rstBoundPoints=null;
+			this._bounds=null;
+		}
+
+		/**
+		*重置数据
+		*/
+		__proto.reset=function(){
+			this._temp && (this._temp.length=0);
+		}
+
+		/**
+		*获取位置及宽高信息矩阵(比较耗CPU，频繁使用会造成卡顿，尽量少用)。
+		*@param realSize （可选）使用图片的真实大小，默认为false
+		*@return 位置与宽高组成的 一个 Rectangle 对象。
+		*/
+		__proto.getBounds=function(realSize){
+			(realSize===void 0)&& (realSize=false);
+			if (!this._bounds || !this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType){
+				this._bounds=Rectangle._getWrapRec(this.getBoundPoints(realSize),this._bounds)
+			}
+			this._cacheBoundsType=realSize;
+			return this._bounds;
+		}
+
+		/**
+		*@private
+		*@param realSize （可选）使用图片的真实大小，默认为false
+		*获取端点列表。
+		*/
+		__proto.getBoundPoints=function(realSize){
+			(realSize===void 0)&& (realSize=false);
+			if (!this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType)
+				this._temp=this._getCmdPoints(realSize);
+			this._cacheBoundsType=realSize;
+			return this._rstBoundPoints=Utils.copyArray(this._rstBoundPoints,this._temp);
+		}
+
+		__proto._getCmdPoints=function(realSize){
+			(realSize===void 0)&& (realSize=false);
+			var context=Render._context;
+			var cmds=this._graphics.cmds;
+			var rst;
+			rst=this._temp || (this._temp=[]);
+			rst.length=0;
+			if (!cmds && this._graphics._one !=null){
+				GraphicsBounds._tempCmds.length=0;
+				GraphicsBounds._tempCmds.push(this._graphics._one);
+				cmds=GraphicsBounds._tempCmds;
+			}
+			if (!cmds)
+				return rst;
+			var matrixs;
+			matrixs=GraphicsBounds._tempMatrixArrays;
+			matrixs.length=0;
+			var tMatrix=GraphicsBounds._initMatrix;
+			tMatrix.identity();
+			var tempMatrix=GraphicsBounds._tempMatrix;
+			var cmd;
+			var tex;
+			for (var i=0,n=cmds.length;i < n;i++){
+				cmd=cmds[i];
+				switch (cmd.callee){
+					case context._save:
+					case 7:
+						matrixs.push(tMatrix);
+						tMatrix=tMatrix.clone();
+						break ;
+					case context._restore:
+					case 8:
+						tMatrix=matrixs.pop();
+						break ;
+					case context._scale:
+					case 5:
+						tempMatrix.identity();
+						tempMatrix.translate(-cmd[2],-cmd[3]);
+						tempMatrix.scale(cmd[0],cmd[1]);
+						tempMatrix.translate(cmd[2],cmd[3]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case context._rotate:
+					case 3:
+						tempMatrix.identity();
+						tempMatrix.translate(-cmd[1],-cmd[2]);
+						tempMatrix.rotate(cmd[0]);
+						tempMatrix.translate(cmd[1],cmd[2]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case context._translate:
+					case 6:
+						tempMatrix.identity();
+						tempMatrix.translate(cmd[0],cmd[1]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case context._transform:
+					case 4:
+						tempMatrix.identity();
+						tempMatrix.translate(-cmd[1],-cmd[2]);
+						tempMatrix.concat(cmd[0]);
+						tempMatrix.translate(cmd[1],cmd[2]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case 16:
+					case 24:
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
+						break ;
+					case 17:
+						tMatrix.copyTo(tempMatrix);
+						tempMatrix.concat(cmd[4]);
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tempMatrix);
+						break ;
+					case context._drawTexture:
+						tex=cmd[0];
+						if (realSize){
+							if (cmd[3] && cmd[4]){
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
+								}else {
+								tex=cmd[0];
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
+							}
+							}else {
+							var wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
+							var hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
+							var oWidth=wRate *tex.sourceWidth;
+							var oHeight=hRate *tex.sourceHeight;
+							var offX=tex.offsetX > 0 ? tex.offsetX :0;
+							var offY=tex.offsetY > 0 ? tex.offsetY :0;
+							offX *=wRate;
+							offY *=hRate;
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),tMatrix);
+						}
+						break ;
+					case context._fillTexture:
+						if (cmd[3] && cmd[4]){
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
+							}else {
+							tex=cmd[0];
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
+						}
+						break ;
+					case context._drawTextureWithTransform:;
+						var drawMatrix;
+						if (cmd[5]){
+							tMatrix.copyTo(tempMatrix);
+							tempMatrix.concat(cmd[5]);
+							drawMatrix=tempMatrix;
+							}else {
+							drawMatrix=tMatrix;
+						}
+						if (realSize){
+							if (cmd[3] && cmd[4]){
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),drawMatrix);
+								}else {
+								tex=cmd[0];
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),drawMatrix);
+							}
+							}else {
+							tex=cmd[0];
+							wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
+							hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
+							oWidth=wRate *tex.sourceWidth;
+							oHeight=hRate *tex.sourceHeight;
+							offX=tex.offsetX > 0 ? tex.offsetX :0;
+							offY=tex.offsetY > 0 ? tex.offsetY :0;
+							offX *=wRate;
+							offY *=hRate;
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),drawMatrix);
+						}
+						break ;
+					case context._drawRect:
+					case 13:
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
+						break ;
+					case context._drawCircle:
+					case context._fillCircle:
+					case 14:
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0]-cmd[2],cmd[1]-cmd[2],cmd[2]+cmd[2],cmd[2]+cmd[2]),tMatrix);
+						break ;
+					case context._drawLine:
+					case 20:
+						GraphicsBounds._tempPoints.length=0;
+						var lineWidth=NaN;
+						lineWidth=cmd[5] *0.5;
+						if (cmd[0]==cmd[2]){
+							GraphicsBounds._tempPoints.push(cmd[0]+lineWidth,cmd[1],cmd[2]+lineWidth,cmd[3],cmd[0]-lineWidth,cmd[1],cmd[2]-lineWidth,cmd[3]);
+							}else if (cmd[1]==cmd[3]){
+							GraphicsBounds._tempPoints.push(cmd[0],cmd[1]+lineWidth,cmd[2],cmd[3]+lineWidth,cmd[0],cmd[1]-lineWidth,cmd[2],cmd[3]-lineWidth);
+							}else {
+							GraphicsBounds._tempPoints.push(cmd[0],cmd[1],cmd[2],cmd[3]);
+						}
+						GraphicsBounds._addPointArrToRst(rst,GraphicsBounds._tempPoints,tMatrix);
+						break ;
+					case context._drawCurves:
+					case 22:
+						GraphicsBounds._addPointArrToRst(rst,Bezier.I.getBezierPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
+						break ;
+					case context._drawPoly:
+					case context._drawLines:
+					case 18:
+						GraphicsBounds._addPointArrToRst(rst,cmd[2],tMatrix,cmd[0],cmd[1]);
+						break ;
+					case context._drawPath:
+					case 19:
+						GraphicsBounds._addPointArrToRst(rst,this._getPathPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
+						break ;
+					case context._drawPie:
+					case 15:
+						GraphicsBounds._addPointArrToRst(rst,this._getPiePoints(cmd[0],cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
+						break ;
+					}
+			}
+			if (rst.length > 200){
+				rst=Utils.copyArray(rst,Rectangle._getWrapRec(rst)._getBoundPoints());
+			}else if (rst.length > 8)
+			rst=GrahamScan.scanPList(rst);
+			return rst;
+		}
+
+		__proto._switchMatrix=function(tMatix,tempMatrix){
+			tempMatrix.concat(tMatix);
+			tempMatrix.copyTo(tMatix);
+		}
+
+		__proto._getPiePoints=function(x,y,radius,startAngle,endAngle){
+			var rst=GraphicsBounds._tempPoints;
+			GraphicsBounds._tempPoints.length=0;
+			rst.push(x,y);
+			var dP=Math.PI / 10;
+			var i=NaN;
+			for (i=startAngle;i < endAngle;i+=dP){
+				rst.push(x+radius *Math.cos(i),y+radius *Math.sin(i));
+			}
+			if (endAngle !=i){
+				rst.push(x+radius *Math.cos(endAngle),y+radius *Math.sin(endAngle));
+			}
+			return rst;
+		}
+
+		__proto._getPathPoints=function(paths){
+			var i=0,len=0;
+			var rst=GraphicsBounds._tempPoints;
+			rst.length=0;
+			len=paths.length;
+			var tCMD;
+			for (i=0;i < len;i++){
+				tCMD=paths[i];
+				if (tCMD.length > 1){
+					rst.push(tCMD[1],tCMD[2]);
+					if (tCMD.length > 3){
+						rst.push(tCMD[3],tCMD[4]);
+					}
+				}
+			}
+			return rst;
+		}
+
+		GraphicsBounds._addPointArrToRst=function(rst,points,matrix,dx,dy){
+			(dx===void 0)&& (dx=0);
+			(dy===void 0)&& (dy=0);
+			var i=0,len=0;
+			len=points.length;
+			for (i=0;i < len;i+=2){
+				GraphicsBounds._addPointToRst(rst,points[i]+dx,points[i+1]+dy,matrix);
+			}
+		}
+
+		GraphicsBounds._addPointToRst=function(rst,x,y,matrix){
+			var _tempPoint=Point.TEMP;
+			_tempPoint.setTo(x ? x :0,y ? y :0);
+			matrix.transformPoint(_tempPoint);
+			rst.push(_tempPoint.x,_tempPoint.y);
+		}
+
+		GraphicsBounds._tempPoints=[];
+		GraphicsBounds._tempMatrixArrays=[];
+		GraphicsBounds._tempCmds=[];
+		__static(GraphicsBounds,
+		['_tempMatrix',function(){return this._tempMatrix=new Matrix();},'_initMatrix',function(){return this._initMatrix=new Matrix();}
+		]);
+		return GraphicsBounds;
 	})()
 
 
@@ -3757,311 +4107,6 @@ var Laya=window.Laya=(function(window,document){
 
 		__class(TransformInfo,'laya.display.css.TransformInfo');
 		return TransformInfo;
-	})()
-
-
-	/**
-	*@private
-	*Graphic bounds数据类
-	*/
-	//class laya.display.GraphicsBounds
-	var GraphicsBounds=(function(){
-		function GraphicsBounds(){
-			//this._temp=null;
-			//this._bounds=null;
-			//this._rstBoundPoints=null;
-			this._cacheBoundsType=false;
-			//this._graphics=null;
-		}
-
-		__class(GraphicsBounds,'laya.display.GraphicsBounds');
-		var __proto=GraphicsBounds.prototype;
-		/**
-		*销毁
-		*/
-		__proto.destroy=function(){
-			this._graphics=null;
-			this._temp=null;
-			this._rstBoundPoints=null;
-			this._bounds=null;
-		}
-
-		/**
-		*重置数据
-		*/
-		__proto.reset=function(){
-			this._temp && (this._temp.length=0);
-		}
-
-		/**
-		*获取位置及宽高信息矩阵(比较耗CPU，频繁使用会造成卡顿，尽量少用)。
-		*@param realSize （可选）使用图片的真实大小，默认为false
-		*@return 位置与宽高组成的 一个 Rectangle 对象。
-		*/
-		__proto.getBounds=function(realSize){
-			(realSize===void 0)&& (realSize=false);
-			if (!this._bounds || !this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType){
-				this._bounds=Rectangle._getWrapRec(this.getBoundPoints(realSize),this._bounds)
-			}
-			this._cacheBoundsType=realSize;
-			return this._bounds;
-		}
-
-		/**
-		*@private
-		*@param realSize （可选）使用图片的真实大小，默认为false
-		*获取端点列表。
-		*/
-		__proto.getBoundPoints=function(realSize){
-			(realSize===void 0)&& (realSize=false);
-			if (!this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType)
-				this._temp=this._getCmdPoints(realSize);
-			this._cacheBoundsType=realSize;
-			return this._rstBoundPoints=Utils.copyArray(this._rstBoundPoints,this._temp);
-		}
-
-		__proto._getCmdPoints=function(realSize){
-			(realSize===void 0)&& (realSize=false);
-			var context=Render._context;
-			var cmds=this._graphics.cmds;
-			var rst;
-			rst=this._temp || (this._temp=[]);
-			rst.length=0;
-			if (!cmds && this._graphics._one !=null){
-				GraphicsBounds._tempCmds.length=0;
-				GraphicsBounds._tempCmds.push(this._graphics._one);
-				cmds=GraphicsBounds._tempCmds;
-			}
-			if (!cmds)
-				return rst;
-			var matrixs;
-			matrixs=GraphicsBounds._tempMatrixArrays;
-			matrixs.length=0;
-			var tMatrix=GraphicsBounds._initMatrix;
-			tMatrix.identity();
-			var tempMatrix=GraphicsBounds._tempMatrix;
-			var cmd;
-			var tex;
-			for (var i=0,n=cmds.length;i < n;i++){
-				cmd=cmds[i];
-				switch (cmd.callee){
-					case context._save:
-					case 7:
-						matrixs.push(tMatrix);
-						tMatrix=tMatrix.clone();
-						break ;
-					case context._restore:
-					case 8:
-						tMatrix=matrixs.pop();
-						break ;
-					case context._scale:
-					case 5:
-						tempMatrix.identity();
-						tempMatrix.translate(-cmd[2],-cmd[3]);
-						tempMatrix.scale(cmd[0],cmd[1]);
-						tempMatrix.translate(cmd[2],cmd[3]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case context._rotate:
-					case 3:
-						tempMatrix.identity();
-						tempMatrix.translate(-cmd[1],-cmd[2]);
-						tempMatrix.rotate(cmd[0]);
-						tempMatrix.translate(cmd[1],cmd[2]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case context._translate:
-					case 6:
-						tempMatrix.identity();
-						tempMatrix.translate(cmd[0],cmd[1]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case context._transform:
-					case 4:
-						tempMatrix.identity();
-						tempMatrix.translate(-cmd[1],-cmd[2]);
-						tempMatrix.concat(cmd[0]);
-						tempMatrix.translate(cmd[1],cmd[2]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case 16:
-					case 24:
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
-						break ;
-					case 17:
-						tMatrix.copyTo(tempMatrix);
-						tempMatrix.concat(cmd[4]);
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tempMatrix);
-						break ;
-					case context._drawTexture:
-						tex=cmd[0];
-						if (realSize){
-							if (cmd[3] && cmd[4]){
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
-								}else {
-								tex=cmd[0];
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
-							}
-							}else {
-							var wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
-							var hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
-							var oWidth=wRate *tex.sourceWidth;
-							var oHeight=hRate *tex.sourceHeight;
-							var offX=tex.offsetX > 0 ? tex.offsetX :0;
-							var offY=tex.offsetY > 0 ? tex.offsetY :0;
-							offX *=wRate;
-							offY *=hRate;
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),tMatrix);
-						}
-						break ;
-					case context._fillTexture:
-						if (cmd[3] && cmd[4]){
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
-							}else {
-							tex=cmd[0];
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
-						}
-						break ;
-					case context._drawTextureWithTransform:;
-						var drawMatrix;
-						if (cmd[5]){
-							tMatrix.copyTo(tempMatrix);
-							tempMatrix.concat(cmd[5]);
-							drawMatrix=tempMatrix;
-							}else {
-							drawMatrix=tMatrix;
-						}
-						if (realSize){
-							if (cmd[3] && cmd[4]){
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),drawMatrix);
-								}else {
-								tex=cmd[0];
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),drawMatrix);
-							}
-							}else {
-							tex=cmd[0];
-							wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
-							hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
-							oWidth=wRate *tex.sourceWidth;
-							oHeight=hRate *tex.sourceHeight;
-							offX=tex.offsetX > 0 ? tex.offsetX :0;
-							offY=tex.offsetY > 0 ? tex.offsetY :0;
-							offX *=wRate;
-							offY *=hRate;
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),drawMatrix);
-						}
-						break ;
-					case context._drawRect:
-					case 13:
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
-						break ;
-					case context._drawCircle:
-					case context._fillCircle:
-					case 14:
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0]-cmd[2],cmd[1]-cmd[2],cmd[2]+cmd[2],cmd[2]+cmd[2]),tMatrix);
-						break ;
-					case context._drawLine:
-					case 20:
-						GraphicsBounds._tempPoints.length=0;
-						var lineWidth=NaN;
-						lineWidth=cmd[5] *0.5;
-						if (cmd[0]==cmd[2]){
-							GraphicsBounds._tempPoints.push(cmd[0]+lineWidth,cmd[1],cmd[2]+lineWidth,cmd[3],cmd[0]-lineWidth,cmd[1],cmd[2]-lineWidth,cmd[3]);
-							}else if (cmd[1]==cmd[3]){
-							GraphicsBounds._tempPoints.push(cmd[0],cmd[1]+lineWidth,cmd[2],cmd[3]+lineWidth,cmd[0],cmd[1]-lineWidth,cmd[2],cmd[3]-lineWidth);
-							}else {
-							GraphicsBounds._tempPoints.push(cmd[0],cmd[1],cmd[2],cmd[3]);
-						}
-						GraphicsBounds._addPointArrToRst(rst,GraphicsBounds._tempPoints,tMatrix);
-						break ;
-					case context._drawCurves:
-					case 22:
-						GraphicsBounds._addPointArrToRst(rst,Bezier.I.getBezierPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
-						break ;
-					case context._drawPoly:
-					case context._drawLines:
-					case 18:
-						GraphicsBounds._addPointArrToRst(rst,cmd[2],tMatrix,cmd[0],cmd[1]);
-						break ;
-					case context._drawPath:
-					case 19:
-						GraphicsBounds._addPointArrToRst(rst,this._getPathPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
-						break ;
-					case context._drawPie:
-					case 15:
-						GraphicsBounds._addPointArrToRst(rst,this._getPiePoints(cmd[0],cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
-						break ;
-					}
-			}
-			if (rst.length > 200){
-				rst=Utils.copyArray(rst,Rectangle._getWrapRec(rst)._getBoundPoints());
-			}else if (rst.length > 8)
-			rst=GrahamScan.scanPList(rst);
-			return rst;
-		}
-
-		__proto._switchMatrix=function(tMatix,tempMatrix){
-			tempMatrix.concat(tMatix);
-			tempMatrix.copyTo(tMatix);
-		}
-
-		__proto._getPiePoints=function(x,y,radius,startAngle,endAngle){
-			var rst=GraphicsBounds._tempPoints;
-			GraphicsBounds._tempPoints.length=0;
-			rst.push(x,y);
-			var dP=Math.PI / 10;
-			var i=NaN;
-			for (i=startAngle;i < endAngle;i+=dP){
-				rst.push(x+radius *Math.cos(i),y+radius *Math.sin(i));
-			}
-			if (endAngle !=i){
-				rst.push(x+radius *Math.cos(endAngle),y+radius *Math.sin(endAngle));
-			}
-			return rst;
-		}
-
-		__proto._getPathPoints=function(paths){
-			var i=0,len=0;
-			var rst=GraphicsBounds._tempPoints;
-			rst.length=0;
-			len=paths.length;
-			var tCMD;
-			for (i=0;i < len;i++){
-				tCMD=paths[i];
-				if (tCMD.length > 1){
-					rst.push(tCMD[1],tCMD[2]);
-					if (tCMD.length > 3){
-						rst.push(tCMD[3],tCMD[4]);
-					}
-				}
-			}
-			return rst;
-		}
-
-		GraphicsBounds._addPointArrToRst=function(rst,points,matrix,dx,dy){
-			(dx===void 0)&& (dx=0);
-			(dy===void 0)&& (dy=0);
-			var i=0,len=0;
-			len=points.length;
-			for (i=0;i < len;i+=2){
-				GraphicsBounds._addPointToRst(rst,points[i]+dx,points[i+1]+dy,matrix);
-			}
-		}
-
-		GraphicsBounds._addPointToRst=function(rst,x,y,matrix){
-			var _tempPoint=Point.TEMP;
-			_tempPoint.setTo(x ? x :0,y ? y :0);
-			matrix.transformPoint(_tempPoint);
-			rst.push(_tempPoint.x,_tempPoint.y);
-		}
-
-		GraphicsBounds._tempPoints=[];
-		GraphicsBounds._tempMatrixArrays=[];
-		GraphicsBounds._tempCmds=[];
-		__static(GraphicsBounds,
-		['_tempMatrix',function(){return this._tempMatrix=new Matrix();},'_initMatrix',function(){return this._initMatrix=new Matrix();}
-		]);
-		return GraphicsBounds;
 	})()
 
 
@@ -9230,6 +9275,109 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*@private
+	*<code>HTMLChar</code> 是一个 HTML 字符类。
+	*/
+	//class laya.utils.HTMLChar
+	var HTMLChar=(function(){
+		function HTMLChar(char,w,h,style){
+			//this._sprite=null;
+			//this._x=NaN;
+			//this._y=NaN;
+			//this._w=NaN;
+			//this._h=NaN;
+			//this.isWord=false;
+			//this.char=null;
+			//this.charNum=NaN;
+			//this.style=null;
+			this.char=char;
+			this.charNum=char.charCodeAt(0);
+			this._x=this._y=0;
+			this.width=w;
+			this.height=h;
+			this.style=style;
+			this.isWord=!HTMLChar._isWordRegExp.test(char);
+		}
+
+		__class(HTMLChar,'laya.utils.HTMLChar');
+		var __proto=HTMLChar.prototype;
+		Laya.imps(__proto,{"laya.display.ILayout":true})
+		/**
+		*设置与此对象绑定的显示对象 <code>Sprite</code> 。
+		*@param sprite 显示对象 <code>Sprite</code> 。
+		*/
+		__proto.setSprite=function(sprite){
+			this._sprite=sprite;
+		}
+
+		/**
+		*获取与此对象绑定的显示对象 <code>Sprite</code>。
+		*@return
+		*/
+		__proto.getSprite=function(){
+			return this._sprite;
+		}
+
+		/**@private */
+		__proto._isChar=function(){
+			return true;
+		}
+
+		/**@private */
+		__proto._getCSSStyle=function(){
+			return this.style;
+		}
+
+		/**
+		*宽度。
+		*/
+		__getset(0,__proto,'width',function(){
+			return this._w;
+			},function(value){
+			this._w=value;
+		});
+
+		/**
+		*此对象存储的 X 轴坐标值。
+		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 x 的值。
+		*/
+		__getset(0,__proto,'x',function(){
+			return this._x;
+			},function(value){
+			if (this._sprite){
+				this._sprite.x=value;
+			}
+			this._x=value;
+		});
+
+		/**
+		*此对象存储的 Y 轴坐标值。
+		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 y 的值。
+		*/
+		__getset(0,__proto,'y',function(){
+			return this._y;
+			},function(value){
+			if (this._sprite){
+				this._sprite.y=value;
+			}
+			this._y=value;
+		});
+
+		/**
+		*高度。
+		*/
+		__getset(0,__proto,'height',function(){
+			return this._h;
+			},function(value){
+			this._h=value;
+		});
+
+		HTMLChar._isWordRegExp=new RegExp("[\\w\.]","");
+		return HTMLChar;
+	})()
+
+
+	/**
 	*鼠标点击区域，可以设置绘制一系列矢量图作为点击区域和非点击区域（目前只支持圆形，矩形，多边形）
 	*/
 	//class laya.utils.HitArea
@@ -9374,109 +9522,6 @@ var Laya=window.Laya=(function(window,document){
 		['_rec',function(){return this._rec=new Rectangle();},'_ptPoint',function(){return this._ptPoint=new Point();}
 		]);
 		return HitArea;
-	})()
-
-
-	/**
-	*@private
-	*<code>HTMLChar</code> 是一个 HTML 字符类。
-	*/
-	//class laya.utils.HTMLChar
-	var HTMLChar=(function(){
-		function HTMLChar(char,w,h,style){
-			//this._sprite=null;
-			//this._x=NaN;
-			//this._y=NaN;
-			//this._w=NaN;
-			//this._h=NaN;
-			//this.isWord=false;
-			//this.char=null;
-			//this.charNum=NaN;
-			//this.style=null;
-			this.char=char;
-			this.charNum=char.charCodeAt(0);
-			this._x=this._y=0;
-			this.width=w;
-			this.height=h;
-			this.style=style;
-			this.isWord=!HTMLChar._isWordRegExp.test(char);
-		}
-
-		__class(HTMLChar,'laya.utils.HTMLChar');
-		var __proto=HTMLChar.prototype;
-		Laya.imps(__proto,{"laya.display.ILayout":true})
-		/**
-		*设置与此对象绑定的显示对象 <code>Sprite</code> 。
-		*@param sprite 显示对象 <code>Sprite</code> 。
-		*/
-		__proto.setSprite=function(sprite){
-			this._sprite=sprite;
-		}
-
-		/**
-		*获取与此对象绑定的显示对象 <code>Sprite</code>。
-		*@return
-		*/
-		__proto.getSprite=function(){
-			return this._sprite;
-		}
-
-		/**@private */
-		__proto._isChar=function(){
-			return true;
-		}
-
-		/**@private */
-		__proto._getCSSStyle=function(){
-			return this.style;
-		}
-
-		/**
-		*宽度。
-		*/
-		__getset(0,__proto,'width',function(){
-			return this._w;
-			},function(value){
-			this._w=value;
-		});
-
-		/**
-		*此对象存储的 X 轴坐标值。
-		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 x 的值。
-		*/
-		__getset(0,__proto,'x',function(){
-			return this._x;
-			},function(value){
-			if (this._sprite){
-				this._sprite.x=value;
-			}
-			this._x=value;
-		});
-
-		/**
-		*此对象存储的 Y 轴坐标值。
-		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 y 的值。
-		*/
-		__getset(0,__proto,'y',function(){
-			return this._y;
-			},function(value){
-			if (this._sprite){
-				this._sprite.y=value;
-			}
-			this._y=value;
-		});
-
-		/**
-		*高度。
-		*/
-		__getset(0,__proto,'height',function(){
-			return this._h;
-			},function(value){
-			this._h=value;
-		});
-
-		HTMLChar._isWordRegExp=new RegExp("[\\w\.]","");
-		return HTMLChar;
 	})()
 
 
@@ -10668,21 +10713,6 @@ var Laya=window.Laya=(function(window,document){
 	})()
 
 
-	/**全局配置*/
-	//class UIConfig
-	var UIConfig=(function(){
-		function UIConfig(){};
-		__class(UIConfig,'UIConfig');
-		UIConfig.touchScrollEnable=true;
-		UIConfig.mouseWheelEnable=true;
-		UIConfig.showButtons=true;
-		UIConfig.popupBgColor="#000000";
-		UIConfig.popupBgAlpha=0.5;
-		UIConfig.closeDialogOnSide=true;
-		return UIConfig;
-	})()
-
-
 	/**
 	*...
 	*@author ww
@@ -11119,6 +11149,7 @@ var Laya=window.Laya=(function(window,document){
 			var factor=0.01;
 			var dScale=NaN;
 			dScale=(distance-this.lastDistance)*factor;
+			dScale=distance / this.lastDistance;
 			this._target.event("ScaleActionEvent",dScale);
 			this.lastDistance=distance;
 		}
@@ -12017,6 +12048,38 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*本类用于模块间消息传递
+	*@author ww
+	*/
+	//class laya.debug.tools.Notice extends laya.events.EventDispatcher
+	var Notice=(function(_super){
+		function Notice(){
+			Notice.__super.call(this);
+		}
+
+		__class(Notice,'laya.debug.tools.Notice',_super);
+		Notice.notify=function(type,data){
+			Notice.I.event(type,data);
+		}
+
+		Notice.listen=function(type,_scope,fun,args,cancelBefore){
+			(cancelBefore===void 0)&& (cancelBefore=false);
+			if(cancelBefore)Notice.cancel(type,_scope,fun);
+			Notice.I.on(type,_scope,fun,args);
+		}
+
+		Notice.cancel=function(type,_scope,fun){
+			Notice.I.off(type,_scope,fun);
+		}
+
+		__static(Notice,
+		['I',function(){return this.I=new Notice();}
+		]);
+		return Notice;
+	})(EventDispatcher)
+
+
+	/**
 	*<p> <code>LoaderManager</code> 类用于用于批量加载资源。此类是单例，不要手动实例化此类，请通过Laya.loader访问。</p>
 	*<p>全部队列加载完成，会派发 Event.COMPLETE 事件；如果队列中任意一个加载失败，会派发 Event.ERROR 事件，事件回调参数值为加载出错的资源地址。</p>
 	*<p> <code>LoaderManager</code> 类提供了以下几种功能：<br/>
@@ -12408,34 +12471,115 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*本类用于模块间消息传递
-	*@author ww
+	*<code>Sound</code> 类是用来播放控制声音的类。
 	*/
-	//class laya.debug.tools.Notice extends laya.events.EventDispatcher
-	var Notice=(function(_super){
-		function Notice(){
-			Notice.__super.call(this);
+	//class laya.media.Sound extends laya.events.EventDispatcher
+	var Sound=(function(_super){
+		function Sound(){Sound.__super.call(this);;
+		};
+
+		__class(Sound,'laya.media.Sound',_super);
+		var __proto=Sound.prototype;
+		/**
+		*加载声音。
+		*@param url 地址。
+		*
+		*/
+		__proto.load=function(url){}
+		/**
+		*播放声音。
+		*@param startTime 开始时间,单位秒
+		*@param loops 循环次数,0表示一直循环
+		*@return 声道 SoundChannel 对象。
+		*
+		*/
+		__proto.play=function(startTime,loops){
+			(startTime===void 0)&& (startTime=0);
+			(loops===void 0)&& (loops=0);
+			return null;
 		}
 
-		__class(Notice,'laya.debug.tools.Notice',_super);
-		Notice.notify=function(type,data){
-			Notice.I.event(type,data);
+		/**
+		*释放声音资源。
+		*
+		*/
+		__proto.dispose=function(){}
+		/**
+		*获取总时间。
+		*/
+		__getset(0,__proto,'duration',function(){
+			return 0;
+		});
+
+		return Sound;
+	})(EventDispatcher)
+
+
+	/**
+	*<p> <code>SoundChannel</code> 用来控制程序中的声音。每个声音均分配给一个声道，而且应用程序可以具有混合在一起的多个声道。</p>
+	*<p> <code>SoundChannel</code> 类包含控制声音的播放、暂停、停止、音量的方法，以及获取声音的播放状态、总时间、当前播放时间、总循环次数、播放地址等信息的方法。</p>
+	*/
+	//class laya.media.SoundChannel extends laya.events.EventDispatcher
+	var SoundChannel=(function(_super){
+		function SoundChannel(){
+			this.url=null;
+			this.loops=0;
+			this.startTime=NaN;
+			this.isStopped=false;
+			this.completeHandler=null;
+			SoundChannel.__super.call(this);
 		}
 
-		Notice.listen=function(type,_scope,fun,args,cancelBefore){
-			(cancelBefore===void 0)&& (cancelBefore=false);
-			if(cancelBefore)Notice.cancel(type,_scope,fun);
-			Notice.I.on(type,_scope,fun,args);
+		__class(SoundChannel,'laya.media.SoundChannel',_super);
+		var __proto=SoundChannel.prototype;
+		/**
+		*播放。
+		*/
+		__proto.play=function(){}
+		/**
+		*停止。
+		*/
+		__proto.stop=function(){}
+		/**
+		*暂停。
+		*/
+		__proto.pause=function(){}
+		/**
+		*继续播放。
+		*/
+		__proto.resume=function(){}
+		/**
+		*private
+		*/
+		__proto.__runComplete=function(handler){
+			if (handler){
+				handler.run();
+			}
 		}
 
-		Notice.cancel=function(type,_scope,fun){
-			Notice.I.off(type,_scope,fun);
-		}
+		/**
+		*音量范围从 0（静音）至 1（最大音量）。
+		*/
+		__getset(0,__proto,'volume',function(){
+			return 1;
+			},function(v){
+		});
 
-		__static(Notice,
-		['I',function(){return this.I=new Notice();}
-		]);
-		return Notice;
+		/**
+		*获取当前播放时间。
+		*/
+		__getset(0,__proto,'position',function(){
+			return 0;
+		});
+
+		/**
+		*获取总时间。
+		*/
+		__getset(0,__proto,'duration',function(){
+			return 0;
+		});
+
+		return SoundChannel;
 	})(EventDispatcher)
 
 
@@ -12598,119 +12742,6 @@ var Laya=window.Laya=(function(window,document){
 		AudioSound._audioCache={};
 		AudioSound._musicAudio=null
 		return AudioSound;
-	})(EventDispatcher)
-
-
-	/**
-	*<p> <code>SoundChannel</code> 用来控制程序中的声音。每个声音均分配给一个声道，而且应用程序可以具有混合在一起的多个声道。</p>
-	*<p> <code>SoundChannel</code> 类包含控制声音的播放、暂停、停止、音量的方法，以及获取声音的播放状态、总时间、当前播放时间、总循环次数、播放地址等信息的方法。</p>
-	*/
-	//class laya.media.SoundChannel extends laya.events.EventDispatcher
-	var SoundChannel=(function(_super){
-		function SoundChannel(){
-			this.url=null;
-			this.loops=0;
-			this.startTime=NaN;
-			this.isStopped=false;
-			this.completeHandler=null;
-			SoundChannel.__super.call(this);
-		}
-
-		__class(SoundChannel,'laya.media.SoundChannel',_super);
-		var __proto=SoundChannel.prototype;
-		/**
-		*播放。
-		*/
-		__proto.play=function(){}
-		/**
-		*停止。
-		*/
-		__proto.stop=function(){}
-		/**
-		*暂停。
-		*/
-		__proto.pause=function(){}
-		/**
-		*继续播放。
-		*/
-		__proto.resume=function(){}
-		/**
-		*private
-		*/
-		__proto.__runComplete=function(handler){
-			if (handler){
-				handler.run();
-			}
-		}
-
-		/**
-		*音量范围从 0（静音）至 1（最大音量）。
-		*/
-		__getset(0,__proto,'volume',function(){
-			return 1;
-			},function(v){
-		});
-
-		/**
-		*获取当前播放时间。
-		*/
-		__getset(0,__proto,'position',function(){
-			return 0;
-		});
-
-		/**
-		*获取总时间。
-		*/
-		__getset(0,__proto,'duration',function(){
-			return 0;
-		});
-
-		return SoundChannel;
-	})(EventDispatcher)
-
-
-	/**
-	*<code>Sound</code> 类是用来播放控制声音的类。
-	*/
-	//class laya.media.Sound extends laya.events.EventDispatcher
-	var Sound=(function(_super){
-		function Sound(){Sound.__super.call(this);;
-		};
-
-		__class(Sound,'laya.media.Sound',_super);
-		var __proto=Sound.prototype;
-		/**
-		*加载声音。
-		*@param url 地址。
-		*
-		*/
-		__proto.load=function(url){}
-		/**
-		*播放声音。
-		*@param startTime 开始时间,单位秒
-		*@param loops 循环次数,0表示一直循环
-		*@return 声道 SoundChannel 对象。
-		*
-		*/
-		__proto.play=function(startTime,loops){
-			(startTime===void 0)&& (startTime=0);
-			(loops===void 0)&& (loops=0);
-			return null;
-		}
-
-		/**
-		*释放声音资源。
-		*
-		*/
-		__proto.dispose=function(){}
-		/**
-		*获取总时间。
-		*/
-		__getset(0,__proto,'duration',function(){
-			return 0;
-		});
-
-		return Sound;
 	})(EventDispatcher)
 
 
@@ -24053,123 +24084,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*
-	*@author ww
-	*@version 1.0
-	*
-	*@created 2015-10-24 下午2:58:37
-	*/
-	//class laya.debug.uicomps.ContextMenu extends laya.ui.Box
-	var ContextMenu=(function(_super){
-		function ContextMenu(){
-			this._tY=0;
-			ContextMenu.__super.call(this);
-			StyleConsts.setViewScale(this);
-		}
-
-		__class(ContextMenu,'laya.debug.uicomps.ContextMenu',_super);
-		var __proto=ContextMenu.prototype;
-		__proto.addItem=function(item){
-			this.addChild(item);
-			item.y=this._tY;
-			this._tY+=item.height;
-			item.on("mousedown",this,this.onClick);
-		}
-
-		__proto.onClick=function(e){
-			this.event("select",e);
-			this.removeSelf();
-		}
-
-		__proto.show=function(posX,posY){
-			(posX===void 0)&& (posX=-999);
-			(posY===void 0)&& (posY=-999);
-			Laya.timer.once(100,this,ContextMenu.showMenu,[this,posX,posY]);
-		}
-
-		ContextMenu.init=function(){
-			Laya.stage.on("click",null,ContextMenu.cleanMenu);
-		}
-
-		ContextMenu.cleanMenu=function(e){
-			var i=0;
-			var len=0;
-			len=ContextMenu._menuList.length;
-			for(i=0;i<len;i++){
-				if(ContextMenu._menuList[i]){
-					ContextMenu._menuList[i].removeSelf();
-				}
-			}
-			ContextMenu._menuList.length=0;
-		}
-
-		ContextMenu.showMenu=function(menu,posX,posY){
-			(posX===void 0)&& (posX=-999);
-			(posY===void 0)&& (posY=-999);
-			ContextMenu.cleanMenu();
-			ContextMenu.adptMenu(menu);
-			Laya._currentStage.addChild(menu);
-			DisControlTool.showToStage(menu);
-			if (posX !=-999 && posY !=-999){
-				menu.pos(posX,posY);
-			}
-			ContextMenu._menuList.push(menu);
-		}
-
-		ContextMenu.createMenu=function(__args){
-			var args=arguments;
-			return ContextMenu.createMenuByArray(args);
-		}
-
-		ContextMenu.createMenuByArray=function(args){
-			var menu=new ContextMenu();
-			var separatorBefore=false;
-			var item;
-			for (var i=0,n=args.length;i < n;i++){
-				var obj=args[i];
-				var info={};
-				if ((typeof obj=='string')){
-					info.label=obj;
-					}else {
-					info=obj;
-				}
-				if (info.label !=""){
-					item=new ContextMenuItem(info.label,separatorBefore);
-					item.data=obj;
-					menu.addItem(item);
-					separatorBefore=false;
-					}else {
-					item=new ContextMenuItem("",separatorBefore);
-					item.data=obj;
-					menu.addItem(item);
-					separatorBefore=true;
-				}
-			}
-			menu.zOrder=9999;
-			return menu;
-		}
-
-		ContextMenu.adptMenu=function(menu){
-			var tWidth=80;
-			var maxWidth=80;
-			var i=0,len=menu.numChildren;
-			for (i=0;i < len;i++){
-				tWidth=(menu.getChildAt(i)).width;
-				if (maxWidth < tWidth){
-					maxWidth=tWidth;
-				}
-			}
-			for (i=0;i < len;i++){
-				(menu.getChildAt(i)).width=maxWidth;
-			}
-		}
-
-		ContextMenu._menuList=[];
-		return ContextMenu;
-	})(Box)
-
-
-	/**
 	*<code>List</code> 控件可显示项目列表。默认为垂直方向列表。可通过UI编辑器自定义列表。
 	*
 	*@example <caption>以下示例代码，创建了一个 <code>List</code> 实例。</caption>
@@ -25651,6 +25565,123 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-10-24 下午2:58:37
+	*/
+	//class laya.debug.uicomps.ContextMenu extends laya.ui.Box
+	var ContextMenu=(function(_super){
+		function ContextMenu(){
+			this._tY=0;
+			ContextMenu.__super.call(this);
+			StyleConsts.setViewScale(this);
+		}
+
+		__class(ContextMenu,'laya.debug.uicomps.ContextMenu',_super);
+		var __proto=ContextMenu.prototype;
+		__proto.addItem=function(item){
+			this.addChild(item);
+			item.y=this._tY;
+			this._tY+=item.height;
+			item.on("mousedown",this,this.onClick);
+		}
+
+		__proto.onClick=function(e){
+			this.event("select",e);
+			this.removeSelf();
+		}
+
+		__proto.show=function(posX,posY){
+			(posX===void 0)&& (posX=-999);
+			(posY===void 0)&& (posY=-999);
+			Laya.timer.once(100,this,ContextMenu.showMenu,[this,posX,posY]);
+		}
+
+		ContextMenu.init=function(){
+			Laya.stage.on("click",null,ContextMenu.cleanMenu);
+		}
+
+		ContextMenu.cleanMenu=function(e){
+			var i=0;
+			var len=0;
+			len=ContextMenu._menuList.length;
+			for(i=0;i<len;i++){
+				if(ContextMenu._menuList[i]){
+					ContextMenu._menuList[i].removeSelf();
+				}
+			}
+			ContextMenu._menuList.length=0;
+		}
+
+		ContextMenu.showMenu=function(menu,posX,posY){
+			(posX===void 0)&& (posX=-999);
+			(posY===void 0)&& (posY=-999);
+			ContextMenu.cleanMenu();
+			ContextMenu.adptMenu(menu);
+			Laya._currentStage.addChild(menu);
+			DisControlTool.showToStage(menu);
+			if (posX !=-999 && posY !=-999){
+				menu.pos(posX,posY);
+			}
+			ContextMenu._menuList.push(menu);
+		}
+
+		ContextMenu.createMenu=function(__args){
+			var args=arguments;
+			return ContextMenu.createMenuByArray(args);
+		}
+
+		ContextMenu.createMenuByArray=function(args){
+			var menu=new ContextMenu();
+			var separatorBefore=false;
+			var item;
+			for (var i=0,n=args.length;i < n;i++){
+				var obj=args[i];
+				var info={};
+				if ((typeof obj=='string')){
+					info.label=obj;
+					}else {
+					info=obj;
+				}
+				if (info.label !=""){
+					item=new ContextMenuItem(info.label,separatorBefore);
+					item.data=obj;
+					menu.addItem(item);
+					separatorBefore=false;
+					}else {
+					item=new ContextMenuItem("",separatorBefore);
+					item.data=obj;
+					menu.addItem(item);
+					separatorBefore=true;
+				}
+			}
+			menu.zOrder=9999;
+			return menu;
+		}
+
+		ContextMenu.adptMenu=function(menu){
+			var tWidth=80;
+			var maxWidth=80;
+			var i=0,len=menu.numChildren;
+			for (i=0;i < len;i++){
+				tWidth=(menu.getChildAt(i)).width;
+				if (maxWidth < tWidth){
+					maxWidth=tWidth;
+				}
+			}
+			for (i=0;i < len;i++){
+				(menu.getChildAt(i)).width=maxWidth;
+			}
+		}
+
+		ContextMenu._menuList=[];
+		return ContextMenu;
+	})(Box)
+
+
+	/**
 	*<code>LayoutBox</code> 是一个布局容器类。
 	*/
 	//class laya.ui.LayoutBox extends laya.ui.Box
@@ -26618,6 +26649,33 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*ww
+	*@author ...
+	*/
+	//class extendui.ui.PixelRatioBox extends laya.ui.Box
+	var PixelRatioBox=(function(_super){
+		function PixelRatioBox(){
+			this.scaleRate=2;
+			PixelRatioBox.__super.call(this);
+			if (Browser.pixelRatio > 1){
+				this.scale(this.scaleRate,this.scaleRate);
+				Laya.stage.on("resize",this,this.onStageResize);
+				this.onStageResize();
+			}
+		}
+
+		__class(PixelRatioBox,'extendui.ui.PixelRatioBox',_super);
+		var __proto=PixelRatioBox.prototype;
+		__proto.onStageResize=function(){
+			this.width=Laya.stage.width /this.scaleRate;
+			this.height=Laya.stage.height/this.scaleRate;
+		}
+
+		return PixelRatioBox;
+	})(Box)
+
+
+	/**
 	*...
 	*@author ww
 	*/
@@ -26663,33 +26721,6 @@ var Laya=window.Laya=(function(window,document){
 		ContextMenuItem.labelColors=null
 		return ContextMenuItem;
 	})(Button)
-
-
-	/**
-	*ww
-	*@author ...
-	*/
-	//class extendui.ui.PixelRatioBox extends laya.ui.Box
-	var PixelRatioBox=(function(_super){
-		function PixelRatioBox(){
-			this.scaleRate=2;
-			PixelRatioBox.__super.call(this);
-			if (Browser.pixelRatio > 1){
-				this.scale(this.scaleRate,this.scaleRate);
-				Laya.stage.on("resize",this,this.onStageResize);
-				this.onStageResize();
-			}
-		}
-
-		__class(PixelRatioBox,'extendui.ui.PixelRatioBox',_super);
-		var __proto=PixelRatioBox.prototype;
-		__proto.onStageResize=function(){
-			this.width=Laya.stage.width /this.scaleRate;
-			this.height=Laya.stage.height/this.scaleRate;
-		}
-
-		return PixelRatioBox;
-	})(Box)
 
 
 	/**
@@ -27335,6 +27366,103 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
+	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
+	*
+	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
+	*package
+	*{
+		*import laya.ui.HSlider;
+		*import laya.ui.VSlider;
+		*import laya.utils.Handler;
+		*public class VSlider_Example
+		*{
+			*private var vSlider:VSlider;
+			*public function VSlider_Example()
+			*{
+				*Laya.init(640,800);//设置游戏画布宽高。
+				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
+				*}
+			*private function onLoadComplete():void
+			*{
+				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+				*vSlider.min=0;//设置 vSlider 最低位置值。
+				*vSlider.max=10;//设置 vSlider 最高位置值。
+				*vSlider.value=2;//设置 vSlider 当前位置值。
+				*vSlider.tick=1;//设置 vSlider 刻度值。
+				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
+				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+				*}
+			*private function onChange(value:Number):void
+			*{
+				*trace("滑块的位置： value="+value);
+				*}
+			*}
+		*}
+	*@example
+	*Laya.init(640,800);//设置游戏画布宽高
+	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
+	*var vSlider;
+	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
+	*function onLoadComplete(){
+		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+		*vSlider.min=0;//设置 vSlider 最低位置值。
+		*vSlider.max=10;//设置 vSlider 最高位置值。
+		*vSlider.value=2;//设置 vSlider 当前位置值。
+		*vSlider.tick=1;//设置 vSlider 刻度值。
+		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
+		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+		*}
+	*function onChange(value){
+		*console.log("滑块的位置： value="+value);
+		*}
+	*@example
+	*import HSlider=laya.ui.HSlider;
+	*import VSlider=laya.ui.VSlider;
+	*import Handler=laya.utils.Handler;
+	*class VSlider_Example {
+		*private vSlider:VSlider;
+		*constructor(){
+			*Laya.init(640,800);//设置游戏画布宽高。
+			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
+			*}
+		*private onLoadComplete():void {
+			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+			*this.vSlider.min=0;//设置 vSlider 最低位置值。
+			*this.vSlider.max=10;//设置 vSlider 最高位置值。
+			*this.vSlider.value=2;//设置 vSlider 当前位置值。
+			*this.vSlider.tick=1;//设置 vSlider 刻度值。
+			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
+			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
+			*}
+		*private onChange(value:number):void {
+			*console.log("滑块的位置： value="+value);
+			*}
+		*}
+	*@see laya.ui.Slider
+	*/
+	//class laya.ui.VSlider extends laya.ui.Slider
+	var VSlider=(function(_super){
+		function VSlider(){VSlider.__super.call(this);;
+		};
+
+		__class(VSlider,'laya.ui.VSlider',_super);
+		return VSlider;
+	})(Slider)
+
+
+	/**
 	*<code>TextInput</code> 类用于创建显示对象以显示和输入文本。
 	*
 	*@example <caption>以下示例代码，创建了一个 <code>TextInput</code> 实例。</caption>
@@ -27655,103 +27783,6 @@ var Laya=window.Laya=(function(window,document){
 
 		return TextInput;
 	})(Label)
-
-
-	/**
-	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
-	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
-	*
-	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
-	*package
-	*{
-		*import laya.ui.HSlider;
-		*import laya.ui.VSlider;
-		*import laya.utils.Handler;
-		*public class VSlider_Example
-		*{
-			*private var vSlider:VSlider;
-			*public function VSlider_Example()
-			*{
-				*Laya.init(640,800);//设置游戏画布宽高。
-				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
-				*}
-			*private function onLoadComplete():void
-			*{
-				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-				*vSlider.min=0;//设置 vSlider 最低位置值。
-				*vSlider.max=10;//设置 vSlider 最高位置值。
-				*vSlider.value=2;//设置 vSlider 当前位置值。
-				*vSlider.tick=1;//设置 vSlider 刻度值。
-				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
-				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-				*}
-			*private function onChange(value:Number):void
-			*{
-				*trace("滑块的位置： value="+value);
-				*}
-			*}
-		*}
-	*@example
-	*Laya.init(640,800);//设置游戏画布宽高
-	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
-	*var vSlider;
-	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
-	*function onLoadComplete(){
-		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-		*vSlider.min=0;//设置 vSlider 最低位置值。
-		*vSlider.max=10;//设置 vSlider 最高位置值。
-		*vSlider.value=2;//设置 vSlider 当前位置值。
-		*vSlider.tick=1;//设置 vSlider 刻度值。
-		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
-		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-		*}
-	*function onChange(value){
-		*console.log("滑块的位置： value="+value);
-		*}
-	*@example
-	*import HSlider=laya.ui.HSlider;
-	*import VSlider=laya.ui.VSlider;
-	*import Handler=laya.utils.Handler;
-	*class VSlider_Example {
-		*private vSlider:VSlider;
-		*constructor(){
-			*Laya.init(640,800);//设置游戏画布宽高。
-			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
-			*}
-		*private onLoadComplete():void {
-			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-			*this.vSlider.min=0;//设置 vSlider 最低位置值。
-			*this.vSlider.max=10;//设置 vSlider 最高位置值。
-			*this.vSlider.value=2;//设置 vSlider 当前位置值。
-			*this.vSlider.tick=1;//设置 vSlider 刻度值。
-			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
-			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
-			*}
-		*private onChange(value:number):void {
-			*console.log("滑块的位置： value="+value);
-			*}
-		*}
-	*@see laya.ui.Slider
-	*/
-	//class laya.ui.VSlider extends laya.ui.Slider
-	var VSlider=(function(_super){
-		function VSlider(){VSlider.__super.call(this);;
-		};
-
-		__class(VSlider,'laya.ui.VSlider',_super);
-		return VSlider;
-	})(Slider)
 
 
 	/**
@@ -28569,25 +28600,6 @@ var Laya=window.Laya=(function(window,document){
 	})(View)
 
 
-	//class ui.mindmap.MindMapEditorUI extends laya.ui.View
-	var MindMapEditorUI=(function(_super){
-		function MindMapEditorUI(){
-			this.saveBtn=null;
-			MindMapEditorUI.__super.call(this);
-		}
-
-		__class(MindMapEditorUI,'ui.mindmap.MindMapEditorUI',_super);
-		var __proto=MindMapEditorUI.prototype;
-		__proto.createChildren=function(){
-			laya.ui.Component.prototype.createChildren.call(this);
-			this.createView(MindMapEditorUI.uiView);
-		}
-
-		MindMapEditorUI.uiView={"type":"View","props":{"width":400,"height":300},"child":[{"type":"Button","props":{"var":"saveBtn","top":5,"skin":"comp/button.png","right":5,"label":"保存"}}]};
-		return MindMapEditorUI;
-	})(View)
-
-
 	//class ui.mindmap.MapItemUI extends laya.ui.View
 	var MapItemUI=(function(_super){
 		function MapItemUI(){
@@ -28607,6 +28619,25 @@ var Laya=window.Laya=(function(window,document){
 
 		MapItemUI.uiView={"type":"View","props":{"width":162,"height":22},"child":[{"type":"TextInput","props":{"var":"text","text":"TextInput","skin":"comp/textinput.png","color":"#93eedf","align":"center"}},{"type":"Button","props":{"y":11,"x":131,"var":"downBtn","skin":"comp/down.png"}},{"type":"Button","props":{"y":-1,"x":131,"var":"upBtn","skin":"comp/up.png"}},{"type":"Radio","props":{"y":4,"x":147,"var":"selectBtn","skin":"comp/selectbtn.png"}}]};
 		return MapItemUI;
+	})(View)
+
+
+	//class ui.mindmap.MindMapEditorUI extends laya.ui.View
+	var MindMapEditorUI=(function(_super){
+		function MindMapEditorUI(){
+			this.saveBtn=null;
+			MindMapEditorUI.__super.call(this);
+		}
+
+		__class(MindMapEditorUI,'ui.mindmap.MindMapEditorUI',_super);
+		var __proto=MindMapEditorUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(MindMapEditorUI.uiView);
+		}
+
+		MindMapEditorUI.uiView={"type":"View","props":{"width":400,"height":300},"child":[{"type":"Button","props":{"var":"saveBtn","top":5,"skin":"comp/button.png","right":5,"label":"保存"}}]};
+		return MindMapEditorUI;
 	})(View)
 
 
@@ -29430,288 +29461,6 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class mindmap.MindMapEditor extends ui.mindmap.MindMapEditorUI
-	var MindMapEditor=(function(_super){
-		function MindMapEditor(){
-			this._menu=null;
-			this.nodeContainer=null;
-			this.onMenuSelectHandler=null;
-			this.onItemActionHandler=null;
-			this._userChanged=false;
-			this._selectItem=null;
-			this._dataO=null;
-			this.mapNodeData=null;
-			this.root=null;
-			this.mindMapItems=[];
-			MindMapEditor.__super.call(this);
-			this._tempPoint=new Point();
-			this._menu=ContextMenu.createMenuByArray(["新建"]);
-			this._menu.on("select",this,this.onSelect);
-			this.onMenuSelectHandler=new Handler(this,this.onSelect);
-			this.onItemActionHandler=new Handler(this,this.onItemAction);
-			this.nodeContainer=new Box();
-			this.nodeContainer.size(1,1);
-			this.nodeContainer.hitTestPrior=false;
-			this.addChild(this.nodeContainer);
-			this.on("resize",this,this.onResize);
-			this.onResize();
-			this.on("mousedown",this,this.onRightDown);
-			this.on("mouseup",this,this.onRightUp);
-			this.saveBtn.zOrder=99;
-			this.saveBtn.on("click",this,this.onActionBtn,["save"]);
-			this.on("mousewheel",this,this.onMouseWheel);
-			ScaleAction.setTargetScaleActionEnabled(this.nodeContainer);
-			this.nodeContainer.on("ScaleActionEvent",this,this.onActionBtn);
-		}
-
-		__class(MindMapEditor,'mindmap.MindMapEditor',_super);
-		var __proto=MindMapEditor.prototype;
-		__proto.onScaleAction=function(dValue){
-			var scale=NaN;
-			scale=this.containerScale;
-			scale+=dValue;
-			if (scale < 0.2){
-				scale=0.2;
-			}
-			this.containerScale=scale;
-		}
-
-		__proto.onMouseWheel=function(e){
-			var scale=NaN;
-			scale=this.containerScale;
-			if (e.delta > 0){
-				scale+=0.1;
-				}else{
-				scale-=0.1;
-				if (scale < 0.2){
-					scale=0.2;
-				}
-			}
-			this.containerScale=scale;
-		}
-
-		__proto.onActionBtn=function(type){
-			switch(type){
-				case "save":
-					debugger;
-					console.log("save:",this._dataO.url,this.mapNodeData);
-					this.event("Save");
-					break ;
-				}
-		}
-
-		__proto.onRightDown=function(e){
-			if (this.nodeContainer.contains(e.target)&& e.target !=this.nodeContainer)return;
-			if (e.touches && e.touches.length > 1){
-				this.nodeContainer.stopDrag();
-				return;
-			}
-			this.nodeContainer.startDrag();
-			this._userChanged=true;
-		}
-
-		__proto.onRightUp=function(e){
-			this.nodeContainer.stopDrag();
-			this.switchPivotCenter();
-		}
-
-		__proto.switchPivotCenter=function(){
-			this._tempPoint.setTo(this.width *0.5,this.height *0.5);
-			this.localToGlobal(this._tempPoint);
-			this.nodeContainer.globalToLocal(this._tempPoint);
-			var dX=NaN,dY=NaN;
-			dX=this._tempPoint.x-this.nodeContainer.pivotX;
-			dY=this._tempPoint.y-this.nodeContainer.pivotY;
-			this.nodeContainer.pivot(this._tempPoint.x,this._tempPoint.y);
-			this.nodeContainer.x+=dX*this.containerScale;
-			this.nodeContainer.y+=dY*this.containerScale;
-		}
-
-		//nodeContainer.scaleY+=0.1;
-		__proto.onResize=function(){
-			var rec;
-			rec=this.scrollRect || new Rectangle();
-			rec.setTo(0,0,this.width,this.height);
-			this.scrollRect=rec;
-			if (this._userChanged)return;
-			this.nodeContainer.pos(this.width*0.5,this.height*0.5);
-		}
-
-		__proto.onRightClick=function(){
-			this._menu.show();
-		}
-
-		__proto.onSelect=function(dataO,target){
-			console.log("onMenuSelect:",dataO,target);
-			var label;
-			label=dataO.target.data;
-			console.log("Menu:",label);
-			this.onItemAction(label,target);
-		}
-
-		__proto.onItemAction=function(action,target){
-			if (!mindmap.MindMapEditor.isEditorMode)return;
-			var parentNode;
-			parentNode=target.parentNode;
-			switch(action){
-				case "新建子":
-					target.nodeData.addChild(MindMapNodeData.createByLabel("new"));
-					this.freshUI();
-					break ;
-				case "新建同级":
-					if (parentNode){
-						parentNode.nodeData.addChild(MindMapNodeData.createByLabel("new"));
-						this.freshUI();
-					}
-					break ;
-				case "删除":
-					if (parentNode){
-						if (target==this._selectItem){
-							this._selectItem=null;
-						}
-						parentNode.nodeData.removeChild(target.nodeData);
-						this.freshUI();
-					}
-					break ;
-				case "up":
-					if (parentNode){
-						parentNode.nodeData.moveChild(target.nodeData,-1);
-						parentNode.updateNodesToDataOrder();
-						this.freshLayout();
-					}
-					break ;
-				case "down":
-					if (parentNode){
-						parentNode.nodeData.moveChild(target.nodeData,1);
-						parentNode.updateNodesToDataOrder();
-						this.freshLayout();
-					}
-					break ;
-				case "select":
-					if (target==this._selectItem){
-						if (!target.isSelect()){
-							this._selectItem=null;
-							return;
-						}
-					}
-					if (!this._selectItem){
-						this._selectItem=target;
-						}else{
-						target.setSelect(false);
-						this._selectItem.setSelect(false);
-						this._selectItem.parentNode.removeChildNode(this._selectItem);
-						target.addChildNode(this._selectItem,true);
-						this._selectItem=null;
-						this.freshLayout();
-					}
-					break ;
-				}
-		}
-
-		__proto.setData=function(dataO){
-			this._dataO=dataO;
-			this._userChanged=false;
-			this.onResize();
-			this.mapNodeData=MindMapNodeData.createByObj(dataO.data||dataO,true);
-			this.freshUI();
-		}
-
-		__proto.clearPreItems=function(){
-			this._selectItem=null;
-			this.mindMapItems.length=0;
-			var i=0,len=0;
-			len=this.nodeContainer.numChildren;
-			var tChild;
-			for (i=0;i < len;i++){
-				tChild=this.nodeContainer.getChildAt(i);
-				if ((tChild instanceof mindmap.MindMapItem )){
-					tChild.recover();
-				}
-			}
-			this.nodeContainer.removeChildren();
-		}
-
-		__proto.freshUI=function(){
-			this.clearPreItems();
-			this.root=this.createMapView(this.mapNodeData);
-			this.root.pos(0,0);
-			this.freshLayout();
-		}
-
-		__proto.freshLayout=function(){
-			if (!this.root)return;
-			this.root.layoutAsCenter();
-			this.nodeContainer.graphics.clear();
-			this.root.drawConnections(this.nodeContainer);
-			console.log("data:",this.root.nodeData);
-		}
-
-		__proto.createMapView=function(nodeData){
-			this.mindMapItems.length=0;
-			var rst;
-			rst=this.createMapItem(nodeData);
-			var childs;
-			childs=nodeData.childs;
-			var i=0,len=0;
-			len=childs.length;
-			var tChildData;
-			var tChildItem;
-			for (i=0;i < len;i++){
-				tChildData=childs[i];
-				tChildItem=this.createMapTree(tChildData);
-				rst.addChildNode(tChildItem);
-			}
-			return rst;
-		}
-
-		__proto.createMapTree=function(nodeData){
-			var rst;
-			rst=this.createMapItem(nodeData);
-			var childs;
-			childs=nodeData.childs;
-			var i=0,len=0;
-			len=childs.length;
-			var tChildData;
-			var tChildItem;
-			for (i=0;i < len;i++){
-				tChildData=childs[i];
-				tChildItem=this.createMapTree(tChildData);
-				rst.addChildNode(tChildItem);
-			}
-			return rst;
-		}
-
-		__proto.createMapItem=function(nodeData){
-			var rst;
-			rst=MindMapItem.createByData(nodeData);
-			this.nodeContainer.addChild(rst);
-			rst.onMenuSelectHandler=this.onMenuSelectHandler;
-			rst.onItemActionHandler=this.onItemActionHandler;
-			this.mindMapItems.push(rst);
-			return rst;
-		}
-
-		__getset(0,__proto,'containerScale',function(){
-			return this.nodeContainer.scaleX;
-			},function(value){
-			this.switchPivotCenter();
-			this.nodeContainer.scale(value,value);
-		});
-
-		__getset(0,__proto,'data',function(){
-			return this._dataO;
-		});
-
-		MindMapEditor.Save="Save";
-		MindMapEditor.isEditorMode=true;
-		return MindMapEditor;
-	})(MindMapEditorUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
 	//class mindmap.MindMapItem extends ui.mindmap.MapItemUI
 	var MindMapItem=(function(_super){
 		function MindMapItem(){
@@ -29979,6 +29728,288 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class mindmap.MindMapEditor extends ui.mindmap.MindMapEditorUI
+	var MindMapEditor=(function(_super){
+		function MindMapEditor(){
+			this._menu=null;
+			this.nodeContainer=null;
+			this.onMenuSelectHandler=null;
+			this.onItemActionHandler=null;
+			this._userChanged=false;
+			this._selectItem=null;
+			this._dataO=null;
+			this.mapNodeData=null;
+			this.root=null;
+			this.mindMapItems=[];
+			MindMapEditor.__super.call(this);
+			this._tempPoint=new Point();
+			this._menu=ContextMenu.createMenuByArray(["新建"]);
+			this._menu.on("select",this,this.onSelect);
+			this.onMenuSelectHandler=new Handler(this,this.onSelect);
+			this.onItemActionHandler=new Handler(this,this.onItemAction);
+			this.nodeContainer=new Box();
+			this.nodeContainer.size(1,1);
+			this.nodeContainer.hitTestPrior=false;
+			this.addChild(this.nodeContainer);
+			this.on("resize",this,this.onResize);
+			this.onResize();
+			this.on("mousedown",this,this.onRightDown);
+			this.on("mouseup",this,this.onRightUp);
+			this.saveBtn.zOrder=99;
+			this.saveBtn.on("click",this,this.onActionBtn,["save"]);
+			this.on("mousewheel",this,this.onMouseWheel);
+			ScaleAction.setTargetScaleActionEnabled(this);
+			this.on("ScaleActionEvent",this,this.onScaleAction);
+		}
+
+		__class(MindMapEditor,'mindmap.MindMapEditor',_super);
+		var __proto=MindMapEditor.prototype;
+		__proto.onScaleAction=function(dValue){
+			var scale=NaN;
+			scale=this.containerScale;
+			scale *=dValue;
+			if (scale < 0.2){
+				scale=0.2;
+			}
+			this.containerScale=scale;
+		}
+
+		__proto.onMouseWheel=function(e){
+			var scale=NaN;
+			scale=this.containerScale;
+			if (e.delta > 0){
+				scale+=0.1;
+				}else{
+				scale-=0.1;
+				if (scale < 0.2){
+					scale=0.2;
+				}
+			}
+			this.containerScale=scale;
+		}
+
+		__proto.onActionBtn=function(type){
+			switch(type){
+				case "save":
+					debugger;
+					console.log("save:",this._dataO.url,this.mapNodeData);
+					this.event("Save");
+					break ;
+				}
+		}
+
+		__proto.onRightDown=function(e){
+			if (this.nodeContainer.contains(e.target)&& e.target !=this.nodeContainer)return;
+			if (e.touches && e.touches.length > 1){
+				this.nodeContainer.stopDrag();
+				return;
+			}
+			this.nodeContainer.startDrag();
+			this._userChanged=true;
+		}
+
+		__proto.onRightUp=function(e){
+			this.nodeContainer.stopDrag();
+			this.switchPivotCenter();
+		}
+
+		__proto.switchPivotCenter=function(){
+			this._tempPoint.setTo(this.width *0.5,this.height *0.5);
+			this.localToGlobal(this._tempPoint);
+			this.nodeContainer.globalToLocal(this._tempPoint);
+			var dX=NaN,dY=NaN;
+			dX=this._tempPoint.x-this.nodeContainer.pivotX;
+			dY=this._tempPoint.y-this.nodeContainer.pivotY;
+			this.nodeContainer.pivot(this._tempPoint.x,this._tempPoint.y);
+			this.nodeContainer.x+=dX*this.containerScale;
+			this.nodeContainer.y+=dY*this.containerScale;
+		}
+
+		//nodeContainer.scaleY+=0.1;
+		__proto.onResize=function(){
+			var rec;
+			rec=this.scrollRect || new Rectangle();
+			rec.setTo(0,0,this.width,this.height);
+			this.scrollRect=rec;
+			if (this._userChanged)return;
+			this.nodeContainer.pos(this.width*0.5,this.height*0.5);
+		}
+
+		__proto.onRightClick=function(){
+			this._menu.show();
+		}
+
+		__proto.onSelect=function(dataO,target){
+			console.log("onMenuSelect:",dataO,target);
+			var label;
+			label=dataO.target.data;
+			console.log("Menu:",label);
+			this.onItemAction(label,target);
+		}
+
+		__proto.onItemAction=function(action,target){
+			if (!mindmap.MindMapEditor.isEditorMode)return;
+			var parentNode;
+			parentNode=target.parentNode;
+			switch(action){
+				case "新建子":
+					target.nodeData.addChild(MindMapNodeData.createByLabel("new"));
+					this.freshUI();
+					break ;
+				case "新建同级":
+					if (parentNode){
+						parentNode.nodeData.addChild(MindMapNodeData.createByLabel("new"));
+						this.freshUI();
+					}
+					break ;
+				case "删除":
+					if (parentNode){
+						if (target==this._selectItem){
+							this._selectItem=null;
+						}
+						parentNode.nodeData.removeChild(target.nodeData);
+						this.freshUI();
+					}
+					break ;
+				case "up":
+					if (parentNode){
+						parentNode.nodeData.moveChild(target.nodeData,-1);
+						parentNode.updateNodesToDataOrder();
+						this.freshLayout();
+					}
+					break ;
+				case "down":
+					if (parentNode){
+						parentNode.nodeData.moveChild(target.nodeData,1);
+						parentNode.updateNodesToDataOrder();
+						this.freshLayout();
+					}
+					break ;
+				case "select":
+					if (target==this._selectItem){
+						if (!target.isSelect()){
+							this._selectItem=null;
+							return;
+						}
+					}
+					if (!this._selectItem){
+						this._selectItem=target;
+						}else{
+						target.setSelect(false);
+						this._selectItem.setSelect(false);
+						this._selectItem.parentNode.removeChildNode(this._selectItem);
+						target.addChildNode(this._selectItem,true);
+						this._selectItem=null;
+						this.freshLayout();
+					}
+					break ;
+				}
+		}
+
+		__proto.setData=function(dataO){
+			this._dataO=dataO;
+			this._userChanged=false;
+			this.onResize();
+			this.mapNodeData=MindMapNodeData.createByObj(dataO.data||dataO,true);
+			this.freshUI();
+		}
+
+		__proto.clearPreItems=function(){
+			this._selectItem=null;
+			this.mindMapItems.length=0;
+			var i=0,len=0;
+			len=this.nodeContainer.numChildren;
+			var tChild;
+			for (i=0;i < len;i++){
+				tChild=this.nodeContainer.getChildAt(i);
+				if ((tChild instanceof mindmap.MindMapItem )){
+					tChild.recover();
+				}
+			}
+			this.nodeContainer.removeChildren();
+		}
+
+		__proto.freshUI=function(){
+			this.clearPreItems();
+			this.root=this.createMapView(this.mapNodeData);
+			this.root.pos(0,0);
+			this.freshLayout();
+		}
+
+		__proto.freshLayout=function(){
+			if (!this.root)return;
+			this.root.layoutAsCenter();
+			this.nodeContainer.graphics.clear();
+			this.root.drawConnections(this.nodeContainer);
+			console.log("data:",this.root.nodeData);
+		}
+
+		__proto.createMapView=function(nodeData){
+			this.mindMapItems.length=0;
+			var rst;
+			rst=this.createMapItem(nodeData);
+			var childs;
+			childs=nodeData.childs;
+			var i=0,len=0;
+			len=childs.length;
+			var tChildData;
+			var tChildItem;
+			for (i=0;i < len;i++){
+				tChildData=childs[i];
+				tChildItem=this.createMapTree(tChildData);
+				rst.addChildNode(tChildItem);
+			}
+			return rst;
+		}
+
+		__proto.createMapTree=function(nodeData){
+			var rst;
+			rst=this.createMapItem(nodeData);
+			var childs;
+			childs=nodeData.childs;
+			var i=0,len=0;
+			len=childs.length;
+			var tChildData;
+			var tChildItem;
+			for (i=0;i < len;i++){
+				tChildData=childs[i];
+				tChildItem=this.createMapTree(tChildData);
+				rst.addChildNode(tChildItem);
+			}
+			return rst;
+		}
+
+		__proto.createMapItem=function(nodeData){
+			var rst;
+			rst=MindMapItem.createByData(nodeData);
+			this.nodeContainer.addChild(rst);
+			rst.onMenuSelectHandler=this.onMenuSelectHandler;
+			rst.onItemActionHandler=this.onItemActionHandler;
+			this.mindMapItems.push(rst);
+			return rst;
+		}
+
+		__getset(0,__proto,'containerScale',function(){
+			return this.nodeContainer.scaleX;
+			},function(value){
+			this.switchPivotCenter();
+			this.nodeContainer.scale(value,value);
+		});
+
+		__getset(0,__proto,'data',function(){
+			return this._dataO;
+		});
+
+		MindMapEditor.Save="Save";
+		MindMapEditor.isEditorMode=true;
+		return MindMapEditor;
+	})(MindMapEditorUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class filekit.LoginView extends ui.deskplatform.LoginViewUI
 	var LoginView=(function(_super){
 		function LoginView(){
@@ -30106,14 +30137,14 @@ var Laya=window.Laya=(function(window,document){
 	})(AlertUI)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,Render,View,Browser,Timer,GraphicAnimation,LocalStorage]);
+	Laya.__init([EventDispatcher,LoaderManager,Render,View,Browser,Timer,LocalStorage,GraphicAnimation]);
 	new TestRemoteView();
 
 })(window,document,Laya);
 
 
 /*
-1 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (102):warning:content This variable is not defined.
-2 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (104):warning:content This variable is not defined.
-3 file:///D:/codes/playground.git/trunk/libs/filetoolkit/client/src/filetoolkit/FileKit.as (104):warning:content This variable is not defined.
+1 file:///E:/onewaymyway/codes/playground/playground/libs/filetoolkit/client/src/filetoolkit/FileKit.as (102):warning:content This variable is not defined.
+2 file:///E:/onewaymyway/codes/playground/playground/libs/filetoolkit/client/src/filetoolkit/FileKit.as (104):warning:content This variable is not defined.
+3 file:///E:/onewaymyway/codes/playground/playground/libs/filetoolkit/client/src/filetoolkit/FileKit.as (104):warning:content This variable is not defined.
 */

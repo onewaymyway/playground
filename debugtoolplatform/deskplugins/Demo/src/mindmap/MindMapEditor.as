@@ -45,14 +45,15 @@ package mindmap
 			this.on(Event.MOUSE_WHEEL, this, onMouseWheel);
 			
 			ScaleAction.setTargetScaleActionEnabled(this);
-			this.on(ScaleAction.ScaleActionEvent, this, onActionBtn);
+			this.on(ScaleAction.ScaleActionEvent, this, onScaleAction);
 		}
 		
 		private function onScaleAction(dValue:Number):void
 		{
 			var scale:Number;
 			scale = containerScale;
-			scale += dValue;
+			scale *= dValue;
+			//trace("scale:", dValue);
 			if (scale < 0.2)
 			{
 				scale = 0.2;

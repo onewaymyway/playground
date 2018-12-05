@@ -28,7 +28,7 @@ package extendui.events
 		{
 			//MessageManager.I.show("onMouseDown");
 			var touches:Array = e.touches;
-			MessageManager.I.show("onTouch"+touches);
+			//MessageManager.I.show("onTouch"+touches);
 
 			if(touches && touches.length == 2)
 			{
@@ -62,9 +62,11 @@ package extendui.events
 			//判断当前距离与上次距离变化，确定是放大还是缩小
 			var factor:Number = 0.01;
 			var dScale:Number;
-			dScale= (distance - lastDistance) * factor;
+			dScale = (distance - lastDistance) * factor;
+			dScale = distance / lastDistance;
+			//debugger;
 			_target.event(ScaleActionEvent, dScale);
-			MessageManager.I.show("Event:"+dScale);
+			//MessageManager.I.show("Event:"+dScale);
 
 			lastDistance = distance;
 		}
