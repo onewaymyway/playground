@@ -1,5 +1,6 @@
 package extendui.events 
 {
+	import electrontools.MessageManager;
 	import laya.display.Sprite;
 	import laya.events.Event;
 	/**
@@ -25,10 +26,13 @@ package extendui.events
 		
 		private function onMouseDown(e:Event):void
 		{
+			//MessageManager.I.show("onMouseDown");
 			var touches:Array = e.touches;
+			MessageManager.I.show("onTouch"+touches);
 
 			if(touches && touches.length == 2)
 			{
+
 				lastDistance = getDistance(touches);
 
 				addMouseEvents();
@@ -59,7 +63,8 @@ package extendui.events
 			var factor:Number = 0.01;
 			var dScale:Number;
 			dScale= (distance - lastDistance) * factor;
-			_target.event(ScaleActionEvent,dScale);
+			_target.event(ScaleActionEvent, dScale);
+			MessageManager.I.show("Event:"+dScale);
 
 			lastDistance = distance;
 		}
