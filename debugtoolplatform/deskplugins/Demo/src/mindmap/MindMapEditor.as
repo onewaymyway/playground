@@ -44,8 +44,8 @@ package mindmap
 			
 			this.on(Event.MOUSE_WHEEL, this, onMouseWheel);
 			
-			ScaleAction.setTargetScaleActionEnabled(nodeContainer);
-			nodeContainer.on(ScaleAction.ScaleActionEvent, this, onActionBtn);
+			ScaleAction.setTargetScaleActionEnabled(this);
+			this.on(ScaleAction.ScaleActionEvent, this, onActionBtn);
 		}
 		
 		private function onScaleAction(dValue:Number):void
