@@ -2,6 +2,7 @@ package mindmap
 {
 	import laya.debug.uicomps.ContextMenu;
 	import laya.events.Event;
+	import laya.maths.Point;
 	import laya.maths.Rectangle;
 	import laya.ui.Box;
 	import laya.utils.Handler;
@@ -39,8 +40,38 @@ package mindmap
 			this.on(Event.MOUSE_UP, this, onRightUp);
 			saveBtn.zOrder = 99;
 			saveBtn.on(Event.CLICK, this, onActionBtn, ["save"]);
+			
+			this.on(Event.MOUSE_WHEEL, this, onMouseWheel);
 		}
 		
+		private function onMouseWheel(e:Event):void
+		{
+			var scale:Number;
+			scale = containerScale;
+			if (e.delta > 0)
+			{
+				scale += 0.1;
+			}else
+			{
+				scale-= 0.1;
+				if (scale < 0.2)
+				{
+					scale = 0.2;
+				}
+			}
+			containerScale = scale;
+		}
+		
+		public function get containerScale():Number
+		{
+			return nodeContainer.scaleX;
+		}
+		
+		public function set containerScale(value:Number):void
+		{
+			switchPivotCenter();
+			nodeContainer.scale(value, value);
+		}
 		
 		private function onActionBtn(type:String):void
 		{
@@ -64,6 +95,31 @@ package mindmap
 		private function onRightUp(e:Event):void
 		{
 			nodeContainer.stopDrag();
+			switchPivotCenter();
+		}
+		
+		
+		private var _tempPoint:Point = new Point();
+		private function switchPivotCenter():void
+		{
+			_tempPoint.setTo(this.width * 0.5, this.height * 0.5);
+			this.localToGlobal(_tempPoint);
+			nodeContainer.globalToLocal(_tempPoint);
+			var dX:Number, dY:Number;
+			dX = _tempPoint.x - nodeContainer.pivotX;
+			dY = _tempPoint.y - nodeContainer.pivotY;
+			//trace("dX dY:",dX,dY);
+			nodeContainer.pivot(_tempPoint.x, _tempPoint.y);
+			nodeContainer.x += dX*containerScale;
+			nodeContainer.y += dY*containerScale;
+			//trace("switchPivotCenter:", _tempPoint.toString(), nodeContainer.pivotX, nodeContainer.pivotY, nodeContainer.x, nodeContainer.y);
+			
+			//_tempPoint.setTo(this.width * 0.5, this.height * 0.5);
+			//this.localToGlobal(_tempPoint);
+			//nodeContainer.globalToLocal(_tempPoint);
+			//trace("adpt:", _tempPoint.toString());
+			//nodeContainer.scaleX += 0.1;
+			//nodeContainer.scaleY += 0.1;
 		}
 		private function onResize():void
 		{
