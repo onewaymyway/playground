@@ -11,7 +11,9 @@ package
 	import laya.debug.uicomps.ContextMenuItem;
 	import laya.display.Sprite;
 	import laya.display.Stage;
+	import laya.events.Event;
 	import laya.net.Loader;
+	import laya.ui.Button;
 	import laya.ui.View;
 	import laya.utils.Browser;
 	import laya.utils.Handler;
@@ -43,6 +45,7 @@ package
 		private var mindMapEditor:MindMapEditor;
 		public var fileKit:FileKit;
 		private var tree:RemoteTreeView;
+		private var switchBtn:Button;
 		private function initFileToolKit():void
 		{
 			FileKit.root = "https://stk.orzooo.com:9953";
@@ -61,11 +64,16 @@ package
 			mindMapEditor.saveBtn.visible = true;
 			MindMapEditor.isEditorMode = true;
 		}
+		
+		private var container:Sprite;
 		private function test():void
 		{
 			
+			switchBtn = new Button();
+			switchBtn.skin = "comp/button.png";
+			switchBtn.label = "Switch";
 			
-			var container:Sprite;
+			
 			if (Browser.pixelRatio > 1)
 			{
 				container = new PixelRatioBox();
@@ -75,6 +83,11 @@ package
 			{
 				container = Laya.stage;
 			}
+			
+			
+			
+			
+			
 			tree = new RemoteTreeView();
 			tree.top = tree.bottom = 5;
 			tree.fileKit = fileKit;
@@ -90,7 +103,26 @@ package
 			mindMapEditor.saveBtn.visible = false;
 			container.addChild(mindMapEditor);
 			
+			
+			container.addChild(switchBtn);
+			switchBtn.left = mindMapEditor.left;
+			switchBtn.on(Event.CLICK, this, onSwitchBtn);
 			Notice.listen(Msgs.Open_File, this, onOpenFile);
+		}
+		
+		private function onSwitchBtn():void
+		{
+			if (tree.parent)
+			{
+				tree.removeSelf();
+				mindMapEditor.left = 2;
+				switchBtn.left = mindMapEditor.left;
+			}else
+			{
+				container.addChild(tree);
+				mindMapEditor.left = tree.x + tree.width + 2;
+				switchBtn.left = mindMapEditor.left;
+			}
 		}
 		
 		private function onMindMapSave():void
