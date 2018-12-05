@@ -1,5 +1,6 @@
 package mindmap 
 {
+	import extendui.events.ScaleAction;
 	import laya.debug.uicomps.ContextMenu;
 	import laya.events.Event;
 	import laya.maths.Point;
@@ -42,6 +43,21 @@ package mindmap
 			saveBtn.on(Event.CLICK, this, onActionBtn, ["save"]);
 			
 			this.on(Event.MOUSE_WHEEL, this, onMouseWheel);
+			
+			ScaleAction.setTargetScaleActionEnabled(nodeContainer);
+			nodeContainer.on(ScaleAction.ScaleActionEvent, this, onActionBtn);
+		}
+		
+		private function onScaleAction(dValue:Number):void
+		{
+			var scale:Number;
+			scale = containerScale;
+			scale += dValue;
+			if (scale < 0.2)
+			{
+				scale = 0.2;
+			}
+			containerScale = scale;
 		}
 		
 		private function onMouseWheel(e:Event):void
@@ -87,7 +103,12 @@ package mindmap
 		}
 		private function onRightDown(e:Event):void
 		{
-			if (nodeContainer.contains(e.target)&&e.target!=nodeContainer) return;
+			if (nodeContainer.contains(e.target) && e.target != nodeContainer) return;
+			if (e.touches && e.touches.length > 1)
+			{
+				nodeContainer.stopDrag();
+				return;
+			}
 			nodeContainer.startDrag();
 			_userChanged = true;
 		}
