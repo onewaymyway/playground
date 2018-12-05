@@ -111,16 +111,23 @@ package
 		}
 		
 		private var tFile:String;
+		private var tID:int = 0;
+		private var preLoadFile:String;
 		private function onOpenFile(dataO:Object):void
 		{
 			var filePath:String;
 			filePath = dataO.path;
-			fileKit.getFile(filePath,Handler.create(this,onFileGet,[filePath]),true);
+			if (filePath == preLoadFile) return;
+			preLoadFile = filePath;
+			tID++;
+			fileKit.getFile(filePath,Handler.create(this,onFileGet,[filePath,tID]),true);
 		}
 		
-		private function onFileGet(filePath:String, dataO:Object):void
+		private function onFileGet(filePath:String,rID:int, dataO:Object):void
 		{
+			
 			trace("onFileGet:", filePath, dataO);
+			if (rID != tID) return;
 			tFile = filePath;
 			if (dataO)
 			{
