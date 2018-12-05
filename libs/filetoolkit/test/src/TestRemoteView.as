@@ -70,6 +70,7 @@ package
 			{
 				container = new PixelRatioBox();
 				Laya.stage.addChild(container);
+				Laya._currentStage = container;
 			}else
 			{
 				container = Laya.stage;

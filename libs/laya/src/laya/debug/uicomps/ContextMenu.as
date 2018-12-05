@@ -52,7 +52,7 @@ package laya.debug.uicomps
 		{
 			cleanMenu();
 			adptMenu(menu);
-			Laya.stage.addChild(menu);
+			Laya._currentStage.addChild(menu);
 			DisControlTool.showToStage(menu);
 			if (posX != -999 && posY != -999)
 			{

@@ -2,6 +2,7 @@ package filekit
 {
 	import consts.Msgs;
 	import electrontools.MessageManager;
+	import extendui.events.LongPress;
 	import filetoolkit.FileKit;
 	import laya.debug.tools.Notice;
 	import laya.debug.uicomps.ContextMenu;
@@ -168,6 +169,20 @@ package filekit
 			_menu.show();
 		}
 		
+		
+		private function onCellLongPress(cell:Box):void
+		{
+			resTree.selectedItem = cell.dataSource;
+			if (!FileKit.I.isLogined) return;
+			if(resTree.selectedItem&&resTree.selectedItem.isFolder)
+			{
+				_menuDir.show();
+				return;
+			}
+
+			_menu.show();
+			
+		}
 		private function resTreeRender(cell:Box, index:int):void {
 			var item:Object = cell.dataSource;
 //			trace("resTreeRender");
@@ -178,6 +193,9 @@ package filekit
 				var label:Label = cell.getChildByName("label") as Label;
 				//icon.width=StyleConsts.DisplayIconWidth;
 				//icon.height=StyleConsts.DisplayIconHeight;
+				LongPress.setTargetLongPressEnabled(cell);
+				cell.off(LongPress.LongPressEvent, this, onCellLongPress);
+				cell.on(LongPress.LongPressEvent, this, onCellLongPress, [cell]);
 
 				if (isDirectory) {
 //					icon.skin = "comp/folder.png";
@@ -210,7 +228,11 @@ package filekit
 //			trace("onResTreeDoubleClick");
 			if (e.target.parent == resTree.list.content && resTree.selectedItem)
 			{
-				if (resTree.selectedItem.isFolder) return;
+				if (resTree.selectedItem.isFolder)
+				{
+					resTree.selectedItem.isOpen = !resTree.selectedItem.isOpen;
+					freshTree();
+				}else
 				Notice.notify(Msgs.Open_File, [resTree.selectedItem]);
 			}
 		}
@@ -230,6 +252,11 @@ package filekit
 				resTree.rootNode = root;
 				
 			}
+		}
+		
+		public function freshTree():void
+		{
+			resTree.rootNode = resTree.rootNode;
 		}
 		
 	}

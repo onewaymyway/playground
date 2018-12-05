@@ -20,6 +20,11 @@ package filetoolkit
 			list.array = getArray();
 		}
 		
+		public function get rootNode():Object
+		{
+			return _rootNode;
+		}
+		
 		override protected function getArray():Array 
 		{
 			var arr:Array;

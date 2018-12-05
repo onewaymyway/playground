@@ -287,13 +287,15 @@ package laya.debug.tools
 		public static function showToStage(dis:Sprite, offX:int = 0, offY:int = 0):void
 		{
 			var rec:Rectangle = dis.getBounds();
-			dis.x = Laya.stage.mouseX + offX;
-			dis.y = Laya.stage.mouseY + offY;
-			if (dis.x + rec.width > Laya.stage.width)
+			var parent:Sprite;
+			parent = dis.parent || Laya.stage;
+			dis.x = parent.mouseX + offX;
+			dis.y = parent.mouseY + offY;
+			if (dis.x + rec.width > parent.width)
 			{
 				dis.x -= rec.width + offX;
 			}
-			if (dis.y + rec.height > Laya.stage.height)
+			if (dis.y + rec.height > parent.height)
 			{
 				dis.y -= rec.height + offY;
 				//dis.y -= 100;
