@@ -10731,6 +10731,7 @@ var Laya=window.Laya=(function(window,document){
 			});
 			_http.on("error",HttpRequestTool,function(msg){
 				console.log("error:",msg);
+				MessageManager.I.show("error:"+msg);
 			});
 			function sendMsg (){
 				var fullUrl=url;

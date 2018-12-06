@@ -1,5 +1,6 @@
 package filetoolkit 
 {
+	import electrontools.MessageManager;
 	import laya.events.Event;
 	import laya.net.HttpRequest;
 	import laya.utils.Handler;
@@ -25,7 +26,8 @@ package filetoolkit
 			});
 			
 			_http.on(Event.ERROR, HttpRequestTool, function(msg:String):void {
-				trace("error:",msg);
+				trace("error:", msg);
+				MessageManager.I.show("error:"+msg);
 			});
 			function sendMsg():void {
 				var fullUrl:String = url;
