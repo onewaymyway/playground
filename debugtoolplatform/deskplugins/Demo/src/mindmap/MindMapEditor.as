@@ -88,6 +88,7 @@ package mindmap
 		{
 			switchPivotCenter();
 			nodeContainer.scale(value, value);
+			_userChanged = true;
 		}
 		
 		private function onActionBtn(type:String):void
@@ -150,7 +151,9 @@ package mindmap
 			rec.setTo(0, 0, this.width, this.height);
 			this.scrollRect = rec;
 			if (_userChanged) return;
-			nodeContainer.pos(this.width*0.5,this.height*0.5);
+			nodeContainer.pos(this.width * 0.5, this.height * 0.5);
+			nodeContainer.pivot(0, 0);
+			containerScale = 1;
 		}
 		
 		private function onRightClick():void

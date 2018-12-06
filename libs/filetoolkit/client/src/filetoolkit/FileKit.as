@@ -101,10 +101,10 @@ package filetoolkit
 		
 		public function addFolder(path:String, completeHandler:Handler):void
 		{
-			if (content is Object)
-			{
-				content = JSON.stringify(content);
-			}
+			//if (content is Object)
+			//{
+				//content = JSON.stringify(content);
+			//}
 			var dataO:Object;
 			dataO = { };
 			dataO.action = "addFolder";
