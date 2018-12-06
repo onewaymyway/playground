@@ -1,6 +1,7 @@
 package  
 {
 	import consts.Msgs;
+	import electrontools.drags.SystemDragOverManager;
 	import electrontools.MessageManager;
 	import extendui.ui.PixelRatioBox;
 	import filekit.RemoteTreeView;
@@ -17,7 +18,11 @@ package
 	import laya.ui.View;
 	import laya.utils.Browser;
 	import laya.utils.Handler;
+	import laya.utils.Utils;
+	import mindmap.adpttool.MM2MindMapData;
 	import mindmap.MindMapEditor;
+	import webfile.FilePathUtils;
+	import webfile.FileReaderTool;
 	/**
 	 * ...
 	 * @author ww
@@ -42,6 +47,8 @@ package
 			resList.push({"url":"res/atlas/play.json","type":Loader.ATLAS});
 			Laya.loader.load(resList, new Handler(this, initFileToolKit));
 			MindMapEditor.isEditorMode = false;
+			SystemDragOverManager.init();
+			Laya.stage.on(SystemDragOverManager.SystemDrag, this, onSystemDrag);
 		}
 		private var mindMapEditor:MindMapEditor;
 		public var fileKit:FileKit;
@@ -58,6 +65,32 @@ package
 			fileKit.on(FileKit.Logined,this,onLogin);
 			//fileKit.login();
 			test();
+		}
+		
+		private function onSystemDrag(dataO:Object):void
+		{
+			debugger;
+			var fileO:Object;
+			fileO = dataO.data.files[0];
+			var fileName:String;
+			fileName = fileO.name;
+			if (FilePathUtils.getExtensionName(fileName) == "mm")
+			{
+				var txt:String;
+				txt = FileReaderTool.readAsString(fileO,Handler.create(this,onFileReadBack,[fileName]));
+			}
+			
+		}
+		
+		private function onFileReadBack(fileName:String, dataO:String):void
+		{
+			var xml:*;
+			xml = Utils.parseXMLFromString(dataO);
+			var obj:Object;
+			obj = MM2MindMapData.parse(xml);
+			tFile="adpt/"+fileName.replace(".mm",".demorender")
+			mindMapEditor.setData(obj);
+			mindMapEditor.visible = true;
 		}
 		
 		private function onLogin():void
