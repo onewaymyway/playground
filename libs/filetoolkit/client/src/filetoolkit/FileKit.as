@@ -112,6 +112,20 @@ package filetoolkit
 			dataO.path = path;
 			HttpRequestTool.request(root, dataO,completeHandler);
 		}
+		
+		public function deleteFile(path:String, completeHandler:Handler):void
+		{
+			//if (content is Object)
+			//{
+				//content = JSON.stringify(content);
+			//}
+			var dataO:Object;
+			dataO = { };
+			dataO.action = "deleteFile";
+			dataO.token = token;
+			dataO.path = path;
+			HttpRequestTool.request(root, dataO,completeHandler);
+		}
 	}
 
 }
