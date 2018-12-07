@@ -34,6 +34,7 @@ package filetoolkit
 			return arr;
 		}
 		
+		public var childSortFun:Function;
 		private function getDisplayItem(node:Object, arr:Array,depth:int=0):void
 		{
 			
@@ -42,6 +43,10 @@ package filetoolkit
 			node.hasChild = childs && childs.length;
 			if (!node.isOpen) return;
 			if (!childs) return;
+			if (childSortFun != null && childs.length)
+			{
+				childs.sort(childSortFun);
+			}
 			var i:int, len:int;
 			len = childs.length;
 			var tChild:Object;
