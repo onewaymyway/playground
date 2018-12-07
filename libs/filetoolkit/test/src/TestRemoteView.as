@@ -93,7 +93,7 @@ package
 			
 			obj = canParseFileDic[extension].parse(dataO);
 			if (!obj) return;
-			tFile="extension/"+fileName.replace(".",".demorender")
+			tFile=extension+"/"+fileName.replace(".",".demorender")
 			mindMapEditor.setData(obj);
 			mindMapEditor.visible = true;
 		}
