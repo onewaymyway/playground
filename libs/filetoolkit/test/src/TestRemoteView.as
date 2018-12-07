@@ -20,6 +20,7 @@ package
 	import laya.utils.Handler;
 	import laya.utils.Utils;
 	import mindmap.adpttool.MM2MindMapData;
+	import mindmap.adpttool.PSO2MindMapData;
 	import mindmap.MindMapEditor;
 	import webfile.FilePathUtils;
 	import webfile.FileReaderTool;
@@ -67,6 +68,7 @@ package
 			test();
 		}
 		
+		private var canParseFileDic:Object = { "mm":MM2MindMapData,"pso":PSO2MindMapData};
 		private function onSystemDrag(dataO:Object):void
 		{
 			debugger;
@@ -74,7 +76,7 @@ package
 			fileO = dataO.data.files[0];
 			var fileName:String;
 			fileName = fileO.name;
-			if (FilePathUtils.getExtensionName(fileName) == "mm")
+			if (canParseFileDic[FilePathUtils.getExtensionName(fileName)])
 			{
 				var txt:String;
 				txt = FileReaderTool.readAsString(fileO,Handler.create(this,onFileReadBack,[fileName]));
@@ -84,11 +86,14 @@ package
 		
 		private function onFileReadBack(fileName:String, dataO:String):void
 		{
-			var xml:*;
-			xml = Utils.parseXMLFromString(dataO);
+			var extension:String;
+			extension = FilePathUtils.getExtensionName(fileName);
 			var obj:Object;
-			obj = MM2MindMapData.parse(xml);
-			tFile="adpt/"+fileName.replace(".mm",".demorender")
+			
+			
+			obj = canParseFileDic[extension].parse(dataO);
+			if (!obj) return;
+			tFile="extension/"+fileName.replace(".",".demorender")
 			mindMapEditor.setData(obj);
 			mindMapEditor.visible = true;
 		}
