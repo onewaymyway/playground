@@ -46,10 +46,22 @@ package filekit
 			
 			_menuDir.on(Event.SELECT, this,onEmunSelect);
 			_mutiMenu= ContextMenu.createMenuByArray(["删除"]);
-			_mutiMenu.on(Event.SELECT, this,onEmunSelect);
+			_mutiMenu.on(Event.SELECT, this, onEmunSelect);
+			resTree.childSortFun = sortFolderFirst;
 		}
 		
-		
+		private static function sortFolderFirst(dataA:Object, dataB:Object):int
+		{
+			if (dataA.isFolder == dataB.isFolder)
+			{
+				return dataA.label > dataB.label?1: -1;
+			}
+			if (dataA.isFolder)
+			{
+				return -1;
+			}
+			return 1;
+		}
 		/**获取当前目录*/
 		private function get currDirectory():String {
 			
