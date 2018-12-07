@@ -1,6 +1,7 @@
 package mindmap.adpttool 
 {
 	import laya.debug.tools.XML2Object;
+	import laya.utils.Utils;
 	/**
 	 * ...
 	 * @author ww
@@ -15,6 +16,7 @@ package mindmap.adpttool
 		
 		public static function parse(mmXML:*):Object
 		{
+			mmXML=Utils.parseXMLFromString(mmXML);
 			var obj:Object;
 			obj = XML2Object.parse(mmXML);
 			var rootNode:Object;
