@@ -15,6 +15,7 @@ package filekit
 	import laya.utils.Handler;
 	import ui.deskplatform.RemoteTreeUI;
 	import view.AddResCommomDialog;
+	import view.Confirm;
 	import webfile.FilePathUtils;
 	/**
 	 * ...
@@ -87,7 +88,7 @@ package filekit
 					//checkRename();
 					break;
 				case "删除": 
-					//deleteRes();
+					deleteRes();
 					break;
 				case "新建目录": 
 					//Notice.notify(PlatformEvents.OPEN_ADDDIR);
@@ -99,6 +100,23 @@ package filekit
 			}
 			
 		}
+		
+		private function deleteRes():void
+		{
+			if (resTree.selectedItem&&resTree.selectedItem.path)
+			{
+				Confirm.show("是否删除" + resTree.selectedItem.path + "?", "是否删除文件", Handler.create(this, onDeleteBack,[resTree.selectedItem.path]));
+			}
+		}
+		
+		private function onDeleteBack(path:String,sure:Boolean):void
+		{
+			if (sure)
+			{
+				fileKit.deleteFile(path, Handler.create(this, refresh));
+			}
+		}
+		
 		
 		
 		private function createDir():void
