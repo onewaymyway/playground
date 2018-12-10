@@ -147,6 +147,8 @@ package
 			switchBtn.left = mindMapEditor.left;
 			switchBtn.on(Event.CLICK, this, onSwitchBtn);
 			Notice.listen(Msgs.Open_File, this, onOpenFile);
+			
+			openFileByPath("FirstOfAll.demorender");
 		}
 		
 		private function onSwitchBtn():void
@@ -188,6 +190,11 @@ package
 		{
 			var filePath:String;
 			filePath = dataO.path;
+			openFileByPath(filePath);
+		}
+		
+		private function openFileByPath(filePath:String):void
+		{
 			if (filePath == preLoadFile) return;
 			preLoadFile = filePath;
 			tID++;
