@@ -4,9 +4,9 @@ package view {
 	import commonui.ui.RenameResUI;
 	import laya.debug.tools.StringTool;
 	import laya.utils.Handler;
-	import nodetools.devices.FileManager;
 	import nodetools.devices.FileTools;
 	import nodetools.devices.Sys;
+	import webfile.FilePathUtils;
 
 	
 	/**重命名资源
@@ -28,12 +28,10 @@ package view {
 			_oldPath = oldPath;
 			_complete = complete;
 			var oldName:String;
-			oldName=FileManager.getFileName(oldPath);
+			oldName=FilePathUtils.getFileName(oldPath);
 			resLbl.text = oldName;
 			nameTxt.restrict=CommonUIConsts.fileNameRestrict;
 			nameTxt.text = oldName;
-			updateCheck.selected = true;
-			updateCheck.visible=false;
 			popup();
 			Laya.stage.focus = nameTxt.textField;
 		}

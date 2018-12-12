@@ -59,6 +59,42 @@ package webfile
 			return file;
 		}
 		
+		public static function getFileName(path:String):String
+		{
+			if (path == null)
+				return null;
+			path = adptToCommonUrl(path);
+			var a:Array = path.split("/");
+			var file:String = a[a.length - 1];
+			if (file.indexOf(".") >= 0)
+			{
+				a = file.split(".");
+				a.pop();
+				file = a.join(".");
+			}
+			return file;
+		}
+		
+		public static function replaceFileName(path:String, newFileName:String):String
+		{
+			if (!path) return null;
+			path = adptToCommonUrl(path);
+			var a:Array = path.split("/");
+			var file:String = a[a.length - 1];
+			var b:Array;
+			if (file.indexOf(".") >= 0)
+			{
+				b = file.split(".");
+				b[0] = newFileName;
+				file = b.join(".");
+			}else
+			{
+				file = newFileName;
+			}
+			a[a.length - 1] = file;
+			file = a.join("/");
+			return file;
+		}
 		public static function adptToCommonUrl(url:String):String
 		{
 			return StringTool.getReplace(url,"\\\\","/");
