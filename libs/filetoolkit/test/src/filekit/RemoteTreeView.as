@@ -48,6 +48,11 @@ package filekit
 			_mutiMenu= ContextMenu.createMenuByArray(["删除"]);
 			_mutiMenu.on(Event.SELECT, this, onEmunSelect);
 			resTree.childSortFun = sortFolderFirst;
+			fliterTxt.on(Event.INPUT,this, onFliterTxtChange);
+		}
+		
+		private function onFliterTxtChange(e:Event=null):void {
+			resTree.filter(fliterTxt.text);
 		}
 		
 		private static function sortFolderFirst(dataA:Object, dataB:Object):int
@@ -153,7 +158,6 @@ package filekit
 		}
 		private function onAddNew(dataO:Object):void
 		{
-			debugger;
 			fileKit.addFile(dataO.dir + "/" + dataO.fileName + ".demorender", "{}",Handler.create(this,onAddFileSuccess));
 		}
 		
@@ -280,7 +284,7 @@ package filekit
 				root = dataO;
 				root.isOpen = true;
 				resTree.rootNode = root;
-				
+				onFliterTxtChange();
 			}
 		}
 		

@@ -22,6 +22,49 @@ package filetoolkit
 			list.array = getArray();
 		}
 		
+		override public function filter(key:String):void 
+		{
+			if (!key)
+			{
+				list.array = getArray();
+				return;
+			}
+			if (_rootNode)
+			{
+				filtetNodeTree(key);
+			}else
+			super.filter(key);
+		}
+		
+		private function filtetNodeTree(key:String):void
+		{
+			list.array = getFilterdItem(_rootNode, key.toLowerCase(), null);
+		}
+		
+		private function getFilterdItem(node:Object, key:String, rst:Array):Array
+		{
+			if (!rst) rst = [];
+			var tLabel:String;
+			tLabel = node.label;
+			if (tLabel.toLocaleLowerCase().indexOf(key) >= 0)
+			{
+				if(!node.isFolder)
+				rst.push(node);
+			}
+			var i:int, len:int;
+			var childs:Array;
+			childs = node.childs;
+			if (childs)
+			{
+				len = childs.length;
+				for (i = 0; i < len; i++)
+				{
+					getFilterdItem(childs[i], key, rst);
+				}
+			}
+			return rst;
+		}
+		
 		public function recoverState(newTree:Object,oldTree:Object):void
 		{
 			if (!newTree || !oldTree) return;

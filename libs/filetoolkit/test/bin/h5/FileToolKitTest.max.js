@@ -29150,6 +29150,41 @@ var Laya=window.Laya=(function(window,document){
 
 		__class(FileTree,'filetoolkit.FileTree',_super);
 		var __proto=FileTree.prototype;
+		__proto.filter=function(key){
+			if (!key){
+				this.list.array=this.getArray();
+				return;
+			}
+			if (this._rootNode){
+				this.filtetNodeTree(key);
+			}else
+			_super.prototype.filter.call(this,key);
+		}
+
+		__proto.filtetNodeTree=function(key){
+			this.list.array=this.getFilterdItem(this._rootNode,key.toLowerCase(),null);
+		}
+
+		__proto.getFilterdItem=function(node,key,rst){
+			if (!rst)rst=[];
+			var tLabel;
+			tLabel=node.label;
+			if (tLabel.toLocaleLowerCase().indexOf(key)>=0){
+				if(!node.isFolder)
+					rst.push(node);
+			};
+			var i=0,len=0;
+			var childs;
+			childs=node.childs;
+			if (childs){
+				len=childs.length;
+				for (i=0;i < len;i++){
+					this.getFilterdItem(childs[i],key,rst);
+				}
+			}
+			return rst;
+		}
+
 		__proto.recoverState=function(newTree,oldTree){
 			if (!newTree || !oldTree)return;
 			var newDic;
@@ -29791,10 +29826,15 @@ var Laya=window.Laya=(function(window,document){
 			this._mutiMenu=ContextMenu.createMenuByArray(["删除"]);
 			this._mutiMenu.on("select",this,this.onEmunSelect);
 			this.resTree.childSortFun=RemoteTreeView.sortFolderFirst;
+			this.fliterTxt.on("input",this,this.onFliterTxtChange);
 		}
 
 		__class(RemoteTreeView,'filekit.RemoteTreeView',_super);
 		var __proto=RemoteTreeView.prototype;
+		__proto.onFliterTxtChange=function(e){
+			this.resTree.filter(this.fliterTxt.text);
+		}
+
 		__proto.onEmunSelect=function(dataO){
 			console.log("onMenuSelect:",dataO);
 			var label;
@@ -29850,7 +29890,6 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.onAddNew=function(dataO){
-			debugger;
 			this.fileKit.addFile(dataO.dir+"/"+dataO.fileName+".demorender","{}",Handler.create(this,this.onAddFileSuccess));
 		}
 
@@ -29940,6 +29979,7 @@ var Laya=window.Laya=(function(window,document){
 				root=dataO;
 				root.isOpen=true;
 				this.resTree.rootNode=root;
+				this.onFliterTxtChange();
 			}
 		}
 
