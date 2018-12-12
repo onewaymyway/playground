@@ -769,7 +769,7 @@ var Laya=window.Laya=(function(window,document){
 			var obj;
 			obj=this.canParseFileDic[extension].parse(dataO);
 			if (!obj)return;
-			this.tFile=extension+"/"+fileName.replace(".",".demorender")
+			this.tFile=extension+"/"+fileName.replace("."+extension,".demorender")
 			this.mindMapEditor.setData(obj);
 			this.mindMapEditor.visible=true;
 		}
@@ -11657,6 +11657,791 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*封装所有驱动级接口
+	*@author yung
+	*/
+	//class nodetools.devices.Device
+	var Device=(function(){
+		function Device(){};
+		__class(Device,'nodetools.devices.Device');
+		Device.init=function(){
+			Device.electron=Device.require("electron");
+			Device.remote=Device.electron.remote;
+			Device.app=Device.remote.app;
+			Device.Buffer=Buffer;
+		}
+
+		Device.require=function(mod){
+			try{
+				var rst;
+				rst=require(mod);
+				return rst;
+			}catch(e){}
+		}
+
+		Device.requireRemote=function(mod){
+			try{
+				if (!Device.remote)return Device.require(mod);
+				return Device.remote[mod];
+				return Device.remote.require(mod);
+			}catch(e){}
+		}
+
+		Device.app=null
+		Device.appName="LayaAir";
+		Device.appPath=null
+		Device.dataPath=null
+		Device.tempPath=null
+		Device.workPath=null
+		Device.userHome=null
+		Device.extensionPath=null
+		Device.remote=null
+		Device.Buffer=null
+		Device.electron=null
+		Device.win=null
+		return Device;
+	})()
+
+
+	/**文件管理类
+	*@author yung
+	*/
+	//class nodetools.devices.FileManager
+	var FileManager=(function(){
+		function FileManager(){};
+		__class(FileManager,'nodetools.devices.FileManager');
+		FileManager.getPath=function(basePath,relativePath){
+			return FileTools.getPath(basePath,relativePath);
+		}
+
+		FileManager.getRelativePath=function(basePath,targetPath){
+			return FileManager.adptToCommonUrl(FileTools.getRelativePath(basePath,targetPath));
+		}
+
+		FileManager.getAppPath=function(path){
+			return FileManager.getPath(SystemSetting.appPath,path);
+		}
+
+		FileManager.getDataPath=function(path){
+			return FileManager.getPath(Device.dataPath,path);
+		}
+
+		FileManager.getAppRelativePath=function(path){
+			return FileManager.getRelativePath(SystemSetting.appPath,path);
+		}
+
+		FileManager.getWorkPath=function(path){
+			return FileManager.getPath(SystemSetting.workPath,path);
+		}
+
+		FileManager.getWorkRelativePath=function(path){
+			return FileManager.adptToCommonUrl(FileManager.getRelativePath(SystemSetting.workPath,path));
+		}
+
+		FileManager.getResRelativePath=function(path){
+			return FileManager.adptToCommonUrl(""+FileManager.getRelativePath(SystemSetting.assetsPath,path));
+		}
+
+		FileManager.adptToCommonUrl=function(url){
+			return StringTool.getReplace(url,"\\\\","/");
+		}
+
+		FileManager.adptToLocalUrl=function(url){
+			return FileTools.path.normalize(url);
+		}
+
+		FileManager.getResPath=function(path){
+			return FileManager.getPath(SystemSetting.assetsPath,path);
+		}
+
+		FileManager.getPagePath=function(path){
+			return FileManager.getPath(SystemSetting.pagesPath,path);
+		}
+
+		FileManager.getFileName=function(path){
+			return FileTools.path.basename(path).split(".")[0];
+		}
+
+		FileManager.createDirectory=function(path){
+			try {
+				FileTools.createDirectory(path);
+				}catch (e){
+				Sys.alert("Create folder failed:"+path);
+			}
+		}
+
+		FileManager.createTxtFile=function(path,value){
+			try {
+				FileTools.createFile(path,value);
+				}catch (e){
+				Sys.alert("Create file failed:"+path);
+			}
+		}
+
+		FileManager.createJSONFile=function(path,value){
+			try {
+				FileTools.createFile(path,JSON.stringify(value));
+				}catch (e){
+				Sys.alert("Create file failed:"+path+e.message);
+			}
+		}
+
+		FileManager.createBytesFile=function(path,bytes){
+			try {
+				FileTools.createFile(path,bytes);
+				}catch (e){
+				Sys.alert("Create file failed:"+path);
+			}
+		}
+
+		FileManager.removeFile=function(path){
+			FileTools.removeE(path);
+		}
+
+		FileManager.copyFile=function(from,to){
+			try {
+				FileTools.copyE(from,to);
+				}catch (e){
+				Sys.alert("Copy file failed:(from:"+from+" to:"+to+")");
+				console.log("Copy file failed:(from:"+from+" to:"+to+")");
+			}
+		}
+
+		FileManager.readTxtFile=function(path,errorAlert){
+			(errorAlert===void 0)&& (errorAlert=true);
+			try {
+				return FileTools.readFile(path);
+				}catch (e){
+				if (errorAlert)Sys.alert("Read file failed:"+path);
+			}
+			return null;
+		}
+
+		FileManager.readJSONFile=function(path,errorAlert){
+			(errorAlert===void 0)&& (errorAlert=true);
+			try {
+				var str=nodetools.devices.FileManager.readTxtFile(path);
+				return JSON.parse(str);
+				}catch (e){
+				if (errorAlert)Sys.alert("Read file failed:"+path);
+				debugger;
+			}
+			return null;
+		}
+
+		FileManager.readByteFile=function(path,errorAlert){
+			(errorAlert===void 0)&& (errorAlert=true);
+			try {
+				return FileTools.readFile(path);
+				}catch (e){
+				if (errorAlert)Sys.alert("Read file failed:"+path);
+			}
+			return null;
+		}
+
+		FileManager.getFileList=function(path){
+			return FileTools.getFileList(path);
+		}
+
+		FileManager.exists=function(path){
+			return FileTools.exist(path);
+		}
+
+		FileManager.getFileTree=function(path,hasExtension){
+			(hasExtension===void 0)&& (hasExtension=false);
+			var xml=findFiles(path);
+			function findFiles (path){
+				var node;
+				if (FileTools.exist(path)){
+					var fileName=FileTools.getFileName(path);
+					node=new /*no*/this.XMLElement("<item label='"+fileName+"' path='"+path+"' isDirectory='true'/>");
+					var a=FileTools.getDirFiles(path);
+					var f;
+					for(var $each_f in a){
+						f=a[$each_f];
+						f=FileTools.getPath(path,f);
+						if (FileTools.isDirectory(f)&& f.indexOf(".svn")==-1){
+							node.appendChild(findFiles(f));
+						}
+					}
+					var $each_f;
+					for($each_f in a){
+						f=a[$each_f];
+						f=FileTools.getPath(path,f);
+						if (FileTools.isDirectory(f)==false){
+							if (fileName.indexOf("$")==-1 && fileName.indexOf("@")==-1){
+								node.appendChild(new /*no*/this.XMLElement("<item label='"+fileName+"' path='"+f+"' isDirectory='false'/>"));
+							}
+						}
+					}
+				}
+				return node;
+			}
+			return xml
+		}
+
+		FileManager.rename=function(oldPath,newPath){
+			try {
+				FileTools.rename(oldPath,newPath);
+				}catch (e){
+				Sys.alert("Rename file failed:(from:"+oldPath+" to:"+newPath+")");
+			}
+		}
+
+		return FileManager;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nodetools.devices.FileTools
+	var FileTools=(function(){
+		function FileTools(){}
+		__class(FileTools,'nodetools.devices.FileTools');
+		__getset(1,FileTools,'appPath',function(){
+			var rst;
+			var dirName;
+			dirName=__dirname;;
+			rst=FileTools.path.resolve(dirName,"../");
+			return rst;
+			var aPath;
+			aPath=/*no*/this.Browser.window.location.href;
+			aPath=aPath.replace("file:///","");
+			aPath=aPath.replace("/h5/index.html","");
+			aPath=aPath.split("index.")[0];
+			aPath=decodeURI(aPath);
+			return aPath;
+		});
+
+		__getset(1,FileTools,'workPath',function(){
+			return "workPath";
+		});
+
+		FileTools.init=function(){
+			FileTools.fs=Device.require("fs");
+			FileTools.path=Device.require("path");
+			FileTools.shell=Device.requireRemote("shell");
+			FileTools.tempApp=Device.remote.app.getDataPath();
+		}
+
+		FileTools.init2=function(){
+			FileTools.fs=Device.require("fs");
+			FileTools.path=Device.require("path");
+			FileTools.shell=Device.requireRemote("shell");
+		}
+
+		FileTools.getSep=function(){
+			return FileTools.path.sep;
+		}
+
+		FileTools.getAbsPath=function(path){
+			return path;
+		}
+
+		FileTools.isAbsPath=function(path){
+			if(!path)return false;
+			if(path.indexOf(":")>0)return true;
+			if(path.substr(0,1)=="/")return true;
+			return false;
+		}
+
+		FileTools.getPath=function(basePath,relativePath){
+			return FileTools.path.join(basePath,relativePath);
+		}
+
+		FileTools.getRelativePath=function(basePath,targetPath){
+			return FileTools.path.relative(basePath,targetPath);
+		}
+
+		FileTools.getAppPath=function(path){
+			return FileTools.getPath(FileTools.appPath,path);
+		}
+
+		FileTools.getAppRelativePath=function(path){
+			return FileTools.getRelativePath(FileTools.appPath,path);
+		}
+
+		FileTools.getWorkPath=function(path){
+			return FileTools.getPath(FileTools.workPath,path);
+		}
+
+		FileTools.getWorkRelativePath=function(path){
+			return FileTools.getRelativePath(FileTools.workPath,path);
+		}
+
+		FileTools.getFileDir=function(path){
+			if (!path)return path;
+			if(nodetools.devices.FileTools.isDirectory(path))return path;
+			return nodetools.devices.FileTools.path.dirname(path);
+		}
+
+		FileTools.getParent=function(path){
+			if (!path)return path;
+			var lasti=0;
+			lasti=path.lastIndexOf(nodetools.devices.FileTools.path.sep);
+			return path.substring(0,lasti);
+		}
+
+		FileTools.getFileName=function(path){
+			return nodetools.devices.FileTools.path.basename(path).split(".")[0];
+		}
+
+		FileTools.getFileNameWithExtension=function(path){
+			if (path==null)
+				return null;
+			var a=path.split(nodetools.devices.FileTools.path.sep);
+			var file=a[a.length-1];
+			return file;
+		}
+
+		FileTools.getExtensionName=function(path){
+			if (path==null)
+				return null;
+			var a=path.split(".");
+			var file=a[a.length-1];
+			return file;
+		}
+
+		FileTools.createDirectory=function(path){
+			if (Boolean(path)){
+				FileTools.ensurePath(path);
+				if (!FileTools.fs.existsSync(path)){
+					FileTools.fs.mkdirSync(path);
+				}
+			}
+		}
+
+		FileTools.ensurePath=function(pathStr){
+			FileTools.mkdirsSync(pathStr,null);
+			return;
+			if (pathStr==null)return;
+			var sep;
+			sep=FileTools.path.sep;
+			var a=pathStr.split(sep);
+			var i=0,len=0;
+			var tPath;
+			tPath=a[0];
+			len=a.length-1;
+			for (i=1;i < len;i++){
+				tPath+=sep+a[i];
+				if (!FileTools.exist(tPath)){
+					FileTools.createDirectory(tPath);
+				}
+			}
+		}
+
+		FileTools.mkdirsSync=function(dirpath,mode){
+			if (!FileTools.fs.existsSync(dirpath)){
+				var pathtmp;
+				var pathParts=dirpath.split(FileTools.path.sep);
+				pathParts.pop();
+				var onWindows=OSInfo.type.indexOf("Windows")>-1;
+				if(!onWindows){
+					pathtmp="/"+pathParts[1];
+					pathParts.splice(0,2);
+				}
+				pathParts.forEach(function(dirname){
+					if (pathtmp){
+						pathtmp=FileTools.path.join(pathtmp,dirname);
+					}
+					else {
+						pathtmp=dirname;
+					}
+					if (!FileTools.fs.existsSync(pathtmp)){
+						if (!FileTools.fs.mkdirSync(pathtmp,mode)){
+							return false;
+						}
+					}
+				});
+			}
+			return true;
+		}
+
+		FileTools.createFile=function(path,value,option){
+			FileTools.ensurePath(path);
+			if (option){
+				FileTools.fs.writeFileSync(path,value,option);
+				}else{
+				FileTools.fs.writeFileSync(path,value);
+			}
+		}
+
+		FileTools.toBuffer=function(ab){
+			var buffer=new Device.Buffer(ab.byteLength);
+			var view=new Uint8Array(ab);
+			for (var i=0;i < buffer.length;++i){
+				buffer[i]=view[i];
+			}
+			return buffer;
+		}
+
+		FileTools.readFile=function(path,encoding){
+			(encoding===void 0)&& (encoding="utf8");
+			if (FileTools.fs.existsSync(path)){
+				var rst;
+				rst=FileTools.fs.readFileSync(path,encoding);
+				if(((typeof rst=='string'))&&rst.charCodeAt(0)==65279&&encoding=="utf8"){
+					rst=rst.substr(1);
+				}
+				return rst;
+			}
+			return null;
+		}
+
+		FileTools.appendFile=function(path,data){
+			FileTools.fs.appendFileSync(path,data);
+		}
+
+		FileTools.moveToTrash=function(path){
+			if (FileTools.exist(path)){
+				if (FileTools.shell){
+					FileTools.shell.moveItemToTrash(path);
+					}else{
+					FileTools.removeE(path,false);
+				}
+			}
+		}
+
+		FileTools.removeFile=function(path,toTrash){
+			(toTrash===void 0)&& (toTrash=true);
+			if (toTrash){
+				FileTools.moveToTrash(path);
+				return;
+			}
+			if (Boolean(path)){
+				FileTools.fs.unlinkSync(path)
+			}
+		}
+
+		FileTools.removeE=function(path,toTrash){
+			(toTrash===void 0)&& (toTrash=true);
+			if (!FileTools.exist(path))
+				return;
+			if (FileTools.isDirectory(path)){
+				FileTools.removeDir(path,toTrash);
+			}
+			else{
+				FileTools.removeFile(path,toTrash);
+			}
+		}
+
+		FileTools.removeDir=function(path,toTrash){
+			(toTrash===void 0)&& (toTrash=true);
+			if (toTrash){
+				FileTools.moveToTrash(path);
+				return;
+			};
+			var files=[];
+			if (FileTools.fs.existsSync(path)){
+				files=FileTools.fs.readdirSync(path);
+				files.forEach(function(file,index){
+					var curPath=FileTools.getPath(path,file);
+					if (FileTools.fs.statSync(curPath).isDirectory()){
+						FileTools.removeDir(curPath);
+					}
+					else{
+						FileTools.fs.unlinkSync(curPath);
+					}
+				});
+				FileTools.fs.rmdirSync(path);
+			}
+		}
+
+		FileTools.exist=function(path){
+			if(!path)return false;
+			return FileTools.fs.existsSync(path);
+		}
+
+		FileTools.isDirectory=function(path){
+			var st;
+			try{
+				st=FileTools.fs.statSync(path);
+				}catch(e){
+				return false;
+			}
+			if(!st)return false;
+			return st.isDirectory();
+		}
+
+		FileTools.getStat=function(path){
+			return FileTools.fs.statSync(path);
+		}
+
+		FileTools.getMTime=function(path){
+			return FileTools.getStat(path).mtime;
+		}
+
+		FileTools.watch=function(path,callBack){
+			FileTools.watcherDic[path]=FileTools.fs.watch(path,callBack);
+			return FileTools.watcherDic[path];
+		}
+
+		FileTools.isDirWatched=function(path){
+			return FileTools.watcherDic.hasOwnProperty(path);
+		}
+
+		FileTools.unwatch=function(path){
+			if (FileTools.watcherDic[path]){
+				FileTools.watcherDic[path].close();
+				delete FileTools.watcherDic[path];
+			}
+		}
+
+		FileTools.copyE=function(from,to){
+			if (!FileTools.exist(from))
+				return;
+			if (FileTools.isDirectory(from)){
+				FileTools.copyDir(from,to);
+			}
+			else{
+				FileTools.copyFile(from,to);
+			}
+		}
+
+		FileTools.copyFile=function(from,to){
+			FileTools.createFile(to,FileTools.readFile(from,null));
+		}
+
+		FileTools.copyDir=function(from,to){
+			var files=[];
+			if (FileTools.fs.existsSync(from)){
+				FileTools.createDirectory(to);
+				files=FileTools.fs.readdirSync(from);
+				files.forEach(function(file,index){
+					var curPath=FileTools.getPath(from,file);
+					var tPath=FileTools.getPath(to,file);
+					if (FileTools.fs.statSync(curPath).isDirectory()){
+						FileTools.copyDir(curPath,tPath);
+					}
+					else{
+						FileTools.copyFile(curPath,tPath);
+					}
+				});
+			}
+		}
+
+		FileTools.walk=function(path,floor,handleFile,self){
+			(self===void 0)&& (self=false);
+			if(self)
+				handleFile(path,floor);
+			floor++;
+			var files=FileTools.fs.readdirSync(path);
+			files.forEach(function(item){
+				var tmpPath=FileTools.getPath(path,item);
+				if (tmpPath.indexOf(".svn")>-1)
+					return;
+				var stats=FileTools.fs.statSync(tmpPath);
+				if (stats.isDirectory()){
+					FileTools.walk(tmpPath,floor,handleFile);
+				}
+				else{
+					handleFile(tmpPath,floor);
+				}
+			});
+		}
+
+		FileTools.getFileList=function(path){
+			var arr=[];
+			if(!nodetools.devices.FileTools.exist(path))return arr;
+			FileTools.walk(path,0,findFiles);
+			function findFiles (spath,floor){
+				arr.push(spath);
+			}
+			return arr;
+		}
+
+		FileTools.getFileDesO=function(path){
+			if (!FileTools.exist(path))
+				return null;
+			var rst={};
+			rst.label=FileTools.getFileName(path);
+			rst.path=path;
+			if (FileTools.isDirectory(path)){
+				rst.files=[];
+				rst.dirs=[];
+				rst.childs=[];
+				rst.isDirectory=true;
+				}else{
+				rst.isDirectory=false;
+			}
+			return rst;
+		}
+
+		FileTools.getDirChildDirs=function(p){
+			var files=nodetools.devices.FileTools.getDirFiles(p);
+			var i=0,len=0;
+			var rst;
+			rst=[];
+			len=files.length;
+			for(i=0;i<len;i++){
+				files[i]=FileTools.path.join(p,files[i]);
+				if(nodetools.devices.FileTools.isDirectory(files[i])){
+					rst.push(files[i]);
+				}
+			}
+			return rst;
+		}
+
+		FileTools.getDirFiles=function(path){
+			var rst;
+			rst=FileTools.fs.readdirSync(path);
+			rst.sort(FileTools.folderFirst);
+			return rst;
+		}
+
+		FileTools.folderFirst=function(pathA,pathB){
+			var isFolderA=false;
+			isFolderA=pathA.indexOf(".")<0;
+			var isFolderB=false;
+			isFolderB=pathB.indexOf(".")<0;
+			var right=-1;
+			if(isFolderA){
+				if(!isFolderB){
+					return right;
+				}
+				return pathA<pathB?right:-right;
+			}
+			if(isFolderB){
+				return-right;
+			}
+			return pathA<pathB?right:-right;
+		}
+
+		FileTools.getFileTreeArr=function(path){
+			var tTreeO=FileTools.getFileTreeO(path);
+			var rst=[];
+			FileTools.getTreeArr(tTreeO,rst,false);
+			return rst;
+		}
+
+		FileTools.getTreeArr=function(treeO,arr,add){
+			(add===void 0)&& (add=true);
+			if(add)
+				arr.push(treeO);
+			var tArr=treeO.childs;
+			var i=0,len=tArr.length;
+			for(i=0;i<len;i++){
+				if(!add){
+					tArr[i].nodeParent=null;
+				}
+				if(tArr[i].isDirectory){
+					FileTools.getTreeArr(tArr[i],arr);
+					}else{
+					arr.push(tArr[i]);
+				}
+			}
+		}
+
+		FileTools.getFileTreeO=function(path){
+			var rst=FileTools.getFileDesO(path);
+			if (FileTools.fs.existsSync(path)){
+				var files=FileTools.getDirFiles(path);
+				var tO;
+				files.forEach(function(file,index){
+					var curPath=FileTools.getPath(path,file);
+					if (FileTools.fs.statSync(curPath).isDirectory()){
+						tO=FileTools.getFileTreeO(curPath);
+						tO.nodeParent=rst;
+						tO.hasChild=tO.childs.length > 0;
+						rst.dirs.push(tO);
+					}
+					else{
+						tO=FileTools.getFileDesO(curPath);
+						tO.nodeParent=rst;
+						tO.hasChild=false;
+						rst.files.push(tO);
+					}
+					tO.label=file;
+					rst.childs.push(tO);
+				});
+				rst.hasChild=rst.childs.length > 0;
+			}
+			return rst;
+		}
+
+		FileTools.isPathSame=function(a,b){
+			if(a.toLocaleLowerCase()==b.toLocaleLowerCase())return true;
+			return false;
+		}
+
+		FileTools.rename=function(oldPath,newPath){
+			if (!FileTools.exist(oldPath))
+				return;
+			if(FileTools.isPathSame(oldPath,newPath)){
+				console.log("在移动文件到同一个位置！！");
+				return;
+			}
+			FileTools.copyE(oldPath,newPath);
+			FileTools.moveToTrash(oldPath);
+			return;
+			FileTools.fs.renameSync(oldPath,newPath);
+		}
+
+		FileTools.openItem=function(path){
+			FileTools.shell.openItem(path);
+		}
+
+		FileTools.showItemInFolder=function(path){
+			FileTools.shell.showItemInFolder(path);
+		}
+
+		FileTools.getFolder=function(path){
+			path=FileManager.adptToCommonUrl(path);
+			var idx=0;
+			idx=path.lastIndexOf(".");
+			if(idx>=0){
+				idx=path.lastIndexOf("/",idx);
+				if(idx>=0){
+					path=path.substr(0,idx);
+				}
+			}
+			return path;
+		}
+
+		FileTools.win=null
+		FileTools.fs=null
+		FileTools.path=null
+		FileTools.shell=null
+		FileTools.tempApp=null
+		FileTools.watcherDic={};
+		return FileTools;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nodetools.devices.OSInfo
+	var OSInfo=(function(){
+		function OSInfo(){}
+		__class(OSInfo,'nodetools.devices.OSInfo');
+		OSInfo.init=function(){
+			OSInfo.os=Device.require("os");
+			OSInfo.platform=OSInfo.os.platform();
+			OSInfo.tempdir=OSInfo.os.tmpdir();
+			OSInfo.type=OSInfo.os.type();
+			var tProcess;
+			tProcess=process;;
+			OSInfo.process=tProcess;
+			OSInfo.env=OSInfo.process.env;
+			console.log("type:",OSInfo.type);
+		}
+
+		OSInfo.os=null
+		OSInfo.platform=null
+		OSInfo.homedir=null
+		OSInfo.tempdir=null
+		OSInfo.type=null
+		OSInfo.process=null
+		OSInfo.env=null
+		return OSInfo;
+	})()
+
+
+	/**
 	*编辑器全局静态入口
 	*@author ww
 	*/
@@ -11716,6 +12501,49 @@ var Laya=window.Laya=(function(window,document){
 	})()
 
 
+	/**系统配置
+	*@author ww
+	*/
+	//class nodetools.devices.SystemSetting
+	var SystemSetting=(function(){
+		function SystemSetting(){};
+		__class(SystemSetting,'nodetools.devices.SystemSetting');
+		SystemSetting.setProject=function(path){
+			if (FileTools.exist(path)){
+				SystemSetting.projectPath=path;
+				SystemSetting.projectName=FileTools.getFileName(path).replace(".laya","");
+				SystemSetting.workPath=FileTools.path.dirname(path);
+				SystemSetting.workPath=FileTools.path.dirname(SystemSetting.workPath);
+				SystemSetting.pagesPath=FileManager.getWorkPath("laya/pages");
+				SystemSetting.assetsPath=FileManager.getWorkPath("laya/assets");
+				SystemSetting.stylePath=FileManager.getWorkPath("laya/styles.xml");
+				SystemSetting.pageStylePath=FileManager.getWorkPath("laya/pageStyles.xml");
+				SystemSetting.tempPath=FileManager.getPath(FileTools.tempApp,"data/"+SystemSetting.projectName)
+				FileManager.createDirectory(SystemSetting.pagesPath);
+				FileManager.createDirectory(SystemSetting.assetsPath);
+				FileManager.createDirectory(SystemSetting.tempPath);
+			}
+		}
+
+		SystemSetting.workPath="";
+		SystemSetting.appPath="";
+		SystemSetting.projectName="";
+		SystemSetting.projectPath="";
+		SystemSetting.pagesPath="";
+		SystemSetting.assetsPath="";
+		SystemSetting.stylePath="";
+		SystemSetting.pageStylePath="";
+		SystemSetting.tempResPath="";
+		SystemSetting.tempVerPath="";
+		SystemSetting.tempPath="";
+		SystemSetting.lang="";
+		SystemSetting.ifShowRuleGrid=true;
+		SystemSetting.toCodeModeWhenPublicEnd=false;
+		SystemSetting.isCMDVer=false;
+		return SystemSetting;
+	})()
+
+
 	/**
 	*...
 	*@author ww
@@ -11745,6 +12573,38 @@ var Laya=window.Laya=(function(window,document){
 			path=FilePathUtils.adptToCommonUrl(path);
 			var a=path.split("/");
 			var file=a[a.length-1];
+			return file;
+		}
+
+		FilePathUtils.getFileName=function(path){
+			if (path==null)
+				return null;
+			path=FilePathUtils.adptToCommonUrl(path);
+			var a=path.split("/");
+			var file=a[a.length-1];
+			if (file.indexOf(".")>=0){
+				a=file.split(".");
+				a.pop();
+				file=a.join(".");
+			}
+			return file;
+		}
+
+		FilePathUtils.replaceFileName=function(path,newFileName){
+			if (!path)return null;
+			path=FilePathUtils.adptToCommonUrl(path);
+			var a=path.split("/");
+			var file=a[a.length-1];
+			var b;
+			if (file.indexOf(".")>=0){
+				b=file.split(".");
+				b[0]=newFileName;
+				file=b.join(".");
+				}else{
+				file=newFileName;
+			}
+			a[a.length-1]=file;
+			file=a.join("/");
 			return file;
 		}
 
@@ -14571,6 +15431,16 @@ var Laya=window.Laya=(function(window,document){
 			dataO.action="deleteFile";
 			dataO.token=this.token;
 			dataO.path=path;
+			HttpRequestTool.request(FileKit.root,dataO,completeHandler);
+		}
+
+		__proto.renameFile=function(path,newPath,completeHandler){
+			var dataO;
+			dataO={};
+			dataO.action="renameFile";
+			dataO.token=this.token;
+			dataO.path=path;
+			dataO.newpath=newPath;
 			HttpRequestTool.request(FileKit.root,dataO,completeHandler);
 		}
 
@@ -29846,6 +30716,7 @@ var Laya=window.Laya=(function(window,document){
 				case "打开所在目录":
 					break ;
 				case "重命名":
+					this.checkRename();
 					break ;
 				case "删除":
 					this.deleteRes();
@@ -29857,6 +30728,24 @@ var Laya=window.Laya=(function(window,document){
 					this.createNew();
 					break ;
 				}
+		}
+
+		__proto.checkRename=function(){
+			if (Boolean(this.resTree.selectedPath)){
+				var fileName=this.resTree.selectedItem.path;
+				RenameRes.instance.start(fileName,Handler.create(this,this.onRenameUIBack));
+			}
+		}
+
+		__proto.onRenameUIBack=function(oldPath,newPath){
+			var adptNewPath;
+			adptNewPath=FilePathUtils.replaceFileName(oldPath,newPath);
+			this.fileKit.renameFile(oldPath,adptNewPath,Handler.create(this,this.onRenameBack));
+		}
+
+		__proto.onRenameBack=function(dataO){
+			console.log("onRenameBack:",dataO);
+			this.refresh();
 		}
 
 		__proto.deleteRes=function(){
@@ -29879,7 +30768,11 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.onAddNewDir=function(dataO){
-			this.fileKit.addFolder(dataO.dir+"/"+dataO.fileName,Handler.create(this,this.onAddFileSuccess));
+			if (dataO.dir){
+				this.fileKit.addFolder(dataO.dir+"/"+dataO.fileName,Handler.create(this,this.onAddFileSuccess));
+				}else{
+				this.fileKit.addFolder(dataO.fileName,Handler.create(this,this.onAddFileSuccess));
+			}
 		}
 
 		__proto.createNew=function(){
@@ -29890,7 +30783,11 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.onAddNew=function(dataO){
-			this.fileKit.addFile(dataO.dir+"/"+dataO.fileName+".demorender","{}",Handler.create(this,this.onAddFileSuccess));
+			if (dataO.dir){
+				this.fileKit.addFile(dataO.dir+"/"+dataO.fileName+".demorender","{}",Handler.create(this,this.onAddFileSuccess));
+				}else{
+				this.fileKit.addFile(dataO.fileName+".demorender","{}",Handler.create(this,this.onAddFileSuccess));
+			}
 		}
 
 		__proto.onAddFileSuccess=function(){
@@ -30075,6 +30972,26 @@ var Laya=window.Laya=(function(window,document){
 
 		ConfirmUI.uiView={"type":"Dialog","props":{"width":500,"scenecolor":"#dddddd","height":250},"child":[{"type":"Image","props":{"y":0,"x":0,"width":500,"skin":"view/bg_dialog.png","height":250,"sizeGrid":"47,20,22,37"}},{"type":"Button","props":{"x":404,"skin":"view/btn_close.png","name":"close","scaleX":0.5,"scaleY":0.5,"right":11,"y":7}},{"type":"Image","props":{"y":7,"x":9,"width":441,"skin":"comp/blank_title_dragrec.png","name":"drag","height":36}},{"type":"Label","props":{"x":21,"var":"titleLbl","text":"确认框","styleSkin":"comp/label_panel_title.png","fontSize":14,"align":"center","color":"#ffffff","centerX":0,"y":16}},{"type":"Label","props":{"y":68,"x":36,"wordWrap":true,"width":427,"var":"msgLbl","valign":"middle","text":"确认内容","styleSkin":"comp/label_intro.png","multiline":true,"mouseEnabled":false,"mouseChildren":false,"isHtml":true,"height":76,"align":"center","fontSize":14,"color":"#C8C8C8"}},{"type":"Button","props":{"y":165,"x":288,"var":"cancelBtn","skin":"comp/btn.png","name":"cancel","label":"取消","labelColors":"#FFFFFF,#FFFFFF,#FFFFFF,#c5c5c5","labelSize":16,"sizeGrid":"0,4,0,4"}},{"type":"Button","props":{"y":165,"x":98,"var":"okBtn","skin":"comp/button.png","name":"sure","label":"确定","labelColors":"#FFFFFF,#FFFFFF,#FFFFFF,#c5c5c5","labelSize":16,"sizeGrid":"0,4,0,4"}}]};
 		return ConfirmUI;
+	})(Dialog)
+
+
+	//class commonui.ui.RenameResUI extends laya.ui.Dialog
+	var RenameResUI=(function(_super){
+		function RenameResUI(){
+			this.nameTxt=null;
+			this.resLbl=null;
+			RenameResUI.__super.call(this);
+		}
+
+		__class(RenameResUI,'commonui.ui.RenameResUI',_super);
+		var __proto=RenameResUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(RenameResUI.uiView);
+		}
+
+		RenameResUI.uiView={"type":"Dialog","props":{"width":500,"scenecolor":"#dddddd","height":250},"child":[{"type":"Image","props":{"y":0,"x":0,"width":500,"skin":"view/bg_dialog.png","height":250,"sizeGrid":"47,20,22,37"}},{"type":"Button","props":{"skin":"view/btn_close.png","name":"close","scaleX":0.5,"scaleY":0.5,"right":11,"y":7}},{"type":"Image","props":{"y":7,"x":9,"width":446,"skin":"comp/blank_title_dragrec.png","name":"drag","height":36}},{"type":"Label","props":{"x":28,"text":"重命名资源","styleSkin":"comp/label_panel_title.png","fontSize":14,"align":"center","color":"#ffffff","centerX":0,"y":16}},{"type":"Label","props":{"y":104,"x":4,"width":127,"text":"新名称：","styleSkin":"comp/label_intro.png","height":18,"align":"right","fontSize":14,"color":"#C8C8C8"}},{"type":"TextInput","props":{"y":99,"x":135,"width":300,"var":"nameTxt","skin":"comp/input_32.png","sizeGrid":"0,3,0,3","color":"#CCCCCC","fontSize":14,"padding":"0,4,0,4","height":32}},{"type":"Label","props":{"y":65,"x":8,"width":123,"text":"原名称：","styleSkin":"comp/label_intro.png","height":18,"align":"right","fontSize":14,"color":"#C8C8C8"}},{"type":"Label","props":{"y":65,"x":135,"width":214,"var":"resLbl","text":"资源内容","styleSkin":"comp/label_highlight.png","height":20,"color":"#cccc00","fontSize":14}},{"type":"Button","props":{"y":178,"x":85,"skin":"comp/button.png","name":"sure","label":"确定","labelColors":"#FFFFFF,#FFFFFF,#FFFFFF,#c5c5c5","labelSize":16,"sizeGrid":"0,4,0,4"}},{"type":"Button","props":{"y":178,"x":295,"skin":"comp/button.png","name":"cancel","label":"取消","labelColors":"#FFFFFF,#FFFFFF,#FFFFFF,#c5c5c5","labelSize":16,"sizeGrid":"0,4,0,4"}}]};
+		return RenameResUI;
 	})(Dialog)
 
 
@@ -30824,7 +31741,67 @@ var Laya=window.Laya=(function(window,document){
 	})(ConfirmUI)
 
 
+	/**重命名资源
+	*@author ww
+	*/
+	//class view.RenameRes extends commonui.ui.RenameResUI
+	var RenameRes=(function(_super){
+		function RenameRes(){
+			this._oldPath=null;
+			this._complete=null;
+			RenameRes.__super.call(this);
+		}
+
+		__class(RenameRes,'view.RenameRes',_super);
+		var __proto=RenameRes.prototype;
+		__proto.initListener=function(){}
+		__proto.start=function(oldPath,complete){
+			this._oldPath=oldPath;
+			this._complete=complete;
+			var oldName;
+			oldName=FilePathUtils.getFileName(oldPath);
+			this.resLbl.text=oldName;
+			this.nameTxt.restrict="0-9a-zA-Z_";
+			this.nameTxt.text=oldName;
+			this.popup();
+			Laya.stage.focus=this.nameTxt.textField;
+		}
+
+		__proto.close=function(type){
+			if (type=="sure"){
+				if(StringTool.isOkFileName(this.nameTxt.text)){
+					if(FileTools.isPathSame(this.nameTxt.text,this.resLbl.text)){
+						Alert.show(Sys.lang("文件名不能相同！！"));
+						return;
+					}
+					this._complete.runWith([this._oldPath,this.nameTxt.text]);
+					laya.ui.Dialog.prototype.close.call(this,type);
+					}else{
+					Alert.show(Sys.lang("文件名不合法"));
+				}
+				}else{
+				laya.ui.Dialog.prototype.close.call(this,type);
+			}
+		}
+
+		__getset(1,RenameRes,'instance',function(){
+			return RenameRes._instance ? RenameRes._instance :RenameRes._instance=new RenameRes();
+		},commonui.ui.RenameResUI._$SET_instance);
+
+		RenameRes._instance=null
+		return RenameRes;
+	})(RenameResUI)
+
+
 	Laya.__init([LoaderManager,EventDispatcher,Browser,Render,View,Timer,GraphicAnimation,LocalStorage]);
 	new TestRemoteView();
 
 })(window,document,Laya);
+
+
+/*
+1 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as (225):warning:XMLElement This variable is not defined.
+2 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
+3 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+4 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+*/

@@ -58,7 +58,7 @@ package
 		private function initFileToolKit():void
 		{
 			FileKit.root = "https://stk.orzooo.com:9953";
-			//FileKit.root = "http://127.0.0.1:9953";
+			//FileKit.root = "https://127.0.0.1:9953";
 			fileKit = new FileKit();
 			FileKit.I = fileKit;
 			//fileKit.username = "deathnote";
@@ -93,7 +93,7 @@ package
 			
 			obj = canParseFileDic[extension].parse(dataO);
 			if (!obj) return;
-			tFile=extension+"/"+fileName.replace(".",".demorender")
+			tFile=extension+"/"+fileName.replace("."+extension,".demorender")
 			mindMapEditor.setData(obj);
 			mindMapEditor.visible = true;
 		}
