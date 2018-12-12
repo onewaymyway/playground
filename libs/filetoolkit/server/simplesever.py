@@ -108,6 +108,11 @@ class UserClient():
             #print("fileExists")
             return readFile(fPath)
         return None
+
+    def renameFile(self,fPath,newPath):
+        fPath=self.getPath(fPath)
+        newPath=self.getPath(newPath)
+        shutil.move(fPath,newPath)
     
 
 class CORSRequestHandler(SimpleHTTPRequestHandler):
@@ -185,6 +190,16 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
                 self.sendErr("not logined")
                 return
             userData.addFolder(form.getvalue("path"))
+            self.sendSuccess({})
+        elif action=="renameFile":
+            if userData.isVisitor:
+                self.sendErr("not logined")
+                return
+            newPath=form.getvalue("newpath")
+            if newPath==None or not userData.checkPath(newPath):
+                self.sendErr("path not ok")
+                return
+            userData.renameFile(form.getvalue("path"),newPath)
             self.sendSuccess({})
 
         

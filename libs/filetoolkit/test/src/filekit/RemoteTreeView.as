@@ -15,6 +15,8 @@ package filekit
 	import laya.utils.Handler;
 	import ui.deskplatform.RemoteTreeUI;
 	import view.AddResCommomDialog;
+	import view.Confirm;
+	import view.RenameRes;
 	import webfile.FilePathUtils;
 	/**
 	 * ...
@@ -45,10 +47,27 @@ package filekit
 			
 			_menuDir.on(Event.SELECT, this,onEmunSelect);
 			_mutiMenu= ContextMenu.createMenuByArray(["删除"]);
-			_mutiMenu.on(Event.SELECT, this,onEmunSelect);
+			_mutiMenu.on(Event.SELECT, this, onEmunSelect);
+			resTree.childSortFun = sortFolderFirst;
+			fliterTxt.on(Event.INPUT,this, onFliterTxtChange);
 		}
 		
+		private function onFliterTxtChange(e:Event=null):void {
+			resTree.filter(fliterTxt.text);
+		}
 		
+		private static function sortFolderFirst(dataA:Object, dataB:Object):int
+		{
+			if (dataA.isFolder == dataB.isFolder)
+			{
+				return dataA.label > dataB.label?1: -1;
+			}
+			if (dataA.isFolder)
+			{
+				return -1;
+			}
+			return 1;
+		}
 		/**获取当前目录*/
 		private function get currDirectory():String {
 			
@@ -84,10 +103,10 @@ package filekit
 					//openCurrPath();
 					break;
 				case "重命名": 
-					//checkRename();
+					checkRename();
 					break;
 				case "删除": 
-					//deleteRes();
+					deleteRes();
 					break;
 				case "新建目录": 
 					//Notice.notify(PlatformEvents.OPEN_ADDDIR);
@@ -99,6 +118,43 @@ package filekit
 			}
 			
 		}
+		private function checkRename():void {
+			if (Boolean(resTree.selectedPath)) {
+				var fileName:String = resTree.selectedItem.path;
+//				fileName=FileTools.getFileName(fileName);
+				RenameRes.instance.start(fileName,Handler.create(this,onRenameUIBack));
+			}
+		}
+		
+		private function onRenameUIBack(oldPath:String, newPath:String):void
+		{
+			var adptNewPath:String;
+			adptNewPath = FilePathUtils.replaceFileName(oldPath, newPath);
+		
+			fileKit.renameFile(oldPath, adptNewPath,Handler.create(this,onRenameBack));
+		}
+		
+		private function onRenameBack(dataO:Object):void
+		{
+			trace("onRenameBack:",dataO);
+			refresh();
+		}
+		private function deleteRes():void
+		{
+			if (resTree.selectedItem&&resTree.selectedItem.path)
+			{
+				Confirm.show("是否删除" + resTree.selectedItem.path + "?", "是否删除文件", Handler.create(this, onDeleteBack,[resTree.selectedItem.path]));
+			}
+		}
+		
+		private function onDeleteBack(path:String,sure:Boolean):void
+		{
+			if (sure)
+			{
+				fileKit.deleteFile(path, Handler.create(this, refresh));
+			}
+		}
+		
 		
 		
 		private function createDir():void
@@ -111,7 +167,14 @@ package filekit
 		
 		private function onAddNewDir(dataO:Object):void
 		{
-			fileKit.addFolder(dataO.dir + "/" + dataO.fileName,Handler.create(this, onAddFileSuccess));
+			if (dataO.dir)
+			{
+				fileKit.addFolder(dataO.dir + "/" + dataO.fileName,Handler.create(this, onAddFileSuccess));
+			}else
+			{
+				fileKit.addFolder(dataO.fileName,Handler.create(this, onAddFileSuccess));
+			}
+			
 		}
 		
 		private function createNew():void
@@ -123,8 +186,14 @@ package filekit
 		}
 		private function onAddNew(dataO:Object):void
 		{
-			debugger;
-			fileKit.addFile(dataO.dir + "/" + dataO.fileName + ".demorender", "{}",Handler.create(this,onAddFileSuccess));
+			if (dataO.dir)
+			{
+				fileKit.addFile(dataO.dir + "/" + dataO.fileName + ".demorender", "{}",Handler.create(this,onAddFileSuccess));
+			}else
+			{
+				fileKit.addFile(dataO.fileName + ".demorender", "{}",Handler.create(this,onAddFileSuccess));
+			}
+			
 		}
 		
 		private function onAddFileSuccess():void
@@ -250,7 +319,7 @@ package filekit
 				root = dataO;
 				root.isOpen = true;
 				resTree.rootNode = root;
-				
+				onFliterTxtChange();
 			}
 		}
 		

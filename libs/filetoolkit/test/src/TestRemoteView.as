@@ -20,6 +20,7 @@ package
 	import laya.utils.Handler;
 	import laya.utils.Utils;
 	import mindmap.adpttool.MM2MindMapData;
+	import mindmap.adpttool.PSO2MindMapData;
 	import mindmap.MindMapEditor;
 	import webfile.FilePathUtils;
 	import webfile.FileReaderTool;
@@ -57,7 +58,7 @@ package
 		private function initFileToolKit():void
 		{
 			FileKit.root = "https://stk.orzooo.com:9953";
-			//FileKit.root = "http://127.0.0.1:9953";
+			//FileKit.root = "https://127.0.0.1:9953";
 			fileKit = new FileKit();
 			FileKit.I = fileKit;
 			//fileKit.username = "deathnote";
@@ -67,6 +68,7 @@ package
 			test();
 		}
 		
+		private var canParseFileDic:Object = { "mm":MM2MindMapData,"pso":PSO2MindMapData};
 		private function onSystemDrag(dataO:Object):void
 		{
 			debugger;
@@ -74,7 +76,7 @@ package
 			fileO = dataO.data.files[0];
 			var fileName:String;
 			fileName = fileO.name;
-			if (FilePathUtils.getExtensionName(fileName) == "mm")
+			if (canParseFileDic[FilePathUtils.getExtensionName(fileName)])
 			{
 				var txt:String;
 				txt = FileReaderTool.readAsString(fileO,Handler.create(this,onFileReadBack,[fileName]));
@@ -84,11 +86,14 @@ package
 		
 		private function onFileReadBack(fileName:String, dataO:String):void
 		{
-			var xml:*;
-			xml = Utils.parseXMLFromString(dataO);
+			var extension:String;
+			extension = FilePathUtils.getExtensionName(fileName);
 			var obj:Object;
-			obj = MM2MindMapData.parse(xml);
-			tFile="adpt/"+fileName.replace(".mm",".demorender")
+			
+			
+			obj = canParseFileDic[extension].parse(dataO);
+			if (!obj) return;
+			tFile=extension+"/"+fileName.replace("."+extension,".demorender")
 			mindMapEditor.setData(obj);
 			mindMapEditor.visible = true;
 		}
@@ -142,6 +147,8 @@ package
 			switchBtn.left = mindMapEditor.left;
 			switchBtn.on(Event.CLICK, this, onSwitchBtn);
 			Notice.listen(Msgs.Open_File, this, onOpenFile);
+			
+			openFileByPath("FirstOfAll.demorender");
 		}
 		
 		private function onSwitchBtn():void
@@ -183,6 +190,11 @@ package
 		{
 			var filePath:String;
 			filePath = dataO.path;
+			openFileByPath(filePath);
+		}
+		
+		private function openFileByPath(filePath:String):void
+		{
 			if (filePath == preLoadFile) return;
 			preLoadFile = filePath;
 			tID++;
