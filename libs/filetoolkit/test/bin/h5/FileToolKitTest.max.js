@@ -717,7 +717,7 @@ var Laya=window.Laya=(function(window,document){
 			this.fileKit=null;
 			this.tree=null;
 			this.switchBtn=null;
-			this.canParseFileDic={"mm":MM2MindMapData,"pso":PSO2MindMapData};
+			this.canParseFileDic={"mm":MM2MindMapData,"pso":PSO2MindMapData,"zmap":ZMap2MindMapData};
 			this.container=null;
 			this.tFile=null;
 			this.tID=0;
@@ -807,6 +807,18 @@ var Laya=window.Laya=(function(window,document){
 			this.switchBtn.on("click",this,this.onSwitchBtn);
 			Notice.listen("Open_File",this,this.onOpenFile);
 			this.openFileByPath("FirstOfAll.demorender");
+		}
+
+		//testPropPanel();
+		__proto.testPropPanel=function(){
+			var testObj;
+			testObj={};
+			testObj.type="CC";
+			testObj.props={};
+			var testNode;
+			testNode={};
+			testNode.comXml=testObj;
+			PropPanel.showPropPanel(testNode);
 		}
 
 		__proto.onSwitchBtn=function(){
@@ -1762,6 +1774,230 @@ var Laya=window.Laya=(function(window,document){
 	*@author ww
 	*@version 1.0
 	*
+	*@created 2015-10-23 下午2:24:04
+	*/
+	//class laya.debug.tools.ClassTool
+	var ClassTool=(function(){
+		function ClassTool(){}
+		__class(ClassTool,'laya.debug.tools.ClassTool');
+		ClassTool.defineProperty=function(obj,name,des){
+			Object.defineProperty(obj,name,des);;
+		}
+
+		ClassTool.getOwnPropertyDescriptor=function(obj,name){
+			var rst;
+			rst=Object.getOwnPropertyDescriptor(obj,name);;
+			return rst;
+		}
+
+		ClassTool.getOwnPropertyDescriptors=function(obj){
+			var rst;
+			rst=Object.getOwnPropertyDescriptors(obj);;
+			return rst;
+		}
+
+		ClassTool.getOwnPropertyNames=function(obj){
+			var rst;
+			rst=Object.getOwnPropertyNames(obj);;
+			return rst;
+		}
+
+		ClassTool.getObjectGetSetKeys=function(obj,rst){
+			if (!rst)rst=[];
+			var keys;
+			keys=laya.debug.tools.ClassTool.getOwnPropertyNames(obj);
+			var key;
+			for (key in keys){
+				key=keys[key];
+				if (key.indexOf("_$get_")>=0){
+					key=key.replace("_$get_","");
+					rst.push(key);
+				}
+			}
+			if (obj["__proto__"]){
+				ClassTool.getObjectGetSetKeys(obj["__proto__"],rst);
+			}
+			return rst;
+		}
+
+		ClassTool.getObjectDisplayAbleKeys=function(obj,rst){
+			if (!rst)rst=[];
+			var key;
+			var tValue;
+			var tType;
+			for (key in obj){
+				tValue=obj[key];
+				tType=typeof(tValue);
+				if (key.charAt(0)=="_")continue ;
+				rst.push(key);
+			}
+			ClassTool.getObjectGetSetKeys(obj,rst);
+			rst=ObjectTools.getNoSameArr(rst);
+			return rst;
+		}
+
+		ClassTool.getClassName=function(tar){
+			if ((typeof tar=='function'))return tar.name;
+			return tar["constructor"].name;
+		}
+
+		ClassTool.getNodeClassAndName=function(tar){
+			if (!tar)return "null";
+			var rst;
+			if (tar.name){
+				rst=ClassTool.getClassName(tar)+"("+tar.name+")";
+				}else{
+				rst=ClassTool.getClassName(tar);
+			}
+			return rst;
+		}
+
+		ClassTool.getClassNameByClz=function(clz){
+			return clz["name"];
+		}
+
+		ClassTool.getClassByName=function(className){
+			var rst;
+			rst=eval(className);
+			return rst;
+		}
+
+		ClassTool.createObjByName=function(className){
+			var clz;
+			clz=ClassTool.getClassByName(className);
+			return new clz();
+		}
+
+		__static(ClassTool,
+		['displayTypes',function(){return this.displayTypes={"boolean":true,"number":true,"string":true };}
+		]);
+		return ClassTool;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.tools.ColorTool
+	var ColorTool=(function(){
+		function ColorTool(){
+			this.red=NaN;
+			this.green=NaN;
+			this.blue=NaN;
+		}
+
+		__class(ColorTool,'laya.debug.tools.ColorTool');
+		ColorTool.toHexColor=function(color){
+			return Utils.toHexColor(color);
+		}
+
+		ColorTool.getRGBByRGBStr=function(str){
+			str.charAt(0)=='#' && (str=str.substr(1));
+			var color=parseInt(str,16);
+			var flag=(str.length==8);
+			var _color;
+			_color=[((0x00FF0000 & color)>> 16),((0x0000FF00 & color)>> 8),(0x000000FF & color)];
+			return _color;
+		}
+
+		ColorTool.getColorBit=function(value){
+			var rst;
+			rst=Math.floor(value).toString(16);
+			rst=rst.length > 1 ? rst :"0"+rst;
+			return rst;
+		}
+
+		ColorTool.getRGBStr=function(rgb){
+			return "#"+ColorTool.getColorBit(rgb[0])+ColorTool.getColorBit(rgb[1])+ColorTool.getColorBit(rgb[2]);
+		}
+
+		ColorTool.traseHSB=function(hsb){
+			console.log("hsb:",hsb[0],hsb[1],hsb[2]);
+		}
+
+		ColorTool.rgb2hsb=function(rgbR,rgbG,rgbB){
+			var rgb=[rgbR,rgbG,rgbB];
+			rgb.sort(MathTools.sortNumSmallFirst);
+			var max=rgb[2];
+			var min=rgb[0];
+			var hsbB=max / 255.0;
+			var hsbS=max==0 ? 0 :(max-min)/ max;
+			var hsbH=0;
+			if(max==min){
+				hsbH=1;
+			}
+			else
+			if (rgbR==0 && rgbG==0&&rgbB==0){
+			}else
+			if (max==rgbR && rgbG >=rgbB){
+				hsbH=(rgbG-rgbB)*60 / (max-min)+0;
+			}
+			else if (max==rgbR && rgbG < rgbB){
+				hsbH=(rgbG-rgbB)*60 / (max-min)+360;
+			}
+			else if (max==rgbG){
+				hsbH=(rgbB-rgbR)*60 / (max-min)+120;
+			}
+			else if (max==rgbB){
+				hsbH=(rgbR-rgbG)*60 / (max-min)+240;
+			}
+			return [hsbH,hsbS,hsbB];
+		}
+
+		ColorTool.hsb2rgb=function(h,s,v){
+			var r=0,g=0,b=0;
+			var i=Math.floor((h / 60)% 6);
+			var f=(h / 60)-i;
+			var p=v *(1-s);
+			var q=v *(1-f *s);
+			var t=v *(1-(1-f)*s);
+			switch (i){
+				case 0:
+					r=v;
+					g=t;
+					b=p;
+					break ;
+				case 1:
+					r=q;
+					g=v;
+					b=p;
+					break ;
+				case 2:
+					r=p;
+					g=v;
+					b=t;
+					break ;
+				case 3:
+					r=p;
+					g=q;
+					b=v;
+					break ;
+				case 4:
+					r=t;
+					g=p;
+					b=v;
+					break ;
+				case 5:
+					r=v;
+					g=p;
+					b=q;
+					break ;
+				default :
+					break ;
+				}
+			return [Math.floor(r *255.0),Math.floor(g *255.0),Math.floor(b *255.0)];
+		}
+
+		return ColorTool;
+	})()
+
+
+	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
 	*@created 2015-9-25 下午7:19:44
 	*/
 	//class laya.debug.tools.DisControlTool
@@ -2055,6 +2291,446 @@ var Laya=window.Laya=(function(window,document){
 		['tempP',function(){return this.tempP=new Point();}
 		]);
 		return DisControlTool;
+	})()
+
+
+	/**
+	*布局工具类,目前只支持水平方向布局
+	*@author ww
+	*/
+	//class laya.debug.tools.layout.Layouter
+	var Layouter=(function(){
+		function Layouter(){
+			this.data=null;
+			this._items=null;
+			this.layoutFun=null;
+			this._sX=0;
+			this._width=0;
+		}
+
+		__class(Layouter,'laya.debug.tools.layout.Layouter');
+		var __proto=Layouter.prototype;
+		__proto.layout=function(){
+			this.layoutFun(this._width,this._items,this.data,this._sX);
+		}
+
+		/**
+		*重新布局
+		*
+		*/
+		__proto.changed=function(){
+			Laya.timer.callLater(this,this.layout);
+		}
+
+		/**
+		*根据当前的对象状态计算位置大小
+		*
+		*/
+		__proto.calSize=function(){
+			var i=0,len=0;
+			var tItem;
+			tItem=this.items[0];
+			this._sX=tItem.x;
+			var maxX=NaN;
+			maxX=this._sX+tItem.width;
+			len=this.items.length;
+			for (i=1;i < len;i++){
+				tItem=this.items[i];
+				if (this._sX > tItem.x){
+					this._sX=tItem.x;
+				}
+				if (maxX < tItem.x+tItem.width){
+					maxX=tItem.x+tItem.width;
+				}
+			}
+			this._width=maxX-this._sX;
+		}
+
+		__getset(0,__proto,'width',function(){
+			return this._width;
+			},function(v){
+			this._width=v;
+			this.changed();
+		});
+
+		__getset(0,__proto,'x',function(){
+			return this._sX;
+			},function(v){
+			this._sX=v;
+			this.changed();
+		});
+
+		__getset(0,__proto,'items',function(){
+			return this._items;
+			},function(arr){
+			this._items=arr;
+			this.calSize();
+		});
+
+		return Layouter;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.tools.layout.LayoutFuns
+	var LayoutFuns=(function(){
+		function LayoutFuns(){}
+		__class(LayoutFuns,'laya.debug.tools.layout.LayoutFuns');
+		LayoutFuns.sameWidth=function(totalWidth,items,data,sX){
+			(sX===void 0)&& (sX=0);
+			var dWidth=0;
+			if (data && data.dWidth)
+				dWidth=data.dWidth;
+			var perWidth=NaN;
+			perWidth=(totalWidth-(items.length-1)*dWidth)/ items.length;
+			var tItem;
+			var i=0,len=0;
+			var tX=NaN;
+			tX=sX;
+			len=items.length;
+			for (i=0;i < len;i++){
+				tItem=items[i];
+				tItem.x=tX;
+				tItem.width=perWidth;
+				tX+=dWidth+perWidth;
+			}
+		}
+
+		LayoutFuns.getSameWidthLayout=function(items,dWidth){
+			var data;
+			data={};
+			data.dWidth=dWidth;
+			return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.sameWidth);
+		}
+
+		LayoutFuns.getLayouter=function(items,data,fun){
+			var layouter;
+			layouter=new Layouter();
+			layouter.items=items;
+			layouter.data=data;
+			layouter.layoutFun=fun;
+			return layouter;
+		}
+
+		LayoutFuns.sameDis=function(totalWidth,items,data,sX){
+			(sX===void 0)&& (sX=0);
+			var dWidth=NaN;
+			dWidth=totalWidth;
+			var tItem;
+			var i=0,len=0;
+			len=items.length;
+			LayoutFuns.prepareForLayoutWidth(totalWidth,items);
+			for (i=0;i < len;i++){
+				tItem=items[i];
+				dWidth-=tItem.width;
+			}
+			if (items.length > 1)
+				dWidth=dWidth / (items.length-1);
+			var tX=NaN;
+			tX=sX;
+			len=items.length;
+			for (i=0;i < len;i++){
+				tItem=items[i];
+				tItem.x=tX;
+				tX+=dWidth+tItem.width;
+			}
+		}
+
+		LayoutFuns.getSameDisLayout=function(items,rateSame){
+			(rateSame===void 0)&& (rateSame=false);
+			var data;
+			data={};
+			if (rateSame){
+				var i=0,len=0;
+				len=items.length;
+				var tItem;
+				var totalWidth=NaN;
+				totalWidth=0;
+				for (i=0;i < len;i++){
+					tItem=items[i];
+					totalWidth+=tItem.width;
+				}
+				totalWidth=tItem.x+tItem.width;
+				for (i=0;i < len;i++){
+					tItem=items[i];
+					LayoutFuns.setItemRate(tItem,tItem.width / totalWidth);
+				}
+			}
+			return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.sameDis);
+		}
+
+		LayoutFuns.fullFill=function(totalWidth,items,data,sX){
+			(sX===void 0)&& (sX=0);
+			var dL=0,dR=0;
+			if (data){
+				if (data.dL)
+					dL=data.dL;
+				if (data.dR)
+					dR=data.dR;
+			};
+			var item;
+			var i=0,len=0;
+			len=items.length;
+			for (i=0;i < len;i++){
+				item=items[i];
+				item.x=sX+dL;
+				item.width=totalWidth-dL-dR;
+			}
+		}
+
+		LayoutFuns.getFullFillLayout=function(items,dL,dR){
+			(dL===void 0)&& (dL=0);
+			(dR===void 0)&& (dR=0);
+			var data;
+			data={};
+			data.dL=dL;
+			data.dR=dR;
+			return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.fullFill);
+		}
+
+		LayoutFuns.fixPos=function(totalWidth,items,data,sX){
+			(sX===void 0)&& (sX=0);
+			var dLen=0;
+			var poss=[];
+			var isRate=false;
+			if (data){
+				if (data.dLen)
+					dLen=data.dLen;
+				if (data.poss)
+					poss=data.poss;
+				if (data.isRate)
+					isRate=data.isRate;
+			};
+			var item;
+			var i=0,len=0;
+			len=poss.length;
+			var tX=NaN;
+			tX=sX;
+			var tValue=NaN;
+			var preItem;
+			preItem=null;
+			for (i=0;i < len;i++){
+				item=items[i];
+				tValue=sX+poss[i];
+				if (isRate){
+					tValue=sX+poss[i] *totalWidth;
+				}
+				item.x=tValue;
+				if (preItem){
+					preItem.width=item.x-dLen-preItem.x;
+				}
+				preItem=item;
+			};
+			var lastItem;
+			lastItem=items[items.length-1];
+			lastItem.width=sX+totalWidth-dLen-lastItem.x;
+		}
+
+		LayoutFuns.getFixPos=function(items,dLen,isRate,poss){
+			(dLen===void 0)&& (dLen=0);
+			(isRate===void 0)&& (isRate=false);
+			var data;
+			data={};
+			var layout;
+			layout=LayoutFuns.getLayouter(items,data,LayoutFuns.fixPos);
+			var i=0,len=0;
+			var sX=NaN;
+			var totalWidth=NaN;
+			sX=layout.x;
+			totalWidth=layout.width;
+			if (!poss){
+				poss=[];
+				len=items.length;
+				var tValue=NaN;
+				for (i=0;i < len;i++){
+					tValue=items[i].x-sX;
+					if (isRate){
+						tValue=tValue / totalWidth;
+					}
+					else{
+					}
+					poss.push(tValue);
+				}
+			}
+			data.dLen=dLen;
+			data.poss=poss;
+			data.isRate=isRate;
+			return layout;
+		}
+
+		LayoutFuns.clearItemsRelativeInfo=function(items){
+			var i=0,len=0;
+			len=items.length;
+			for (i=0;i < len;i++){
+				LayoutFuns.clearItemRelativeInfo(items[i]);
+			}
+		}
+
+		LayoutFuns.clearItemRelativeInfo=function(item){
+			var Nan="NaN";
+			item.getLayout().left=Nan;
+			item.getLayout().right=Nan;
+		}
+
+		LayoutFuns.prepareForLayoutWidth=function(totalWidth,items){
+			var i=0,len=0;
+			len=items.length;
+			for (i=0;i < len;i++){
+				LayoutFuns.prepareItemForLayoutWidth(totalWidth,items[i]);
+			}
+		}
+
+		LayoutFuns.getSumWidth=function(items){
+			var sum=NaN;
+			sum=0;
+			var i=0,len=0;
+			len=items.length;
+			for (i=0;i < len;i++){
+				sum+=items[i].width;
+			}
+			return sum;
+		}
+
+		LayoutFuns.prepareItemForLayoutWidth=function(totalWidth,item){
+			if (LayoutFuns.getItemRate(item)> 0){
+				item.width=totalWidth *LayoutFuns.getItemRate(item);
+			}
+		}
+
+		LayoutFuns.setItemRate=function(item,rate){
+			item["layoutRate"]=rate;
+		}
+
+		LayoutFuns.getItemRate=function(item){
+			return item["layoutRate"] ? item["layoutRate"] :-1;
+		}
+
+		LayoutFuns.setItemFreeSize=function(item,free){
+			(free===void 0)&& (free=true);
+			item["layoutFreeSize"]=free;
+		}
+
+		LayoutFuns.isItemFreeSize=function(item){
+			return item["layoutFreeSize"];
+		}
+
+		LayoutFuns.lockedDis=function(totalWidth,items,data,sX){
+			(sX===void 0)&& (sX=0);
+			var dists;
+			dists=data.dists;
+			var sumDis=NaN;
+			sumDis=data.sumDis;
+			var sumWidth=NaN;
+			var i=0,len=0;
+			var tItem;
+			var preItem;
+			LayoutFuns.prepareForLayoutWidth(totalWidth,items);
+			sumWidth=LayoutFuns.getSumWidth(items);
+			var dWidth=NaN;
+			dWidth=totalWidth-sumDis-sumWidth;
+			var freeItem;
+			freeItem=LayoutFuns.getFreeItem(items);
+			if(freeItem){
+				freeItem.width+=dWidth;
+			}
+			preItem=items[0];
+			preItem.x=sX;
+			len=items.length;
+			for(i=1;i<len;i++){
+				tItem=items[i];
+				tItem.x=preItem.x+preItem.width+dists[i-1];
+				preItem=tItem;
+			}
+		}
+
+		LayoutFuns.getFreeItem=function(items){
+			var i=0,len=0;
+			len=items.length;
+			for (i=0;i < len;i++){
+				if(LayoutFuns.isItemFreeSize(items[i])){
+					return items[i];
+				}
+			}
+			return null;
+		}
+
+		LayoutFuns.getLockedDis=function(items){
+			var data;
+			data={};
+			var dists;
+			var i=0,len=0;
+			var tItem;
+			var preItem;
+			var sumDis=NaN;
+			sumDis=0;
+			var tDis=NaN;
+			preItem=items[0];
+			dists=[];
+			len=items.length;
+			for(i=1;i<len;i++){
+				tItem=items[i];
+				tDis=tItem.x-preItem.x-preItem.width;
+				dists.push(tDis);
+				sumDis+=tDis;
+				preItem=tItem;
+			}
+			data.dists=dists;
+			data.sumDis=sumDis;
+			return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.lockedDis);
+		}
+
+		LayoutFuns.RateSign="layoutRate";
+		LayoutFuns.FreeSizeSign="layoutFreeSize";
+		return LayoutFuns;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.tools.MathTools
+	var MathTools=(function(){
+		function MathTools(){}
+		__class(MathTools,'laya.debug.tools.MathTools');
+		MathTools.sortBigFirst=function(a,b){
+			if (a==b)
+				return 0;
+			return b > a ? 1 :-1;
+		}
+
+		MathTools.sortSmallFirst=function(a,b){
+			if (a==b)
+				return 0;
+			return b > a ?-1 :1;
+		}
+
+		MathTools.sortNumBigFirst=function(a,b){
+			return parseFloat(b)-parseFloat(a);
+		}
+
+		MathTools.sortNumSmallFirst=function(a,b){
+			return parseFloat(a)-parseFloat(b);
+		}
+
+		MathTools.sortByKey=function(key,bigFirst,forceNum){
+			(bigFirst===void 0)&& (bigFirst=false);
+			(forceNum===void 0)&& (forceNum=true);
+			var _sortFun;
+			if (bigFirst){
+				_sortFun=forceNum ? MathTools.sortNumBigFirst :MathTools.sortBigFirst;
+				}else {
+				_sortFun=forceNum ? MathTools.sortNumSmallFirst :MathTools.sortSmallFirst;
+			}
+			return function (a,b){
+				return _sortFun(a[key],b[key]);
+			};
+		}
+
+		return MathTools;
 	})()
 
 
@@ -11283,6 +11959,57 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class mindmap.adpttool.ZMap2MindMapData
+	var ZMap2MindMapData=(function(){
+		function ZMap2MindMapData(){}
+		__class(ZMap2MindMapData,'mindmap.adpttool.ZMap2MindMapData');
+		ZMap2MindMapData.parse=function(dataStr){
+			var nodeO;
+			try{
+				nodeO=JSON.parse(dataStr);
+				}catch (e){
+				alert("转换出错");
+			}
+			nodeO=nodeO[0];
+			if (!nodeO)return null;
+			var rst;
+			rst=ZMap2MindMapData.parseNode(nodeO);
+			return rst;
+		}
+
+		ZMap2MindMapData.getAdptTitle=function(text){
+			text=text.replace(/<[^>]+>/g,"");
+			text=text.replace(/&nbsp;/ig,"");
+			return text;
+		}
+
+		ZMap2MindMapData.parseNode=function(node){
+			var rst;
+			rst={};
+			rst.label=ZMap2MindMapData.getAdptTitle(node.title);
+			rst.childs=[];
+			var cList;
+			cList=node.children;
+			if (cList && cList.length){
+				var i=0,len=0;
+				len=cList.length;
+				var tChild;
+				for (i=0;i < len;i++){
+					tChild=cList[i];
+					rst.childs.push(ZMap2MindMapData.parseNode(tChild));
+				}
+			}
+			return rst;
+		}
+
+		return ZMap2MindMapData;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class mindmap.MindMapNodeData
 	var MindMapNodeData=(function(){
 		function MindMapNodeData(){
@@ -11766,7 +12493,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				FileTools.createDirectory(path);
 				}catch (e){
-				Sys.alert("Create folder failed:"+path);
+				Sys$1.alert("Create folder failed:"+path);
 			}
 		}
 
@@ -11774,7 +12501,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				FileTools.createFile(path,value);
 				}catch (e){
-				Sys.alert("Create file failed:"+path);
+				Sys$1.alert("Create file failed:"+path);
 			}
 		}
 
@@ -11782,7 +12509,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				FileTools.createFile(path,JSON.stringify(value));
 				}catch (e){
-				Sys.alert("Create file failed:"+path+e.message);
+				Sys$1.alert("Create file failed:"+path+e.message);
 			}
 		}
 
@@ -11790,7 +12517,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				FileTools.createFile(path,bytes);
 				}catch (e){
-				Sys.alert("Create file failed:"+path);
+				Sys$1.alert("Create file failed:"+path);
 			}
 		}
 
@@ -11802,7 +12529,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				FileTools.copyE(from,to);
 				}catch (e){
-				Sys.alert("Copy file failed:(from:"+from+" to:"+to+")");
+				Sys$1.alert("Copy file failed:(from:"+from+" to:"+to+")");
 				console.log("Copy file failed:(from:"+from+" to:"+to+")");
 			}
 		}
@@ -11812,7 +12539,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				return FileTools.readFile(path);
 				}catch (e){
-				if (errorAlert)Sys.alert("Read file failed:"+path);
+				if (errorAlert)Sys$1.alert("Read file failed:"+path);
 			}
 			return null;
 		}
@@ -11823,7 +12550,7 @@ var Laya=window.Laya=(function(window,document){
 				var str=nodetools.devices.FileManager.readTxtFile(path);
 				return JSON.parse(str);
 				}catch (e){
-				if (errorAlert)Sys.alert("Read file failed:"+path);
+				if (errorAlert)Sys$1.alert("Read file failed:"+path);
 				debugger;
 			}
 			return null;
@@ -11834,7 +12561,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				return FileTools.readFile(path);
 				}catch (e){
-				if (errorAlert)Sys.alert("Read file failed:"+path);
+				if (errorAlert)Sys$1.alert("Read file failed:"+path);
 			}
 			return null;
 		}
@@ -11884,7 +12611,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				FileTools.rename(oldPath,newPath);
 				}catch (e){
-				Sys.alert("Rename file failed:(from:"+oldPath+" to:"+newPath+")");
+				Sys$1.alert("Rename file failed:(from:"+oldPath+" to:"+newPath+")");
 			}
 		}
 
@@ -12446,9 +13173,9 @@ var Laya=window.Laya=(function(window,document){
 	*@author ww
 	*/
 	//class nodetools.devices.Sys
-	var Sys=(function(){
+	var Sys$1=(function(){
 		function Sys(){};
-		__class(Sys,'nodetools.devices.Sys');
+		__class(Sys,'nodetools.devices.Sys',null,'Sys$1');
 		Sys.mParseFloat=function(v){
 			v=parseFloat(v);
 			if (isNaN(v))return 0;
@@ -12649,12 +13376,557 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class commonui.colorpanel.ColorPickerControl
+	var ColorPickerControl=(function(){
+		function ColorPickerControl(){
+			this.closeWhenOtherClick=false;
+			this.hideCompleteHandler=null;
+			this.colorPicker=null;
+			this.showY=NaN;
+			this.hideY=NaN;
+			this.colorPicker=new colorpanel.colorselectorpanel.SelectorColorPicker();
+			this.colorPicker.on("change",this,this.onColorChange);
+		}
+
+		__class(ColorPickerControl,'commonui.colorpanel.ColorPickerControl');
+		var __proto=ColorPickerControl.prototype;
+		__proto.onColorChange=function(color){
+			if (ColorPickerControl.colorChangeHandler){
+				ColorPickerControl.colorChangeHandler.runWith(color);
+			}
+		}
+
+		__proto.showEffect=function(){
+			Laya.stage.off("click",this,this.onStageClick);
+			this.colorPicker.y=this.hideY;
+			Tween.clearTween(this.colorPicker);
+			Tween.to(this.colorPicker,{y:this.showY },300,Ease.circOut,Handler.create(this,this.onShowComplete));
+		}
+
+		__proto.onShowComplete=function(){
+			Laya.stage.on("click",this,this.onStageClick);
+		}
+
+		__proto.onStageClick=function(e){
+			if (!this.colorPicker.contains(e.target)){
+				this.hideEffect();
+			}
+		}
+
+		__proto.hideEffect=function(){
+			Laya.stage.off("click",this,this.onStageClick);
+			Tween.clearTween(this.colorPicker);
+			Tween.to(this.colorPicker,{y:this.hideY },300,Ease.circIn,Handler.create(this,this.onHideComplete));
+		}
+
+		__proto.onHideComplete=function(){
+			ColorPickerControl.isShow=false;
+			this.colorPicker.removeSelf();
+			if (this.hideCompleteHandler){
+				this.hideCompleteHandler.run();
+			}
+		}
+
+		ColorPickerControl._init=function(){
+			if (!ColorPickerControl._skySettingPanel){
+				ColorPickerControl._skySettingPanel=new ColorPickerControl();
+			}
+		}
+
+		ColorPickerControl.showColorPicker=function(colorChangeHandler,parentBox,parentBottomOffset,childIndex,hasImage,autoClose,hideHandler){
+			(parentBottomOffset===void 0)&& (parentBottomOffset=100);
+			(childIndex===void 0)&& (childIndex=-1);
+			(hasImage===void 0)&& (hasImage=true);
+			(autoClose===void 0)&& (autoClose=false);
+			if (ColorPickerControl.isShow)return;
+			ColorPickerControl._init();
+			commonui.colorpanel.ColorPickerControl.colorChangeHandler=colorChangeHandler;
+			ColorPickerControl._skySettingPanel.colorPicker.setHasImage(hasImage);
+			ColorPickerControl._skySettingPanel.hideY=parentBox.height;
+			ColorPickerControl._skySettingPanel.showY=parentBox.height-ColorPickerControl._skySettingPanel.colorPicker.height-parentBottomOffset;
+			ColorPickerControl.isShow=true;
+			ColorPickerControl._skySettingPanel.closeWhenOtherClick=autoClose;
+			ColorPickerControl._skySettingPanel.hideCompleteHandler=hideHandler;
+			if (childIndex >=0){
+				parentBox.addChildAt(ColorPickerControl._skySettingPanel.colorPicker,childIndex);
+				}else{
+				parentBox.addChild(ColorPickerControl._skySettingPanel.colorPicker);
+			}
+			ColorPickerControl._skySettingPanel.showEffect();
+		}
+
+		ColorPickerControl.hideColorPicker=function(){
+			if (!ColorPickerControl.isShow)return;
+			ColorPickerControl.isShow=false;
+			if (ColorPickerControl._skySettingPanel){
+				ColorPickerControl._skySettingPanel.hideEffect();
+			}
+		}
+
+		ColorPickerControl._skySettingPanel=null
+		ColorPickerControl.colorChangeHandler=null
+		ColorPickerControl.isShow=false;
+		return ColorPickerControl;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.colorpanel.ColorTableTool
+	var ColorTableTool=(function(){
+		function ColorTableTool(){}
+		__class(ColorTableTool,'commonui.colorpanel.ColorTableTool');
+		ColorTableTool.initList=function(start,end,count,includEnd){
+			(includEnd===void 0)&& (includEnd=true);
+			var i=0,len=0;
+			len=count;
+			var d=NaN;
+			d=(end-start)/ count;
+			var rst;
+			rst=[];
+			if (includEnd){
+				start+=d;
+			}
+			for (i=0;i < len;i++){
+				rst.push(start+i*d);
+			}
+			return rst;
+		}
+
+		ColorTableTool.createGrayColor=function(split){
+			(split===void 0)&& (split=8);
+			var arr;
+			arr=[];
+			var i=0,len=0;
+			len=split;
+			var dLen=0;
+			dLen=255 / (split-1);
+			var tValue;
+			for (i=0;i < len;i++){
+				tValue=Math.floor(i*dLen);
+				tValue=ColorTool.getRGBStr([tValue,tValue,tValue]);
+				arr.push(tValue);
+			}
+			return arr;
+		}
+
+		ColorTableTool.createColorTable=function(circleSplit,depthSplit,startS,endS,startB,endB){
+			(circleSplit===void 0)&& (circleSplit=32);
+			(depthSplit===void 0)&& (depthSplit=8);
+			(startS===void 0)&& (startS=0.2);
+			(endS===void 0)&& (endS=1);
+			(startB===void 0)&& (startB=0.1);
+			(endB===void 0)&& (endB=1);
+			ColorTableTool.grayList=ColorTableTool.createGrayColor(depthSplit);
+			ColorTableTool.hueList=ColorTableTool.initList(0,360,circleSplit-1,false);
+			ColorTableTool.saturationList=ColorTableTool.initList(startS,endS,depthSplit);
+			ColorTableTool.birghtList=ColorTableTool.initList(startB,endB,depthSplit);
+			var i=0,len=0;
+			var j=0,jLen=0;
+			len=circleSplit;
+			jLen=depthSplit;
+			var colors;
+			colors=[];
+			for (i=0;i < len;i++){
+				for (j=0;j < jLen;j++){
+					if (i==len-1){
+						colors.push(ColorTableTool.changeColor(ColorTableTool.grayList[j]));
+					}else
+					colors.push(ColorTableTool.changeColor(ColorTool.getRGBStr(ColorTool.hsb2rgb(ColorTableTool.hueList[i],ColorTableTool.saturationList[j],ColorTableTool.birghtList[j]))));
+				}
+			}
+			return colors;
+		}
+
+		ColorTableTool.changeColor=function(str){
+			var ___color=ColorTool.getRGBByRGBStr(str);
+			return ColorTool.getRGBStr([(___color[0] >> 3 << 3),(___color[1] >> 3 << 3),(___color[2] >> 3 << 3)]);
+		}
+
+		ColorTableTool.getHSBByRGB=function(color){
+			var rgb;
+			rgb=ColorTool.getRGBByRGBStr(color);
+			return ColorTool.rgb2hsb(rgb[0],rgb[1],rgb[2]);
+		}
+
+		ColorTableTool.RGB2Gray=function(color){
+			var rgb;
+			rgb=ColorTool.getRGBByRGBStr(color);
+			return rgb[0] *0.299+rgb[1] *0.587+rgb[2] *0.114;
+		}
+
+		ColorTableTool.getTextColor=function(color){
+			return ColorTableTool.RGB2Gray(color)> 200?"#000000":"#ffffff";
+		}
+
+		ColorTableTool.hueList=null
+		ColorTableTool.saturationList=null
+		ColorTableTool.birghtList=null
+		ColorTableTool.grayList=null
+		return ColorTableTool;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class commonui.consts.CommonUIConsts
 	var CommonUIConsts=(function(){
 		function CommonUIConsts(){}
 		__class(CommonUIConsts,'commonui.consts.CommonUIConsts');
 		CommonUIConsts.fileNameRestrict="0-9a-zA-Z_";
 		return CommonUIConsts;
+	})()
+
+
+	/**
+	*属性面板插件管理器
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2018-5-7 上午10:23:40
+	*/
+	//class commonui.view.prop.PropPluginManager
+	var PropPluginManager=(function(){
+		function PropPluginManager(){}
+		__class(PropPluginManager,'commonui.view.prop.PropPluginManager');
+		PropPluginManager.regPlugin=function(type,clz){
+			type=type.toLowerCase();
+			PropPluginManager.typeToPluginDic[type]=clz;
+		}
+
+		PropPluginManager.createPluginByType=function(type){
+			type=type.toLowerCase();
+			var tClz;
+			tClz=PropPluginManager.typeToPluginDic[type]||PropPluginManager.defaultInputClz;
+			if(!tClz)return null;
+			return new tClz();
+		}
+
+		PropPluginManager.initIDEPlugins=function(){
+			PropPluginManager.defaultInputClz=PropsTextInput;
+			PropPluginManager.regPlugin("number",PropsNumberInput);
+			PropPluginManager.regPlugin("color",PropsColorInput);
+			PropPluginManager.regPlugin("colorarray",PropsColorArrayInput);
+		}
+
+		PropPluginManager.typeToPluginDic={};
+		PropPluginManager.defaultInputClz=null
+		PropPluginManager.__init$=function(){
+			;
+			PropPluginManager.initIDEPlugins();
+		}
+
+		return PropPluginManager;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.PropStyleConst
+	var PropStyleConst=(function(){
+		function PropStyleConst(){}
+		__class(PropStyleConst,'commonui.view.prop.PropStyleConst');
+		PropStyleConst.PropPanelTitleColor="#44a7ff";
+		PropStyleConst.PropPanelScrollBar=" ";
+		PropStyleConst.TreeItemColor="#c5c5c5";
+		PropStyleConst.TreeFolderColor="#c5c5c5";
+		PropStyleConst.PropPanelFontSize=30;
+		PropStyleConst.InputItemSize=38;
+		return PropStyleConst;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.PropUtils
+	var PropUtils=(function(){
+		function PropUtils(){}
+		__class(PropUtils,'commonui.view.prop.PropUtils');
+		PropUtils.getNumberFix=function(value){
+			var str;
+			str=value+"";
+			var index=0;
+			index=str.indexOf(".");
+			if (index < 0)return 0;
+			return str.length-index-1;
+		}
+
+		PropUtils.numberToFixed=function(value,fix){
+			(fix===void 0)&& (fix=0);
+			if (fix <=0){
+				return Math.floor(value);
+			};
+			var p=NaN;
+			p=Math.pow(10,fix);
+			return Math.round(value *p)/ p;
+		}
+
+		PropUtils.mParseInt=function(v){
+			return parseInt(v)||0;
+		}
+
+		PropUtils.mParserFloat=function(v){
+			return parseFloat(v)||0;
+		}
+
+		PropUtils.isNumber=function(value){
+			return (parseFloat(value)==value);
+		}
+
+		PropUtils.isNaNS=function(value){
+			return (value.toString()=="NaN");
+		}
+
+		PropUtils.isNaN=function(value){
+			if(typeof(value)=="number")return false;
+			if(typeof(value)=="string"){
+				if(parseFloat(value).toString()!="NaN"){
+					if(parseFloat(value)==value){
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
+		PropUtils.getDisplayPropObject=function(propO){
+			return propO;
+		}
+
+		PropUtils.getDefaultValueByType=function(valueType){
+			var value;
+			if(valueType.toLowerCase!=null)
+				valueType=valueType.toLowerCase();
+			switch (valueType){
+				case "int":
+				case "number":
+				case "snumber":
+				case "number":
+				case "pnumber":
+				case "unumber":
+					value=0;
+					break ;
+				case "bool":
+					value=false;
+					break ;
+				default :
+					value="";
+				}
+			return value;
+		}
+
+		PropUtils.getAdptValue=function(value,valueType){
+			if (value !=""){
+				if(valueType.toLowerCase!=null)
+					valueType=valueType.toLowerCase();
+				switch (valueType){
+					case "int":
+						value=PropUtils.mParseInt(value);
+					case "number":
+					case "snumber":
+					case "number":
+						value=parseFloat(value);
+						break ;
+					case "pnumber":
+					case "unumber":
+						value=Math.abs(parseFloat(value));
+						break ;
+					case "bool":
+						value=(value=="true"||value==true)? true :false;
+						break ;
+					}
+				if (PropUtils.isNaNS(value)){
+					value=0;
+				}
+			}
+			return value;
+		}
+
+		return PropUtils;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.UIConfigManager
+	var UIConfigManager=(function(){
+		function UIConfigManager(){}
+		__class(UIConfigManager,'commonui.view.prop.UIConfigManager');
+		UIConfigManager.initDatas=function(){
+			UIConfigManager.configedTypeDic["Image"]=true;
+		}
+
+		UIConfigManager.getCompProp=function(type,key){
+			if (!UIConfigManager.nodeConfigDic[type])return null;
+			return UIConfigManager.nodeConfigDic[type][key];
+		}
+
+		UIConfigManager.getCompConfig=function(type){
+			return UIConfigManager.nodeConfigDic[type];
+		}
+
+		UIConfigManager.getCompTreeIcon=function(type){
+			var iconurl;
+			iconurl=commonui.view.prop.UIConfigManager.getCompProp(type,"icon");
+			if(!iconurl){
+				iconurl="Image";
+			}
+			return UIConfigManager.getTypeIcon(iconurl);
+		}
+
+		UIConfigManager.getNickNameFromPropConfig=function(propConfig){
+			return propConfig.nickName || propConfig.title || propConfig.name;
+		}
+
+		UIConfigManager.getTypeIcon=function(type){
+			return type+".png";
+		}
+
+		UIConfigManager.getConfigedType=function(type){
+			if (!UIConfigManager.configedTypeDic[type])return "Image";
+			return type;
+		}
+
+		UIConfigManager.getTypeFromNode=function(node){
+			if (!node || !node.comXml){
+				return "Image";
+			}
+			return UIConfigManager.getConfigedType(node.comXml.type);
+		}
+
+		UIConfigManager.getPropValueFromNode=function(node,key){
+			if (!node || !node.comXml||!node.comXml.props){
+				return null;
+			}
+			return node.comXml.props[key];
+		}
+
+		UIConfigManager.getNodeIDFromNode=function(node){
+			if (!node || !node.comXml){
+				return null;
+			}
+			return node.comXml.compId;
+		}
+
+		UIConfigManager.getTypeConfigPath=function(type){
+			return UIConfigManager.propsConfigRoot+type+".json";
+		}
+
+		UIConfigManager.loadConfigByNode=function(node,complete){
+			var type;
+			type=UIConfigManager.getTypeFromNode(node);
+			if (UIConfigManager.nodeConfigDic[type]){
+				complete.runWith(UIConfigManager.nodeConfigDic[type]);
+				}else{
+				Laya.loader.load(UIConfigManager.getTypeConfigPath(type),Handler.create(null,UIConfigManager.onConfigLoaded,[type,complete]));
+			}
+		}
+
+		UIConfigManager.onConfigLoaded=function(type,complete,dataO){
+			UIConfigManager.nodeConfigDic[type]=dataO;
+			complete.runWith(dataO);
+		}
+
+		UIConfigManager.nodeConfigDic={};
+		UIConfigManager.DefaultType="Image";
+		UIConfigManager.configedTypeDic={};
+		UIConfigManager.propsConfigRoot="props/";
+		UIConfigManager.__init$=function(){
+			;
+			UIConfigManager.initDatas();;
+		}
+
+		return UIConfigManager;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.TipMessage
+	var TipMessage=(function(){
+		function TipMessage(){};
+		__class(TipMessage,'commonui.view.TipMessage');
+		TipMessage.hideTipLabel=function(){
+			if (TipMessage.label)TipMessage.label.removeSelf();
+		}
+
+		TipMessage.getTipLabel=function(){
+			if (!TipMessage.label){
+				TipMessage.label=new Label();
+				TipMessage.label.width=400;
+				TipMessage.label.fontSize=60;
+				TipMessage.label.align="center";
+			}
+			return TipMessage.label;
+		}
+
+		TipMessage.i=null
+		TipMessage.label=null
+		return TipMessage;
+	})()
+
+
+	/**
+	*编辑器全局静态入口
+	*@author yung
+	*/
+	//class Sys
+	var Sys=(function(){
+		function Sys(){};
+		__class(Sys,'Sys');
+		Sys.lang=function(body,__args){
+			var args=[];for(var i=1,sz=arguments.length;i<sz;i++)args.push(arguments[i]);
+			var i=0,len=0;
+			len=args.length;
+			if(Sys.langPack&&Sys.langPack[body]){
+				body=Sys.langPack[body];
+			}
+			for (i=0;i < len;i++){
+				body=body.replace("{"+i+"}",args[i]);
+			}
+			return body;
+		}
+
+		Sys.adptLangPack=function(){
+			if(!Sys.langPack)return;
+			var key;
+			var newKey;
+			for(key in Sys.langPack){
+				if(key.indexOf("\\n")>=0){
+					newKey=StringTool.getReplace(key,"\\\\n","\n");
+					Sys.langPack[newKey]=StringTool.getReplace(Sys.langPack[key],"\\\\n","\n");
+				}
+			}
+		}
+
+		Sys.langArr=function(txtList){
+			if(!Sys.langPack)return txtList;
+			var i=0,len=0;
+			len=txtList.length;
+			var tTxt;
+			for(i=0;i<len;i++){
+				tTxt=txtList[i];
+				if(Sys.langPack[tTxt]){
+					txtList[i]=Sys.langPack[tTxt];
+				}
+			}
+			return txtList;
+		}
+
+		Sys.langPack=null
+		return Sys;
 	})()
 
 
@@ -20454,6 +21726,231 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*颜色选取类
+	*@author ww
+	*/
+	//class wraps.colorselect.ColorSelector extends laya.display.Sprite
+	var ColorSelector$1=(function(_super){
+		function ColorSelector(){
+			this.sideColor=null;
+			this.mainColor=null;
+			this.demoColor=null;
+			this.posSp=null;
+			this.hPos=null;
+			this.container=null;
+			this._gradientSp=null;
+			this._darkSp=null;
+			this.isChanging=false;
+			this.tColor=null;
+			this.tH=NaN;
+			this._colorFilter=null;
+			ColorSelector.__super.call(this);
+			this.container=this;
+			this.mouseEnabled=true;
+			this.createUI();
+		}
+
+		__class(ColorSelector,'wraps.colorselect.ColorSelector',_super,'ColorSelector$1');
+		var __proto=ColorSelector.prototype;
+		__proto.createUI=function(){
+			this.sideColor=new Sprite();
+			this.container.addChild(this.sideColor);
+			this.sideColor.graphics.drawRect(0,0,150,150,"#ffffff");
+			this._gradientSp=new Sprite();
+			var tex;
+			tex=Loader.getRes(ColorSelector.sideColorPic);
+			this._gradientSp.graphics.drawImage(tex,0,0,150,150);
+			this.sideColor.addChild(this._gradientSp);
+			this._darkSp=new Sprite();
+			this.sideColor.addChild(this._darkSp);
+			tex=Loader.getRes(ColorSelector.overlayPic);
+			this._darkSp.graphics.drawImage(tex,0,0,150,150);
+			this.posSp=new Sprite();
+			this.posSp.pos(100,100);
+			this.posSp.graphics.drawCircle(0,0,5,null,"#ff0000");
+			this.posSp.graphics.drawCircle(0,0,6,null,"#ffff00");
+			this.posSp.autoSize=true;
+			this.sideColor.addChild(this.posSp);
+			this.sideColor.pos(0,0);
+			this.sideColor.size(150,150);
+			this.sideColor.on("mousedown",this,this.sideColorClick);
+			var i=0;
+			this.mainColor=new Sprite();
+			var g;
+			g=this.mainColor.graphics;
+			var h=NaN;
+			var s=NaN;
+			var b=NaN;
+			var rgb;
+			tex=Loader.getRes(ColorSelector.mainColorPic);
+			this.mainColor.graphics.drawImage(tex,0,0,tex.width,150);
+			this.mainColor.pos(150+4,0);
+			this.mainColor.size(tex.width,150);
+			this.hPos=new Sprite();
+			this.hPos.graphics.drawPie(0,0,20,-10,10,"#ff0000");
+			this.hPos.x=this.mainColor.x+this.mainColor.width-20;
+			this.container.addChild(this.mainColor);
+			this.container.addChild(this.hPos);
+			this.mainColor.on("mousedown",this,this.mainColorClick);
+			this.demoColor=new Sprite();
+			this.demoColor.pos(this.sideColor.x+44,this.sideColor.y+this.sideColor.height+4);
+			this.demoColor.size(150,40);
+			this.container.addChild(this.demoColor);
+			this.width=this.mainColor.x+this.mainColor.width;
+			this.setColorByRGBStr("#099599");
+			this.posSp.on("dragmove",this,this.posDraging);
+		}
+
+		// posSp.on(Event.MOUSE_DOWN,this,posMouseDown);
+		__proto.posMouseDown=function(e){}
+		__proto.posDraging=function(){
+			this.updatePosSpAndShowColor();
+			this.event("COLOR_CHANGING");
+		}
+
+		__proto.posDragEnd=function(){
+			this.isChanging=false;
+			this.updatePosSpAndShowColor();
+		}
+
+		__proto.setColorByRGBStr=function(rgbStr){
+			var rgb;
+			rgb=ColorTool.getRGBByRGBStr(rgbStr);
+			this.setColor(rgb[0],rgb[1],rgb[2]);
+		}
+
+		__proto.setColor=function(red,green,blue,notice){
+			(notice===void 0)&& (notice=true);
+			var hsb;
+			hsb=ColorTool.rgb2hsb(red,green,blue);
+			var tRGB;
+			tRGB=ColorTool.hsb2rgb(hsb[0],hsb[1],hsb[2]);
+			this.setColorByHSB(hsb[0],hsb[1],hsb[2],notice);
+		}
+
+		__proto.setColorByHSB=function(h,s,b,notice){
+			(notice===void 0)&& (notice=true);
+			this.hPos.y=this.mainColor.y+h/360*150;
+			this.posSp.x=s *150;
+			this.posSp.y=(1-b)*150;
+			this.updateSideColor(h,notice);
+		}
+
+		__proto.sideColorClick=function(e){
+			this.isChanging=true;
+			this.posSp.startDrag();
+			this.updatePosSpAndShowColor();
+			Laya.stage.off("mouseup",this,this.sideColorMouseUp);
+			Laya.stage.once("mouseup",this,this.sideColorMouseUp);
+		}
+
+		__proto.sideColorMouseUp=function(e){
+			this.isChanging=false;
+			this.updatePosSpAndShowColor();
+		}
+
+		__proto.updatePosSpAndShowColor=function(){
+			this.posSp.x=this.sideColor.mouseX;
+			this.posSp.y=this.sideColor.mouseY;
+			if(this.posSp.x<0)this.posSp.x=0;
+			if(this.posSp.y<0)this.posSp.y=0;
+			if(this.posSp.x>150)this.posSp.x=150;
+			if(this.posSp.y>150)this.posSp.y=150;
+			this.updateDemoColor();
+		}
+
+		__proto.updateDemoColor=function(notice){
+			(notice===void 0)&& (notice=true);
+			var h=NaN;
+			var s=NaN;
+			var b=NaN;
+			h=this.tH;
+			s=this.posSp.x / 150;
+			b=1-this.posSp.y / 150;
+			this.tColor=ColorTool.hsb2rgb(h,s,b);
+			var g;
+			g=this.demoColor.graphics;
+			g.clear();
+			g.drawRect(0,0,this.demoColor.width,this.demoColor.height,ColorTool.getRGBStr(this.tColor));
+			if(this.isChanging)return;
+			if(notice)
+				this.event("ColorChanged",this);
+		}
+
+		__proto.mainColorClick=function(e){
+			this.updateMainColorValue();
+			this.addMainColorEvents();
+		}
+
+		__proto.removeMainColorEvents=function(){
+			Laya.stage.off("mousemove",this,this.onMainColorMouseMove);
+			Laya.stage.off("mouseout",this,this.onMainColorMouseOut);
+			Laya.stage.off("mouseup",this,this.onMainColorMouseOut);
+		}
+
+		__proto.addMainColorEvents=function(){
+			this.removeMainColorEvents();
+			Laya.stage.on("mousemove",this,this.onMainColorMouseMove);
+			Laya.stage.on("mouseout",this,this.onMainColorMouseOut);
+			Laya.stage.on("mouseup",this,this.onMainColorMouseOut);
+		}
+
+		__proto.updateMainColorValue=function(){
+			var yPos=NaN;
+			yPos=this.mainColor.mouseY;
+			if (yPos < 0)yPos=0;
+			if (yPos > 150)yPos=150;
+			this.hPos.y=yPos+this.mainColor.y;
+			var h=NaN;
+			h=yPos / 150 *360;
+			this.updateSideColor(h);
+		}
+
+		__proto.onMainColorMouseMove=function(){
+			this.updateMainColorValue();
+		}
+
+		__proto.onMainColorMouseOut=function(){
+			this.removeMainColorEvents();
+		}
+
+		__proto.createColorFilter=function(arr,colorFilter){
+			if (!colorFilter)colorFilter=new ColorFilter();
+			var mt=[0,0,0,0,arr[0],0,0,0,0,arr[1],0,0,0,0,arr[2],0,0,0,1,0];
+			colorFilter.setByMatrix(mt);
+			return colorFilter;
+		}
+
+		__proto.updateSideColor=function(h,notice){
+			(notice===void 0)&& (notice=true);
+			this.tH=h;
+			var s=NaN;
+			var b=NaN;
+			var g;
+			g=this.sideColor.graphics;
+			var rgb;
+			rgb=ColorTool.hsb2rgb(h,1,1);
+			this._colorFilter=this.createColorFilter(rgb,this._colorFilter);
+			this._gradientSp.filters=[this._colorFilter];
+			this.updateDemoColor(notice);
+		}
+
+		__getset(0,__proto,'curColorStr',function(){
+			return ColorTool.getRGBStr(this.tColor);
+		});
+
+		ColorSelector.COLOR_CHANGED="ColorChanged";
+		ColorSelector.COLOR_CHANGING="COLOR_CHANGING";
+		ColorSelector.COLOR_CLEARED="COLOR_CLEARED";
+		ColorSelector.RecWidth=150;
+		ColorSelector.overlayPic="color/colorpicker_overlay.png";
+		ColorSelector.mainColorPic="color/maincolor.png";
+		ColorSelector.sideColorPic="color/sidecolor.png";
+		return ColorSelector;
+	})(Sprite)
+
+
+	/**
 	*@private
 	*<code>FileBitmap</code> 是图片文件资源类。
 	*/
@@ -28089,6 +29586,289 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.colorpanel.ColorPickerWithIndex extends laya.ui.Box
+	var ColorPickerWithIndex=(function(_super){
+		function ColorPickerWithIndex(){
+			this.tipRec=null;
+			this.tipImg=null;
+			this.selectFocusSp=null;
+			this._colorTiles=null;
+			this._colors=[];
+			this._gridSize=40;
+			this._imgs=[];
+			this.xCount=18;
+			this._isSelectingColor=false;
+			this._tSelectColor=null;
+			this._tColorIndex=0;
+			this.tipRecWidth=60;
+			this.tipRecOffset=100;
+			this.preHasImage=false;
+			ColorPickerWithIndex.__super.call(this);
+			this.hitTestPrior=false;
+			this.addChild(this._colorTiles=new Sprite());
+			this.selectFocusSp=new Sprite();
+			this.tipRec=new Sprite();
+			this.tipImg=new Image();
+			this.changePanel();
+			this._colorTiles.on("mousedown",this,this.onMouseDown);
+			this._colorTiles.on("mousemove",this,this.onMouseMove);
+			this._colorTiles.on("mouseup",this,this.onMouseUp);
+			this._colorTiles.on("mouseout",this,this._$5_onMouseOut);
+		}
+
+		__class(ColorPickerWithIndex,'commonui.colorpanel.ColorPickerWithIndex',_super);
+		var __proto=ColorPickerWithIndex.prototype;
+		__proto.onMouseDown=function(e){
+			e.stopPropagation();
+			this._isSelectingColor=true;
+			this.checkSelectColor();
+		}
+
+		__proto.onMouseMove=function(){
+			if (this._isSelectingColor){
+				this.checkSelectColor();
+			}
+		}
+
+		__proto.onMouseUp=function(){
+			this._isSelectingColor=false;
+			this.hideSelectColorTip();
+		}
+
+		__proto._$5_onMouseOut=function(){
+			this._isSelectingColor=false;
+			this.hideSelectColorTip();
+		}
+
+		__proto.checkSelectColor=function(){
+			var color;
+			color=this.getColorByMouse();
+			this._tColorIndex=this.getCurColorIndex();
+			if (color !=this._tSelectColor){
+				this.event("change",color);
+			}
+			this._tSelectColor=color;
+			this.showSelectColorTip();
+		}
+
+		__proto.showSelectColorTip=function(){
+			if (!this._tSelectColor){
+				this.hideSelectColorTip();
+				return;
+			};
+			var tRecSp;
+			if ((typeof this._tSelectColor=='string')){
+				this.tipRec.graphics.clear();
+				this.tipRec.graphics.drawRect(-this.tipRecWidth,-this.tipRecWidth,this.tipRecWidth *2,this.tipRecWidth *2,this._tSelectColor,"#ffffff",4);
+				tRecSp=this.tipRec;
+				this.tipImg.removeSelf();
+				}else{
+				this.tipImg.skin=this._tSelectColor.smallPic;
+				this.tipImg.pivot(this.tipRecWidth-4,this.tipRecWidth-4);
+				this.tipImg.size((this.tipRecWidth-4)*2,(this.tipRecWidth-4)*2);
+				this.tipRec.graphics.clear();
+				this.tipRec.addChild(this.tipImg);
+				this.tipRec.graphics.drawRect(-this.tipRecWidth,-this.tipRecWidth,this.tipRecWidth *2,this.tipRecWidth *2,null,"#ffffff",4);
+				tRecSp=this.tipRec;
+			}
+			this.posRecSp(tRecSp);
+			this.addChild(this.selectFocusSp);
+			var curPos;
+			curPos=this.getColorStartPosByMouse();
+			this.selectFocusSp.pos(curPos.x,curPos.y);
+		}
+
+		__proto.posRecSp=function(tRecSp){
+			this.addChild(tRecSp);
+			tRecSp.pos(this.width *0.5,-this.tipRecWidth *2-this.tipRecOffset);
+		}
+
+		__proto.hideSelectColorTip=function(){
+			this.tipRec.removeSelf();
+			this.tipImg.removeSelf();
+		}
+
+		__proto.createColorList=function(){
+			var i=0,len=0;
+			var rst;
+			rst=[];
+			var grayList;
+			grayList=ColorTableTool.createGrayColor(18);
+			for (i=0;i < 12;i++){
+				for (var j=0;j < 18;j++){
+					var color=0;
+					color=(((i *3+j / 6)% 3 << 0)+((i / 6)<< 0)*3)*0x33 << 16 | j % 6 *0x33 << 8 | (i << 0)% 6 *0x33;
+					var strColor=UIUtils.toColor(color);
+					rst.push(strColor);
+				}
+			}
+			rst=rst.concat(grayList);
+			return rst;
+		}
+
+		__proto.getImageList=function(){
+			var i=0,len=0;
+			var rst;
+			rst=[];
+			len=9;
+			var tImageO;
+			var img;
+			var child;
+			var index=0;
+			for (i=0;i < len;i++){
+				index=i+1;
+				tImageO={};
+				tImageO.name="i:"+i;
+				tImageO.smallPic=/*no*/this.Server.url_file+"/scenes/sky/"+index+"/preview.jpg";
+				tImageO.file=/*no*/this.Server.url_file+"/scenes/sky/"+index+"/"+index+".lmat";
+				img=new Image();
+				img.skin=tImageO.smallPic;
+				tImageO.img=img;
+				child=new Sprite();
+				img.addChild(child);
+				tImageO.bg=child;
+				rst.push(tImageO);
+			}
+			return rst;
+		}
+
+		__proto.setHasImage=function(hasImage){
+			if (hasImage==this.preHasImage)return;
+			this.changePanel(hasImage);
+		}
+
+		__proto.createColorListForDraw=function(hasImage){
+			(hasImage===void 0)&& (hasImage=true);
+			this._colors=[];
+			this._colors=this._colors.concat(this.createColorList());
+			if(hasImage)
+				this._colors=this._colors.concat(this.getImageList());
+		}
+
+		/**
+		*改变颜色样本列表面板。
+		*/
+		__proto.changePanel=function(hasImage){
+			(hasImage===void 0)&& (hasImage=true);
+			this.preHasImage=hasImage;
+			this.createColorListForDraw(hasImage);
+			var curPos;
+			curPos=this.renderColors();
+			this.selectFocusSp.graphics.clear();
+			this.selectFocusSp.graphics.drawRect(0,0,this._gridSize,this._gridSize,null,"#ff0000",3);
+			this.setUpSize(curPos);
+		}
+
+		__proto.renderColors=function(){
+			var g;
+			this._colorTiles.removeChildren();
+			g=this._colorTiles.graphics;
+			g.clear(true);
+			var colorList;
+			var i=0,len=0;
+			len=this._colors.length;
+			var curPos;
+			var tImageO;
+			var tImg;
+			var tImgBg;
+			for (i=0;i < len;i++){
+				curPos=this.getIJByIndex(i);
+				tImageO=this._colors[i];
+				if ((typeof tImageO=='string')){
+					g.drawRect(curPos.x*this._gridSize,curPos.y*this._gridSize,this._gridSize,this._gridSize,tImageO,"#000000");
+					}else{
+					tImg=tImageO.img;
+					tImgBg=tImageO.bg;
+					tImg.size(this._gridSize,this._gridSize);
+					tImg.pos(curPos.x *this._gridSize,curPos.y *this._gridSize);
+					tImgBg.graphics.clear();
+					tImgBg.graphics.drawRect(0,0,this._gridSize,this._gridSize,null,"#000000",1);
+					this._colorTiles.addChild(tImg);
+				}
+			}
+			return curPos;
+		}
+
+		__proto.setUpSize=function(curPos){
+			this.width=720;
+			this.height=curPos.y *this._gridSize+this._gridSize;
+			this._colorTiles.size(this.width,this.height);
+		}
+
+		/**
+		*通过鼠标位置取对应的颜色块的颜色值。
+		*/
+		__proto.getColorByMouse=function(){
+			var point=this.getColorIJByMouse();
+			return this._colors[this.getIndexByIJ(point.x,point.y)];
+		}
+
+		__proto.getCurColorIndex=function(){
+			var point=this.getColorIJByMouse();
+			return this.getIndexByIJ(point.x,point.y);
+		}
+
+		__proto.getColorIJByMouse=function(){
+			var point=this._colorTiles.getMousePoint();
+			var x=Math.floor(point.x / this._gridSize);
+			var y=Math.floor(point.y / this._gridSize);
+			return ColorPickerWithIndex._ijPoint.setTo(x,y);
+		}
+
+		__proto.getColorStartPosByMouse=function(){
+			var point;
+			point=this.getColorIJByMouse();
+			point.x=point.x *this._gridSize;
+			point.y=point.y *this._gridSize;
+			return point;
+		}
+
+		__proto.getIJByIndex=function(index){
+			var i=0,j=0;
+			i=index % this.xCount;
+			j=Math.floor(index / this.xCount);
+			ColorPickerWithIndex._ijPoint.setTo(i,j);
+			return ColorPickerWithIndex._ijPoint;
+		}
+
+		__proto.getIndexByIJ=function(i,j){
+			return i+j *this.xCount;
+		}
+
+		__static(ColorPickerWithIndex,
+		['_ijPoint',function(){return this._ijPoint=new Point();}
+		]);
+		return ColorPickerWithIndex;
+	})(Box)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.PropItemBox extends laya.ui.Box
+	var PropItemBox=(function(_super){
+		function PropItemBox(){
+			this.layouter=null;
+			PropItemBox.__super.call(this);
+		}
+
+		__class(PropItemBox,'commonui.view.prop.PropItemBox',_super);
+		var __proto=PropItemBox.prototype;
+		__proto.changeSize=function(){
+			laya.ui.Component.prototype.changeSize.call(this);
+			this.graphics.clear();
+			this.graphics.drawRect(0,0,this.width,this.height,"#333333");
+		}
+
+		return PropItemBox;
+	})(Box)
+
+
+	/**
 	*<code>CheckBox</code> 组件显示一个小方框，该方框内可以有选中标记。
 	*<code>CheckBox</code> 组件还可以显示可选的文本标签，默认该标签位于 CheckBox 右侧。
 	*<p><code>CheckBox</code> 使用 <code>dataSource</code>赋值时的的默认属性是：<code>selected</code>。</p>
@@ -30007,6 +31787,143 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*属性面板输入插件基类
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2018-5-7 上午10:11:55
+	*/
+	//class commonui.view.prop.PropsInputBase extends laya.ui.View
+	var PropsInputBase=(function(_super){
+		function PropsInputBase(){
+			this.isFixHeight=true;
+			this.useIDELabel=true;
+			this.hasSide=true;
+			this.selfAlign=false;
+			this.valueKey=null;
+			this.target=null;
+			this.config=null;
+			this.isSettingValue=false;
+			PropsInputBase.__super.call(this);
+		}
+
+		__class(PropsInputBase,'commonui.view.prop.PropsInputBase',_super);
+		var __proto=PropsInputBase.prototype;
+		/**
+		*设置编辑对象
+		*@param target
+		*
+		*/
+		__proto.setTarget=function(target){
+			this.target=target;
+		}
+
+		__proto.getValueFromTarget=function(){
+			return this.target[this.valueKey];
+		}
+
+		__proto.getValueFromTargetProps=function(){
+			return this.target.comXml.props[this.valueKey];
+		}
+
+		__proto.getDisplayValue=function(){
+			if (this.isPropValueExist())return this.getValueFromTargetProps();
+			if (this.isConfigDefaultExist())return this.getDefaultValue();
+			return this.getValueFromTarget()
+		}
+
+		__proto.isPropValueExist=function(){
+			return this.target.comXml.props.hasOwnProperty(this.valueKey);
+		}
+
+		__proto.isConfigDefaultExist=function(){
+			return this.config.hasOwnProperty("default");
+		}
+
+		__proto.getTitle=function(){
+			return this.config.nickName || this.config.title || this.config.name;
+		}
+
+		__proto.getDefaultValue=function(){
+			return this.config["default"];
+		}
+
+		/**
+		*根据配置文件初始化输入框
+		*@param configO
+		*
+		*/
+		__proto.initByConfig=function(configO){
+			this.config=configO;
+		}
+
+		__proto.setValueToTarget=function(value){
+			this.target.comXml.props[this.valueKey]=value;
+			this.target[this.valueKey]=value;
+		}
+
+		__proto.noticeValueChange=function(){}
+		/**
+		*通知宽高变化
+		*
+		*/
+		__proto.freshSize=function(){
+			this.event("resize");
+		}
+
+		PropsInputBase.regPlugin=function(type,clz){
+			PropPluginManager.regPlugin(type,clz);
+		}
+
+		return PropsInputBase;
+	})(View)
+
+
+	//class commonui.ui.prop.PropGroupUI extends laya.ui.View
+	var PropGroupUI=(function(_super){
+		function PropGroupUI(){
+			this.groupBar=null;
+			this.groupLabl=null;
+			this.arrowClip=null;
+			this.groupBox=null;
+			PropGroupUI.__super.call(this);
+		}
+
+		__class(PropGroupUI,'commonui.ui.prop.PropGroupUI',_super);
+		var __proto=PropGroupUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(PropGroupUI.uiView);
+		}
+
+		PropGroupUI.uiView={"type":"View","props":{"scenecolor":"#dddddd","hitTestPrior":true},"child":[{"type":"Image","props":{"y":76,"width":100,"var":"groupBar","sizeGrid":"0,4,0,4","right":0,"mouseEnabled":true,"left":0,"height":30}},{"type":"Label","props":{"y":81,"x":36,"width":109,"var":"groupLabl","text":"label","mouseEnabled":false,"mouseChildren":false,"height":20,"fontSize":20,"color":"#006666"}},{"type":"Clip","props":{"y":79,"x":4,"width":26,"var":"arrowClip","skin":"comp/clip_tree_arrow.png","scaleY":1,"scaleX":1,"mouseEnabled":false,"mouseChildren":false,"height":26,"clipY":2}},{"type":"VBox","props":{"y":107,"var":"groupBox","right":0,"mouseEnabled":true,"left":0},"child":[{"type":"Button","props":{"y":17,"x":8,"skin":"comp/button.png","labelColors":"#dddddd,#dddddd,#dddddd","label":"label","labelSize":16,"sizeGrid":"0,4,0,4"}}]}]};
+		return PropGroupUI;
+	})(View)
+
+
+	//class commonui.ui.prop.PropPanelUI extends laya.ui.View
+	var PropPanelUI=(function(_super){
+		function PropPanelUI(){
+			this.typeLbl=null;
+			this.propFootBox=null;
+			this.propAddBtn=null;
+			this.cancelBtn=null;
+			PropPanelUI.__super.call(this);
+		}
+
+		__class(PropPanelUI,'commonui.ui.prop.PropPanelUI',_super);
+		var __proto=PropPanelUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(PropPanelUI.uiView);
+		}
+
+		PropPanelUI.uiView={"type":"View","props":{"title":"属性","scenecolor":"#dddddd","recTabSkin":"view/tab_proppanel.png","recBarSkin":"view/bg_proppanel_bar.png","recActionType":"toRight","recActionPos":"right","mouseEnabled":true,"minWidth":220,"hitTestPrior":true},"child":[{"type":"Image","props":{"y":0,"x":0,"width":200,"top":0,"skin":"view/backmain.png","sizeGrid":"7,8,5,9","right":0,"left":0,"height":300,"bottom":0}},{"type":"Label","props":{"y":12,"x":16,"var":"typeLbl","text":"label","styleSkin":"comp/label_highlight.png","fontSize":20,"bold":true,"color":"#cccc00"}},{"type":"Box","props":{"y":304,"x":10,"width":180,"var":"propFootBox","right":10,"left":10,"height":38},"child":[{"type":"Button","props":{"y":7,"x":20,"width":126,"var":"propAddBtn","stateNum":2,"skin":"comp/btn_addcomp.png","sizeGrid":"2,2,2,30","right":5,"left":5,"label":"添加组件","height":21,"labelColors":"#FFFFFF,#FFFFFF,#FFFFFF"}}]},{"type":"Button","props":{"var":"cancelBtn","top":5,"skin":"view/btn_close.png","right":5,"scaleX":0.5,"scaleY":0.5,"y":7}}]};
+		return PropPanelUI;
+	})(View)
+
+
+	/**
 	*...
 	*@author ww
 	*/
@@ -30426,6 +32343,126 @@ var Laya=window.Laya=(function(window,document){
 
 		return Tab;
 	})(UIGroup)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.colorpanel.colorselectorpanel.SelectorColorPicker extends commonui.colorpanel.ColorPickerWithIndex
+	var SelectorColorPicker=(function(_super){
+		function SelectorColorPicker(){
+			this.colorSelector=null;
+			this.resetBtn=null;
+			SelectorColorPicker.__super.call(this);
+		}
+
+		__class(SelectorColorPicker,'commonui.colorpanel.colorselectorpanel.SelectorColorPicker',_super);
+		var __proto=SelectorColorPicker.prototype;
+		__proto.changePanel=function(hasImage){
+			(hasImage===void 0)&& (hasImage=true);
+			this.xCount=13;
+			_super.prototype.changePanel.call(this,hasImage);
+			ColorSelector$1.overlayPic="res/comp/colorpicker_overlay.png";
+			ColorSelector$1.mainColorPic="res/comp/maincolor.png";
+			ColorSelector$1.sideColorPic="res/comp/sidecolor.png";
+			this.colorSelector=new ColorSelector$1();
+			this.colorSelector.x=this.width-this.colorSelector.width-2;
+			this.colorSelector.on("ColorChanged",this,this.onColorSelectorColorChanged);
+			this.addChild(this.colorSelector);
+			this.resetBtn=new Sprite();
+			this.resetBtn.size(40,40);
+			this.resetBtn.graphics.drawImage(Loader.getRes("res/comp/icon_reset.png"),2,2,36,36);
+			this.addChild(this.resetBtn);
+			this.resetBtn.x=this.colorSelector.x;
+			this.resetBtn.y=this.height-this.resetBtn.height-4;
+			this.resetBtn.on("click",this,this.onResetBtn);
+		}
+
+		__proto.onResetBtn=function(){
+			this.resetColorInfo();
+		}
+
+		__proto.onColorSelectorColorChanged=function(){
+			this._colors[this._tColorIndex]=this.colorSelector.curColorStr;
+			this.renderColors();
+			this._tSelectColor=this.colorSelector.curColorStr;
+			this.event("change",this._tSelectColor);
+			this.saveColorInfo();
+		}
+
+		__proto.checkSelectColor=function(){
+			_super.prototype.checkSelectColor.call(this);
+			if (this._tSelectColor){
+				this.colorSelector.setColorByRGBStr(this._tSelectColor);
+			}
+		}
+
+		__proto.recoverColorInfo=function(){
+			try{
+				this._colors=LocalStorage.getJSON(SelectorColorPicker.ColorStateSign);
+				}catch (e){
+			}
+			if (!this._colors){
+				this._colors=this.createColorListWork();
+			}
+		}
+
+		//resetHelpInfo();
+		__proto.saveColorInfo=function(){
+			LocalStorage.setJSON(SelectorColorPicker.ColorStateSign,this._colors);
+		}
+
+		__proto.resetColorInfo=function(){
+			this._colors=this.createColorListWork();
+			this.saveColorInfo();
+			this.renderColors();
+			this._tSelectColor=this._colors[this._tColorIndex];
+			this.event("change",this._tSelectColor);
+		}
+
+		__proto.createColorListForDraw=function(hasImage){
+			(hasImage===void 0)&& (hasImage=true);
+			this.recoverColorInfo();
+		}
+
+		__proto.createColorListWork=function(){
+			var depth=0;
+			depth=5;
+			var colors;
+			colors=/*no*/this.ColorTableTool.createColorTable(this.xCount,depth);
+			var newColors;
+			newColors=[];
+			newColors.length=colors.length;
+			var i=0,len=0;
+			len=newColors.length;
+			var tColor;
+			var curPos;
+			var x=0,y=0;
+			for (i=0;i < len;i++){
+				tColor=colors[i];
+				x=Math.floor(i / depth);
+				y=i % depth;
+				newColors[x+y*this.xCount]=tColor;
+			}
+			return newColors;
+		}
+
+		__proto.getImageList=function(){
+			return [];
+		}
+
+		__proto.setUpSize=function(curPos){
+			this.width=720;
+			this.height=curPos.y *this._gridSize+this._gridSize;
+			this._colorTiles.size(this._gridSize *this.xCount,this.height);
+			this.graphics.clear();
+			this.graphics.drawRect(-2,-2,this.width+4,this.height+4,"#283840","#000000");
+		}
+
+		SelectorColorPicker.ColorStateSign="CommonUI_ColorStateSign";
+		return SelectorColorPicker;
+	})(ColorPickerWithIndex)
 
 
 	/**
@@ -31547,6 +33584,657 @@ var Laya=window.Laya=(function(window,document){
 	})(MapItemUI)
 
 
+	//class commonui.ui.prop.NumberInputUI extends commonui.view.prop.PropsInputBase
+	var NumberInputUI=(function(_super){
+		function NumberInputUI(){
+			this.input=null;
+			this.leftBtn=null;
+			this.rightBtn=null;
+			NumberInputUI.__super.call(this);
+			this.createUI(NumberInputUI.uiView);
+		}
+
+		__class(NumberInputUI,'commonui.ui.prop.NumberInputUI',_super);
+		var __proto=NumberInputUI.prototype;
+		__proto.createUI=function(uiData){
+			ClassUtils.createByJson(uiData,this,this);
+		}
+
+		NumberInputUI.uiView={"type":"PropsInputBase","props":{"width":150,"height":47},"child":[{"type":"TextInput","props":{"var":"input","top":2,"text":"123","skin":"comp/input_32.png","right":24,"padding":"0,10,0,10","left":24,"fontSize":20,"bottom":2,"align":"center","sizeGrid":"0,3,0,3","color":"#CCCCCC","height":32}},{"type":"Box","props":{"width":69,"var":"leftBtn","top":0,"left":0,"bottom":0},"child":[{"type":"Image","props":{"x":0,"skin":"view/arrow_left.png","height":36,"centerY":0}}]},{"type":"Box","props":{"width":71,"var":"rightBtn","top":0,"right":0,"bottom":0},"child":[{"type":"Image","props":{"x":52,"skin":"view/arrow_right.png","right":0,"height":36,"centerY":0}}]}]};
+		return NumberInputUI;
+	})(PropsInputBase)
+
+
+	//class commonui.ui.prop.PropTextInputUI extends commonui.view.prop.PropsInputBase
+	var PropTextInputUI=(function(_super){
+		function PropTextInputUI(){
+			this.input=null;
+			PropTextInputUI.__super.call(this);
+			this.createUI(PropTextInputUI.uiView);
+		}
+
+		__class(PropTextInputUI,'commonui.ui.prop.PropTextInputUI',_super);
+		var __proto=PropTextInputUI.prototype;
+		__proto.createUI=function(uiData){
+			ClassUtils.createByJson(uiData,this,this);
+		}
+
+		PropTextInputUI.uiView={"type":"PropsInputBase","props":{"width":150,"height":47},"child":[{"type":"Label","props":{"var":"input","valign":"middle","top":0,"text":"111","styleSkin":"comp/input_32.png","right":0,"mouseEnabled":false,"left":0,"fontSize":30,"editable":false,"color":"#000000","bottom":0,"sizeGrid":"0,3,0,3","padding":"0,4,0,4","height":32}}]};
+		return PropTextInputUI;
+	})(PropsInputBase)
+
+
+	/**属性组
+	*@author ww
+	*/
+	//class commonui.view.prop.PropGroup extends commonui.ui.prop.PropGroupUI
+	var PropGroup=(function(_super){
+		function PropGroup(name,props){
+			this._props=[];
+			this._isSettingValue=false;
+			this.type=null;
+			this.layouter=null;
+			this._items=null;
+			this.ItemHeight=60;
+			this.ItemD=5;
+			this.nameTypeO={};
+			this._nameList=[];
+			this.labelDic={};
+			this.labelInitLabel={};
+			this._enableClickSwitch=true;
+			this.groupData=null;
+			this.node=null;
+			this._nameItemDic={};
+			this.isSettingValue=false;
+			this._curBox=null;
+			this._boxOffsetY=0;
+			this._data=null;
+			this.itemType=null;
+			PropGroup.__super.call(this);
+			this.groupBar.on("mousedown",this,this.onGroupBarClick);
+			this.groupBox.y+=this.ItemD;
+			this.groupBox.space=this.ItemD;
+			if (!name)return;
+			this.createBy(name,props);
+		}
+
+		__class(PropGroup,'commonui.view.prop.PropGroup',_super);
+		var __proto=PropGroup.prototype;
+		__proto.setClickSwitchEnable=function(value){
+			this._enableClickSwitch=value;
+			this.arrowClip.visible=value;
+			if(value){
+				this.groupLabl.x=19;
+				}else{
+				this.groupLabl.x=PropGroup.x1;
+			}
+		}
+
+		__proto.setGroupState=function(show){
+			if(show){
+				this.addChild(this.groupBox);
+				this.arrowClip.index=1;
+				}else{
+				this.groupBox.removeSelf();
+				this.arrowClip.index=0;
+			}
+			this.event("resize");
+		}
+
+		__proto.getItemByName=function(name){
+			return this._nameItemDic[name];
+		}
+
+		__proto.createBy=function(name,props,groupData){
+			this.groupData=groupData;
+			this._props.length=0;
+			this.groupLabl.text=name;
+			this.groupLabl.color=PropStyleConst.TreeFolderColor;
+			this.groupLabl.bold=true;
+			this.groupBox.removeChildren();
+			this.arrowClip.index=1;
+			this._items=[];
+			var tY=NaN;
+			for (var i=0,n=props.length;i < n;i++){
+				var prop=PropUtils.getDisplayPropObject(props[i]);
+				tY=i *this.ItemHeight+this.ItemD;
+				if (prop.type=="group"){
+					this.createGroupProp(props[i],tY);
+					}else {
+					this.createPropUI(prop,150,tY);
+				}
+			};
+			var len=0;
+			var lItems;
+			lItems=[];
+			len=this._items.length;
+			var tLayout;
+			var items;
+			if (this._items.length > 0){
+				this.layouter=LayoutFuns.getFullFillLayout(this._items,0,20);
+			}
+		}
+
+		__proto.reset=function(){
+			var childs;
+			childs=this.groupBox._children;
+			var i=0,len=0;
+			var tChild;
+			for (i=0;i < len;i++){
+				tChild=childs[i];
+				this.clearCurBox(tChild);
+			}
+			this.groupBox.removeChildren();
+			this._nameItemDic={};
+			this._nameList.length=0;
+			this.node=null;
+		}
+
+		__proto.changeSize=function(){
+			laya.ui.Component.prototype.changeSize.call(this);
+			if (this.layouter){
+				this.layouter.width=this.width;
+			}
+		}
+
+		__proto.freshMySize=function(){
+			if (this.layouter){
+				this.layouter.width=this.width;
+			}
+		}
+
+		__proto.onGroupBarClick=function(e){
+			if(!this._enableClickSwitch)return;
+			this.setGroupState(!this.groupBox.parent);
+		}
+
+		__proto.createGroupProp=function(groupData,tY){
+			var tgLayout;
+			var props;
+			props=groupData.cList;
+			var i=0,len=0;
+			len=props.length;
+			var nickName;
+			var items;
+			items=[];
+			var labelWidth=NaN;
+			labelWidth=150*0.6;
+			if (len > 2){
+				labelWidth=150*0.5;
+			}
+			if (PropUtils.mParseInt(groupData["labelWidth"])){
+				labelWidth=PropUtils.mParseInt(groupData["labelWidth"]);
+			};
+			var propBox;
+			propBox=new PropItemBox();
+			for (i=0;i < len;i++){
+				var prop=PropUtils.getDisplayPropObject(props[i]);
+				var tLabelWidth=NaN;
+				tLabelWidth=PropUtils.mParseInt(prop["labelWidth"]);
+				tLabelWidth=tLabelWidth ? tLabelWidth :labelWidth;
+				var tLayout;
+				tLayout=this.createPropUI(prop,labelWidth,tY,propBox);
+				if(tLayout)
+					items.push(tLayout);
+			}
+			tgLayout=LayoutFuns.getSameWidthLayout(items,5);
+			this._items.push(tgLayout);
+		}
+
+		__proto.clearCurBox=function(box){
+			if(!box["BBoxSign"])return;
+			var childs;
+			childs=box._children;
+			var i=0,len=0;
+			var tChild;
+			for (i=0;i < len;i++){
+				tChild=childs[i];
+				tChild.offAll();
+			}
+			box.removeChildren();
+		}
+
+		__proto.adptAllChild=function(container,dY){
+			var i=0,len=0;
+			var childs;
+			childs=container._children;
+			len=childs.length;
+			for(i=0;i<len;i++){
+				childs[i].y+=dY;
+			}
+		}
+
+		__proto.addFixHeightItem=function(item){
+			this.CurBox.addChild(item);
+			if(!this._boxOffsetY){
+				this._boxOffsetY=item.y;
+				item.y=0;
+				}else{
+				item.y-=this._boxOffsetY;
+			}
+			if(item.y<0){
+				this._boxOffsetY+=item.y;
+				this.adptAllChild(this.CurBox,-item.y);
+			}
+			if(item.name){
+				this._nameItemDic[item.name]=item;
+			}
+		}
+
+		__proto.addNoFixHeightItem=function(item){
+			this._curBox=null;
+			if(item.name){
+				this._nameItemDic[item.name]=item;
+			}
+			this.groupBox.addChild(item);
+		}
+
+		/**创建属性设置面板*/
+		__proto.createPropUI=function(data,labelWidth,y,propBox){
+			(labelWidth===void 0)&& (labelWidth=150);
+			(y===void 0)&& (y=0);
+			if (!propBox){
+				propBox=new PropItemBox();
+			}
+			propBox.left=propBox.right=0;
+			propBox.y=y;
+			this.groupBox.addChild(propBox);
+			var name;
+			name=data.name;
+			var type;
+			type=data.type;
+			var nickName;
+			nickName=UIConfigManager.getNickNameFromPropConfig(data);
+			this._props.push(data);
+			this._nameList.push(name);
+			if (PropGroup.typeTrans[type]){
+				type=PropGroup.typeTrans[type];
+			}
+			if (!type)type="string";
+			type=type.toLowerCase();
+			var tItems;
+			tItems=[];
+			var tLayout;
+			this.nameTypeO[name]=type;
+			var label;
+			var propsInput;
+			propsInput=PropPluginManager.createPluginByType(type);
+			if(propsInput){
+				this._nameItemDic[name]=propsInput;
+				if (!propsInput.selfAlign){
+					propsInput.right=PropGroup.rightD;
+					propsInput.left=PropGroup.x1;
+				}
+				if(!propsInput.hasSide){
+					propsInput.right=0;
+					propsInput.left=0;
+				}
+				propsInput.name=name;
+				propsInput.valueKey=name;
+				propsInput.initByConfig(data);
+				propsInput.y=y;
+				propsInput.y=0;
+				if(propsInput.useIDELabel){
+					label=new Label();
+					label.text=nickName;
+					label.fontSize=PropStyleConst.PropPanelFontSize;
+					label.height=label.fontSize+2;
+					label.pos(PropGroup.x1,(this.ItemHeight-label.height)*0.5);
+					label.color=PropStyleConst.TreeItemColor;
+					label.width=labelWidth;
+					label.textField.overflow=Text.HIDDEN;
+					this.labelDic[name]=label;
+					this.labelInitLabel[name]=label.toolTip;
+					PropGroup.x2=label.width;
+					if (!propsInput.selfAlign){
+						LayoutFuns.clearItemRelativeInfo(propsInput);
+						propsInput.x=PropGroup.x2;
+					}
+					propBox.addChild(label);
+				}
+				propBox.addChild(propsInput);
+				if(propsInput.isFixHeight){
+					propsInput.height=this.ItemHeight;
+					}else{
+				}
+				if (propsInput.useIDELabel&&!propsInput.selfAlign){
+					tItems.push(label);
+					tItems.push(propsInput);
+					LayoutFuns.clearItemsRelativeInfo(tItems);
+					tLayout=LayoutFuns.getFixPos(tItems,5,false);
+					this._items.push(tLayout);
+					return tLayout;
+				}
+				return null;
+			}
+			return null;
+		}
+
+		__proto.setValueD=function(node){
+			this.itemType=this.itemType;
+			this._data=node.comXml;
+			var data;
+			data=this._data.props;
+			this.node=node;
+			var defaultData;
+			this._isSettingValue=true;
+			for (var i=0,n=this._props.length;i < n;i++){
+				var prop=PropUtils.getDisplayPropObject(this._props[i]);
+				var name=prop.name;
+				var dataName;
+				dataName=prop.hasOwnProperty("_$dataName")?prop._$dataName:name;
+				var value="";
+				if (!data.hasOwnProperty(dataName)){
+					if (defaultData && defaultData.hasOwnProperty(dataName)){
+						value=ObjectTools.getAutoValue(defaultData[dataName]);
+						if (prop.type=="bool"){
+							value=value ? "true" :"false";
+						}
+					}
+					}else {
+					value=data[dataName];
+					if (prop.type=="bool"){
+						value=value ? "true" :"false";
+					}
+				};
+				var target=this.getItemByName(name);
+				target.isSettingValue=true;
+				target.setTarget(node);
+				target.isSettingValue=false;
+			}
+			this._isSettingValue=false;
+		}
+
+		__getset(0,__proto,'CurBox',function(){
+			if(!this._curBox){
+				this._curBox=new Box();
+				this._curBox.left=this._curBox.right=0;
+				this._curBox.mouseEnabled=true;
+				this._boxOffsetY=0;
+				this._curBox["BBoxSign"]="BBoxSign";
+			}
+			this.groupBox.addChild(this._curBox);
+			return this._curBox;
+		});
+
+		PropGroup.Prop="Prop";
+		PropGroup.Node="Node";
+		PropGroup.LabelX=19;
+		PropGroup.x2=85;
+		PropGroup.x1=15;
+		PropGroup.rightD=15;
+		PropGroup.DefaultLabelWidth=150;
+		PropGroup.BBoxSign="BBoxSign";
+		__static(PropGroup,
+		['typeTrans',function(){return this.typeTrans={"Boolean":"bool","String":"string"};}
+		]);
+		return PropGroup;
+	})(PropGroupUI)
+
+
+	/**属性面板
+	*@author ww
+	*/
+	//class commonui.view.prop.PropPanel extends commonui.ui.prop.PropPanelUI
+	var PropPanel=(function(_super){
+		function PropPanel(){
+			this._panel=null;
+			this._panelMap={};
+			this.scrollValueDic={};
+			this._preCompID=0;
+			this._preCompScrollValue=NaN;
+			this.node=null;
+			PropPanel.__super.call(this);
+			PropPanel.initStaticDatas();
+			this.width=400;
+			this.height=600;
+			this.cancelBtn.on("click",this,this.onCloseBtn);
+			this.clear();
+		}
+
+		__class(PropPanel,'commonui.view.prop.PropPanel',_super);
+		var __proto=PropPanel.prototype;
+		__proto.onCloseBtn=function(){
+			this.hide();
+		}
+
+		__proto.hide=function(){
+			this.clear();
+			this.removeSelf();
+		}
+
+		/**清理*/
+		__proto.clear=function(){
+			if (this._panel){
+				this.recordPrePanelScroll();
+				this._panel.removeSelf();
+				this._panel=null;
+			}
+			this.node=null;
+			this.typeLbl.text="";
+			this.propFootBox.removeSelf();
+		}
+
+		__proto.recordPrePanelScroll=function(){
+			if (this._panel){
+				this.scrollValueDic[this._panel.contentHeight]=this._panel.vScrollBar.value;
+				if (this.node){
+					this._preCompID=UIConfigManager.getNodeIDFromNode(this.node);
+					this._preCompScrollValue=this._panel.vScrollBar.value;
+					}else{
+					this._preCompID=-1;
+				}
+			}
+		}
+
+		__proto.initByObj=function(node){
+			this.clear();
+			this.node=node;
+			if (node){
+				UIConfigManager.loadConfigByNode(node,Handler.create(this,this.onUIConfigLoaded));
+			}
+		}
+
+		//TweenUtils.tweenToShow(instance);
+		__proto.onUIConfigLoaded=function(){
+			if (this.node){
+				var type=UIConfigManager.getTypeFromNode(this.node);
+				this.typeLbl.text=type;
+				this.typeLbl.color=PropStyleConst.PropPanelTitleColor;
+				this._panel=this.createPanel(this.node);
+				this.addChild(this._panel);
+				this.refreshGroupsPosition();
+				var dataO;
+				dataO=this.node.comXml;
+				var propO;
+				propO=dataO;
+				for (var i=0,n=this._panel.numChildren;i < n;i++){
+					var propGroup=this._panel.getChildAt(i);
+					if (!((propGroup instanceof commonui.view.prop.PropGroup )))continue ;
+					if (propGroup.type !="Node")
+						propGroup.setValueD(this.node);
+				}
+				if(this.scrollValueDic[this._panel.contentHeight]){
+					this._panel.vScrollBar.value=this.scrollValueDic[this._panel.contentHeight];
+					}else{
+					if (propO && propO.compId==this._preCompID){
+						this._panel.vScrollBar.value=this._preCompScrollValue;
+					}
+				}
+			}
+		}
+
+		__proto.refresh=function(){}
+		__proto.clearPanelCache=function(type){
+			delete this._panelMap[type];
+		}
+
+		__proto.createPanel=function(node){
+			var type;
+			type=UIConfigManager.getTypeFromNode(node);
+			var cacheKey;
+			cacheKey=type;
+			var isSameType=false;
+			var panel=this._panelMap[cacheKey];
+			if (panel==null){
+				panel=new Panel();
+				panel.mouseEnabled=true;
+				panel.content.mouseEnabled=true;
+				panel.vScrollBarSkin=PropStyleConst.PropPanelScrollBar;
+				panel.left=panel.right=0;
+				panel.bottom=2;
+				panel.top=50;
+				var props=UIConfigManager.getCompConfig(type);
+				if (props){
+					var labels=props.groups;
+					var groupLabels=labels ? labels.split(","):[];
+					groupLabels=Sys.langArr(groupLabels);
+					groupLabels.push(Sys.lang("其他"));
+					var groups=[];
+					for (var j=0,m=groupLabels.length;j < m;j++){
+						groups.push([]);
+					};
+					var otherGroupIndex=groupLabels.indexOf(Sys.lang("其他"));
+					var list=props.prop;
+					for (var i=0,n=list.length;i < n;i++){
+						var prop=list[i];
+						var group=Sys.lang(prop.group);
+						if (!Boolean(group)){
+							var index=otherGroupIndex;
+							}else {
+							index=groupLabels.indexOf(group);
+							if (index==-1){
+								index=otherGroupIndex;
+							}
+						}
+						groups[index].push(prop);
+					}
+					index=groupLabels.indexOf(Sys.lang("公用"));
+					if (index==-1){
+						index=otherGroupIndex;
+					};
+					var otherGroup=groups[otherGroupIndex];
+					otherGroup.sort(PropPanel.sortByNameHH);
+					for (var k=0,t=groups.length;k < t;k++){
+						var arr=groups[k];
+						if (arr.length > 0){
+							var propGroup=new PropGroup(groupLabels[k],arr);
+							propGroup.left=0;
+							propGroup.right=1;
+							propGroup.on("resize",this,this.freshPositionsLater);
+							if(groupLabels[k]==Sys.lang("其他")){
+								propGroup.setGroupState(false);
+							}
+							panel.addChild(propGroup);
+						}
+					}
+				}
+				this._panelMap[cacheKey]=panel;
+			}
+			return panel;
+		}
+
+		__proto.freshPositionsLater=function(){
+			Laya.timer.callLater(this,this.refreshGroupsPosition);
+		}
+
+		/**刷新属性面板位置*/
+		__proto.refreshGroupsPosition=function(){
+			PropPanel.refreshPanelChilds(this._panel,this.propFootBox);
+		}
+
+		__getset(1,PropPanel,'instance',function(){
+			return PropPanel._instance ? PropPanel._instance :PropPanel._instance=new PropPanel();
+		},commonui.ui.prop.PropPanelUI._$SET_instance);
+
+		PropPanel.showPropPanel=function(node){
+			PropPanel.instance.initByObj(node);
+			Laya.stage.addChild(PropPanel.instance);
+			PropPanel.instance.x=Laya.stage.width-PropPanel.instance.width;
+			PropPanel.instance.y=(Laya.stage.height-PropPanel.instance.height)*0.5;
+		}
+
+		PropPanel.initStaticDatas=function(){}
+		PropPanel.sortByNameHH=function(obj0,obj1){
+			return obj0.p.name < obj1.p.name ?-1 :1;
+		}
+
+		PropPanel.refreshPanelChilds=function(panel,propFootBox){
+			var y=0;
+			if(!panel)return 0;
+			for (var i=0,n=panel.numChildren;i < n;i++){
+				var propGroup=panel.getChildAt(i);
+				if (propGroup==propFootBox)continue ;
+				if (propGroup){
+					propGroup.y=y;
+					y=y+propGroup.height+10;
+				}
+			}
+			if(propFootBox){
+				propFootBox.y=y;
+			}
+			panel.refresh();
+			return y;
+		}
+
+		PropPanel._instance=null
+		PropPanel.spaceY=10;
+		return PropPanel;
+	})(PropPanelUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.PropsColorInput extends commonui.view.prop.PropsInputBase
+	var PropsColorInput=(function(_super){
+		function PropsColorInput(){
+			this.colorBox=null;
+			this._color=null;
+			this._changeHandler=null;
+			PropsColorInput.__super.call(this);
+			this._changeHandler=new Handler(this,this.onColorChanged);
+			this.colorBox=new Box();
+			this.colorBox.left=this.colorBox.right=this.colorBox.top=this.colorBox.bottom=2;
+			this.addChild(this.colorBox);
+			this.on("click",this,this.onClick);
+			this.colorBox.on("resize",this,this.freshColorRec);
+		}
+
+		__class(PropsColorInput,'commonui.view.prop.PropsColorInput',_super);
+		var __proto=PropsColorInput.prototype;
+		__proto.onClick=function(){
+			ColorPickerControl.showColorPicker(this._changeHandler,Laya.stage,0,-1,false,true);
+		}
+
+		__proto.freshColorRec=function(){
+			this.colorBox.graphics.clear();
+			this.colorBox.graphics.drawRect(0,0,this.colorBox.width,this.colorBox.height,this._color);
+		}
+
+		__proto.onColorChanged=function(color){
+			if(color)
+				this.updateColor(color);
+		}
+
+		__proto.updateColor=function(color){
+			if (!this.isSettingValue && this._color !=color){
+				this.setValueToTarget(color);
+			}
+			this._color=color;
+			this.freshColorRec();
+		}
+
+		__proto.setTarget=function(target){
+			_super.prototype.setTarget.call(this,target);
+			this.updateColor(this.getDisplayValue()||"#000000");
+		}
+
+		return PropsColorInput;
+	})(PropsInputBase)
+
+
 	/**
 	*...
 	*@author ww
@@ -31614,8 +34302,8 @@ var Laya=window.Laya=(function(window,document){
 			if (!dataO)return;
 			this._complete=complete;
 			this.dataO=dataO;
-			this.titleTxt.text=Sys.lang("新建");
-			this.nameTip.text=Sys.lang("名称：");
+			this.titleTxt.text=Sys$1.lang("新建");
+			this.nameTip.text=Sys$1.lang("名称：");
 			this.nameTxt.restrict="0-9a-zA-Z_";
 			this.nameTxt.text="";
 			this.popup();
@@ -31629,7 +34317,7 @@ var Laya=window.Laya=(function(window,document){
 					this.dataO.fileName=this.nameTxt.text;
 					this._complete.runWith(this.dataO);
 					}else {
-					Alert.show(Sys.lang("名称不能为空"));
+					Alert.show(Sys$1.lang("名称不能为空"));
 				}
 				}else{
 				laya.ui.Dialog.prototype.close.call(this,type);
@@ -31668,7 +34356,7 @@ var Laya=window.Laya=(function(window,document){
 		Alert.show=function(msg,title){
 			(title===void 0)&& (title="提示");
 			if(title=="提示"){
-				title=Sys.lang("提示");
+				title=Sys$1.lang("提示");
 			}
 			Alert.instance.start(msg,title);
 		}
@@ -31729,8 +34417,8 @@ var Laya=window.Laya=(function(window,document){
 		},commonui.ui.ConfirmUI._$SET_instance);
 
 		Confirm.show=function(msg,title,handler,args,okName,cancelName){
-			if(!okName)okName=Sys.lang("确定");
-			if(!cancelName)cancelName=Sys.lang("取消");
+			if(!okName)okName=Sys$1.lang("确定");
+			if(!cancelName)cancelName=Sys$1.lang("取消");
 			Confirm.instance.okBtn.label=okName;
 			Confirm.instance.cancelBtn.label=cancelName;
 			Confirm.instance.start(msg,title,handler,args);
@@ -31771,13 +34459,13 @@ var Laya=window.Laya=(function(window,document){
 			if (type=="sure"){
 				if(StringTool.isOkFileName(this.nameTxt.text)){
 					if(FileTools.isPathSame(this.nameTxt.text,this.resLbl.text)){
-						Alert.show(Sys.lang("文件名不能相同！！"));
+						Alert.show(Sys$1.lang("文件名不能相同！！"));
 						return;
 					}
 					this._complete.runWith([this._oldPath,this.nameTxt.text]);
 					laya.ui.Dialog.prototype.close.call(this,type);
 					}else{
-					Alert.show(Sys.lang("文件名不合法"));
+					Alert.show(Sys$1.lang("文件名不合法"));
 				}
 				}else{
 				laya.ui.Dialog.prototype.close.call(this,type);
@@ -31793,7 +34481,230 @@ var Laya=window.Laya=(function(window,document){
 	})(RenameResUI)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,Browser,Render,View,Timer,GraphicAnimation,LocalStorage]);
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.PropsNumberInput extends commonui.ui.prop.NumberInputUI
+	var PropsNumberInput=(function(_super){
+		function PropsNumberInput(){
+			this.tick=1;
+			this.fix=1;
+			this._dValue=NaN;
+			PropsNumberInput.__super.call(this);
+			this.input.editable=false;
+			this.input.mouseEnabled=false;
+			this.leftBtn.on("mousedown",this,this.onBtnAction,["left"]);
+			this.rightBtn.on("mousedown",this,this.onBtnAction,["right"]);
+			this.leftBtn.on("mouseup",this,this.onBtnAction,["stopAllTimer"]);
+			this.rightBtn.on("mouseup",this,this.onBtnAction,["stopAllTimer"]);
+			this.leftBtn.on("mouseout",this,this.onBtnAction,["stopAllTimer"]);
+			this.rightBtn.on("mouseout",this,this.onBtnAction,["stopAllTimer"]);
+		}
+
+		__class(PropsNumberInput,'commonui.view.prop.PropsNumberInput',_super);
+		var __proto=PropsNumberInput.prototype;
+		__proto.onBtnAction=function(type){
+			var curValue=NaN;
+			curValue=this.getCurValue();
+			switch(type){
+				case "left":
+					this.setUpTipLabel();
+					curValue-=this.tick;
+					this.updateValueTo(curValue);
+					this.tryStartAutoUpdate(-this.tick);
+					break ;
+				case "right":
+					this.setUpTipLabel();
+					curValue+=this.tick;
+					this.updateValueTo(curValue);
+					this.tryStartAutoUpdate(this.tick);
+					break ;
+				case "stopAllTimer":
+					this.hideTipLabel();
+					Laya.timer.clear(this,this.startAutoUpdate);
+					this.stopAutoUpdate();
+					break ;
+				}
+		}
+
+		__proto.setUpTipLabel=function(){
+			var label;
+			label=TipMessage.getTipLabel();
+			this.addChild(label);
+			label.y=-150;
+			label.x=this.width *0.5-label.width *0.5;
+		}
+
+		__proto.updateTipLabelText=function(){
+			var label;
+			label=TipMessage.getTipLabel();
+			if (label.parent){
+				label.text=this.input.text;
+			}
+		}
+
+		__proto.hideTipLabel=function(){
+			TipMessage.hideTipLabel();
+		}
+
+		__proto.tryStartAutoUpdate=function(dValue){
+			Laya.timer.once(500,this,this.startAutoUpdate,[dValue]);
+		}
+
+		__proto.startAutoUpdate=function(dValue){
+			this._dValue=dValue;
+			this.stopAutoUpdate();
+			Laya.timer.frameLoop(1,this,this.autoUpdateLoop);
+		}
+
+		__proto.getCurValue=function(){
+			return PropUtils.mParserFloat(this.input.text);
+		}
+
+		__proto.stopAutoUpdate=function(){
+			Laya.timer.clear(this,this.autoUpdateLoop);
+		}
+
+		__proto.autoUpdateLoop=function(){
+			this.updateValueTo(this.getCurValue()+this._dValue);
+		}
+
+		__proto.updateValueTo=function(value){
+			if(this.tick!=1)
+				value=PropUtils.numberToFixed(value,this.fix);
+			this.input.text=value+"";
+			this.updateTipLabelText();
+			this.onInput();
+		}
+
+		__proto.initByConfig=function(configO){
+			commonui.view.prop.PropsInputBase.prototype.initByConfig.call(this,configO);
+			this.tick=configO.tick || 1;
+			this.fix=PropUtils.getNumberFix(this.tick);
+		}
+
+		__proto.onInput=function(){
+			this.setValueToTarget(PropUtils.mParserFloat(this.input.text));
+		}
+
+		__proto.setTarget=function(target){
+			commonui.view.prop.PropsInputBase.prototype.setTarget.call(this,target);
+			this.input.text=""+(this.getDisplayValue()||"");
+		}
+
+		return PropsNumberInput;
+	})(NumberInputUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.PropsTextInput extends commonui.ui.prop.PropTextInputUI
+	var PropsTextInput=(function(_super){
+		//protected var input:TextInput;
+		function PropsTextInput(){
+			PropsTextInput.__super.call(this);
+			this.input.fontSize=PropStyleConst.PropPanelFontSize;
+			this.mouseEnabled=true;
+			this.input.on("enter",this,this.onInput);
+			this.input.on("blur",this,this.onInput);
+		}
+
+		__class(PropsTextInput,'commonui.view.prop.PropsTextInput',_super);
+		var __proto=PropsTextInput.prototype;
+		__proto.onInputPageBack=function(value,ifSave){
+			console.log("onInputPageBack:",value,ifSave);
+			if (ifSave){
+				if (this.input.text !=value){
+					this.input.text=value;
+					this.setValueToTarget(value);
+				}
+			}
+		}
+
+		__proto.onInput=function(){
+			console.log("valueChange:",this.input.text);
+			this.setValueToTarget(this.input.text);
+		}
+
+		__proto.setTarget=function(target){
+			commonui.view.prop.PropsInputBase.prototype.setTarget.call(this,target);
+			this.input.text=this.getDisplayValue()||"";
+		}
+
+		__proto.initByConfig=function(configO){
+			commonui.view.prop.PropsInputBase.prototype.initByConfig.call(this,configO);
+		}
+
+		return PropsTextInput;
+	})(PropTextInputUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.PropsColorArrayInput extends commonui.view.prop.PropsColorInput
+	var PropsColorArrayInput=(function(_super){
+		function PropsColorArrayInput(){
+			this._colorArr=null;
+			PropsColorArrayInput.__super.call(this);
+		}
+
+		__class(PropsColorArrayInput,'commonui.view.prop.PropsColorArrayInput',_super);
+		var __proto=PropsColorArrayInput.prototype;
+		__proto.getAlpha=function(){
+			return this._colorArr[3];
+		}
+
+		__proto.setTarget=function(target){
+			_super.prototype.setTarget.call(this,target);
+			this.initColor(this.getDisplayValue()||[1,1,1,1]);
+		}
+
+		__proto.updateColor=function(color){
+			if (!this.isSettingValue && this._color !=color){
+				this.setValueToTarget(PropsColorArrayInput.colorStrToColorArray(color,this.getAlpha()));
+			}
+			this._color=color;
+			this.freshColorRec();
+		}
+
+		__proto.initColor=function(colorArr){
+			this._colorArr=colorArr;
+			var colorStr;
+			colorStr=PropsColorArrayInput.getColorStrByColorArr(colorArr);
+			this.updateColor(colorStr);
+		}
+
+		PropsColorArrayInput.getColorStrByColorArr=function(colorArr,rate){
+			(rate===void 0)&& (rate=255);
+			return "#"+ColorTool.getColorBit(colorArr[0]*rate)+ColorTool.getColorBit(colorArr[1]*rate)+ColorTool.getColorBit(colorArr[2]*rate);
+		}
+
+		PropsColorArrayInput.colorStrToColorArray=function(tColorStr,alpha){
+			(alpha===void 0)&& (alpha=1);
+			var rgbs;
+			rgbs=ColorTool.getRGBByRGBStr(tColorStr);
+			var i=0,len=0;
+			len=rgbs.length;
+			var _colorArr;
+			_colorArr=[];
+			_colorArr.length=4;
+			for(i=0;i<len;i++){
+				_colorArr[i]=rgbs[i]/255;
+			}
+			_colorArr[3]=alpha;
+			return _colorArr;
+		}
+
+		return PropsColorArrayInput;
+	})(PropsColorInput)
+
+
+	Laya.__init([LoaderManager,EventDispatcher,Browser,View,Render,Timer,GraphicAnimation,LocalStorage,PropPluginManager,UIConfigManager]);
 	new TestRemoteView();
 
 })(window,document,Laya);
@@ -31804,4 +34715,7 @@ var Laya=window.Laya=(function(window,document){
 2 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
 3 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 4 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+5 file:///D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/ColorPickerWithIndex.as (176):warning:Server.url_file This variable is not defined.
+6 file:///D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/ColorPickerWithIndex.as (177):warning:Server.url_file This variable is not defined.
+7 file:///D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/colorselectorpanel/SelectorColorPicker.as (108):warning:ColorTableTool.createColorTable This variable is not defined.
 */
