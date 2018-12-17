@@ -285,7 +285,15 @@ package mindmap
 			{
 				tChild = childNodes[i];
 				childItemHeight = tChild.getItemHeight();
-				tChild.setPos(childX, tY,isRight);
+				//tChild.setPos(childX, tY, isRight);
+				if (isRight)
+				{
+					tChild.setPos(childX, tY, isRight);
+				}else
+				{
+					tChild.setPos(x-tChild.width-XSpace, tY,isRight);
+				}
+				
 				tY += childItemHeight + YSpace;
 			}
 		}
