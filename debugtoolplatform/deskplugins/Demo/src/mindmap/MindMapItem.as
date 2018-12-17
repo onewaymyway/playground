@@ -124,7 +124,11 @@ package mindmap
 		public function freshUI():void
 		{
 			text.editable = MindMapEditor.isEditorMode;
-			text.text = nodeData.label||"";
+			text.text = nodeData.label || "";
+			text.width = 400;
+			text.textField.typeset();
+			text.width = text.textField.textWidth + 20;
+			this.width = text.textField.textWidth + 20 + 33;
 		}
 		
 		public function drawConnections(sprite:Sprite):void
@@ -189,6 +193,25 @@ package mindmap
 			return totalHeight;
 		}
 		
+		public function getItemWidth(childNodes:Array = null):Number
+		{
+			if (!childNodes) childNodes = this.childNodes;
+			if (!childNodes || !childNodes.length) return 0;
+			var maxWidth:Number = 0;
+			var i:int, len:int;
+			len = childNodes.length;
+			var tChild:MindMapItem;
+
+			for (i = 0; i < len; i++)
+			{
+				tChild = childNodes[i];
+				maxWidth = Math.max(maxWidth, tChild.width);
+
+			}
+
+			return maxWidth;
+		}
+		
 		public function setPos(x:Number,y:Number,isRight:Boolean=true):void
 		{
 			layoutChilds(this.childNodes, x, y, isRight);
@@ -228,6 +251,9 @@ package mindmap
 		{
 			var itemHeight:Number;
 			itemHeight = getItemHeight(childNodes);
+			var itemWidth:Number;
+			itemWidth = getItemWidth(childNodes);
+			itemWidth = Math.max(this.width, itemWidth);
 			if (!lockPos)
 			{
 				this.pos(x, y + itemHeight * 0.5);
@@ -244,7 +270,7 @@ package mindmap
 				childX = x + this.width + XSpace;
 			}else
 			{
-				childX = x - this.width - XSpace;
+				childX = x - itemWidth - XSpace;
 			}
 			
 			var tChild:MindMapItem;
