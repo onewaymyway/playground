@@ -30,7 +30,8 @@ package view {
 			var oldName:String;
 			oldName=FilePathUtils.getFileName(oldPath);
 			resLbl.text = oldName;
-			nameTxt.restrict=CommonUIConsts.fileNameRestrict;
+			nameTxt.restrict = CommonUIConsts.fileNameRestrict;
+			nameTxt.restrict = CommonUIConsts.fileNameRestrictEx;
 			nameTxt.text = oldName;
 			popup();
 			Laya.stage.focus = nameTxt.textField;
