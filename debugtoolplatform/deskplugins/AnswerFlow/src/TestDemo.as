@@ -1,5 +1,6 @@
 package  
 {
+	import answerflow.AnswerFlowEditor;
 	import laya.debug.DebugPanel;
 	import laya.debug.uicomps.ContextMenu;
 	import laya.debug.uicomps.ContextMenuItem;
@@ -7,7 +8,6 @@ package
 	import laya.display.Text;
 	import laya.net.Loader;
 	import laya.utils.Handler;
-	import mindmap.MindMapEditor;
 	import nodetools.devices.FileManager;
 	import viewRender.EditorRenderBase;
 	/**
@@ -32,7 +32,7 @@ package
 			//DebugPanel.init();
 		}
 		private var text:Text;
-		private var mindMapEditor:MindMapEditor;
+		private var mindMapEditor:AnswerFlowEditor;
 		
 		private function test():void
 		{
@@ -44,16 +44,16 @@ package
 			text.pos(100, 100);
 			Laya.stage.addChild(text);
 			
-			mindMapEditor = new MindMapEditor();
+			mindMapEditor = new AnswerFlowEditor();
 			mindMapEditor.left = mindMapEditor.right = mindMapEditor.top = mindMapEditor.bottom = 2;
-			mindMapEditor.on(MindMapEditor.Save, this, onMindMapSave);
+			mindMapEditor.on("save", this, onMindMapSave);
 			Laya.stage.addChild(mindMapEditor);
 			updateUIContent();
 		}
 		
 		private function onMindMapSave():void
 		{
-			FileManager.createJSONFile(mindMapEditor.data.url, mindMapEditor.mapNodeData);
+			FileManager.createJSONFile(_data.url, _data);
 		}
 		
 		private var _data:Object;
