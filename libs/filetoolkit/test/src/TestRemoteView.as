@@ -1,5 +1,6 @@
 package  
 {
+	import commonui.view.prop.PropPanel;
 	import consts.Msgs;
 	import electrontools.drags.SystemDragOverManager;
 	import electrontools.MessageManager;
@@ -21,6 +22,7 @@ package
 	import laya.utils.Utils;
 	import mindmap.adpttool.MM2MindMapData;
 	import mindmap.adpttool.PSO2MindMapData;
+	import mindmap.adpttool.ZMap2MindMapData;
 	import mindmap.MindMapEditor;
 	import webfile.FilePathUtils;
 	import webfile.FileReaderTool;
@@ -68,7 +70,7 @@ package
 			test();
 		}
 		
-		private var canParseFileDic:Object = { "mm":MM2MindMapData,"pso":PSO2MindMapData};
+		private var canParseFileDic:Object = { "mm":MM2MindMapData,"pso":PSO2MindMapData,"zmap":ZMap2MindMapData};
 		private function onSystemDrag(dataO:Object):void
 		{
 			debugger;
@@ -149,6 +151,20 @@ package
 			Notice.listen(Msgs.Open_File, this, onOpenFile);
 			
 			openFileByPath("FirstOfAll.demorender");
+			//testPropPanel();
+		}
+		
+		
+		private function testPropPanel():void
+		{
+			var testObj:Object;
+			testObj = { };
+			testObj.type = "CC";
+			testObj.props = { };
+			var testNode:Object;
+			testNode = { };
+			testNode.comXml = testObj;
+			PropPanel.showPropPanel(testNode);
 		}
 		
 		private function onSwitchBtn():void

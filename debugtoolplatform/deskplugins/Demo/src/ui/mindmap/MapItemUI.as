@@ -9,7 +9,7 @@ package ui.mindmap {
 		public var upBtn:Button;
 		public var selectBtn:Radio;
 
-		public static var uiView:Object =/*[STATIC SAFE]*/{"type":"View","props":{"width":162,"height":22},"child":[{"type":"TextInput","props":{"var":"text","text":"TextInput","skin":"comp/textinput.png","color":"#93eedf","align":"center"}},{"type":"Button","props":{"y":11,"x":131,"var":"downBtn","skin":"comp/down.png"}},{"type":"Button","props":{"y":-1,"x":131,"var":"upBtn","skin":"comp/up.png"}},{"type":"Radio","props":{"y":4,"x":147,"var":"selectBtn","skin":"comp/selectbtn.png"}}]};
+		public static var uiView:Object =/*[STATIC SAFE]*/{"type":"View","props":{"width":162,"height":22},"child":[{"type":"TextInput","props":{"var":"text","text":"TextInput","skin":"comp/textinput.png","sizeGrid":"7,10,5,5","right":33,"left":0,"color":"#93eedf","align":"center"}},{"type":"Button","props":{"y":11,"var":"downBtn","skin":"comp/down.png","right":19}},{"type":"Button","props":{"y":-1,"var":"upBtn","skin":"comp/up.png","right":19}},{"type":"Radio","props":{"y":4,"var":"selectBtn","skin":"comp/selectbtn.png","right":1}}]};
 		override protected function createChildren():void {
 			super.createChildren();
 			createView(uiView);

@@ -2,7 +2,7 @@
     "x":0,
     "type":"View",
     "selectedBox":1,
-    "selecteID":5,
+    "selecteID":2,
     "props":{"width":162,"sceneWidth":162,"sceneHeight":22,"sceneColor":"#000000","height":22},
     "nodeParent":-1,
     "label":"View",
@@ -15,7 +15,7 @@
         {
             "x":15,
             "type":"TextInput",
-            "props":{"var":"text","text":"TextInput","skin":"comp/textinput.png","color":"#93eedf","align":"center"},
+            "props":{"var":"text","text":"TextInput","skin":"comp/textinput.png","sizeGrid":"7,10,5,5","right":33,"left":0,"color":"#93eedf","align":"center"},
             "nodeParent":1,
             "label":"TextInput(text)",
             "isDirectory":false,
@@ -28,7 +28,7 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"y":11,"x":131,"var":"downBtn","skin":"comp/down.png"},
+            "props":{"y":11,"var":"downBtn","skin":"comp/down.png","right":19},
             "nodeParent":1,
             "label":"Button(downBtn)",
             "isDirectory":false,
@@ -41,7 +41,7 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"y":-1,"x":131,"var":"upBtn","skin":"comp/up.png"},
+            "props":{"y":-1,"var":"upBtn","skin":"comp/up.png","right":19},
             "nodeParent":1,
             "label":"Button(upBtn)",
             "isDirectory":false,
@@ -54,7 +54,7 @@
         {
             "x":15,
             "type":"Radio",
-            "props":{"y":4,"x":147,"var":"selectBtn","skin":"comp/selectbtn.png"},
+            "props":{"y":4,"var":"selectBtn","skin":"comp/selectbtn.png","right":1},
             "nodeParent":1,
             "label":"Radio(selectBtn)",
             "isDirectory":false,

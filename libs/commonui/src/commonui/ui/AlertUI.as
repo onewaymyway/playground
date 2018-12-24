@@ -2,6 +2,7 @@
 package commonui.ui {
 	import laya.ui.*;
 	import laya.display.*; 
+	import commonui.view.prop.PropsInputBase;
 
 	public class AlertUI extends Dialog {
 		public var titleLbl:Label;
