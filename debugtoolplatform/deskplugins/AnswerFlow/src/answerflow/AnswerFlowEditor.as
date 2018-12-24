@@ -14,7 +14,7 @@ package answerflow
 		public var dataO:Object;
 		public function AnswerFlowEditor() 
 		{
-			actionList.itemRender = new Handler(this, itemRender);
+			actionList.renderHandler = new Handler(this, itemRender);
 			actionList.on(Event.DOUBLE_CLICK, this, onDoubleClick);
 		}
 		

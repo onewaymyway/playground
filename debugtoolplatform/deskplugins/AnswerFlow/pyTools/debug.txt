@@ -23,7 +23,7 @@ Project configuration:E:\onewaymyway\codes\playground\playground\debugtoolplatfo
 7,89.73,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonlayout/mindmaptree/MindMapTreeLayouter.as,114,childNodes This variable is not defined.
 7,89.73,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonlayout/mindmaptree/MindMapTreeLayouter.as,117,childNodes This variable is not defined.
 1,89.95,,0,Disable Flash3D E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplugins/AnswerFlow/src/TestDemo.as
-12,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/AnswerFlow.max.js,10699,
+12,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/AnswerFlow.max.js,10702,
 12,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/laya.js,1237874,
 11,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/AnswerFlow.max.html,844,
 ******************************************************************************

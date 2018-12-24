@@ -222,7 +222,7 @@
 		function AnswerFlowEditor(){
 			this.dataO=null;
 			AnswerFlowEditor.__super.call(this);
-			this.actionList.itemRender=new Handler(this,this.itemRender);
+			this.actionList.renderHandler=new Handler(this,this.itemRender);
 			this.actionList.on("doubleclick",this,this.onDoubleClick);
 		}
 
