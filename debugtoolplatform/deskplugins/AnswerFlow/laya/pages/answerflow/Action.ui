@@ -2,7 +2,7 @@
     "x":0,
     "type":"View",
     "selectedBox":1,
-    "selecteID":18,
+    "selecteID":12,
     "props":{"width":400,"sceneColor":"#000000","height":500},
     "nodeParent":-1,
     "label":"View",
@@ -14,87 +14,9 @@
     "child":[
         {
             "x":15,
-            "type":"Label",
-            "props":{"y":172,"x":27,"width":63,"text":"操作","styleSkin":"comp/label.png","height":21,"color":"#e72320"},
-            "nodeParent":1,
-            "label":"Label",
-            "isDirectory":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":2,
-            "child":[
-                ]
-        },
-        {
-            "x":15,
-            "type":"Label",
-            "props":{"y":303,"x":99,"width":63,"text":"数据","styleSkin":"comp/label.png","height":21,"color":"#e72320"},
-            "nodeParent":1,
-            "label":"Label",
-            "isDirectory":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":3,
-            "child":[
-                ]
-        },
-        {
-            "x":15,
-            "type":"Label",
-            "props":{"y":202,"x":25,"width":51,"text":"描述","styleSkin":"comp/label.png","height":21,"color":"#e72320"},
-            "nodeParent":1,
-            "label":"Label",
-            "isDirectory":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":4,
-            "child":[
-                ]
-        },
-        {
-            "x":15,
-            "type":"Label",
-            "props":{"y":117,"x":97,"width":63,"text":"触发方式","styleSkin":"comp/label.png","height":21,"color":"#e72320"},
-            "nodeParent":1,
-            "label":"Label",
-            "isDirectory":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":5,
-            "child":[
-                ]
-        },
-        {
-            "x":15,
-            "type":"Label",
-            "props":{"y":276,"x":165,"width":63,"text":"增加","styleSkin":"comp/label.png","height":21,"color":"#e72320"},
-            "nodeParent":1,
-            "label":"Label",
-            "isDirectory":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":9,
-            "child":[
-                ]
-        },
-        {
-            "x":15,
-            "type":"Label",
-            "props":{"y":348,"x":166,"width":63,"text":"减少","styleSkin":"comp/label.png","height":21,"color":"#e72320"},
-            "nodeParent":1,
-            "label":"Label",
-            "isDirectory":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":10,
-            "child":[
-                ]
-        },
-        {
-            "x":15,
             "type":"UIView",
             "source":"answerflow/ItemData.ui",
-            "props":{"y":239,"x":219},
+            "props":{"y":234,"x":279},
             "nodeParent":1,
             "label":"UIView",
             "isDirectory":false,
@@ -108,7 +30,7 @@
             "x":15,
             "type":"UIView",
             "source":"answerflow/ItemData.ui",
-            "props":{"y":285,"x":219},
+            "props":{"y":280,"x":279},
             "nodeParent":1,
             "label":"UIView",
             "isDirectory":false,
@@ -122,7 +44,7 @@
             "x":15,
             "type":"UIView",
             "source":"answerflow/ItemData.ui",
-            "props":{"y":335,"x":219},
+            "props":{"y":335,"x":279},
             "nodeParent":1,
             "label":"UIView",
             "isDirectory":false,
@@ -136,7 +58,7 @@
             "x":15,
             "type":"UIView",
             "source":"answerflow/ItemData.ui",
-            "props":{"y":375,"x":219},
+            "props":{"y":375,"x":279},
             "nodeParent":1,
             "label":"UIView",
             "isDirectory":false,
@@ -150,7 +72,7 @@
             "x":15,
             "type":"UIView",
             "source":"answerflow/ItemData.ui",
-            "props":{"y":417,"x":219},
+            "props":{"y":417,"x":279},
             "nodeParent":1,
             "label":"UIView",
             "isDirectory":false,
@@ -199,6 +121,76 @@
             "isAniNode":true,
             "hasChild":false,
             "compId":18,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"UIView",
+            "source":"answerflow/ActionRoot.ui",
+            "props":{"y":184,"x":11},
+            "nodeParent":1,
+            "label":"UIView",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":19,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"UIView",
+            "source":"answerflow/SimpleNode.ui",
+            "props":{"y":302,"x":88},
+            "nodeParent":1,
+            "label":"UIView",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":21,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"UIView",
+            "source":"answerflow/AddAbleNode.ui",
+            "props":{"y":98,"x":80},
+            "nodeParent":1,
+            "label":"UIView",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":22,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"UIView",
+            "source":"answerflow/AddAbleNode.ui",
+            "props":{"y":264,"x":160},
+            "nodeParent":1,
+            "label":"UIView",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":23,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"UIView",
+            "source":"answerflow/AddAbleNode.ui",
+            "props":{"y":378,"x":155},
+            "nodeParent":1,
+            "label":"UIView",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":24,
             "child":[
                 ]
         }],
