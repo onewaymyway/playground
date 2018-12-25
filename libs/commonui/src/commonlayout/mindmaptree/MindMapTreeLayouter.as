@@ -46,7 +46,7 @@ package commonlayout.mindmaptree
 			for (i = 0; i < len; i++)
 			{
 				tChild = childNodes[i];
-				tChild.drawConnections(tChild,sprite);
+				drawConnections(tChild,sprite);
 				drawOneLine(treeItem as Sprite, tChild as Sprite, sprite);
 			}
 		}
@@ -64,7 +64,7 @@ package commonlayout.mindmaptree
 			for (i = 0; i < len; i++)
 			{
 				tChild = childNodes[i];
-				tHeight = tChild.getItemHeight();
+				tHeight = getItemHeight(tChild);
 				totalHeight += tHeight;
 			}
 			totalHeight += YSpace * (len - 1);
@@ -95,11 +95,13 @@ package commonlayout.mindmaptree
 			layoutChilds(tree,tree.childNodes, x, y, isRight);
 		}
 		
-		public function layoutAsCenter(tree:IMindMapTreeItem):void
+		public function layoutAsCenter(tree:IMindMapTreeItem,onlyRight:Boolean=false):void
 		{
-			if (childNodes.length <= 1)
+			var childNodes:Array;
+			childNodes = tree.childNodes;
+			if (onlyRight||childNodes.length <= 1)
 			{
-				layoutChilds(tree,childNodes, tree.x, tree.y, true);
+				layoutChilds(tree,childNodes, tree.x, tree.y, true,true);
 				return;
 			}
 			var leftChilds:Array;

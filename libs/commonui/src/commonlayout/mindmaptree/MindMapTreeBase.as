@@ -25,6 +25,7 @@ package commonlayout.mindmaptree
 		
 		public function recover():void
 		{
+			reset();
 			Pool.recover(ClassTool.getClassName(this),this);
 		}
 		
@@ -36,6 +37,7 @@ package commonlayout.mindmaptree
 		public function reset():void
 		{
 			_childNodes = [];
+			pos(0, 0);
 		}
 		
 		public function setData(dataO:Object):void

@@ -1,11 +1,13 @@
 package commonlayout.mindmaptree 
 {
+	import laya.debug.tools.ClassTool;
 	import laya.debug.tools.ObjectTools;
 	import laya.display.Sprite;
 	import laya.events.Event;
 	import laya.maths.Point;
 	import laya.maths.Rectangle;
 	import laya.ui.Box;
+	import laya.utils.Pool;
 	/**
 	 * ...
 	 * @author ww
@@ -13,13 +15,27 @@ package commonlayout.mindmaptree
 	public class MindMapViewer extends Box
 	{
 		private var _typeClassDic:Object = { };
-		public function regItemCreater(type:String, fun:Function):void
+		public function regItemCreater(type:String, clz:Class):void
 		{
-			_typeClassDic[type] = fun;
+			_typeClassDic[type] = clz;
+		}
+		public function regItemClassList(clzList:Array):void
+		{
+			var i:int, len:int;
+			len = clzList.length;
+			var tClz:Class;
+			for (i = 0; i < len; i++)
+			{
+				tClz = clzList[i];
+				regItemCreater(ClassTool.getClassName(tClz), tClz);
+			}
 		}
 		public function createByType(type:String):*
 		{
-			return _typeClassDic[type]();
+			var clz:Class;
+			clz = _typeClassDic[type];
+			return Pool.getItemByClass(ClassTool.getClassName(clz), clz);
+			//return _typeClassDic[type]();
 		}
 		
 		private var _layouter:MindMapTreeLayouter;
@@ -88,7 +104,7 @@ package commonlayout.mindmaptree
 			var rec:Rectangle;
 			rec = this.scrollRect || new Rectangle();
 			rec.setTo(0, 0, this.width, this.height);
-			this.scrollRect = rec;
+			//this.scrollRect = rec;
 			if (_userChanged) return;
 			nodeContainer.pos(this.width * 0.5, this.height * 0.5);
 			nodeContainer.pivot(0, 0);
@@ -108,7 +124,8 @@ package commonlayout.mindmaptree
 		{
 			clearPreItems();
 			_root = createNodeByData(_dataO);
-			_layouter.layoutAsCenter(_root);
+			_layouter.layoutAsCenter(_root, true);
+			_layouter.drawConnections(_root, nodeContainer);
 		}
 		
 		public static function addChildNode(parent:IMindMapTreeItem, child:IMindMapTreeItem):void
@@ -152,6 +169,7 @@ package commonlayout.mindmaptree
 		}
 		private function clearPreItems():void
 		{
+			nodeContainer.graphics.clear();
 			var i:int, len:int;
 			len = nodeContainer.numChildren;
 			var tChild:IMindMapTreeItem;

@@ -218,7 +218,7 @@ package laya.debug.tools
 			return arr;
 		}
 		
-		public static function removeFromArr(arr:Array,item:*):void
+		public static function removeFromArr(arr:Array,item:*):*
 		{
 			var i:int,len:int;
 			len=arr.length;
@@ -227,9 +227,10 @@ package laya.debug.tools
 				if(arr[i]==item)
 				{
 					arr.splice(i,1);
-					return;
+					return item;
 				}
 			}
+			return null;
 		}
 		public static function setValueArr(src:Array, v:Array):Array {
 			src || (src = []);
