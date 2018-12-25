@@ -17,6 +17,8 @@ package answerflow
 		override protected function renderByData():void 
 		{
 			super.renderByData();
+			desTxt.text = _dataO.props.des;
+			actionTxt.text = _dataO.props.label;
 		}
 	}
 

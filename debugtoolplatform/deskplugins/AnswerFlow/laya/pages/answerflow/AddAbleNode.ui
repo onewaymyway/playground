@@ -15,9 +15,9 @@
         {
             "x":15,
             "type":"Label",
-            "props":{"y":2,"x":0,"width":63,"text":"触发方式","styleSkin":"comp/label.png","height":21,"color":"#e72320"},
+            "props":{"y":2,"x":0,"width":63,"var":"txt","text":"触发方式","styleSkin":"comp/label.png","height":21,"color":"#e72320"},
             "nodeParent":1,
-            "label":"Label",
+            "label":"Label(txt)",
             "isDirectory":false,
             "isAniNode":true,
             "hasChild":false,
@@ -28,9 +28,9 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"y":0,"x":79,"width":26,"skin":"comp/button.png","label":"+","height":24},
+            "props":{"y":0,"x":79,"width":26,"var":"addBtn","skin":"comp/button.png","label":"+","height":24},
             "nodeParent":1,
-            "label":"Button",
+            "label":"Button(addBtn)",
             "isDirectory":false,
             "isAniNode":true,
             "hasChild":false,

@@ -21,6 +21,7 @@ package
 		{
 			Laya.init(1000, 900);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
+			//Laya.stage.bgColor = "#ffffff";
 			ContextMenu.init();
 			ContextMenuItem.labelColors = "#ffffff,#ffffff,#ffffff,#ffffff";
 			ContextMenuItem.btnSkin = "comp/button.png";
@@ -53,7 +54,7 @@ package
 		
 		private function onMindMapSave():void
 		{
-			FileManager.createJSONFile(_data.url, _data);
+			FileManager.createJSONFile(_data.url, _data.data);
 		}
 		
 		private var _data:Object;
@@ -80,7 +81,7 @@ package
 		private function updateUIContent():void
 		{
 			if (!_data||!mindMapEditor) return;
-			mindMapEditor.setData(_data);
+			mindMapEditor.setData(_data.data);
 			text.text = JSON.stringify(_data);
 		}
 	}
