@@ -4,50 +4,8 @@
 
 	var Box=laya.ui.Box,Button=laya.ui.Button,ContextMenu=laya.debug.uicomps.ContextMenu,ContextMenuItem=laya.debug.uicomps.ContextMenuItem;
 	var EditorRenderBase=viewRender.EditorRenderBase,Event=laya.events.Event,Handler=laya.utils.Handler,Loader=laya.net.Loader;
-	var Pool=laya.utils.Pool,Radio=laya.ui.Radio,Sprite=laya.display.Sprite,Stage=laya.display.Stage,Text=laya.display.Text;
-	var TextInput=laya.ui.TextInput,View=laya.ui.View;
-	/**
-	*...
-	*@author ww
-	*/
-	//class mindmap.MindMapData
-	var MindMapData=(function(){
-		function MindMapData(){
-			this._mapData=null;
-			this._nodeList=null;
-			this._idDic={};
-		}
-
-		__class(MindMapData,'mindmap.MindMapData');
-		var __proto=MindMapData.prototype;
-		__proto.initByObj=function(obj){
-			this._mapData=obj;
-			this.adptMapData();
-		}
-
-		__proto.adptMapData=function(){
-			if (!this._mapData.nodeList)this._mapData.nodeList=[];
-			this._nodeList=this._mapData.nodeList;
-		}
-
-		__proto.addNode=function(node){}
-		__proto.removeNode=function(){}
-		__proto.getNodeByID=function(id){}
-		__proto.getNodeList=function(){
-			return this._nodeList;
-		}
-
-		MindMapData.createByObj=function(obj){
-			var mapData;
-			mapData=new MindMapData();
-			mapData.initByObj(obj);
-			return mapData;
-		}
-
-		return MindMapData;
-	})()
-
-
+	var Pool=laya.utils.Pool,Radio=laya.ui.Radio,Rectangle=laya.maths.Rectangle,Sprite=laya.display.Sprite,Stage=laya.display.Stage;
+	var Text=laya.display.Text,TextInput=laya.ui.TextInput,View=laya.ui.View;
 	/**
 	*...
 	*@author ww
@@ -166,8 +124,13 @@
 			Laya.stage.addChild(this.text);
 			this.mindMapEditor=new MindMapEditor();
 			this.mindMapEditor.left=this.mindMapEditor.right=this.mindMapEditor.top=this.mindMapEditor.bottom=2;
+			this.mindMapEditor.on("Save",this,this.onMindMapSave);
 			Laya.stage.addChild(this.mindMapEditor);
 			this.updateUIContent();
+		}
+
+		__proto.onMindMapSave=function(){
+			nodetools.devices.FileManager.createJSONFile(this.mindMapEditor.data.url,this.mindMapEditor.mapNodeData);
 		}
 
 		__proto.getRenderData=function(){
@@ -251,7 +214,6 @@
 			this._userChanged=false;
 			this._selectItem=null;
 			this._dataO=null;
-			this.mapData=null;
 			this.mapNodeData=null;
 			this.root=null;
 			this.mindMapItems=[];
@@ -279,7 +241,7 @@
 				case "save":
 					debugger;
 					console.log("save:",this._dataO.url,this.mapNodeData);
-					nodetools.devices.FileManager.createJSONFile(this._dataO.url,this.mapNodeData);
+					this.event("Save");
 					break ;
 				}
 		}
@@ -295,6 +257,10 @@
 		}
 
 		__proto.onResize=function(){
+			var rec;
+			rec=this.scrollRect || new Rectangle();
+			rec.setTo(0,0,this.width,this.height);
+			this.scrollRect=rec;
 			if (this._userChanged)return;
 			this.nodeContainer.pos(this.width*0.5,this.height*0.5);
 		}
@@ -371,7 +337,7 @@
 
 		__proto.setData=function(dataO){
 			this._dataO=dataO;
-			this.mapNodeData=MindMapNodeData.createByObj(dataO.data,true);
+			this.mapNodeData=MindMapNodeData.createByObj(dataO.data||dataO,true);
 			this.freshUI();
 		}
 
@@ -450,6 +416,11 @@
 			return rst;
 		}
 
+		__getset(0,__proto,'data',function(){
+			return this._dataO;
+		});
+
+		MindMapEditor.Save="Save";
 		return MindMapEditor;
 	})(MindMapEditorUI)
 
