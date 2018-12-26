@@ -145,7 +145,7 @@ package commonlayout.mindmaptree
 			if (tChild)
 			{
 				tChild.parentNode = null;
-				ObjectTools.removeFromArr(parent.getData(), tChild.getData());
+				ObjectTools.removeFromArr(parent.getData().childs, tChild.getData());
 			}
 		}
 		private function createNodeByData(dataO:Object):*
