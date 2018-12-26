@@ -9,6 +9,7 @@ package
 	import laya.net.Loader;
 	import laya.utils.Handler;
 	import nodetools.devices.FileManager;
+	import test.MakeAnsFlowFile;
 	import viewRender.EditorRenderBase;
 	/**
 	 * ...
@@ -50,6 +51,14 @@ package
 			mindMapEditor.on("save", this, onMindMapSave);
 			Laya.stage.addChild(mindMapEditor);
 			updateUIContent();
+			//testMakeAnsFlowFile();
+		}
+		
+		private function testMakeAnsFlowFile():void
+		{
+			var tt:MakeAnsFlowFile;
+			tt = new MakeAnsFlowFile();
+			tt.test();
 		}
 		
 		private function onMindMapSave():void

@@ -14,10 +14,10 @@
     "child":[
         {
             "x":15,
-            "type":"Label",
-            "props":{"y":4,"x":0,"width":63,"var":"actionTxt","text":"操作","styleSkin":"comp/label.png","height":21,"color":"#e72320"},
+            "type":"TextInput",
+            "props":{"x":0,"width":63,"var":"actionTxt","text":"操作","styleSkin":"comp/label.png","skin":"comp/input_22.png","height":21,"color":"#e72320"},
             "nodeParent":1,
-            "label":"Label(actionTxt)",
+            "label":"TextInput(actionTxt)",
             "isDirectory":false,
             "isAniNode":true,
             "hasChild":false,
@@ -27,10 +27,10 @@
         },
         {
             "x":15,
-            "type":"Label",
-            "props":{"y":34,"x":-2,"width":51,"var":"desTxt","text":"描述","styleSkin":"comp/label.png","height":21,"color":"#e72320"},
+            "type":"TextInput",
+            "props":{"y":27,"x":0,"width":67,"var":"desTxt","text":"描述","styleSkin":"comp/label.png","skin":"comp/input_22.png","height":27,"color":"#e72320"},
             "nodeParent":1,
-            "label":"Label(desTxt)",
+            "label":"TextInput(desTxt)",
             "isDirectory":false,
             "isAniNode":true,
             "hasChild":false,

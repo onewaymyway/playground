@@ -24,6 +24,87 @@
 	*...
 	*@author ww
 	*/
+	//class test.MakeAnsFlowFile
+	var MakeAnsFlowFile=(function(){
+		function MakeAnsFlowFile(){}
+		__class(MakeAnsFlowFile,'test.MakeAnsFlowFile');
+		var __proto=MakeAnsFlowFile.prototype;
+		__proto.test=function(){
+			Laya.loader.load("rules.json",Handler.create(this,this.onLoaded));
+		}
+
+		__proto.onLoaded=function(dataO){
+			debugger;
+			this.parseRulesToAnsFlowFile(dataO);
+		}
+
+		__proto.parseRulesToAnsFlowFile=function(dataO){
+			var rules;
+			rules=dataO.rules;
+			var i=0,len=0;
+			len=rules.length;
+			var actions;
+			actions=[];
+			for (i=0;i < len;i++){
+				actions.push(this.parseOneAction(rules[i]));
+			}
+			debugger;
+			var dataStore;
+			dataStore={};
+			dataStore.type="AutoCreate";
+			dataStore.actions=actions;
+			nodetools.devices.FileManager.createJSONFile(nodetools.devices.FileManager.getAppPath("files/Life.ansflow"),dataStore);
+		}
+
+		__proto.parseOneAction=function(actionO){
+			var rst;
+			rst=AnswerFlowEditor.createActionData();
+			var actionData;
+			actionData=rst.data;
+			actionData.props.des=actionO.tip;
+			actionData.props.label=actionO.name;
+			this.parseItemsToArr(actionO.solve.add,actionData.childs[1].childs[0].childs);
+			this.parseItemsToArr(actionO.solve.sub,actionData.childs[1].childs[1].childs);
+			return rst;
+		}
+
+		__proto.parseItemsToArr=function(arr,rstArr){
+			if (!arr)return;
+			if (!rstArr)return;
+			var i=0,len=0;
+			len=arr.length;
+			for (i=0;i < len;i++){
+				rstArr.push(this.parseOneItem(arr[i]));
+			}
+		}
+
+		__proto.createOneItem=function(name,count){
+			var rst;
+			rst={
+				"type":"ItemData",
+				"props":{item:name,count:count },
+				"childs":[]
+			};
+			return rst;
+		}
+
+		__proto.parseOneItem=function(item){
+			if ((typeof item=='string')){
+				return this.createOneItem(item,1);
+			}
+			if ((item instanceof Array)){
+				return this.createOneItem(item[0],item[1]?item[1]:1);
+			}
+		}
+
+		return MakeAnsFlowFile;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class TestDemo extends viewRender.EditorRenderBase
 	var TestDemo=(function(_super){
 		function TestDemo(){
@@ -55,6 +136,13 @@
 			this.mindMapEditor.on("save",this,this.onMindMapSave);
 			Laya.stage.addChild(this.mindMapEditor);
 			this.updateUIContent();
+		}
+
+		//testMakeAnsFlowFile();
+		__proto.testMakeAnsFlowFile=function(){
+			var tt;
+			tt=new MakeAnsFlowFile();
+			tt.test();
 		}
 
 		__proto.onMindMapSave=function(){
@@ -190,7 +278,7 @@
 			this.createView(ActionRootUI.uiView);
 		}
 
-		ActionRootUI.uiView={"type":"MindMapTreeBase","props":{"width":63,"height":55},"child":[{"type":"Label","props":{"y":4,"x":0,"width":63,"var":"actionTxt","text":"操作","styleSkin":"comp/label.png","height":21,"color":"#e72320"}},{"type":"Label","props":{"y":34,"x":-2,"width":51,"var":"desTxt","text":"描述","styleSkin":"comp/label.png","height":21,"color":"#e72320"}}]};
+		ActionRootUI.uiView={"type":"MindMapTreeBase","props":{"width":63,"height":55},"child":[{"type":"TextInput","props":{"x":0,"width":63,"var":"actionTxt","text":"操作","styleSkin":"comp/label.png","skin":"comp/input_22.png","height":21,"color":"#e72320"}},{"type":"TextInput","props":{"y":27,"x":0,"width":67,"var":"desTxt","text":"描述","styleSkin":"comp/label.png","skin":"comp/input_22.png","height":27,"color":"#e72320"}}]};
 		return ActionRootUI;
 	})(MindMapTreeBase)
 
@@ -260,6 +348,9 @@
 			var dataO;
 			dataO=cell.dataSource;
 			label.text=dataO.label;
+			if (dataO.type=="Action"){
+				label.text=dataO.data.props.label;
+			}
 		}
 
 		__proto.onDoubleClick=function(){
@@ -278,7 +369,7 @@
 		}
 
 		__proto.addNewAction=function(){
-			this.dataO.actions.push(this.createActionData());
+			this.dataO.actions.push(AnswerFlowEditor.createActionData());
 			this.setData(this.dataO);
 		}
 
@@ -286,7 +377,27 @@
 			this.actionEditor.setData(dataO.data);
 		}
 
-		__proto.createActionData=function(){
+		__proto.createAddActionData=function(){
+			var rst;
+			rst={};
+			rst.type="addnew";
+			rst.label="addNew";
+			return rst;
+		}
+
+		__proto.setData=function(dataO){
+			this.dataO=dataO;
+			this.freshUI();
+		}
+
+		__proto.freshUI=function(){
+			if (!this.dataO.actions){
+				this.dataO.actions=[this.createAddActionData()];
+			}
+			this.actionList.array=this.dataO.actions;
+		}
+
+		AnswerFlowEditor.createActionData=function(){
 			var rst;
 			rst={};
 			rst.type="Action";
@@ -339,26 +450,6 @@
 			return rst;
 		}
 
-		__proto.createAddActionData=function(){
-			var rst;
-			rst={};
-			rst.type="addnew";
-			rst.label="addNew";
-			return rst;
-		}
-
-		__proto.setData=function(dataO){
-			this.dataO=dataO;
-			this.freshUI();
-		}
-
-		__proto.freshUI=function(){
-			if (!this.dataO.actions){
-				this.dataO.actions=[this.createAddActionData()];
-			}
-			this.actionList.array=this.dataO.actions;
-		}
-
 		return AnswerFlowEditor;
 	})(AnswerFlowEditorUI)
 
@@ -368,6 +459,7 @@
 		function ItemDataUI(){
 			this.item=null;
 			this.count=null;
+			this.removeBtn=null;
 			ItemDataUI.__super.call(this);
 		}
 
@@ -378,7 +470,7 @@
 			this.createView(ItemDataUI.uiView);
 		}
 
-		ItemDataUI.uiView={"type":"MindMapTreeBase","props":{"width":168,"height":30},"child":[{"type":"TextInput","props":{"y":4,"x":5,"width":95,"var":"item","text":"物品","skin":"comp/input_22.png","promptColor":"#f31713","height":22,"color":"#e80d09"}},{"type":"TextInput","props":{"y":4,"x":108,"width":60,"var":"count","text":"数量","skin":"comp/input_22.png","height":22,"color":"#ec130f"}}]};
+		ItemDataUI.uiView={"type":"MindMapTreeBase","props":{"width":200,"height":30},"child":[{"type":"TextInput","props":{"y":4,"x":5,"width":95,"var":"item","text":"物品","skin":"comp/input_22.png","promptColor":"#f31713","height":22,"color":"#e80d09"}},{"type":"TextInput","props":{"y":4,"x":108,"width":60,"var":"count","text":"数量","skin":"comp/input_22.png","height":22,"color":"#ec130f"}},{"type":"Button","props":{"y":3,"x":173,"width":26,"var":"removeBtn","skin":"comp/button.png","label":"-","height":24}}]};
 		return ItemDataUI;
 	})(MindMapTreeBase)
 
@@ -410,6 +502,8 @@
 	var ActionRoot=(function(_super){
 		function ActionRoot(){
 			ActionRoot.__super.call(this);
+			this.setUpTextInput(this.desTxt,"des");
+			this.setUpTextInput(this.actionTxt,"label");
 		}
 
 		__class(ActionRoot,'answerflow.ActionRoot',_super);
@@ -480,12 +574,17 @@
 	var ItemData=(function(_super){
 		function ItemData(){
 			ItemData.__super.call(this);
+			this.setUpTextInput(this.item,"item");
+			this.setUpTextInput(this.count,"count");
+			this.removeBtn.on("click",this,this.removeFromParent);
 		}
 
 		__class(ItemData,'answerflow.ItemData',_super);
 		var __proto=ItemData.prototype;
 		__proto.renderByData=function(){
 			commonlayout.mindmaptree.MindMapTreeBase.prototype.renderByData.call(this);
+			this.item.text=this._dataO.props["item"] || "";
+			this.count.text=this._dataO.props["count"] || "";
 		}
 
 		return ItemData;

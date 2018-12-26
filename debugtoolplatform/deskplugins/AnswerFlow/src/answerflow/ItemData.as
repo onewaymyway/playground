@@ -1,5 +1,6 @@
 package answerflow 
 {
+	import laya.events.Event;
 	import ui.answerflow.ItemDataUI;
 	
 	/**
@@ -11,12 +12,16 @@ package answerflow
 		
 		public function ItemData() 
 		{
-			
+			setUpTextInput(item, "item");
+			setUpTextInput(count, "count");
+			removeBtn.on(Event.CLICK, this, removeFromParent);
 		}
 		
 		override protected function renderByData():void 
 		{
 			super.renderByData();
+			item.text = _dataO.props["item"] || "";
+			count.text = _dataO.props["count"] || "";
 		}
 	}
 

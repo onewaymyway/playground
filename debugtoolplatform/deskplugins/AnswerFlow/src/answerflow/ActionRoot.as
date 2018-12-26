@@ -11,7 +11,8 @@ package answerflow
 		
 		public function ActionRoot() 
 		{
-			
+			setUpTextInput(desTxt,"des");
+			setUpTextInput(actionTxt,"label");
 		}
 		
 		override protected function renderByData():void 

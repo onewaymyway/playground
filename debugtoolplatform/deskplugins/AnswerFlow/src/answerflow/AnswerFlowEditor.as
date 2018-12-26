@@ -33,6 +33,10 @@ package answerflow
 			var dataO:Object;
 			dataO = cell.dataSource;
 			label.text = dataO.label;
+			if (dataO.type == "Action")
+			{
+				label.text = dataO.data.props.label;
+			}
 		}
 		
 		private function onDoubleClick():void
@@ -65,7 +69,7 @@ package answerflow
 		}
 		
 		
-		private function createActionData():Object
+		public static function createActionData():Object
 		{
 			var rst:Object;
 			rst = {};

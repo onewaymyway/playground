@@ -32380,7 +32380,7 @@ var Laya=window.Laya=(function(window,document){
 			tChild=ObjectTools.removeFromArr(childNodes,child);
 			if (tChild){
 				tChild.parentNode=null;
-				ObjectTools.removeFromArr(parent.getData(),tChild.getData());
+				ObjectTools.removeFromArr(parent.getData().childs,tChild.getData());
 			}
 		}
 
@@ -35485,6 +35485,7 @@ var Laya=window.Laya=(function(window,document){
 		function MindMapTreeBase(){
 			this._dataO=null;
 			this._childNodes=null;
+			this.parentNode=null;
 			MindMapTreeBase.__super.call(this);
 			this.reset();
 		}
@@ -35492,6 +35493,23 @@ var Laya=window.Laya=(function(window,document){
 		__class(MindMapTreeBase,'commonlayout.mindmaptree.MindMapTreeBase',_super);
 		var __proto=MindMapTreeBase.prototype;
 		Laya.imps(__proto,{"commonlayout.mindmaptree.IMindMapTreeItem":true})
+		__proto.removeFromParent=function(){
+			if (this.parentNode){
+				MindMapViewer.removeChildNode(this.parentNode,this);
+				Notice$1.notify("DataChanged");
+			}
+		}
+
+		__proto.setUpTextInput=function(input,key){
+			input.on("blur",this,this.onTextInputChange,[input,key]);
+		}
+
+		__proto.onTextInputChange=function(input,key){
+			if (this._dataO.props[key]==input.text)return;
+			this._dataO.props[key]=input.text;
+			Notice$1.notify("DataChanged");
+		}
+
 		__proto.setLayoutPos=function(x,y){
 			this.pos(x,y);
 		}
