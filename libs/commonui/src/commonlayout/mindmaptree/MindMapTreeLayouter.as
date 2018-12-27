@@ -16,14 +16,17 @@ package commonlayout.mindmaptree
 		{
 			var leftItem:Sprite;
 			var rightItem:Sprite;
+			var isRight:Boolean;
 			if (parentItem.x < childItem.x)
 			{
 				leftItem = parentItem;
 				rightItem = childItem;
+				isRight = true;
 			}else
 			{
 				leftItem = childItem;
 				rightItem = parentItem;
+				isRight = false;
 			}
 			var lx:Number, ly:Number;
 			var rx:Number, ry:Number;
@@ -32,8 +35,13 @@ package commonlayout.mindmaptree
 			rx = rightItem.x;
 			ry = rightItem.y;
 			//sprite.graphics.drawCurves(0, 0, [lx, ly, (lx + rx) / 2, (ly + ry) / 2, rx, ry], "#ff0000");
-			sprite.graphics.drawCurves(0, 0, [lx,ly,(lx+rx)/2,ly,rx,ry], "#ff0000");
-			//sprite.graphics.drawLine(leftItem.x + leftItem.width, leftItem.y, rightItem.x, rightItem.y,"#ff0000");
+			if (isRight)
+			{
+				sprite.graphics.drawCurves(0, 0, [lx,ly,(lx+rx)/2,ry,rx,ry], "#ff0000");
+			}else
+			{
+				sprite.graphics.drawCurves(0, 0, [lx,ly,(lx+rx)/2,ly,rx,ry], "#ff0000");
+			}
 		}
 		
 		public function drawConnections(treeItem:IMindMapTreeItem,sprite:Sprite):void
