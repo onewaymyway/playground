@@ -25367,7 +25367,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(TarotCardUI.uiView);
 		}
 
-		TarotCardUI.uiView={"type":"View","props":{"width":130,"height":300},"child":[{"type":"Label","props":{"y":4,"x":0,"width":128,"var":"titleTxt","text":"过去","styleSkin":"comp/label.png","height":26,"fontSize":20,"color":"#f6e3e2","align":"center"}},{"type":"Box","props":{"y":29,"x":0,"width":130,"var":"contentBox","height":250},"child":[{"type":"Image","props":{"y":91,"x":65,"width":130,"var":"img","skin":"cards/death.jpg","height":180,"anchorY":0.5,"anchorX":0.5}},{"type":"Label","props":{"y":191,"x":1,"width":128,"var":"nameTxt","text":"Death\\n死亡","styleSkin":"comp/label.png","height":26,"fontSize":20,"color":"#f6e3e2","align":"center"}},{"type":"Button","props":{"y":237,"x":3,"width":125,"var":"detailBtn","skin":"comp/button.png","label":"牌解","height":28}}]}]};
+		TarotCardUI.uiView={"type":"View","props":{"width":130,"height":300},"child":[{"type":"Label","props":{"y":4,"x":0,"width":128,"var":"titleTxt","text":"过去","styleSkin":"comp/label.png","height":26,"fontSize":20,"color":"#f6e3e2","align":"center"}},{"type":"Box","props":{"y":29,"x":0,"width":130,"var":"contentBox","height":250},"child":[{"type":"Image","props":{"y":91,"x":65,"width":130,"var":"img","skin":"cards/death.jpg","height":180,"anchorY":0.5,"anchorX":0.5}},{"type":"Label","props":{"y":191,"x":1,"width":128,"var":"nameTxt","text":"Death\\n死亡","styleSkin":"comp/label.png","height":26,"fontSize":20,"color":"#f6e3e2","align":"center"}},{"type":"Button","props":{"y":237,"x":3,"width":125,"var":"detailBtn","skin":"comp/button.png","label":"牌解","height":28,"labelColors":"#fffff"}}]}]};
 		return TarotCardUI;
 	})(View)
 
@@ -25391,7 +25391,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(TarotMainUI.uiView);
 		}
 
-		TarotMainUI.uiView={"type":"View","props":{"width":800,"height":600},"child":[{"type":"TarotCard","props":{"y":40,"x":71,"var":"past","runtime":"view.tarot.TarotCard"}},{"type":"TarotCard","props":{"y":40,"x":327,"var":"now","runtime":"view.tarot.TarotCard"}},{"type":"TarotCard","props":{"y":40,"x":583,"var":"feature","runtime":"view.tarot.TarotCard"}},{"type":"Label","props":{"y":367,"x":66,"wordWrap":true,"width":649,"var":"detailTxt","text":"label","styleSkin":"comp/label.png","height":168,"fontSize":18,"color":"#f4e6e6"}},{"type":"Button","props":{"y":1,"x":1,"width":96,"var":"workBtn","skin":"comp/button.png","label":"预测","height":41}}]};
+		TarotMainUI.uiView={"type":"View","props":{"width":800,"height":600},"child":[{"type":"TarotCard","props":{"y":40,"x":71,"var":"past","runtime":"view.tarot.TarotCard"}},{"type":"TarotCard","props":{"y":40,"x":327,"var":"now","runtime":"view.tarot.TarotCard"}},{"type":"TarotCard","props":{"y":40,"x":583,"var":"feature","runtime":"view.tarot.TarotCard"}},{"type":"Label","props":{"y":367,"x":66,"wordWrap":true,"width":649,"var":"detailTxt","text":"label","styleSkin":"comp/label.png","height":168,"fontSize":18,"color":"#f4e6e6"}},{"type":"Button","props":{"y":1,"x":1,"width":96,"var":"workBtn","skin":"comp/button.png","label":"预测","height":41,"labelColors":"#fffff"}}]};
 		return TarotMainUI;
 	})(View)
 
