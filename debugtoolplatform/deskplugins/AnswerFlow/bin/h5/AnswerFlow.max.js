@@ -166,7 +166,8 @@
 		}
 
 		__proto.updateUIContent=function(){
-			if (!this._data||!this.mindMapEditor)return;
+			if (!this._data || !this.mindMapEditor)return;
+			this.mindMapEditor.setEditType(nodetools.devices.FileTools.getExtensionName(this._data.url));
 			this.mindMapEditor.setData(this._data.data);
 			this.text.text=JSON.stringify(this._data);
 		}
@@ -298,7 +299,7 @@
 			this.createView(AddAbleNodeUI.uiView);
 		}
 
-		AddAbleNodeUI.uiView={"type":"MindMapTreeBase","props":{"width":105,"height":23},"child":[{"type":"Label","props":{"y":2,"x":0,"width":63,"var":"txt","text":"触发方式","styleSkin":"comp/label.png","height":21,"color":"#e72320"}},{"type":"Button","props":{"y":0,"x":79,"width":26,"var":"addBtn","skin":"comp/button.png","label":"+","height":24}}]};
+		AddAbleNodeUI.uiView={"type":"MindMapTreeBase","props":{"width":105,"height":23},"child":[{"type":"TextInput","props":{"y":1,"x":1,"width":71,"var":"txt","text":"触发方式","skin":"comp/input_22.png","height":21,"color":"#e72320"}},{"type":"Button","props":{"y":0,"x":79,"width":26,"var":"addBtn","skin":"comp/button.png","label":"+","height":24}}]};
 		return AddAbleNodeUI;
 	})(MindMapTreeBase)
 
@@ -328,6 +329,7 @@
 	var AnswerFlowEditor=(function(_super){
 		function AnswerFlowEditor(){
 			this.dataO=null;
+			this._type=null;
 			AnswerFlowEditor.__super.call(this);
 			this.actionList.renderHandler=new Handler(this,this.itemRender);
 			this.actionList.selectEnable=true;
@@ -369,12 +371,25 @@
 		}
 
 		__proto.addNewAction=function(){
-			this.dataO.actions.push(AnswerFlowEditor.createActionData());
+			this.dataO.actions.push(this.createDefaultActionData());
 			this.setData(this.dataO);
 		}
 
 		__proto.onActionSelect=function(dataO){
 			this.actionEditor.setData(dataO.data);
+		}
+
+		__proto.createDefaultActionData=function(){
+			var rst;
+			switch(this._type){
+				case "ansflow":
+					rst=AnswerFlowEditor.createActionData();
+					break ;
+				case "qgame":
+					rst=AnswerFlowEditor.createQGameActionData();
+					break ;
+				}
+			return rst;
 		}
 
 		__proto.createAddActionData=function(){
@@ -383,6 +398,11 @@
 			rst.type="addnew";
 			rst.label="addNew";
 			return rst;
+		}
+
+		__proto.setEditType=function(type){
+			console.log("setEditType:",type);
+			this._type=type;
 		}
 
 		__proto.setData=function(dataO){
@@ -450,6 +470,43 @@
 			return rst;
 		}
 
+		AnswerFlowEditor.createQGameActionData=function(){
+			var rst;
+			rst={};
+			rst.type="Action";
+			rst.label="actionData";
+			var actionData;
+			actionData={
+				"type":"ActionRoot",
+				"props":{"des":"描述信息","label":"问题"},
+				"childs":
+				[{
+					"type":"AddAbleNode",
+					"props":{
+						"label":"选项",
+						"tpl":{
+							"type":"AddAbleNode",
+							"props":{
+								"label":"选项内容" ,
+								"editable":true,
+								"tpl":{
+									"type":"ItemData",
+									"props":{},
+									"childs":[]
+								}
+							},
+							"childs":[]
+						}
+					},
+					"childs":[]
+				}]
+			};
+			rst.data=actionData;
+			return rst;
+		}
+
+		AnswerFlowEditor.AnswerFlow="ansflow";
+		AnswerFlowEditor.QGame="qgame";
 		return AnswerFlowEditor;
 	})(AnswerFlowEditorUI)
 
@@ -527,6 +584,7 @@
 		function AddAbleNode(){
 			AddAbleNode.__super.call(this);
 			this.addBtn.on("click",this,this.onAddBtn);
+			this.setUpTextInput(this.txt,"label");
 		}
 
 		__class(AddAbleNode,'answerflow.AddAbleNode',_super);
@@ -534,6 +592,7 @@
 		__proto.renderByData=function(){
 			commonlayout.mindmaptree.MindMapTreeBase.prototype.renderByData.call(this);
 			this.txt.text=this._dataO.props.label;
+			this.txt.editable=this._dataO.props.editable==true;
 		}
 
 		__proto.onAddBtn=function(){

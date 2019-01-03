@@ -12,6 +12,8 @@ package answerflow
 	 */
 	public class AnswerFlowEditor extends AnswerFlowEditorUI 
 	{
+		public static const AnswerFlow:String = "ansflow";
+		public static const QGame:String = "qgame";
 		public var dataO:Object;
 		public function AnswerFlowEditor() 
 		{
@@ -59,7 +61,7 @@ package answerflow
 		
 		private function addNewAction():void
 		{
-			dataO.actions.push(createActionData());
+			dataO.actions.push(createDefaultActionData());
 			setData(dataO);
 		}
 		
@@ -68,6 +70,20 @@ package answerflow
 			actionEditor.setData(dataO.data);
 		}
 		
+		private function createDefaultActionData():Object
+		{
+			var rst:Object;
+			switch(_type)
+			{
+				case AnswerFlow:
+					rst=createActionData();
+					break;
+				case QGame:
+					rst=createQGameActionData();
+					break;
+			}
+			return rst;
+		}
 		
 		public static function createActionData():Object
 		{
@@ -128,6 +144,45 @@ package answerflow
 			rst.data = actionData;
 			return rst;
 		}
+		public static function createQGameActionData():Object
+		{
+			var rst:Object;
+			rst = {};
+			rst.type = "Action";
+			rst.label = "actionData";
+			var actionData:Object;
+			actionData = {
+				"type":"ActionRoot",
+				"props":{"des":"描述信息","label":"问题"},
+				"childs":
+					[
+						{
+							"type":"AddAbleNode",
+							"props": {
+								"label":"选项",
+								"tpl": {
+									
+									"type":"AddAbleNode",
+									"props": {
+										"label":"选项内容" ,
+										"editable":true,
+										"tpl": {
+												"type":"ItemData",
+												"props": { },
+												"childs":[]
+												}
+										},
+									"childs":[]
+									
+									}
+								},
+							"childs":[]
+						}
+					]
+				};
+			rst.data = actionData;
+			return rst;
+		}
 		private function createAddActionData():Object
 		{
 			var rst:Object;
@@ -136,6 +191,14 @@ package answerflow
 			rst.label = "addNew";
 			return rst;
 		}
+		
+		private var _type:String;
+		public function setEditType(type:String):void
+		{
+			trace("setEditType:", type);
+			_type = type;
+		}
+		
 		public function setData(dataO:Object):void
 		{
 			this.dataO = dataO;

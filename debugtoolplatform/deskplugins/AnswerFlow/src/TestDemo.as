@@ -9,6 +9,7 @@ package
 	import laya.net.Loader;
 	import laya.utils.Handler;
 	import nodetools.devices.FileManager;
+	import nodetools.devices.FileTools;
 	import test.MakeAnsFlowFile;
 	import viewRender.EditorRenderBase;
 	/**
@@ -89,7 +90,8 @@ package
 		
 		private function updateUIContent():void
 		{
-			if (!_data||!mindMapEditor) return;
+			if (!_data || !mindMapEditor) return;
+			mindMapEditor.setEditType(FileTools.getExtensionName(_data.url));
 			mindMapEditor.setData(_data.data);
 			text.text = JSON.stringify(_data);
 		}
