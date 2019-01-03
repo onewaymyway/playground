@@ -1883,7 +1883,13 @@
 					var renderPath;
 					renderPath=FileManager.getPath(folder,configO.url);
 					if(FileManager.exists(renderPath)){
-						EditRenderManager.regRender(configO.extension,renderPath);
+						var extensions;
+						extensions=configO.extension.split(",");
+						var i=0,len=0;
+						len=extensions.length;
+						for (i=0;i < len;i++){
+							EditRenderManager.regRender(extensions[i],renderPath);
+						}
 					}
 				}
 				if (configO.createMenus){
