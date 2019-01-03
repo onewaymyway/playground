@@ -115,7 +115,15 @@ package platform.managers
 					renderPath=FileManager.getPath(folder,configO.url);
 					if(FileManager.exists(renderPath))
 					{
-						regRender(configO.extension,renderPath);
+						var extensions:Array;
+						extensions = configO.extension.split(",");
+						var i:int, len:int;
+						len = extensions.length;
+						for (i = 0; i < len; i++)
+						{
+							regRender(extensions[i],renderPath);
+						}
+						//regRender(configO.extension,renderPath);
 					}
 				}
 				if (configO.createMenus)
