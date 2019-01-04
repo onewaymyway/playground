@@ -16062,6 +16062,25 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*...
+	*@author ww
+	*/
+	//class commontools.EventTools
+	var EventTools=(function(){
+		function EventTools(){}
+		__class(EventTools,'commontools.EventTools');
+		EventTools.sendEventOnTree=function(tar,event){
+			while (tar){
+				tar.event(event);
+				tar=tar.parent;
+			}
+		}
+
+		return EventTools;
+	})()
+
+
+	/**
 	*<code>Node</code> 类是可放在显示列表中的所有对象的基类。该显示列表管理 Laya 运行时中显示的所有对象。使用 Node 类排列显示列表中的显示对象。Node 对象可以有子显示对象。
 	*/
 	//class laya.display.Node extends laya.events.EventDispatcher
@@ -32334,6 +32353,7 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.createNodeByData=function(dataO){
+			if (!dataO)debugger;
 			var tItem;
 			tItem=this.createByType(dataO.type);
 			tItem.setData(dataO);
@@ -35502,7 +35522,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.removeFromParent=function(){
 			if (this.parentNode){
 				MindMapViewer.removeChildNode(this.parentNode,this);
-				Notice$1.notify("DataChanged");
+				EventTools.sendEventOnTree(this,"DataChanged");
 			}
 		}
 
@@ -35513,7 +35533,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.onTextInputChange=function(input,key){
 			if (this._dataO.props[key]==input.text)return;
 			this._dataO.props[key]=input.text;
-			Notice$1.notify("DataChanged");
+			EventTools.sendEventOnTree(this,"DataChanged");
 		}
 
 		__proto.setLayoutPos=function(x,y){
@@ -36709,25 +36729,6 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
-	var FindNodeSmall=(function(_super){
-		function FindNodeSmall(){
-			FindNodeSmall.__super.call(this);
-			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
-			this.createView(FindNodeSmallUI.uiView);
-		}
-
-		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
-		var __proto=FindNodeSmall.prototype;
-		__proto.createChildren=function(){}
-		return FindNodeSmall;
-	})(FindNodeSmallUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
 	//class laya.debug.view.nodeInfo.nodetree.FindNode extends laya.debug.ui.debugui.FindNodeUI
 	var FindNode=(function(_super){
 		function FindNode(){
@@ -36744,6 +36745,25 @@ var Laya=window.Laya=(function(window,document){
 
 		return FindNode;
 	})(FindNodeUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
+	var FindNodeSmall=(function(_super){
+		function FindNodeSmall(){
+			FindNodeSmall.__super.call(this);
+			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
+			this.createView(FindNodeSmallUI.uiView);
+		}
+
+		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
+		var __proto=FindNodeSmall.prototype;
+		__proto.createChildren=function(){}
+		return FindNodeSmall;
+	})(FindNodeSmallUI)
 
 
 	/**

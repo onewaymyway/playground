@@ -203,6 +203,8 @@
 			this.actionList=null;
 			this.actionEditor=null;
 			this.saveBtn=null;
+			this.itemList=null;
+			this.addItemBtn=null;
 			AnswerFlowEditorUI.__super.call(this);
 		}
 
@@ -214,7 +216,7 @@
 			this.createView(AnswerFlowEditorUI.uiView);
 		}
 
-		AnswerFlowEditorUI.uiView={"type":"View","props":{"width":600,"height":600},"child":[{"type":"Label","props":{"y":6,"x":20,"width":53,"text":"操作","styleSkin":"comp/label.png","height":15,"color":"#ef3431"}},{"type":"List","props":{"x":19,"width":67,"var":"actionList","top":30,"bottom":5},"child":[{"type":"Box","props":{"name":"render"},"child":[{"type":"Label","props":{"width":53,"text":"label","styleSkin":"comp/label.png","name":"label","height":15,"color":"#ef3431"}}]}]},{"type":"Action","props":{"var":"actionEditor","top":30,"runtime":"answerflow.Action","right":20,"left":80,"bottom":20}},{"type":"Button","props":{"var":"saveBtn","top":5,"skin":"comp/button.png","right":5,"label":"save"}}]};
+		AnswerFlowEditorUI.uiView={"type":"View","props":{"width":600,"height":600},"child":[{"type":"Label","props":{"y":6,"x":20,"width":53,"text":"操作","styleSkin":"comp/label.png","height":15,"color":"#ef3431"}},{"type":"List","props":{"x":19,"width":67,"var":"actionList","vScrollBarSkin":"comp/vscroll.png","top":30,"bottom":5},"child":[{"type":"Box","props":{"name":"render"},"child":[{"type":"Label","props":{"width":53,"text":"label","styleSkin":"comp/label.png","name":"label","height":15,"color":"#ef3431"}}]}]},{"type":"Action","props":{"var":"actionEditor","top":30,"runtime":"answerflow.Action","right":20,"left":80,"bottom":20}},{"type":"Button","props":{"var":"saveBtn","top":5,"skin":"comp/button.png","right":5,"label":"save"}},{"type":"List","props":{"var":"itemList","vScrollBarSkin":"comp/vscroll.png","top":5,"spaceY":5,"spaceX":5,"right":200,"left":110,"height":39},"child":[{"type":"Box","props":{"name":"render"},"child":[{"type":"TextInput","props":{"width":53,"text":"label","skin":"comp/input_22.png","name":"label","height":15,"color":"#ef3431"}}]}]},{"type":"Button","props":{"width":28,"var":"addItemBtn","top":11,"skin":"comp/button.png","right":151,"label":"+","height":24}}]};
 		return AnswerFlowEditorUI;
 	})(View)
 
@@ -239,18 +241,12 @@
 			this.viewer.x=100;
 			this.on("display",this,this.onDisplayChange);
 			this.on("undisplay",this,this.onDisplayChange);
+			this.on("DataChanged",this,this.freshUI);
 		}
 
 		__class(Action,'answerflow.Action',_super);
 		var __proto=Action.prototype;
-		__proto.onDisplayChange=function(){
-			Notice$1.cancel("DataChanged",this,this.freshUI);
-			if (this.displayedInStage){
-				Notice$1.listen("DataChanged",this,this.freshUI);
-				}else{
-			}
-		}
-
+		__proto.onDisplayChange=function(){}
 		__proto.freshUI=function(){
 			this.viewer.setData(this._dataO);
 		}
@@ -336,10 +332,20 @@
 			this.actionList.on("doubleclick",this,this.onDoubleClick);
 			Notice$1.listen("DataChanged",this,this.freshUI);
 			this.saveBtn.on("click",this,this.onSaveBtn);
+			this.addItemBtn.on("click",this,this.onAddItemBtn);
+			this.itemList.renderHandler=new Handler(this,this.itemListItemRender);
 		}
 
 		__class(AnswerFlowEditor,'answerflow.AnswerFlowEditor',_super);
 		var __proto=AnswerFlowEditor.prototype;
+		__proto.onAddItemBtn=function(){
+			if (!this.dataO.items){
+				this.dataO.items=[];
+			}
+			this.dataO.items.push("new item");
+			this.freshUI();
+		}
+
 		__proto.onSaveBtn=function(){
 			this.event("save");
 		}
@@ -353,6 +359,14 @@
 			if (dataO.type=="Action"){
 				label.text=dataO.data.props.label;
 			}
+		}
+
+		__proto.itemListItemRender=function(cell,index){
+			var label;
+			label=cell.getChildByName("label");
+			var dataO;
+			dataO=cell.dataSource;
+			label.text=dataO;
 		}
 
 		__proto.onDoubleClick=function(){
@@ -415,6 +429,12 @@
 				this.dataO.actions=[this.createAddActionData()];
 			}
 			this.actionList.array=this.dataO.actions;
+			if (!this.dataO.items){
+				this.itemList.visible=false;
+				}else{
+				this.itemList.visible=true;
+				this.itemList.array=this.dataO.items;
+			}
 		}
 
 		AnswerFlowEditor.createActionData=function(){

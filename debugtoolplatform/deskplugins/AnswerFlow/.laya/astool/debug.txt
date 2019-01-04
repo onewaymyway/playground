@@ -1,2 +1,5 @@
-Project configuration:d:\Documents\myLayaaaaqaaaaaqqsaaaaaaaareqaaaaasaaqq/.actionScriptProperties.
-******************************************************************************
+1,0.00,,0,Project command:d:\codes\playground.git\trunk\debugtoolplatform\deskplugins\AnswerFlow/.actionScriptProperties;iflash=false;windowshow=false;chromerun=false;quickcompile=true
+Project configuration:d:\codes\playground.git\trunk\debugtoolplatform\deskplugins\AnswerFlow/.actionScriptProperties.
+1,0.00,,0,output path:d:/codes/playground.git/trunk/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/
+7,0.00,,0,No Document Class
+14,0.00,,0,

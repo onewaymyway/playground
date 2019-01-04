@@ -25,18 +25,19 @@ package answerflow
 			viewer.x = 100;
 			this.on(Event.DISPLAY, this, onDisplayChange);
 			this.on(Event.UNDISPLAY, this, onDisplayChange);
+			this.on(AnswerFlowEvents.DataChanged, this, freshUI);
 		}
 		
 		private function onDisplayChange():void
 		{
-			Notice.cancel(AnswerFlowEvents.DataChanged, this, freshUI);
-			if (this.displayedInStage)
-			{
-				Notice.listen(AnswerFlowEvents.DataChanged, this, freshUI);
-			}else
-			{
-				
-			}
+			//Notice.cancel(AnswerFlowEvents.DataChanged, this, freshUI);
+			//if (this.displayedInStage)
+			//{
+				//Notice.listen(AnswerFlowEvents.DataChanged, this, freshUI);
+			//}else
+			//{
+				//
+			//}
 		}
 		private var _dataO:Object;
 		public function freshUI():void

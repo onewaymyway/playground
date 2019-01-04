@@ -22,8 +22,21 @@ package answerflow
 			actionList.on(Event.DOUBLE_CLICK, this, onDoubleClick);
 			Notice.listen(AnswerFlowEvents.DataChanged, this, freshUI);
 			saveBtn.on(Event.CLICK, this, onSaveBtn);
+			addItemBtn.on(Event.CLICK, this, onAddItemBtn);
+			
+			itemList.renderHandler = new Handler(this, itemListItemRender);
 		}
 		
+		
+		private function onAddItemBtn():void
+		{
+			if (!dataO.items)
+			{
+				dataO.items = [];
+			}
+			dataO.items.push("new item");
+			freshUI();
+		}
 		private function onSaveBtn():void
 		{
 			event("save");
@@ -39,6 +52,15 @@ package answerflow
 			{
 				label.text = dataO.data.props.label;
 			}
+		}
+		
+		private function itemListItemRender(cell:*, index:int):void
+		{
+			var label:Label;
+			label = cell.getChildByName("label");
+			var dataO:Object;
+			dataO = cell.dataSource;
+			label.text = dataO;
 		}
 		
 		private function onDoubleClick():void
@@ -211,7 +233,17 @@ package answerflow
 			{
 				dataO.actions = [createAddActionData()];
 			}
+			
 			actionList.array = dataO.actions;
+			
+			if (!dataO.items)
+			{
+				itemList.visible = false;
+			}else
+			{
+				itemList.visible = true;
+				itemList.array = dataO.items;
+			}
 		}
 	}
 
