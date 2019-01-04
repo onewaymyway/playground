@@ -150,6 +150,7 @@ package commonlayout.mindmaptree
 		}
 		private function createNodeByData(dataO:Object):*
 		{
+			if (!dataO) debugger;
 			var tItem:IMindMapTreeItem;
 			tItem = createByType(dataO.type);
 			tItem.setData(dataO);

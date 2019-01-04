@@ -717,6 +717,7 @@ var Laya=window.Laya=(function(window,document){
 			this.fileKit=null;
 			this.tree=null;
 			this.switchBtn=null;
+			this.canParseFileDic={"mm":MM2MindMapData,"pso":PSO2MindMapData,"zmap":ZMap2MindMapData};
 			this.container=null;
 			this.tFile=null;
 			this.tID=0;
@@ -728,6 +729,7 @@ var Laya=window.Laya=(function(window,document){
 			ContextMenu.init();
 			ContextMenuItem.labelColors="#ffffff,#ffffff,#ffffff,#ffffff";
 			ContextMenuItem.btnSkin="comp/button.png";
+			ContextMenuItem.lineSkin="comp/line2.png";
 			View.regComponent("TreeEx",FileTree);
 			var resList;
 			resList=[ {"url":"res/atlas/comp.json","type":"atlas" }];
@@ -735,6 +737,8 @@ var Laya=window.Laya=(function(window,document){
 			resList.push({"url":"res/atlas/play.json","type":"atlas"});
 			Laya.loader.load(resList,new Handler(this,this.initFileToolKit));
 			MindMapEditor.isEditorMode=false;
+			SystemDragOverManager.init();
+			Laya.stage.on("SystemDrag",this,this.onSystemDrag);
 		}
 
 		__class(TestRemoteView,'TestRemoteView');
@@ -745,6 +749,29 @@ var Laya=window.Laya=(function(window,document){
 			FileKit.I=this.fileKit;
 			this.fileKit.on("Logined",this,this.onLogin);
 			this.test();
+		}
+
+		__proto.onSystemDrag=function(dataO){
+			debugger;
+			var fileO;
+			fileO=dataO.data.files[0];
+			var fileName;
+			fileName=fileO.name;
+			if (this.canParseFileDic[FilePathUtils.getExtensionName(fileName)]){
+				var txt;
+				txt=FileReaderTool.readAsString(fileO,Handler.create(this,this.onFileReadBack,[fileName]));
+			}
+		}
+
+		__proto.onFileReadBack=function(fileName,dataO){
+			var extension;
+			extension=FilePathUtils.getExtensionName(fileName);
+			var obj;
+			obj=this.canParseFileDic[extension].parse(dataO);
+			if (!obj)return;
+			this.tFile=extension+"/"+fileName.replace("."+extension,".demorender")
+			this.mindMapEditor.setData(obj);
+			this.mindMapEditor.visible=true;
 		}
 
 		__proto.onLogin=function(){
@@ -779,6 +806,19 @@ var Laya=window.Laya=(function(window,document){
 			this.switchBtn.left=this.mindMapEditor.left;
 			this.switchBtn.on("click",this,this.onSwitchBtn);
 			Notice.listen("Open_File",this,this.onOpenFile);
+			this.openFileByPath("FirstOfAll.demorender");
+		}
+
+		//testPropPanel();
+		__proto.testPropPanel=function(){
+			var testObj;
+			testObj={};
+			testObj.type="CC";
+			testObj.props={};
+			var testNode;
+			testNode={};
+			testNode.comXml=testObj;
+			PropPanel.showPropPanel(testNode);
 		}
 
 		__proto.onSwitchBtn=function(){
@@ -810,6 +850,10 @@ var Laya=window.Laya=(function(window,document){
 		__proto.onOpenFile=function(dataO){
 			var filePath;
 			filePath=dataO.path;
+			this.openFileByPath(filePath);
+		}
+
+		__proto.openFileByPath=function(filePath){
 			if (filePath==this.preLoadFile)return;
 			this.preLoadFile=filePath;
 			this.tID++;
@@ -847,51 +891,6 @@ var Laya=window.Laya=(function(window,document){
 		Config.isStencil=true;
 		Config.preserveDrawingBuffer=false;
 		return Config;
-	})()
-
-
-	/**
-	*...
-	*@author dongketao
-	*/
-	//class PathFinding.core.Node
-	var Node$1=(function(){
-		function Node(x,y,walkable){
-			this.x=0;
-			this.y=0;
-			this.g=0;
-			this.f=0;
-			this.h=0;
-			this.by=0;
-			this.parent=null;
-			this.opened=null;
-			this.closed=null;
-			this.tested=null;
-			this.retainCount=null;
-			this.walkable=false;
-			(walkable===void 0)&& (walkable=true);
-			this.x=x;
-			this.y=y;
-			this.walkable=walkable;
-		}
-
-		__class(Node,'PathFinding.core.Node',null,'Node$1');
-		return Node;
-	})()
-
-
-	/**全局配置*/
-	//class UIConfig
-	var UIConfig=(function(){
-		function UIConfig(){};
-		__class(UIConfig,'UIConfig');
-		UIConfig.touchScrollEnable=true;
-		UIConfig.mouseWheelEnable=true;
-		UIConfig.showButtons=true;
-		UIConfig.popupBgColor="#000000";
-		UIConfig.popupBgAlpha=0.5;
-		UIConfig.closeDialogOnSide=true;
-		return UIConfig;
 	})()
 
 
@@ -1771,6 +1770,971 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-10-23 下午2:24:04
+	*/
+	//class laya.debug.tools.ClassTool
+	var ClassTool=(function(){
+		function ClassTool(){}
+		__class(ClassTool,'laya.debug.tools.ClassTool');
+		ClassTool.defineProperty=function(obj,name,des){
+			Object.defineProperty(obj,name,des);;
+		}
+
+		ClassTool.getOwnPropertyDescriptor=function(obj,name){
+			var rst;
+			rst=Object.getOwnPropertyDescriptor(obj,name);;
+			return rst;
+		}
+
+		ClassTool.getOwnPropertyDescriptors=function(obj){
+			var rst;
+			rst=Object.getOwnPropertyDescriptors(obj);;
+			return rst;
+		}
+
+		ClassTool.getOwnPropertyNames=function(obj){
+			var rst;
+			rst=Object.getOwnPropertyNames(obj);;
+			return rst;
+		}
+
+		ClassTool.getObjectGetSetKeys=function(obj,rst){
+			if (!rst)rst=[];
+			var keys;
+			keys=laya.debug.tools.ClassTool.getOwnPropertyNames(obj);
+			var key;
+			for (key in keys){
+				key=keys[key];
+				if (key.indexOf("_$get_")>=0){
+					key=key.replace("_$get_","");
+					rst.push(key);
+				}
+			}
+			if (obj["__proto__"]){
+				ClassTool.getObjectGetSetKeys(obj["__proto__"],rst);
+			}
+			return rst;
+		}
+
+		ClassTool.getObjectDisplayAbleKeys=function(obj,rst){
+			if (!rst)rst=[];
+			var key;
+			var tValue;
+			var tType;
+			for (key in obj){
+				tValue=obj[key];
+				tType=typeof(tValue);
+				if (key.charAt(0)=="_")continue ;
+				rst.push(key);
+			}
+			ClassTool.getObjectGetSetKeys(obj,rst);
+			rst=ObjectTools.getNoSameArr(rst);
+			return rst;
+		}
+
+		ClassTool.getClassName=function(tar){
+			if ((typeof tar=='function'))return tar.name;
+			return tar["constructor"].name;
+		}
+
+		ClassTool.getNodeClassAndName=function(tar){
+			if (!tar)return "null";
+			var rst;
+			if (tar.name){
+				rst=ClassTool.getClassName(tar)+"("+tar.name+")";
+				}else{
+				rst=ClassTool.getClassName(tar);
+			}
+			return rst;
+		}
+
+		ClassTool.getClassNameByClz=function(clz){
+			return clz["name"];
+		}
+
+		ClassTool.getClassByName=function(className){
+			var rst;
+			rst=eval(className);
+			return rst;
+		}
+
+		ClassTool.createObjByName=function(className){
+			var clz;
+			clz=ClassTool.getClassByName(className);
+			return new clz();
+		}
+
+		__static(ClassTool,
+		['displayTypes',function(){return this.displayTypes={"boolean":true,"number":true,"string":true };}
+		]);
+		return ClassTool;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.tools.ColorTool
+	var ColorTool=(function(){
+		function ColorTool(){
+			this.red=NaN;
+			this.green=NaN;
+			this.blue=NaN;
+		}
+
+		__class(ColorTool,'laya.debug.tools.ColorTool');
+		ColorTool.toHexColor=function(color){
+			return Utils.toHexColor(color);
+		}
+
+		ColorTool.getRGBByRGBStr=function(str){
+			str.charAt(0)=='#' && (str=str.substr(1));
+			var color=parseInt(str,16);
+			var flag=(str.length==8);
+			var _color;
+			_color=[((0x00FF0000 & color)>> 16),((0x0000FF00 & color)>> 8),(0x000000FF & color)];
+			return _color;
+		}
+
+		ColorTool.getColorBit=function(value){
+			var rst;
+			rst=Math.floor(value).toString(16);
+			rst=rst.length > 1 ? rst :"0"+rst;
+			return rst;
+		}
+
+		ColorTool.getRGBStr=function(rgb){
+			return "#"+ColorTool.getColorBit(rgb[0])+ColorTool.getColorBit(rgb[1])+ColorTool.getColorBit(rgb[2]);
+		}
+
+		ColorTool.traseHSB=function(hsb){
+			console.log("hsb:",hsb[0],hsb[1],hsb[2]);
+		}
+
+		ColorTool.rgb2hsb=function(rgbR,rgbG,rgbB){
+			var rgb=[rgbR,rgbG,rgbB];
+			rgb.sort(MathTools.sortNumSmallFirst);
+			var max=rgb[2];
+			var min=rgb[0];
+			var hsbB=max / 255.0;
+			var hsbS=max==0 ? 0 :(max-min)/ max;
+			var hsbH=0;
+			if(max==min){
+				hsbH=1;
+			}
+			else
+			if (rgbR==0 && rgbG==0&&rgbB==0){
+			}else
+			if (max==rgbR && rgbG >=rgbB){
+				hsbH=(rgbG-rgbB)*60 / (max-min)+0;
+			}
+			else if (max==rgbR && rgbG < rgbB){
+				hsbH=(rgbG-rgbB)*60 / (max-min)+360;
+			}
+			else if (max==rgbG){
+				hsbH=(rgbB-rgbR)*60 / (max-min)+120;
+			}
+			else if (max==rgbB){
+				hsbH=(rgbR-rgbG)*60 / (max-min)+240;
+			}
+			return [hsbH,hsbS,hsbB];
+		}
+
+		ColorTool.hsb2rgb=function(h,s,v){
+			var r=0,g=0,b=0;
+			var i=Math.floor((h / 60)% 6);
+			var f=(h / 60)-i;
+			var p=v *(1-s);
+			var q=v *(1-f *s);
+			var t=v *(1-(1-f)*s);
+			switch (i){
+				case 0:
+					r=v;
+					g=t;
+					b=p;
+					break ;
+				case 1:
+					r=q;
+					g=v;
+					b=p;
+					break ;
+				case 2:
+					r=p;
+					g=v;
+					b=t;
+					break ;
+				case 3:
+					r=p;
+					g=q;
+					b=v;
+					break ;
+				case 4:
+					r=t;
+					g=p;
+					b=v;
+					break ;
+				case 5:
+					r=v;
+					g=p;
+					b=q;
+					break ;
+				default :
+					break ;
+				}
+			return [Math.floor(r *255.0),Math.floor(g *255.0),Math.floor(b *255.0)];
+		}
+
+		return ColorTool;
+	})()
+
+
+	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-9-25 下午7:19:44
+	*/
+	//class laya.debug.tools.DisControlTool
+	var DisControlTool=(function(){
+		function DisControlTool(){}
+		__class(DisControlTool,'laya.debug.tools.DisControlTool');
+		DisControlTool.getObjectsUnderPoint=function(sprite,x,y,rst,filterFun){
+			rst=rst?rst:[];
+			if(filterFun!=null&&!filterFun(sprite))return rst;
+			if (sprite.getBounds().contains(x,y)){
+				var tS;
+				var tempP=new Point();
+				tempP.setTo(x,y);
+				tempP=sprite.fromParentPoint(tempP);
+				x=tempP.x;
+				y=tempP.y;
+				var childList;
+				childList=sprite._childs||sprite._children;
+				for (var i=childList.length-1;i >-1;i--){
+					var child=childList[i];
+					if((child instanceof laya.display.Sprite ))
+						DisControlTool.getObjectsUnderPoint(child,x,y,rst,filterFun);
+				}
+				rst.push(sprite);
+			}
+			return rst;
+		}
+
+		DisControlTool.getObjectsUnderGlobalPoint=function(sprite,filterFun,point){
+			if(!point){
+				point=new Point();
+				point.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
+			}
+			if(sprite.parent)
+				point=(sprite.parent).globalToLocal(point);
+			return DisControlTool.getObjectsUnderPoint(sprite,point.x,point.y,null,filterFun);
+		}
+
+		DisControlTool.findFirstObjectsUnderGlobalPoint=function(){
+			var disList;
+			disList=DisControlTool.getObjectsUnderGlobalPoint(Laya.stage);
+			if (!disList)return null;
+			var i=0,len=0;
+			var tDis;
+			len=disList.length;
+			for (i=len-1;i>=0;i--){
+				tDis=disList[i];
+				if (tDis && tDis.numChildren < 1){
+					return tDis;
+				}
+			}
+			return tDis;
+		}
+
+		DisControlTool.visibleAndEnableObjFun=function(tar){
+			return tar.visible&&tar.mouseEnabled;
+		}
+
+		DisControlTool.visibleObjFun=function(tar){
+			return tar.visible;
+		}
+
+		DisControlTool.getMousePoint=function(sprite){
+			var point=new Point();
+			point.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
+			point=sprite.globalToLocal(point);
+			return point;
+		}
+
+		DisControlTool.isChildE=function(parent,child){
+			if (!parent)return false;
+			while (child){
+				if (child.parent==parent)return true;
+				child=child.parent;
+			}
+			return false;
+		}
+
+		DisControlTool.isInTree=function(pNode,child){
+			return pNode==child || DisControlTool.isChildE(pNode,child);
+		}
+
+		DisControlTool.setTop=function(tar){
+			if(tar&&tar.parent){
+				var tParent;
+				tParent=tar.parent;
+				tParent.setChildIndex(tar,tParent.numChildren-1);
+			}
+		}
+
+		DisControlTool.clearItemRelativeInfo=function(item){
+			var Nan="NaN";
+			item.getLayout().left=Nan;
+			item.getLayout().right=Nan;
+			item.getLayout().top=Nan;
+			item.getLayout().bottom=Nan;
+		}
+
+		DisControlTool.swap=function(tarA,tarB){
+			if (tarA==tarB)return;
+			var iA=0;
+			iA=tarA.parent.getChildIndex(tarA);
+			var iB=0;
+			iB=tarB.parent.getChildIndex(tarB);
+			var bP;
+			bP=tarB.parent;
+			tarA.parent.addChildAt(tarB,iA);
+			bP.addChildAt(tarA,iB);
+		}
+
+		DisControlTool.insertToTarParent=function(tarA,tars,after){
+			(after===void 0)&& (after=false);
+			var tIndex=0;
+			var parent;
+			if(!tarA)return;
+			parent=tarA.parent;
+			if(!parent)return;
+			tIndex=parent.getChildIndex(tarA);
+			if(after)tIndex++;
+			DisControlTool.insertToParent(parent,tars,tIndex);
+		}
+
+		DisControlTool.insertToParent=function(parent,tars,index){
+			(index===void 0)&& (index=-1);
+			if(!parent)return;
+			if(index<0)index=parent.numChildren;
+			var i=0,len=0;
+			len=tars.length;
+			for(i=0;i<len;i++){
+				DisControlTool.transParent(tars[i],parent);
+				parent.addChildAt(tars[i],index);
+			}
+		}
+
+		DisControlTool.transParent=function(tar,newParent){
+			if(!tar||!newParent)return;
+			if(!tar.parent)return;
+			var preParent;
+			preParent=tar.parent;
+			var pos;
+			pos=new Point(tar.x,tar.y);
+			pos=preParent.localToGlobal(pos);
+			pos=newParent.globalToLocal(pos);
+			tar.pos(pos.x,pos.y);
+		}
+
+		DisControlTool.transPoint=function(nowParent,tarParent,point){
+			point=nowParent.localToGlobal(point);
+			point=tarParent.globalToLocal(point);
+			return point;
+		}
+
+		DisControlTool.removeItems=function(itemList){
+			var i=0,len=0;
+			len=itemList.length;
+			for (i=0;i < len;i++){
+				(itemList [i]).removeSelf();
+			}
+		}
+
+		DisControlTool.addItems=function(itemList,parent){
+			var i=0,len=0;
+			len=itemList.length;
+			for (i=0;i < len;i++){
+				parent.addChild(itemList[i]);
+			}
+		}
+
+		DisControlTool.getAllChild=function(tar){
+			if(!tar)return [];
+			var i=0;
+			var len=0;
+			var rst=[];
+			len=tar.numChildren;
+			for(i=0;i<len;i++){
+				rst.push(tar.getChildAt(i));
+			}
+			return rst;
+		}
+
+		DisControlTool.upDis=function(child){
+			if(child&&child.parent){
+				var tParent;
+				tParent=child.parent;
+				var newIndex=0;
+				newIndex=tParent.getChildIndex(child)+1;
+				if(newIndex>=tParent.numChildren){
+					newIndex=tParent.numChildren-1;
+				}
+				console.log("setChildIndex:"+newIndex);
+				tParent.setChildIndex(child,newIndex);
+			}
+		}
+
+		DisControlTool.downDis=function(child){
+			if(child&&child.parent){
+				var tParent;
+				tParent=child.parent;
+				var newIndex=0;
+				newIndex=tParent.getChildIndex(child)-1;
+				if(newIndex<0)newIndex=0;
+				console.log("setChildIndex:"+newIndex);
+				tParent.setChildIndex(child,newIndex);
+			}
+		}
+
+		DisControlTool.setResizeAbleEx=function(node){
+			var clickItem;
+			clickItem=node.getChildByName("resizeBtn");
+			if (clickItem){
+				SimpleResizer.setResizeAble(clickItem,node);
+			}
+		}
+
+		DisControlTool.setResizeAble=function(node){
+			node.on("click",null,DisControlTool.resizeHandler,[node]);
+		}
+
+		DisControlTool.resizeHandler=function(tar){
+			DisResizer.setUp(tar);
+		}
+
+		DisControlTool.setDragingItem=function(dragBar,tar){
+			dragBar.on("mousedown",null,DisControlTool.dragingHandler,[tar]);
+			tar.on("dragend",null,DisControlTool.dragingEnd,[tar]);
+		}
+
+		DisControlTool.dragingHandler=function(tar){
+			if (tar){
+				tar.startDrag();
+			}
+		}
+
+		DisControlTool.dragingEnd=function(tar){
+			DisControlTool.intFyDisPos(tar);
+			console.log(tar.x,tar.y);
+		}
+
+		DisControlTool.showToStage=function(dis,offX,offY){
+			(offX===void 0)&& (offX=0);
+			(offY===void 0)&& (offY=0);
+			var rec=dis.getBounds();
+			var parent;
+			parent=dis.parent || Laya.stage;
+			dis.x=parent.mouseX+offX;
+			dis.y=parent.mouseY+offY;
+			if (dis.x+rec.width > parent.width){
+				dis.x-=rec.width+offX;
+			}
+			if (dis.y+rec.height > parent.height){
+				dis.y-=rec.height+offY;
+			}
+			DisControlTool.intFyDisPos(dis);
+		}
+
+		DisControlTool.intFyDisPos=function(dis){
+			if (!dis)return;
+			dis.x=Math.round(dis.x);
+			dis.y=Math.round(dis.y);
+		}
+
+		DisControlTool.showOnly=function(disList,showItem){
+			var i=0,len=0;
+			len=disList.length;
+			for (i=0;i < len;i++){
+				disList[i].visible=disList[i]==showItem;
+			}
+		}
+
+		DisControlTool.showOnlyByIndex=function(disList,index){
+			DisControlTool.showOnly(disList,disList[index]);
+		}
+
+		DisControlTool.addOnly=function(disList,showItem,parent){
+			var i=0,len=0;
+			len=disList.length;
+			for (i=0;i < len;i++){
+				if (disList[i] !=showItem){
+					disList[i].removeSelf();
+					}else{
+					parent.addChild(disList[i]);
+				}
+			}
+		}
+
+		DisControlTool.addOnlyByIndex=function(disList,index,parent){
+			DisControlTool.addOnly(disList,disList[index],parent);
+		}
+
+		__static(DisControlTool,
+		['tempP',function(){return this.tempP=new Point();}
+		]);
+		return DisControlTool;
+	})()
+
+
+	/**
+	*布局工具类,目前只支持水平方向布局
+	*@author ww
+	*/
+	//class laya.debug.tools.layout.Layouter
+	var Layouter=(function(){
+		function Layouter(){
+			this.data=null;
+			this._items=null;
+			this.layoutFun=null;
+			this._sX=0;
+			this._width=0;
+		}
+
+		__class(Layouter,'laya.debug.tools.layout.Layouter');
+		var __proto=Layouter.prototype;
+		__proto.layout=function(){
+			this.layoutFun(this._width,this._items,this.data,this._sX);
+		}
+
+		/**
+		*重新布局
+		*
+		*/
+		__proto.changed=function(){
+			Laya.timer.callLater(this,this.layout);
+		}
+
+		/**
+		*根据当前的对象状态计算位置大小
+		*
+		*/
+		__proto.calSize=function(){
+			var i=0,len=0;
+			var tItem;
+			tItem=this.items[0];
+			this._sX=tItem.x;
+			var maxX=NaN;
+			maxX=this._sX+tItem.width;
+			len=this.items.length;
+			for (i=1;i < len;i++){
+				tItem=this.items[i];
+				if (this._sX > tItem.x){
+					this._sX=tItem.x;
+				}
+				if (maxX < tItem.x+tItem.width){
+					maxX=tItem.x+tItem.width;
+				}
+			}
+			this._width=maxX-this._sX;
+		}
+
+		__getset(0,__proto,'width',function(){
+			return this._width;
+			},function(v){
+			this._width=v;
+			this.changed();
+		});
+
+		__getset(0,__proto,'x',function(){
+			return this._sX;
+			},function(v){
+			this._sX=v;
+			this.changed();
+		});
+
+		__getset(0,__proto,'items',function(){
+			return this._items;
+			},function(arr){
+			this._items=arr;
+			this.calSize();
+		});
+
+		return Layouter;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.tools.layout.LayoutFuns
+	var LayoutFuns=(function(){
+		function LayoutFuns(){}
+		__class(LayoutFuns,'laya.debug.tools.layout.LayoutFuns');
+		LayoutFuns.sameWidth=function(totalWidth,items,data,sX){
+			(sX===void 0)&& (sX=0);
+			var dWidth=0;
+			if (data && data.dWidth)
+				dWidth=data.dWidth;
+			var perWidth=NaN;
+			perWidth=(totalWidth-(items.length-1)*dWidth)/ items.length;
+			var tItem;
+			var i=0,len=0;
+			var tX=NaN;
+			tX=sX;
+			len=items.length;
+			for (i=0;i < len;i++){
+				tItem=items[i];
+				tItem.x=tX;
+				tItem.width=perWidth;
+				tX+=dWidth+perWidth;
+			}
+		}
+
+		LayoutFuns.getSameWidthLayout=function(items,dWidth){
+			var data;
+			data={};
+			data.dWidth=dWidth;
+			return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.sameWidth);
+		}
+
+		LayoutFuns.getLayouter=function(items,data,fun){
+			var layouter;
+			layouter=new Layouter();
+			layouter.items=items;
+			layouter.data=data;
+			layouter.layoutFun=fun;
+			return layouter;
+		}
+
+		LayoutFuns.sameDis=function(totalWidth,items,data,sX){
+			(sX===void 0)&& (sX=0);
+			var dWidth=NaN;
+			dWidth=totalWidth;
+			var tItem;
+			var i=0,len=0;
+			len=items.length;
+			LayoutFuns.prepareForLayoutWidth(totalWidth,items);
+			for (i=0;i < len;i++){
+				tItem=items[i];
+				dWidth-=tItem.width;
+			}
+			if (items.length > 1)
+				dWidth=dWidth / (items.length-1);
+			var tX=NaN;
+			tX=sX;
+			len=items.length;
+			for (i=0;i < len;i++){
+				tItem=items[i];
+				tItem.x=tX;
+				tX+=dWidth+tItem.width;
+			}
+		}
+
+		LayoutFuns.getSameDisLayout=function(items,rateSame){
+			(rateSame===void 0)&& (rateSame=false);
+			var data;
+			data={};
+			if (rateSame){
+				var i=0,len=0;
+				len=items.length;
+				var tItem;
+				var totalWidth=NaN;
+				totalWidth=0;
+				for (i=0;i < len;i++){
+					tItem=items[i];
+					totalWidth+=tItem.width;
+				}
+				totalWidth=tItem.x+tItem.width;
+				for (i=0;i < len;i++){
+					tItem=items[i];
+					LayoutFuns.setItemRate(tItem,tItem.width / totalWidth);
+				}
+			}
+			return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.sameDis);
+		}
+
+		LayoutFuns.fullFill=function(totalWidth,items,data,sX){
+			(sX===void 0)&& (sX=0);
+			var dL=0,dR=0;
+			if (data){
+				if (data.dL)
+					dL=data.dL;
+				if (data.dR)
+					dR=data.dR;
+			};
+			var item;
+			var i=0,len=0;
+			len=items.length;
+			for (i=0;i < len;i++){
+				item=items[i];
+				item.x=sX+dL;
+				item.width=totalWidth-dL-dR;
+			}
+		}
+
+		LayoutFuns.getFullFillLayout=function(items,dL,dR){
+			(dL===void 0)&& (dL=0);
+			(dR===void 0)&& (dR=0);
+			var data;
+			data={};
+			data.dL=dL;
+			data.dR=dR;
+			return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.fullFill);
+		}
+
+		LayoutFuns.fixPos=function(totalWidth,items,data,sX){
+			(sX===void 0)&& (sX=0);
+			var dLen=0;
+			var poss=[];
+			var isRate=false;
+			if (data){
+				if (data.dLen)
+					dLen=data.dLen;
+				if (data.poss)
+					poss=data.poss;
+				if (data.isRate)
+					isRate=data.isRate;
+			};
+			var item;
+			var i=0,len=0;
+			len=poss.length;
+			var tX=NaN;
+			tX=sX;
+			var tValue=NaN;
+			var preItem;
+			preItem=null;
+			for (i=0;i < len;i++){
+				item=items[i];
+				tValue=sX+poss[i];
+				if (isRate){
+					tValue=sX+poss[i] *totalWidth;
+				}
+				item.x=tValue;
+				if (preItem){
+					preItem.width=item.x-dLen-preItem.x;
+				}
+				preItem=item;
+			};
+			var lastItem;
+			lastItem=items[items.length-1];
+			lastItem.width=sX+totalWidth-dLen-lastItem.x;
+		}
+
+		LayoutFuns.getFixPos=function(items,dLen,isRate,poss){
+			(dLen===void 0)&& (dLen=0);
+			(isRate===void 0)&& (isRate=false);
+			var data;
+			data={};
+			var layout;
+			layout=LayoutFuns.getLayouter(items,data,LayoutFuns.fixPos);
+			var i=0,len=0;
+			var sX=NaN;
+			var totalWidth=NaN;
+			sX=layout.x;
+			totalWidth=layout.width;
+			if (!poss){
+				poss=[];
+				len=items.length;
+				var tValue=NaN;
+				for (i=0;i < len;i++){
+					tValue=items[i].x-sX;
+					if (isRate){
+						tValue=tValue / totalWidth;
+					}
+					else{
+					}
+					poss.push(tValue);
+				}
+			}
+			data.dLen=dLen;
+			data.poss=poss;
+			data.isRate=isRate;
+			return layout;
+		}
+
+		LayoutFuns.clearItemsRelativeInfo=function(items){
+			var i=0,len=0;
+			len=items.length;
+			for (i=0;i < len;i++){
+				LayoutFuns.clearItemRelativeInfo(items[i]);
+			}
+		}
+
+		LayoutFuns.clearItemRelativeInfo=function(item){
+			var Nan="NaN";
+			item.getLayout().left=Nan;
+			item.getLayout().right=Nan;
+		}
+
+		LayoutFuns.prepareForLayoutWidth=function(totalWidth,items){
+			var i=0,len=0;
+			len=items.length;
+			for (i=0;i < len;i++){
+				LayoutFuns.prepareItemForLayoutWidth(totalWidth,items[i]);
+			}
+		}
+
+		LayoutFuns.getSumWidth=function(items){
+			var sum=NaN;
+			sum=0;
+			var i=0,len=0;
+			len=items.length;
+			for (i=0;i < len;i++){
+				sum+=items[i].width;
+			}
+			return sum;
+		}
+
+		LayoutFuns.prepareItemForLayoutWidth=function(totalWidth,item){
+			if (LayoutFuns.getItemRate(item)> 0){
+				item.width=totalWidth *LayoutFuns.getItemRate(item);
+			}
+		}
+
+		LayoutFuns.setItemRate=function(item,rate){
+			item["layoutRate"]=rate;
+		}
+
+		LayoutFuns.getItemRate=function(item){
+			return item["layoutRate"] ? item["layoutRate"] :-1;
+		}
+
+		LayoutFuns.setItemFreeSize=function(item,free){
+			(free===void 0)&& (free=true);
+			item["layoutFreeSize"]=free;
+		}
+
+		LayoutFuns.isItemFreeSize=function(item){
+			return item["layoutFreeSize"];
+		}
+
+		LayoutFuns.lockedDis=function(totalWidth,items,data,sX){
+			(sX===void 0)&& (sX=0);
+			var dists;
+			dists=data.dists;
+			var sumDis=NaN;
+			sumDis=data.sumDis;
+			var sumWidth=NaN;
+			var i=0,len=0;
+			var tItem;
+			var preItem;
+			LayoutFuns.prepareForLayoutWidth(totalWidth,items);
+			sumWidth=LayoutFuns.getSumWidth(items);
+			var dWidth=NaN;
+			dWidth=totalWidth-sumDis-sumWidth;
+			var freeItem;
+			freeItem=LayoutFuns.getFreeItem(items);
+			if(freeItem){
+				freeItem.width+=dWidth;
+			}
+			preItem=items[0];
+			preItem.x=sX;
+			len=items.length;
+			for(i=1;i<len;i++){
+				tItem=items[i];
+				tItem.x=preItem.x+preItem.width+dists[i-1];
+				preItem=tItem;
+			}
+		}
+
+		LayoutFuns.getFreeItem=function(items){
+			var i=0,len=0;
+			len=items.length;
+			for (i=0;i < len;i++){
+				if(LayoutFuns.isItemFreeSize(items[i])){
+					return items[i];
+				}
+			}
+			return null;
+		}
+
+		LayoutFuns.getLockedDis=function(items){
+			var data;
+			data={};
+			var dists;
+			var i=0,len=0;
+			var tItem;
+			var preItem;
+			var sumDis=NaN;
+			sumDis=0;
+			var tDis=NaN;
+			preItem=items[0];
+			dists=[];
+			len=items.length;
+			for(i=1;i<len;i++){
+				tItem=items[i];
+				tDis=tItem.x-preItem.x-preItem.width;
+				dists.push(tDis);
+				sumDis+=tDis;
+				preItem=tItem;
+			}
+			data.dists=dists;
+			data.sumDis=sumDis;
+			return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.lockedDis);
+		}
+
+		LayoutFuns.RateSign="layoutRate";
+		LayoutFuns.FreeSizeSign="layoutFreeSize";
+		return LayoutFuns;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.tools.MathTools
+	var MathTools=(function(){
+		function MathTools(){}
+		__class(MathTools,'laya.debug.tools.MathTools');
+		MathTools.sortBigFirst=function(a,b){
+			if (a==b)
+				return 0;
+			return b > a ? 1 :-1;
+		}
+
+		MathTools.sortSmallFirst=function(a,b){
+			if (a==b)
+				return 0;
+			return b > a ?-1 :1;
+		}
+
+		MathTools.sortNumBigFirst=function(a,b){
+			return parseFloat(b)-parseFloat(a);
+		}
+
+		MathTools.sortNumSmallFirst=function(a,b){
+			return parseFloat(a)-parseFloat(b);
+		}
+
+		MathTools.sortByKey=function(key,bigFirst,forceNum){
+			(bigFirst===void 0)&& (bigFirst=false);
+			(forceNum===void 0)&& (forceNum=true);
+			var _sortFun;
+			if (bigFirst){
+				_sortFun=forceNum ? MathTools.sortNumBigFirst :MathTools.sortBigFirst;
+				}else {
+				_sortFun=forceNum ? MathTools.sortNumSmallFirst :MathTools.sortSmallFirst;
+			}
+			return function (a,b){
+				return _sortFun(a[key],b[key]);
+			};
+		}
+
+		return MathTools;
+	})()
+
+
+	/**
 	*本类提供obj相关的一些操作
 	*@author ww
 	*@version 1.0
@@ -1952,9 +2916,10 @@ var Laya=window.Laya=(function(window,document){
 			for(i=0;i<len;i++){
 				if(arr[i]==item){
 					arr.splice(i,1);
-					return;
+					return item;
 				}
 			}
+			return null;
 		}
 
 		ObjectTools.setValueArr=function(src,v){
@@ -2169,6 +3134,240 @@ var Laya=window.Laya=(function(window,document){
 
 		ObjectTools.sign="_";
 		return ObjectTools;
+	})()
+
+
+	/**
+	*本类用于调整对象的宽高以及坐标
+	*@author ww
+	*/
+	//class laya.debug.tools.resizer.DisResizer
+	var DisResizer=(function(){
+		function DisResizer(){}
+		__class(DisResizer,'laya.debug.tools.resizer.DisResizer');
+		DisResizer.init=function(){
+			if (DisResizer._up)return;
+			DisResizer._up=new AutoFillRec("T");
+			DisResizer._up.height=2;
+			DisResizer._up.type=0;
+			DisResizer._down=new AutoFillRec("T");
+			DisResizer._down.height=2;
+			DisResizer._down.type=0;
+			DisResizer._left=new AutoFillRec("R");
+			DisResizer._left.width=2;
+			DisResizer._left.type=1;
+			DisResizer._right=new AutoFillRec("R");
+			DisResizer._right.width=2;
+			DisResizer._right.type=1;
+			DisResizer._barList=[DisResizer._up,DisResizer._down,DisResizer._left,DisResizer._right];
+			DisResizer.addEvent();
+		}
+
+		DisResizer.stageDown=function(e){
+			var target;
+			target=e.target;
+			if (DisResizer._tar && DisControlTool.isInTree(DisResizer._tar,target)){
+				return;
+			}
+			DisResizer.clear();
+		}
+
+		DisResizer.clear=function(){
+			DisResizer._tar=null;
+			Laya.stage.off("mouseup",null,DisResizer.stageDown);
+			DisControlTool.removeItems(DisResizer._barList);
+			DisResizer.clearDragEvents();
+		}
+
+		DisResizer.addEvent=function(){
+			var i=0,len=0;
+			var tBar;
+			len=DisResizer._barList.length;
+			for (i=0;i < len;i++){
+				tBar=DisResizer._barList[i];
+				tBar.on("mousedown",null,DisResizer.barDown);
+			}
+		}
+
+		DisResizer.barDown=function(e){
+			DisResizer.clearDragEvents();
+			DisResizer.tBar=e.target;
+			if (!DisResizer.tBar)return;
+			var area;
+			area=new Rectangle();
+			if (DisResizer.tBar.type==0){
+				area.x=DisResizer.tBar.x;
+				area.width=0;
+				area.y=DisResizer.tBar.y-200;
+				area.height=400;
+				}else{
+				area.x=DisResizer.tBar.x-200;
+				area.width=400;
+				area.y=0;
+				area.height=0;
+			};
+			var option;
+			option={};
+			option.area=area;
+			DisResizer.tBar.record();
+			DisResizer.tBar.startDrag(area);
+			DisResizer.tBar.on("dragmove",null,DisResizer.draging);
+			DisResizer.tBar.on("dragend",null,DisResizer.dragEnd);
+		}
+
+		DisResizer.draging=function(e){
+			console.log("draging");
+			if (!DisResizer.tBar)return;
+			if (!DisResizer._tar)return;
+			switch(DisResizer.tBar){
+				case DisResizer._left:
+					DisResizer._tar.x+=DisResizer.tBar.getDx();
+					DisResizer._tar.width-=DisResizer.tBar.getDx();
+					DisResizer._up.width-=DisResizer.tBar.getDx();
+					DisResizer._down.width-=DisResizer.tBar.getDx();
+					DisResizer._right.x-=DisResizer.tBar.getDx();
+					DisResizer.tBar.x-=DisResizer.tBar.getDx();
+					break ;
+				case DisResizer._right:
+					DisResizer._tar.width+=DisResizer.tBar.getDx();
+					DisResizer._up.width+=DisResizer.tBar.getDx();
+					DisResizer._down.width+=DisResizer.tBar.getDx();
+					break ;
+				case DisResizer._up:
+					DisResizer._tar.y+=DisResizer.tBar.getDy();
+					DisResizer._tar.height-=DisResizer.tBar.getDy();
+					DisResizer._right.height-=DisResizer.tBar.getDy();
+					DisResizer._left.height-=DisResizer.tBar.getDy();
+					DisResizer._down.y-=DisResizer.tBar.getDy();
+					DisResizer.tBar.y-=DisResizer.tBar.getDy();
+					break ;
+				case DisResizer._down:
+					DisResizer._tar.height+=DisResizer.tBar.getDy();
+					DisResizer._right.height+=DisResizer.tBar.getDy();
+					DisResizer._left.height+=DisResizer.tBar.getDy();
+					break ;
+				}
+			DisResizer.tBar.record();
+		}
+
+		DisResizer.dragEnd=function(e){
+			console.log("dragEnd");
+			DisResizer.clearDragEvents();
+			DisResizer.updates();
+		}
+
+		DisResizer.clearDragEvents=function(){
+			if (!DisResizer.tBar)return;
+			DisResizer.tBar.off("dragmove",null,DisResizer.draging);
+			DisResizer.tBar.off("dragend",null,DisResizer.dragEnd);
+		}
+
+		DisResizer.setUp=function(dis,force){
+			(force===void 0)&& (force=false);
+			if (force && dis==DisResizer._tar){
+				return;
+			};
+			DisControlTool.removeItems(DisResizer._barList);
+			if (DisResizer._tar==dis){
+				DisResizer._tar=null;
+				DisResizer.clearDragEvents();
+				if(!force)
+					return;
+			}
+			DisResizer._tar=dis;
+			DisResizer.updates();
+			DisControlTool.addItems(DisResizer._barList,dis);
+			Laya.stage.off("mouseup",null,DisResizer.stageDown);
+			Laya.stage.on("mouseup",null,DisResizer.stageDown);
+		}
+
+		DisResizer.updates=function(){
+			var dis;
+			dis=DisResizer._tar;
+			if(!dis)return;
+			var bounds;
+			bounds=new Rectangle(0,0,dis.width,dis.height);
+			DisResizer._up.x=bounds.x;
+			DisResizer._up.y=bounds.y;
+			DisResizer._up.width=bounds.width;
+			DisResizer._down.x=bounds.x;
+			DisResizer._down.y=bounds.y+bounds.height-2;
+			DisResizer._down.width=bounds.width;
+			DisResizer._left.x=bounds.x;
+			DisResizer._left.y=bounds.y;
+			DisResizer._left.height=bounds.height;
+			DisResizer._right.x=bounds.x+bounds.width-2;
+			DisResizer._right.y=bounds.y;
+			DisResizer._right.height=bounds.height;
+		}
+
+		DisResizer.Side=2;
+		DisResizer.Vertical=1;
+		DisResizer.Horizon=0;
+		DisResizer._up=null
+		DisResizer._down=null
+		DisResizer._left=null
+		DisResizer._right=null
+		DisResizer._barList=null
+		DisResizer._tar=null
+		DisResizer.barWidth=2;
+		DisResizer.useGetBounds=false;
+		DisResizer.tBar=null
+		return DisResizer;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.tools.resizer.SimpleResizer
+	var SimpleResizer=(function(){
+		function SimpleResizer(){}
+		__class(SimpleResizer,'laya.debug.tools.resizer.SimpleResizer');
+		SimpleResizer.setResizeAble=function(clickItem,tar,minWidth,minHeight){
+			(minWidth===void 0)&& (minWidth=150);
+			(minHeight===void 0)&& (minHeight=150);
+			clickItem.on("mousedown",null,SimpleResizer.onMouseDown,[tar,minWidth,minHeight]);
+		}
+
+		SimpleResizer.onMouseDown=function(tar,minWidth,minHeight,e){
+			SimpleResizer.clearEvents();
+			if (!tar)return;
+			SimpleResizer.preMousePoint.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
+			SimpleResizer.preTarSize.setTo(tar.width,tar.height);
+			SimpleResizer.preScale.setTo(1,1);
+			var rTar;
+			rTar=tar;
+			while (rTar&&rTar!=Laya.stage){
+				SimpleResizer.preScale.x *=rTar.scaleX;
+				SimpleResizer.preScale.y *=rTar.scaleY;
+				rTar=rTar.parent;
+			}
+			Laya.stage.on("mouseup",null,SimpleResizer.onMouseMoveEnd);
+			Laya.timer.loop(100,null,SimpleResizer.onMouseMoving,[tar,minWidth,minHeight]);
+		}
+
+		SimpleResizer.onMouseMoving=function(tar,minWidth,minHeight,e){
+			var tWidth=(Laya.stage.mouseX-SimpleResizer.preMousePoint.x)/ SimpleResizer.preScale.x+SimpleResizer.preTarSize.x;
+			var tHeight=(Laya.stage.mouseY-SimpleResizer.preMousePoint.y)/SimpleResizer.preScale.y+SimpleResizer.preTarSize.y;
+			tar.width=tWidth > minWidth?tWidth:minWidth;
+			tar.height=tHeight>minHeight?tHeight:minHeight;
+		}
+
+		SimpleResizer.onMouseMoveEnd=function(e){
+			SimpleResizer.clearEvents();
+		}
+
+		SimpleResizer.clearEvents=function(){
+			Laya.timer.clear(null,SimpleResizer.onMouseMoving);
+			Laya.stage.off("mouseup",null,SimpleResizer.onMouseMoveEnd);
+		}
+
+		__static(SimpleResizer,
+		['preMousePoint',function(){return this.preMousePoint=new Point();},'preTarSize',function(){return this.preTarSize=new Point();},'preScale',function(){return this.preScale=new Point();}
+		]);
+		return SimpleResizer;
 	})()
 
 
@@ -2714,537 +3913,101 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*本类用于调整对象的宽高以及坐标
+	*XML转Object类
 	*@author ww
-	*/
-	//class laya.debug.tools.resizer.DisResizer
-	var DisResizer=(function(){
-		function DisResizer(){}
-		__class(DisResizer,'laya.debug.tools.resizer.DisResizer');
-		DisResizer.init=function(){
-			if (DisResizer._up)return;
-			DisResizer._up=new AutoFillRec("T");
-			DisResizer._up.height=2;
-			DisResizer._up.type=0;
-			DisResizer._down=new AutoFillRec("T");
-			DisResizer._down.height=2;
-			DisResizer._down.type=0;
-			DisResizer._left=new AutoFillRec("R");
-			DisResizer._left.width=2;
-			DisResizer._left.type=1;
-			DisResizer._right=new AutoFillRec("R");
-			DisResizer._right.width=2;
-			DisResizer._right.type=1;
-			DisResizer._barList=[DisResizer._up,DisResizer._down,DisResizer._left,DisResizer._right];
-			DisResizer.addEvent();
-		}
-
-		DisResizer.stageDown=function(e){
-			var target;
-			target=e.target;
-			if (DisResizer._tar && DisControlTool.isInTree(DisResizer._tar,target)){
-				return;
-			}
-			DisResizer.clear();
-		}
-
-		DisResizer.clear=function(){
-			DisResizer._tar=null;
-			Laya.stage.off("mouseup",null,DisResizer.stageDown);
-			DisControlTool.removeItems(DisResizer._barList);
-			DisResizer.clearDragEvents();
-		}
-
-		DisResizer.addEvent=function(){
-			var i=0,len=0;
-			var tBar;
-			len=DisResizer._barList.length;
-			for (i=0;i < len;i++){
-				tBar=DisResizer._barList[i];
-				tBar.on("mousedown",null,DisResizer.barDown);
-			}
-		}
-
-		DisResizer.barDown=function(e){
-			DisResizer.clearDragEvents();
-			DisResizer.tBar=e.target;
-			if (!DisResizer.tBar)return;
-			var area;
-			area=new Rectangle();
-			if (DisResizer.tBar.type==0){
-				area.x=DisResizer.tBar.x;
-				area.width=0;
-				area.y=DisResizer.tBar.y-200;
-				area.height=400;
-				}else{
-				area.x=DisResizer.tBar.x-200;
-				area.width=400;
-				area.y=0;
-				area.height=0;
-			};
-			var option;
-			option={};
-			option.area=area;
-			DisResizer.tBar.record();
-			DisResizer.tBar.startDrag(area);
-			DisResizer.tBar.on("dragmove",null,DisResizer.draging);
-			DisResizer.tBar.on("dragend",null,DisResizer.dragEnd);
-		}
-
-		DisResizer.draging=function(e){
-			console.log("draging");
-			if (!DisResizer.tBar)return;
-			if (!DisResizer._tar)return;
-			switch(DisResizer.tBar){
-				case DisResizer._left:
-					DisResizer._tar.x+=DisResizer.tBar.getDx();
-					DisResizer._tar.width-=DisResizer.tBar.getDx();
-					DisResizer._up.width-=DisResizer.tBar.getDx();
-					DisResizer._down.width-=DisResizer.tBar.getDx();
-					DisResizer._right.x-=DisResizer.tBar.getDx();
-					DisResizer.tBar.x-=DisResizer.tBar.getDx();
-					break ;
-				case DisResizer._right:
-					DisResizer._tar.width+=DisResizer.tBar.getDx();
-					DisResizer._up.width+=DisResizer.tBar.getDx();
-					DisResizer._down.width+=DisResizer.tBar.getDx();
-					break ;
-				case DisResizer._up:
-					DisResizer._tar.y+=DisResizer.tBar.getDy();
-					DisResizer._tar.height-=DisResizer.tBar.getDy();
-					DisResizer._right.height-=DisResizer.tBar.getDy();
-					DisResizer._left.height-=DisResizer.tBar.getDy();
-					DisResizer._down.y-=DisResizer.tBar.getDy();
-					DisResizer.tBar.y-=DisResizer.tBar.getDy();
-					break ;
-				case DisResizer._down:
-					DisResizer._tar.height+=DisResizer.tBar.getDy();
-					DisResizer._right.height+=DisResizer.tBar.getDy();
-					DisResizer._left.height+=DisResizer.tBar.getDy();
-					break ;
-				}
-			DisResizer.tBar.record();
-		}
-
-		DisResizer.dragEnd=function(e){
-			console.log("dragEnd");
-			DisResizer.clearDragEvents();
-			DisResizer.updates();
-		}
-
-		DisResizer.clearDragEvents=function(){
-			if (!DisResizer.tBar)return;
-			DisResizer.tBar.off("dragmove",null,DisResizer.draging);
-			DisResizer.tBar.off("dragend",null,DisResizer.dragEnd);
-		}
-
-		DisResizer.setUp=function(dis,force){
-			(force===void 0)&& (force=false);
-			if (force && dis==DisResizer._tar){
-				return;
-			};
-			DisControlTool.removeItems(DisResizer._barList);
-			if (DisResizer._tar==dis){
-				DisResizer._tar=null;
-				DisResizer.clearDragEvents();
-				if(!force)
-					return;
-			}
-			DisResizer._tar=dis;
-			DisResizer.updates();
-			DisControlTool.addItems(DisResizer._barList,dis);
-			Laya.stage.off("mouseup",null,DisResizer.stageDown);
-			Laya.stage.on("mouseup",null,DisResizer.stageDown);
-		}
-
-		DisResizer.updates=function(){
-			var dis;
-			dis=DisResizer._tar;
-			if(!dis)return;
-			var bounds;
-			bounds=new Rectangle(0,0,dis.width,dis.height);
-			DisResizer._up.x=bounds.x;
-			DisResizer._up.y=bounds.y;
-			DisResizer._up.width=bounds.width;
-			DisResizer._down.x=bounds.x;
-			DisResizer._down.y=bounds.y+bounds.height-2;
-			DisResizer._down.width=bounds.width;
-			DisResizer._left.x=bounds.x;
-			DisResizer._left.y=bounds.y;
-			DisResizer._left.height=bounds.height;
-			DisResizer._right.x=bounds.x+bounds.width-2;
-			DisResizer._right.y=bounds.y;
-			DisResizer._right.height=bounds.height;
-		}
-
-		DisResizer.Side=2;
-		DisResizer.Vertical=1;
-		DisResizer.Horizon=0;
-		DisResizer._up=null
-		DisResizer._down=null
-		DisResizer._left=null
-		DisResizer._right=null
-		DisResizer._barList=null
-		DisResizer._tar=null
-		DisResizer.barWidth=2;
-		DisResizer.useGetBounds=false;
-		DisResizer.tBar=null
-		return DisResizer;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class laya.debug.tools.resizer.SimpleResizer
-	var SimpleResizer=(function(){
-		function SimpleResizer(){}
-		__class(SimpleResizer,'laya.debug.tools.resizer.SimpleResizer');
-		SimpleResizer.setResizeAble=function(clickItem,tar,minWidth,minHeight){
-			(minWidth===void 0)&& (minWidth=150);
-			(minHeight===void 0)&& (minHeight=150);
-			clickItem.on("mousedown",null,SimpleResizer.onMouseDown,[tar,minWidth,minHeight]);
-		}
-
-		SimpleResizer.onMouseDown=function(tar,minWidth,minHeight,e){
-			SimpleResizer.clearEvents();
-			if (!tar)return;
-			SimpleResizer.preMousePoint.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
-			SimpleResizer.preTarSize.setTo(tar.width,tar.height);
-			SimpleResizer.preScale.setTo(1,1);
-			var rTar;
-			rTar=tar;
-			while (rTar&&rTar!=Laya.stage){
-				SimpleResizer.preScale.x *=rTar.scaleX;
-				SimpleResizer.preScale.y *=rTar.scaleY;
-				rTar=rTar.parent;
-			}
-			Laya.stage.on("mouseup",null,SimpleResizer.onMouseMoveEnd);
-			Laya.timer.loop(100,null,SimpleResizer.onMouseMoving,[tar,minWidth,minHeight]);
-		}
-
-		SimpleResizer.onMouseMoving=function(tar,minWidth,minHeight,e){
-			var tWidth=(Laya.stage.mouseX-SimpleResizer.preMousePoint.x)/ SimpleResizer.preScale.x+SimpleResizer.preTarSize.x;
-			var tHeight=(Laya.stage.mouseY-SimpleResizer.preMousePoint.y)/SimpleResizer.preScale.y+SimpleResizer.preTarSize.y;
-			tar.width=tWidth > minWidth?tWidth:minWidth;
-			tar.height=tHeight>minHeight?tHeight:minHeight;
-		}
-
-		SimpleResizer.onMouseMoveEnd=function(e){
-			SimpleResizer.clearEvents();
-		}
-
-		SimpleResizer.clearEvents=function(){
-			Laya.timer.clear(null,SimpleResizer.onMouseMoving);
-			Laya.stage.off("mouseup",null,SimpleResizer.onMouseMoveEnd);
-		}
-
-		__static(SimpleResizer,
-		['preMousePoint',function(){return this.preMousePoint=new Point();},'preTarSize',function(){return this.preTarSize=new Point();},'preScale',function(){return this.preScale=new Point();}
-		]);
-		return SimpleResizer;
-	})()
-
-
-	/**
 	*
-	*@author ww
-	*@version 1.0
-	*
-	*@created 2015-9-25 下午7:19:44
 	*/
-	//class laya.debug.tools.DisControlTool
-	var DisControlTool=(function(){
-		function DisControlTool(){}
-		__class(DisControlTool,'laya.debug.tools.DisControlTool');
-		DisControlTool.getObjectsUnderPoint=function(sprite,x,y,rst,filterFun){
-			rst=rst?rst:[];
-			if(filterFun!=null&&!filterFun(sprite))return rst;
-			if (sprite.getBounds().contains(x,y)){
-				var tS;
-				var tempP=new Point();
-				tempP.setTo(x,y);
-				tempP=sprite.fromParentPoint(tempP);
-				x=tempP.x;
-				y=tempP.y;
-				var childList;
-				childList=sprite._childs||sprite._children;
-				for (var i=childList.length-1;i >-1;i--){
-					var child=childList[i];
-					if((child instanceof laya.display.Sprite ))
-						DisControlTool.getObjectsUnderPoint(child,x,y,rst,filterFun);
-				}
-				rst.push(sprite);
+	//class laya.debug.tools.XML2Object
+	var XML2Object=(function(){
+		function XML2Object(){};
+		__class(XML2Object,'laya.debug.tools.XML2Object');
+		__getset(1,XML2Object,'arrays',function(){
+			if(!XML2Object._arrays){
+				XML2Object._arrays=[];
 			}
-			return rst;
-		}
+			return XML2Object._arrays;
+			},function(a){
+			XML2Object._arrays=a;
+		});
 
-		DisControlTool.getObjectsUnderGlobalPoint=function(sprite,filterFun,point){
-			if(!point){
-				point=new Point();
-				point.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
-			}
-			if(sprite.parent)
-				point=(sprite.parent).globalToLocal(point);
-			return DisControlTool.getObjectsUnderPoint(sprite,point.x,point.y,null,filterFun);
-		}
-
-		DisControlTool.findFirstObjectsUnderGlobalPoint=function(){
-			var disList;
-			disList=DisControlTool.getObjectsUnderGlobalPoint(Laya.stage);
-			if (!disList)return null;
-			var i=0,len=0;
-			var tDis;
-			len=disList.length;
-			for (i=len-1;i>=0;i--){
-				tDis=disList[i];
-				if (tDis && tDis.numChildren < 1){
-					return tDis;
+		XML2Object.parse=function(node,isFirst){
+			(isFirst===void 0)&& (isFirst=true);
+			var obj={};
+			if(isFirst)
+				obj.Name=node.localName;
+			var numOfChilds=node.children.length;
+			var childs=[];
+			var children={};
+			obj.c=children;
+			obj.cList=childs;
+			for(var i=0;i<numOfChilds;i++){
+				var childNode=node.children[i];
+				var childNodeName=childNode.localName;
+				var value;
+				var numOfAttributes
+				value=XML2Object.parse(childNode,true);
+				childs.push(value);
+				if(children[childNodeName]){
+					if(XML2Object.getTypeof(children[childNodeName])=="array"){
+						children[childNodeName].push(value);
+						}else {
+						children[childNodeName]=[children[childNodeName],value];
+					}
+					}else if(XML2Object.isArray(childNodeName)){
+					children[childNodeName]=[value];
+					}else {
+					children[childNodeName]=value;
 				}
 			}
-			return tDis;
+			numOfAttributes=0;
+			if(node.attributes){
+				numOfAttributes=node.attributes.length;
+				var prop={};
+				obj.p=prop;
+				for(i=0;i<numOfAttributes;i++){
+					prop[node.attributes[i].name.toString()]=String(node.attributes[i].nodeValue);
+				}
+			}
+			if(numOfChilds==0){
+				if(numOfAttributes==0){
+					obj="";
+				}else {}
+			}
+			return obj;
 		}
 
-		DisControlTool.visibleAndEnableObjFun=function(tar){
-			return tar.visible&&tar.mouseEnabled;
+		XML2Object.getArr=function(v){
+			if(!v)return [];
+			if(XML2Object.getTypeof(v)=="array")return v;
+			return [v];
 		}
 
-		DisControlTool.visibleObjFun=function(tar){
-			return tar.visible;
-		}
-
-		DisControlTool.getMousePoint=function(sprite){
-			var point=new Point();
-			point.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
-			point=sprite.globalToLocal(point);
-			return point;
-		}
-
-		DisControlTool.isChildE=function(parent,child){
-			if (!parent)return false;
-			while (child){
-				if (child.parent==parent)return true;
-				child=child.parent;
+		XML2Object.isArray=function(nodeName){
+			var numOfArrays=XML2Object._arrays ? XML2Object._arrays.length :0;
+			for(var i=0;i<numOfArrays;i++){
+				if(nodeName==XML2Object._arrays[i]){
+					return true;
+				}
 			}
 			return false;
 		}
 
-		DisControlTool.isInTree=function(pNode,child){
-			return pNode==child || DisControlTool.isChildE(pNode,child);
-		}
-
-		DisControlTool.setTop=function(tar){
-			if(tar&&tar.parent){
-				var tParent;
-				tParent=tar.parent;
-				tParent.setChildIndex(tar,tParent.numChildren-1);
-			}
-		}
-
-		DisControlTool.clearItemRelativeInfo=function(item){
-			var Nan="NaN";
-			item.getLayout().left=Nan;
-			item.getLayout().right=Nan;
-			item.getLayout().top=Nan;
-			item.getLayout().bottom=Nan;
-		}
-
-		DisControlTool.swap=function(tarA,tarB){
-			if (tarA==tarB)return;
-			var iA=0;
-			iA=tarA.parent.getChildIndex(tarA);
-			var iB=0;
-			iB=tarB.parent.getChildIndex(tarB);
-			var bP;
-			bP=tarB.parent;
-			tarA.parent.addChildAt(tarB,iA);
-			bP.addChildAt(tarA,iB);
-		}
-
-		DisControlTool.insertToTarParent=function(tarA,tars,after){
-			(after===void 0)&& (after=false);
-			var tIndex=0;
-			var parent;
-			if(!tarA)return;
-			parent=tarA.parent;
-			if(!parent)return;
-			tIndex=parent.getChildIndex(tarA);
-			if(after)tIndex++;
-			DisControlTool.insertToParent(parent,tars,tIndex);
-		}
-
-		DisControlTool.insertToParent=function(parent,tars,index){
-			(index===void 0)&& (index=-1);
-			if(!parent)return;
-			if(index<0)index=parent.numChildren;
-			var i=0,len=0;
-			len=tars.length;
-			for(i=0;i<len;i++){
-				DisControlTool.transParent(tars[i],parent);
-				parent.addChildAt(tars[i],index);
-			}
-		}
-
-		DisControlTool.transParent=function(tar,newParent){
-			if(!tar||!newParent)return;
-			if(!tar.parent)return;
-			var preParent;
-			preParent=tar.parent;
-			var pos;
-			pos=new Point(tar.x,tar.y);
-			pos=preParent.localToGlobal(pos);
-			pos=newParent.globalToLocal(pos);
-			tar.pos(pos.x,pos.y);
-		}
-
-		DisControlTool.transPoint=function(nowParent,tarParent,point){
-			point=nowParent.localToGlobal(point);
-			point=tarParent.globalToLocal(point);
-			return point;
-		}
-
-		DisControlTool.removeItems=function(itemList){
-			var i=0,len=0;
-			len=itemList.length;
-			for (i=0;i < len;i++){
-				(itemList [i]).removeSelf();
-			}
-		}
-
-		DisControlTool.addItems=function(itemList,parent){
-			var i=0,len=0;
-			len=itemList.length;
-			for (i=0;i < len;i++){
-				parent.addChild(itemList[i]);
-			}
-		}
-
-		DisControlTool.getAllChild=function(tar){
-			if(!tar)return [];
-			var i=0;
-			var len=0;
-			var rst=[];
-			len=tar.numChildren;
-			for(i=0;i<len;i++){
-				rst.push(tar.getChildAt(i));
-			}
-			return rst;
-		}
-
-		DisControlTool.upDis=function(child){
-			if(child&&child.parent){
-				var tParent;
-				tParent=child.parent;
-				var newIndex=0;
-				newIndex=tParent.getChildIndex(child)+1;
-				if(newIndex>=tParent.numChildren){
-					newIndex=tParent.numChildren-1;
+		XML2Object.getTypeof=function(o){
+			if(typeof(o)=="object"){
+				if(o.length==null){
+					return "object";
+					}else if(typeof(o.length)=="number"){
+					return "array";
+					}else {
+					return "object";
 				}
-				console.log("setChildIndex:"+newIndex);
-				tParent.setChildIndex(child,newIndex);
+				}else {
+				return typeof(o);
 			}
 		}
 
-		DisControlTool.downDis=function(child){
-			if(child&&child.parent){
-				var tParent;
-				tParent=child.parent;
-				var newIndex=0;
-				newIndex=tParent.getChildIndex(child)-1;
-				if(newIndex<0)newIndex=0;
-				console.log("setChildIndex:"+newIndex);
-				tParent.setChildIndex(child,newIndex);
-			}
-		}
-
-		DisControlTool.setResizeAbleEx=function(node){
-			var clickItem;
-			clickItem=node.getChildByName("resizeBtn");
-			if (clickItem){
-				SimpleResizer.setResizeAble(clickItem,node);
-			}
-		}
-
-		DisControlTool.setResizeAble=function(node){
-			node.on("click",null,DisControlTool.resizeHandler,[node]);
-		}
-
-		DisControlTool.resizeHandler=function(tar){
-			DisResizer.setUp(tar);
-		}
-
-		DisControlTool.setDragingItem=function(dragBar,tar){
-			dragBar.on("mousedown",null,DisControlTool.dragingHandler,[tar]);
-			tar.on("dragend",null,DisControlTool.dragingEnd,[tar]);
-		}
-
-		DisControlTool.dragingHandler=function(tar){
-			if (tar){
-				tar.startDrag();
-			}
-		}
-
-		DisControlTool.dragingEnd=function(tar){
-			DisControlTool.intFyDisPos(tar);
-			console.log(tar.x,tar.y);
-		}
-
-		DisControlTool.showToStage=function(dis,offX,offY){
-			(offX===void 0)&& (offX=0);
-			(offY===void 0)&& (offY=0);
-			var rec=dis.getBounds();
-			var parent;
-			parent=dis.parent || Laya.stage;
-			dis.x=parent.mouseX+offX;
-			dis.y=parent.mouseY+offY;
-			if (dis.x+rec.width > parent.width){
-				dis.x-=rec.width+offX;
-			}
-			if (dis.y+rec.height > parent.height){
-				dis.y-=rec.height+offY;
-			}
-			DisControlTool.intFyDisPos(dis);
-		}
-
-		DisControlTool.intFyDisPos=function(dis){
-			if (!dis)return;
-			dis.x=Math.round(dis.x);
-			dis.y=Math.round(dis.y);
-		}
-
-		DisControlTool.showOnly=function(disList,showItem){
-			var i=0,len=0;
-			len=disList.length;
-			for (i=0;i < len;i++){
-				disList[i].visible=disList[i]==showItem;
-			}
-		}
-
-		DisControlTool.showOnlyByIndex=function(disList,index){
-			DisControlTool.showOnly(disList,disList[index]);
-		}
-
-		DisControlTool.addOnly=function(disList,showItem,parent){
-			var i=0,len=0;
-			len=disList.length;
-			for (i=0;i < len;i++){
-				if (disList[i] !=showItem){
-					disList[i].removeSelf();
-					}else{
-					parent.addChild(disList[i]);
-				}
-			}
-		}
-
-		DisControlTool.addOnlyByIndex=function(disList,index,parent){
-			DisControlTool.addOnly(disList,disList[index],parent);
-		}
-
-		__static(DisControlTool,
-		['tempP',function(){return this.tempP=new Point();}
-		]);
-		return DisControlTool;
+		XML2Object._arrays=null
+		return XML2Object;
 	})()
 
 
@@ -3435,311 +4198,6 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		return BitmapFont;
-	})()
-
-
-	/**
-	*@private
-	*Graphic bounds数据类
-	*/
-	//class laya.display.GraphicsBounds
-	var GraphicsBounds=(function(){
-		function GraphicsBounds(){
-			//this._temp=null;
-			//this._bounds=null;
-			//this._rstBoundPoints=null;
-			this._cacheBoundsType=false;
-			//this._graphics=null;
-		}
-
-		__class(GraphicsBounds,'laya.display.GraphicsBounds');
-		var __proto=GraphicsBounds.prototype;
-		/**
-		*销毁
-		*/
-		__proto.destroy=function(){
-			this._graphics=null;
-			this._temp=null;
-			this._rstBoundPoints=null;
-			this._bounds=null;
-		}
-
-		/**
-		*重置数据
-		*/
-		__proto.reset=function(){
-			this._temp && (this._temp.length=0);
-		}
-
-		/**
-		*获取位置及宽高信息矩阵(比较耗CPU，频繁使用会造成卡顿，尽量少用)。
-		*@param realSize （可选）使用图片的真实大小，默认为false
-		*@return 位置与宽高组成的 一个 Rectangle 对象。
-		*/
-		__proto.getBounds=function(realSize){
-			(realSize===void 0)&& (realSize=false);
-			if (!this._bounds || !this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType){
-				this._bounds=Rectangle._getWrapRec(this.getBoundPoints(realSize),this._bounds)
-			}
-			this._cacheBoundsType=realSize;
-			return this._bounds;
-		}
-
-		/**
-		*@private
-		*@param realSize （可选）使用图片的真实大小，默认为false
-		*获取端点列表。
-		*/
-		__proto.getBoundPoints=function(realSize){
-			(realSize===void 0)&& (realSize=false);
-			if (!this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType)
-				this._temp=this._getCmdPoints(realSize);
-			this._cacheBoundsType=realSize;
-			return this._rstBoundPoints=Utils.copyArray(this._rstBoundPoints,this._temp);
-		}
-
-		__proto._getCmdPoints=function(realSize){
-			(realSize===void 0)&& (realSize=false);
-			var context=Render._context;
-			var cmds=this._graphics.cmds;
-			var rst;
-			rst=this._temp || (this._temp=[]);
-			rst.length=0;
-			if (!cmds && this._graphics._one !=null){
-				GraphicsBounds._tempCmds.length=0;
-				GraphicsBounds._tempCmds.push(this._graphics._one);
-				cmds=GraphicsBounds._tempCmds;
-			}
-			if (!cmds)
-				return rst;
-			var matrixs;
-			matrixs=GraphicsBounds._tempMatrixArrays;
-			matrixs.length=0;
-			var tMatrix=GraphicsBounds._initMatrix;
-			tMatrix.identity();
-			var tempMatrix=GraphicsBounds._tempMatrix;
-			var cmd;
-			var tex;
-			for (var i=0,n=cmds.length;i < n;i++){
-				cmd=cmds[i];
-				switch (cmd.callee){
-					case context._save:
-					case 7:
-						matrixs.push(tMatrix);
-						tMatrix=tMatrix.clone();
-						break ;
-					case context._restore:
-					case 8:
-						tMatrix=matrixs.pop();
-						break ;
-					case context._scale:
-					case 5:
-						tempMatrix.identity();
-						tempMatrix.translate(-cmd[2],-cmd[3]);
-						tempMatrix.scale(cmd[0],cmd[1]);
-						tempMatrix.translate(cmd[2],cmd[3]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case context._rotate:
-					case 3:
-						tempMatrix.identity();
-						tempMatrix.translate(-cmd[1],-cmd[2]);
-						tempMatrix.rotate(cmd[0]);
-						tempMatrix.translate(cmd[1],cmd[2]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case context._translate:
-					case 6:
-						tempMatrix.identity();
-						tempMatrix.translate(cmd[0],cmd[1]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case context._transform:
-					case 4:
-						tempMatrix.identity();
-						tempMatrix.translate(-cmd[1],-cmd[2]);
-						tempMatrix.concat(cmd[0]);
-						tempMatrix.translate(cmd[1],cmd[2]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case 16:
-					case 24:
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
-						break ;
-					case 17:
-						tMatrix.copyTo(tempMatrix);
-						tempMatrix.concat(cmd[4]);
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tempMatrix);
-						break ;
-					case context._drawTexture:
-						tex=cmd[0];
-						if (realSize){
-							if (cmd[3] && cmd[4]){
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
-								}else {
-								tex=cmd[0];
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
-							}
-							}else {
-							var wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
-							var hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
-							var oWidth=wRate *tex.sourceWidth;
-							var oHeight=hRate *tex.sourceHeight;
-							var offX=tex.offsetX > 0 ? tex.offsetX :0;
-							var offY=tex.offsetY > 0 ? tex.offsetY :0;
-							offX *=wRate;
-							offY *=hRate;
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),tMatrix);
-						}
-						break ;
-					case context._fillTexture:
-						if (cmd[3] && cmd[4]){
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
-							}else {
-							tex=cmd[0];
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
-						}
-						break ;
-					case context._drawTextureWithTransform:;
-						var drawMatrix;
-						if (cmd[5]){
-							tMatrix.copyTo(tempMatrix);
-							tempMatrix.concat(cmd[5]);
-							drawMatrix=tempMatrix;
-							}else {
-							drawMatrix=tMatrix;
-						}
-						if (realSize){
-							if (cmd[3] && cmd[4]){
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),drawMatrix);
-								}else {
-								tex=cmd[0];
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),drawMatrix);
-							}
-							}else {
-							tex=cmd[0];
-							wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
-							hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
-							oWidth=wRate *tex.sourceWidth;
-							oHeight=hRate *tex.sourceHeight;
-							offX=tex.offsetX > 0 ? tex.offsetX :0;
-							offY=tex.offsetY > 0 ? tex.offsetY :0;
-							offX *=wRate;
-							offY *=hRate;
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),drawMatrix);
-						}
-						break ;
-					case context._drawRect:
-					case 13:
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
-						break ;
-					case context._drawCircle:
-					case context._fillCircle:
-					case 14:
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0]-cmd[2],cmd[1]-cmd[2],cmd[2]+cmd[2],cmd[2]+cmd[2]),tMatrix);
-						break ;
-					case context._drawLine:
-					case 20:
-						GraphicsBounds._tempPoints.length=0;
-						var lineWidth=NaN;
-						lineWidth=cmd[5] *0.5;
-						if (cmd[0]==cmd[2]){
-							GraphicsBounds._tempPoints.push(cmd[0]+lineWidth,cmd[1],cmd[2]+lineWidth,cmd[3],cmd[0]-lineWidth,cmd[1],cmd[2]-lineWidth,cmd[3]);
-							}else if (cmd[1]==cmd[3]){
-							GraphicsBounds._tempPoints.push(cmd[0],cmd[1]+lineWidth,cmd[2],cmd[3]+lineWidth,cmd[0],cmd[1]-lineWidth,cmd[2],cmd[3]-lineWidth);
-							}else {
-							GraphicsBounds._tempPoints.push(cmd[0],cmd[1],cmd[2],cmd[3]);
-						}
-						GraphicsBounds._addPointArrToRst(rst,GraphicsBounds._tempPoints,tMatrix);
-						break ;
-					case context._drawCurves:
-					case 22:
-						GraphicsBounds._addPointArrToRst(rst,Bezier.I.getBezierPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
-						break ;
-					case context._drawPoly:
-					case context._drawLines:
-					case 18:
-						GraphicsBounds._addPointArrToRst(rst,cmd[2],tMatrix,cmd[0],cmd[1]);
-						break ;
-					case context._drawPath:
-					case 19:
-						GraphicsBounds._addPointArrToRst(rst,this._getPathPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
-						break ;
-					case context._drawPie:
-					case 15:
-						GraphicsBounds._addPointArrToRst(rst,this._getPiePoints(cmd[0],cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
-						break ;
-					}
-			}
-			if (rst.length > 200){
-				rst=Utils.copyArray(rst,Rectangle._getWrapRec(rst)._getBoundPoints());
-			}else if (rst.length > 8)
-			rst=GrahamScan.scanPList(rst);
-			return rst;
-		}
-
-		__proto._switchMatrix=function(tMatix,tempMatrix){
-			tempMatrix.concat(tMatix);
-			tempMatrix.copyTo(tMatix);
-		}
-
-		__proto._getPiePoints=function(x,y,radius,startAngle,endAngle){
-			var rst=GraphicsBounds._tempPoints;
-			GraphicsBounds._tempPoints.length=0;
-			rst.push(x,y);
-			var dP=Math.PI / 10;
-			var i=NaN;
-			for (i=startAngle;i < endAngle;i+=dP){
-				rst.push(x+radius *Math.cos(i),y+radius *Math.sin(i));
-			}
-			if (endAngle !=i){
-				rst.push(x+radius *Math.cos(endAngle),y+radius *Math.sin(endAngle));
-			}
-			return rst;
-		}
-
-		__proto._getPathPoints=function(paths){
-			var i=0,len=0;
-			var rst=GraphicsBounds._tempPoints;
-			rst.length=0;
-			len=paths.length;
-			var tCMD;
-			for (i=0;i < len;i++){
-				tCMD=paths[i];
-				if (tCMD.length > 1){
-					rst.push(tCMD[1],tCMD[2]);
-					if (tCMD.length > 3){
-						rst.push(tCMD[3],tCMD[4]);
-					}
-				}
-			}
-			return rst;
-		}
-
-		GraphicsBounds._addPointArrToRst=function(rst,points,matrix,dx,dy){
-			(dx===void 0)&& (dx=0);
-			(dy===void 0)&& (dy=0);
-			var i=0,len=0;
-			len=points.length;
-			for (i=0;i < len;i+=2){
-				GraphicsBounds._addPointToRst(rst,points[i]+dx,points[i+1]+dy,matrix);
-			}
-		}
-
-		GraphicsBounds._addPointToRst=function(rst,x,y,matrix){
-			var _tempPoint=Point.TEMP;
-			_tempPoint.setTo(x ? x :0,y ? y :0);
-			matrix.transformPoint(_tempPoint);
-			rst.push(_tempPoint.x,_tempPoint.y);
-		}
-
-		GraphicsBounds._tempPoints=[];
-		GraphicsBounds._tempMatrixArrays=[];
-		GraphicsBounds._tempCmds=[];
-		__static(GraphicsBounds,
-		['_tempMatrix',function(){return this._tempMatrix=new Matrix();},'_initMatrix',function(){return this._initMatrix=new Matrix();}
-		]);
-		return GraphicsBounds;
 	})()
 
 
@@ -4111,6 +4569,311 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*@private
+	*Graphic bounds数据类
+	*/
+	//class laya.display.GraphicsBounds
+	var GraphicsBounds=(function(){
+		function GraphicsBounds(){
+			//this._temp=null;
+			//this._bounds=null;
+			//this._rstBoundPoints=null;
+			this._cacheBoundsType=false;
+			//this._graphics=null;
+		}
+
+		__class(GraphicsBounds,'laya.display.GraphicsBounds');
+		var __proto=GraphicsBounds.prototype;
+		/**
+		*销毁
+		*/
+		__proto.destroy=function(){
+			this._graphics=null;
+			this._temp=null;
+			this._rstBoundPoints=null;
+			this._bounds=null;
+		}
+
+		/**
+		*重置数据
+		*/
+		__proto.reset=function(){
+			this._temp && (this._temp.length=0);
+		}
+
+		/**
+		*获取位置及宽高信息矩阵(比较耗CPU，频繁使用会造成卡顿，尽量少用)。
+		*@param realSize （可选）使用图片的真实大小，默认为false
+		*@return 位置与宽高组成的 一个 Rectangle 对象。
+		*/
+		__proto.getBounds=function(realSize){
+			(realSize===void 0)&& (realSize=false);
+			if (!this._bounds || !this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType){
+				this._bounds=Rectangle._getWrapRec(this.getBoundPoints(realSize),this._bounds)
+			}
+			this._cacheBoundsType=realSize;
+			return this._bounds;
+		}
+
+		/**
+		*@private
+		*@param realSize （可选）使用图片的真实大小，默认为false
+		*获取端点列表。
+		*/
+		__proto.getBoundPoints=function(realSize){
+			(realSize===void 0)&& (realSize=false);
+			if (!this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType)
+				this._temp=this._getCmdPoints(realSize);
+			this._cacheBoundsType=realSize;
+			return this._rstBoundPoints=Utils.copyArray(this._rstBoundPoints,this._temp);
+		}
+
+		__proto._getCmdPoints=function(realSize){
+			(realSize===void 0)&& (realSize=false);
+			var context=Render._context;
+			var cmds=this._graphics.cmds;
+			var rst;
+			rst=this._temp || (this._temp=[]);
+			rst.length=0;
+			if (!cmds && this._graphics._one !=null){
+				GraphicsBounds._tempCmds.length=0;
+				GraphicsBounds._tempCmds.push(this._graphics._one);
+				cmds=GraphicsBounds._tempCmds;
+			}
+			if (!cmds)
+				return rst;
+			var matrixs;
+			matrixs=GraphicsBounds._tempMatrixArrays;
+			matrixs.length=0;
+			var tMatrix=GraphicsBounds._initMatrix;
+			tMatrix.identity();
+			var tempMatrix=GraphicsBounds._tempMatrix;
+			var cmd;
+			var tex;
+			for (var i=0,n=cmds.length;i < n;i++){
+				cmd=cmds[i];
+				switch (cmd.callee){
+					case context._save:
+					case 7:
+						matrixs.push(tMatrix);
+						tMatrix=tMatrix.clone();
+						break ;
+					case context._restore:
+					case 8:
+						tMatrix=matrixs.pop();
+						break ;
+					case context._scale:
+					case 5:
+						tempMatrix.identity();
+						tempMatrix.translate(-cmd[2],-cmd[3]);
+						tempMatrix.scale(cmd[0],cmd[1]);
+						tempMatrix.translate(cmd[2],cmd[3]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case context._rotate:
+					case 3:
+						tempMatrix.identity();
+						tempMatrix.translate(-cmd[1],-cmd[2]);
+						tempMatrix.rotate(cmd[0]);
+						tempMatrix.translate(cmd[1],cmd[2]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case context._translate:
+					case 6:
+						tempMatrix.identity();
+						tempMatrix.translate(cmd[0],cmd[1]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case context._transform:
+					case 4:
+						tempMatrix.identity();
+						tempMatrix.translate(-cmd[1],-cmd[2]);
+						tempMatrix.concat(cmd[0]);
+						tempMatrix.translate(cmd[1],cmd[2]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case 16:
+					case 24:
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
+						break ;
+					case 17:
+						tMatrix.copyTo(tempMatrix);
+						tempMatrix.concat(cmd[4]);
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tempMatrix);
+						break ;
+					case context._drawTexture:
+						tex=cmd[0];
+						if (realSize){
+							if (cmd[3] && cmd[4]){
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
+								}else {
+								tex=cmd[0];
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
+							}
+							}else {
+							var wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
+							var hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
+							var oWidth=wRate *tex.sourceWidth;
+							var oHeight=hRate *tex.sourceHeight;
+							var offX=tex.offsetX > 0 ? tex.offsetX :0;
+							var offY=tex.offsetY > 0 ? tex.offsetY :0;
+							offX *=wRate;
+							offY *=hRate;
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),tMatrix);
+						}
+						break ;
+					case context._fillTexture:
+						if (cmd[3] && cmd[4]){
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
+							}else {
+							tex=cmd[0];
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
+						}
+						break ;
+					case context._drawTextureWithTransform:;
+						var drawMatrix;
+						if (cmd[5]){
+							tMatrix.copyTo(tempMatrix);
+							tempMatrix.concat(cmd[5]);
+							drawMatrix=tempMatrix;
+							}else {
+							drawMatrix=tMatrix;
+						}
+						if (realSize){
+							if (cmd[3] && cmd[4]){
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),drawMatrix);
+								}else {
+								tex=cmd[0];
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),drawMatrix);
+							}
+							}else {
+							tex=cmd[0];
+							wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
+							hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
+							oWidth=wRate *tex.sourceWidth;
+							oHeight=hRate *tex.sourceHeight;
+							offX=tex.offsetX > 0 ? tex.offsetX :0;
+							offY=tex.offsetY > 0 ? tex.offsetY :0;
+							offX *=wRate;
+							offY *=hRate;
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),drawMatrix);
+						}
+						break ;
+					case context._drawRect:
+					case 13:
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
+						break ;
+					case context._drawCircle:
+					case context._fillCircle:
+					case 14:
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0]-cmd[2],cmd[1]-cmd[2],cmd[2]+cmd[2],cmd[2]+cmd[2]),tMatrix);
+						break ;
+					case context._drawLine:
+					case 20:
+						GraphicsBounds._tempPoints.length=0;
+						var lineWidth=NaN;
+						lineWidth=cmd[5] *0.5;
+						if (cmd[0]==cmd[2]){
+							GraphicsBounds._tempPoints.push(cmd[0]+lineWidth,cmd[1],cmd[2]+lineWidth,cmd[3],cmd[0]-lineWidth,cmd[1],cmd[2]-lineWidth,cmd[3]);
+							}else if (cmd[1]==cmd[3]){
+							GraphicsBounds._tempPoints.push(cmd[0],cmd[1]+lineWidth,cmd[2],cmd[3]+lineWidth,cmd[0],cmd[1]-lineWidth,cmd[2],cmd[3]-lineWidth);
+							}else {
+							GraphicsBounds._tempPoints.push(cmd[0],cmd[1],cmd[2],cmd[3]);
+						}
+						GraphicsBounds._addPointArrToRst(rst,GraphicsBounds._tempPoints,tMatrix);
+						break ;
+					case context._drawCurves:
+					case 22:
+						GraphicsBounds._addPointArrToRst(rst,Bezier.I.getBezierPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
+						break ;
+					case context._drawPoly:
+					case context._drawLines:
+					case 18:
+						GraphicsBounds._addPointArrToRst(rst,cmd[2],tMatrix,cmd[0],cmd[1]);
+						break ;
+					case context._drawPath:
+					case 19:
+						GraphicsBounds._addPointArrToRst(rst,this._getPathPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
+						break ;
+					case context._drawPie:
+					case 15:
+						GraphicsBounds._addPointArrToRst(rst,this._getPiePoints(cmd[0],cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
+						break ;
+					}
+			}
+			if (rst.length > 200){
+				rst=Utils.copyArray(rst,Rectangle._getWrapRec(rst)._getBoundPoints());
+			}else if (rst.length > 8)
+			rst=GrahamScan.scanPList(rst);
+			return rst;
+		}
+
+		__proto._switchMatrix=function(tMatix,tempMatrix){
+			tempMatrix.concat(tMatix);
+			tempMatrix.copyTo(tMatix);
+		}
+
+		__proto._getPiePoints=function(x,y,radius,startAngle,endAngle){
+			var rst=GraphicsBounds._tempPoints;
+			GraphicsBounds._tempPoints.length=0;
+			rst.push(x,y);
+			var dP=Math.PI / 10;
+			var i=NaN;
+			for (i=startAngle;i < endAngle;i+=dP){
+				rst.push(x+radius *Math.cos(i),y+radius *Math.sin(i));
+			}
+			if (endAngle !=i){
+				rst.push(x+radius *Math.cos(endAngle),y+radius *Math.sin(endAngle));
+			}
+			return rst;
+		}
+
+		__proto._getPathPoints=function(paths){
+			var i=0,len=0;
+			var rst=GraphicsBounds._tempPoints;
+			rst.length=0;
+			len=paths.length;
+			var tCMD;
+			for (i=0;i < len;i++){
+				tCMD=paths[i];
+				if (tCMD.length > 1){
+					rst.push(tCMD[1],tCMD[2]);
+					if (tCMD.length > 3){
+						rst.push(tCMD[3],tCMD[4]);
+					}
+				}
+			}
+			return rst;
+		}
+
+		GraphicsBounds._addPointArrToRst=function(rst,points,matrix,dx,dy){
+			(dx===void 0)&& (dx=0);
+			(dy===void 0)&& (dy=0);
+			var i=0,len=0;
+			len=points.length;
+			for (i=0;i < len;i+=2){
+				GraphicsBounds._addPointToRst(rst,points[i]+dx,points[i+1]+dy,matrix);
+			}
+		}
+
+		GraphicsBounds._addPointToRst=function(rst,x,y,matrix){
+			var _tempPoint=Point.TEMP;
+			_tempPoint.setTo(x ? x :0,y ? y :0);
+			matrix.transformPoint(_tempPoint);
+			rst.push(_tempPoint.x,_tempPoint.y);
+		}
+
+		GraphicsBounds._tempPoints=[];
+		GraphicsBounds._tempMatrixArrays=[];
+		GraphicsBounds._tempCmds=[];
+		__static(GraphicsBounds,
+		['_tempMatrix',function(){return this._tempMatrix=new Matrix();},'_initMatrix',function(){return this._initMatrix=new Matrix();}
+		]);
+		return GraphicsBounds;
+	})()
+
+
+	/**
 	*<code>Event</code> 是事件类型的集合。一般当发生事件时，<code>Event</code> 对象将作为参数传递给事件侦听器。
 	*/
 	//class laya.events.Event
@@ -4280,6 +5043,116 @@ var Laya=window.Laya=(function(window,document){
 		Event.WORLDMATRIX_NEEDCHANGE="worldmatrixneedchanged";
 		Event.ANIMATION_CHANGED="animationchanged";
 		return Event;
+	})()
+
+
+	/**
+	*<code>Keyboard</code> 类的属性是一些常数，这些常数表示控制游戏时最常用的键。
+	*/
+	//class laya.events.Keyboard
+	var Keyboard=(function(){
+		function Keyboard(){};
+		__class(Keyboard,'laya.events.Keyboard');
+		Keyboard.NUMBER_0=48;
+		Keyboard.NUMBER_1=49;
+		Keyboard.NUMBER_2=50;
+		Keyboard.NUMBER_3=51;
+		Keyboard.NUMBER_4=52;
+		Keyboard.NUMBER_5=53;
+		Keyboard.NUMBER_6=54;
+		Keyboard.NUMBER_7=55;
+		Keyboard.NUMBER_8=56;
+		Keyboard.NUMBER_9=57;
+		Keyboard.A=65;
+		Keyboard.B=66;
+		Keyboard.C=67;
+		Keyboard.D=68;
+		Keyboard.E=69;
+		Keyboard.F=70;
+		Keyboard.G=71;
+		Keyboard.H=72;
+		Keyboard.I=73;
+		Keyboard.J=74;
+		Keyboard.K=75;
+		Keyboard.L=76;
+		Keyboard.M=77;
+		Keyboard.N=78;
+		Keyboard.O=79;
+		Keyboard.P=80;
+		Keyboard.Q=81;
+		Keyboard.R=82;
+		Keyboard.S=83;
+		Keyboard.T=84;
+		Keyboard.U=85;
+		Keyboard.V=86;
+		Keyboard.W=87;
+		Keyboard.X=88;
+		Keyboard.Y=89;
+		Keyboard.Z=90;
+		Keyboard.F1=112;
+		Keyboard.F2=113;
+		Keyboard.F3=114;
+		Keyboard.F4=115;
+		Keyboard.F5=116;
+		Keyboard.F6=117;
+		Keyboard.F7=118;
+		Keyboard.F8=119;
+		Keyboard.F9=120;
+		Keyboard.F10=121;
+		Keyboard.F11=122;
+		Keyboard.F12=123;
+		Keyboard.F13=124;
+		Keyboard.F14=125;
+		Keyboard.F15=126;
+		Keyboard.NUMPAD=21;
+		Keyboard.NUMPAD_0=96;
+		Keyboard.NUMPAD_1=97;
+		Keyboard.NUMPAD_2=98;
+		Keyboard.NUMPAD_3=99;
+		Keyboard.NUMPAD_4=100;
+		Keyboard.NUMPAD_5=101;
+		Keyboard.NUMPAD_6=102;
+		Keyboard.NUMPAD_7=103;
+		Keyboard.NUMPAD_8=104;
+		Keyboard.NUMPAD_9=105;
+		Keyboard.NUMPAD_ADD=107;
+		Keyboard.NUMPAD_DECIMAL=110;
+		Keyboard.NUMPAD_DIVIDE=111;
+		Keyboard.NUMPAD_ENTER=108;
+		Keyboard.NUMPAD_MULTIPLY=106;
+		Keyboard.NUMPAD_SUBTRACT=109;
+		Keyboard.SEMICOLON=186;
+		Keyboard.EQUAL=187;
+		Keyboard.COMMA=188;
+		Keyboard.MINUS=189;
+		Keyboard.PERIOD=190;
+		Keyboard.SLASH=191;
+		Keyboard.BACKQUOTE=192;
+		Keyboard.LEFTBRACKET=219;
+		Keyboard.BACKSLASH=220;
+		Keyboard.RIGHTBRACKET=221;
+		Keyboard.QUOTE=222;
+		Keyboard.ALTERNATE=18;
+		Keyboard.BACKSPACE=8;
+		Keyboard.CAPS_LOCK=20;
+		Keyboard.COMMAND=15;
+		Keyboard.CONTROL=17;
+		Keyboard.DELETE=46;
+		Keyboard.ENTER=13;
+		Keyboard.ESCAPE=27;
+		Keyboard.PAGE_UP=33;
+		Keyboard.PAGE_DOWN=34;
+		Keyboard.END=35;
+		Keyboard.HOME=36;
+		Keyboard.LEFT=37;
+		Keyboard.UP=38;
+		Keyboard.RIGHT=39;
+		Keyboard.DOWN=40;
+		Keyboard.SHIFT=16;
+		Keyboard.SPACE=32;
+		Keyboard.TAB=9;
+		Keyboard.INSERT=45;
+		return Keyboard;
 	})()
 
 
@@ -9275,109 +10148,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*@private
-	*<code>HTMLChar</code> 是一个 HTML 字符类。
-	*/
-	//class laya.utils.HTMLChar
-	var HTMLChar=(function(){
-		function HTMLChar(char,w,h,style){
-			//this._sprite=null;
-			//this._x=NaN;
-			//this._y=NaN;
-			//this._w=NaN;
-			//this._h=NaN;
-			//this.isWord=false;
-			//this.char=null;
-			//this.charNum=NaN;
-			//this.style=null;
-			this.char=char;
-			this.charNum=char.charCodeAt(0);
-			this._x=this._y=0;
-			this.width=w;
-			this.height=h;
-			this.style=style;
-			this.isWord=!HTMLChar._isWordRegExp.test(char);
-		}
-
-		__class(HTMLChar,'laya.utils.HTMLChar');
-		var __proto=HTMLChar.prototype;
-		Laya.imps(__proto,{"laya.display.ILayout":true})
-		/**
-		*设置与此对象绑定的显示对象 <code>Sprite</code> 。
-		*@param sprite 显示对象 <code>Sprite</code> 。
-		*/
-		__proto.setSprite=function(sprite){
-			this._sprite=sprite;
-		}
-
-		/**
-		*获取与此对象绑定的显示对象 <code>Sprite</code>。
-		*@return
-		*/
-		__proto.getSprite=function(){
-			return this._sprite;
-		}
-
-		/**@private */
-		__proto._isChar=function(){
-			return true;
-		}
-
-		/**@private */
-		__proto._getCSSStyle=function(){
-			return this.style;
-		}
-
-		/**
-		*宽度。
-		*/
-		__getset(0,__proto,'width',function(){
-			return this._w;
-			},function(value){
-			this._w=value;
-		});
-
-		/**
-		*此对象存储的 X 轴坐标值。
-		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 x 的值。
-		*/
-		__getset(0,__proto,'x',function(){
-			return this._x;
-			},function(value){
-			if (this._sprite){
-				this._sprite.x=value;
-			}
-			this._x=value;
-		});
-
-		/**
-		*此对象存储的 Y 轴坐标值。
-		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 y 的值。
-		*/
-		__getset(0,__proto,'y',function(){
-			return this._y;
-			},function(value){
-			if (this._sprite){
-				this._sprite.y=value;
-			}
-			this._y=value;
-		});
-
-		/**
-		*高度。
-		*/
-		__getset(0,__proto,'height',function(){
-			return this._h;
-			},function(value){
-			this._h=value;
-		});
-
-		HTMLChar._isWordRegExp=new RegExp("[\\w\.]","");
-		return HTMLChar;
-	})()
-
-
-	/**
 	*鼠标点击区域，可以设置绘制一系列矢量图作为点击区域和非点击区域（目前只支持圆形，矩形，多边形）
 	*/
 	//class laya.utils.HitArea
@@ -9522,6 +10292,109 @@ var Laya=window.Laya=(function(window,document){
 		['_rec',function(){return this._rec=new Rectangle();},'_ptPoint',function(){return this._ptPoint=new Point();}
 		]);
 		return HitArea;
+	})()
+
+
+	/**
+	*@private
+	*<code>HTMLChar</code> 是一个 HTML 字符类。
+	*/
+	//class laya.utils.HTMLChar
+	var HTMLChar=(function(){
+		function HTMLChar(char,w,h,style){
+			//this._sprite=null;
+			//this._x=NaN;
+			//this._y=NaN;
+			//this._w=NaN;
+			//this._h=NaN;
+			//this.isWord=false;
+			//this.char=null;
+			//this.charNum=NaN;
+			//this.style=null;
+			this.char=char;
+			this.charNum=char.charCodeAt(0);
+			this._x=this._y=0;
+			this.width=w;
+			this.height=h;
+			this.style=style;
+			this.isWord=!HTMLChar._isWordRegExp.test(char);
+		}
+
+		__class(HTMLChar,'laya.utils.HTMLChar');
+		var __proto=HTMLChar.prototype;
+		Laya.imps(__proto,{"laya.display.ILayout":true})
+		/**
+		*设置与此对象绑定的显示对象 <code>Sprite</code> 。
+		*@param sprite 显示对象 <code>Sprite</code> 。
+		*/
+		__proto.setSprite=function(sprite){
+			this._sprite=sprite;
+		}
+
+		/**
+		*获取与此对象绑定的显示对象 <code>Sprite</code>。
+		*@return
+		*/
+		__proto.getSprite=function(){
+			return this._sprite;
+		}
+
+		/**@private */
+		__proto._isChar=function(){
+			return true;
+		}
+
+		/**@private */
+		__proto._getCSSStyle=function(){
+			return this.style;
+		}
+
+		/**
+		*宽度。
+		*/
+		__getset(0,__proto,'width',function(){
+			return this._w;
+			},function(value){
+			this._w=value;
+		});
+
+		/**
+		*此对象存储的 X 轴坐标值。
+		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 x 的值。
+		*/
+		__getset(0,__proto,'x',function(){
+			return this._x;
+			},function(value){
+			if (this._sprite){
+				this._sprite.x=value;
+			}
+			this._x=value;
+		});
+
+		/**
+		*此对象存储的 Y 轴坐标值。
+		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 y 的值。
+		*/
+		__getset(0,__proto,'y',function(){
+			return this._y;
+			},function(value){
+			if (this._sprite){
+				this._sprite.y=value;
+			}
+			this._y=value;
+		});
+
+		/**
+		*高度。
+		*/
+		__getset(0,__proto,'height',function(){
+			return this._h;
+			},function(value){
+			this._h=value;
+		});
+
+		HTMLChar._isWordRegExp=new RegExp("[\\w\.]","");
+		return HTMLChar;
 	})()
 
 
@@ -10713,6 +11586,21 @@ var Laya=window.Laya=(function(window,document){
 	})()
 
 
+	/**全局配置*/
+	//class UIConfig
+	var UIConfig=(function(){
+		function UIConfig(){};
+		__class(UIConfig,'UIConfig');
+		UIConfig.touchScrollEnable=true;
+		UIConfig.mouseWheelEnable=true;
+		UIConfig.showButtons=true;
+		UIConfig.popupBgColor="#000000";
+		UIConfig.popupBgAlpha=0.5;
+		UIConfig.closeDialogOnSide=true;
+		return UIConfig;
+	})()
+
+
 	/**
 	*...
 	*@author ww
@@ -10975,6 +11863,155 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class mindmap.adpttool.MM2MindMapData
+	var MM2MindMapData=(function(){
+		function MM2MindMapData(){}
+		__class(MM2MindMapData,'mindmap.adpttool.MM2MindMapData');
+		MM2MindMapData.parse=function(mmXML){
+			mmXML=Utils.parseXMLFromString(mmXML);
+			var obj;
+			obj=XML2Object.parse(mmXML);
+			var rootNode;
+			rootNode=obj["c"]["map"]["c"]["node"];
+			var rst;
+			rst=MM2MindMapData.parseNode(rootNode);
+			return rst;
+		}
+
+		MM2MindMapData.parseNode=function(node){
+			var rst;
+			rst={};
+			rst.label=node.p.TEXT;
+			rst.childs=[];
+			var cList;
+			cList=node.cList;
+			if (cList && cList.length){
+				var i=0,len=0;
+				len=cList.length;
+				var tChild;
+				for (i=0;i < len;i++){
+					tChild=cList[i];
+					if (tChild.Name=="node"){
+						rst.childs.push(MM2MindMapData.parseNode(tChild));
+					}
+				}
+			}
+			return rst;
+		}
+
+		return MM2MindMapData;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class mindmap.adpttool.PSO2MindMapData
+	var PSO2MindMapData=(function(){
+		function PSO2MindMapData(){}
+		__class(PSO2MindMapData,'mindmap.adpttool.PSO2MindMapData');
+		PSO2MindMapData.parse=function(dataStr){
+			var nodeO;
+			try{
+				nodeO=JSON.parse(dataStr);
+				}catch (e){
+				alert("转换出错");
+			}
+			if (!nodeO)return null;
+			var rst;
+			rst=PSO2MindMapData.parseNode(nodeO);
+			return rst;
+		}
+
+		PSO2MindMapData.parseNode=function(node){
+			var rst;
+			rst={};
+			rst.label=node.title;
+			rst.childs=[];
+			var cList;
+			cList=node.leftChildren;
+			if (cList && cList.length){
+				var i=0,len=0;
+				len=cList.length;
+				var tChild;
+				for (i=0;i < len;i++){
+					tChild=cList[i];
+					rst.childs.push(PSO2MindMapData.parseNode(tChild));
+				}
+			}
+			cList=node.children;
+			if (cList && cList.length){
+				var i=0,len=0;
+				len=cList.length;
+				var tChild;
+				for (i=0;i < len;i++){
+					tChild=cList[i];
+					rst.childs.push(PSO2MindMapData.parseNode(tChild));
+				}
+			}
+			return rst;
+		}
+
+		return PSO2MindMapData;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class mindmap.adpttool.ZMap2MindMapData
+	var ZMap2MindMapData=(function(){
+		function ZMap2MindMapData(){}
+		__class(ZMap2MindMapData,'mindmap.adpttool.ZMap2MindMapData');
+		ZMap2MindMapData.parse=function(dataStr){
+			var nodeO;
+			try{
+				nodeO=JSON.parse(dataStr);
+				}catch (e){
+				alert("转换出错");
+			}
+			nodeO=nodeO[0];
+			if (!nodeO)return null;
+			var rst;
+			rst=ZMap2MindMapData.parseNode(nodeO);
+			return rst;
+		}
+
+		ZMap2MindMapData.getAdptTitle=function(text){
+			text=text.replace(/<[^>]+>/g,"");
+			text=text.replace(/&nbsp;/ig,"");
+			return text;
+		}
+
+		ZMap2MindMapData.parseNode=function(node){
+			var rst;
+			rst={};
+			rst.label=ZMap2MindMapData.getAdptTitle(node.title);
+			rst.childs=[];
+			var cList;
+			cList=node.children;
+			if (cList && cList.length){
+				var i=0,len=0;
+				len=cList.length;
+				var tChild;
+				for (i=0;i < len;i++){
+					tChild=cList[i];
+					rst.childs.push(ZMap2MindMapData.parseNode(tChild));
+				}
+			}
+			return rst;
+		}
+
+		return ZMap2MindMapData;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class mindmap.MindMapNodeData
 	var MindMapNodeData=(function(){
 		function MindMapNodeData(){
@@ -11054,6 +12091,82 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		return MindMapNodeData;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class electrontools.drags.SystemDragOverManager
+	var SystemDragOverManager=(function(){
+		function SystemDragOverManager(){}
+		__class(SystemDragOverManager,'electrontools.drags.SystemDragOverManager');
+		SystemDragOverManager.init=function(){
+			var canvas=Render.canvas;
+			Browser.container.ondrop=SystemDragOverManager.dragDrop;
+			Browser.container.ondragover=SystemDragOverManager.dragOver;
+		}
+
+		SystemDragOverManager.dragOver=function(e){
+			e.preventDefault();
+		}
+
+		SystemDragOverManager.dragDrop=function(e){
+			console.log("system dragover",e);
+			var file;
+			try {
+				file=e.dataTransfer.files[0];
+				SystemDragOverManager.onFileDrag(e.dataTransfer.files,e.clientX,e.clientY);
+				e.preventDefault();
+			}
+			catch (e){}
+			return false;
+		}
+
+		SystemDragOverManager.onFileDrag=function(files,x,y){
+			if (!files || files.length < 1)
+				return;
+			var data;
+			var type="SystemDrag";
+			var files;
+			files=Utils.copyArray(files,[]);
+			data={type:type,files:files};
+			SystemDragOverManager.sendDragEventByData("SystemDrag",data,data,x,y);
+		}
+
+		SystemDragOverManager.sendDragEventByData=function(type,_dragInitiator,_data,x,y){
+			(x===void 0)&& (x="s");
+			(y===void 0)&& (y="s");
+			if (x=="s"){
+				x=Laya.stage.mouseX;
+			}
+			if (y=="s"){
+				y=Laya.stage.mouseY;
+			};
+			var rst;
+			rst=DisControlTool.getObjectsUnderPoint(Laya.stage,x *Browser.pixelRatio,y *Browser.pixelRatio,null,DisControlTool.visibleAndEnableObjFun);
+			var i=0,len=0;
+			var tTar;
+			len=rst.length;
+			var tEvent=SystemDragOverManager.tempEvent;
+			tEvent.dragInitiator=_dragInitiator;
+			tEvent.data=_data;
+			tEvent.hitList=rst;
+			for (i=0;i < len;i++){
+				tTar=rst[i];
+				if ((tTar instanceof laya.events.EventDispatcher )){
+					if (tTar.hasListener(type)){
+						tEvent.target=tTar;
+						tTar.event(type,tEvent);
+					}
+				}
+			}
+		}
+
+		SystemDragOverManager.SystemDrag="SystemDrag";
+		SystemDragOverManager.tempEvent={};
+		return SystemDragOverManager;
 	})()
 
 
@@ -11190,13 +12303,881 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2016-4-20 下午4:48:41
+	*/
+	//class extendui.KeyManager
+	var KeyManager=(function(){
+		function KeyManager(){
+			this.isCommandKeyDown=false;
+		}
+
+		__class(KeyManager,'extendui.KeyManager');
+		var __proto=KeyManager.prototype;
+		__proto.init=function(){
+			Laya.stage.on("keydown",this,this.keyDown);
+			Laya.stage.on("keyup",this,this.keyUp);
+			Laya.stage.on("blur",this,this.onBlur);
+		}
+
+		__proto.onBlur=function(){
+			this.isCommandKeyDown=false;
+		}
+
+		__proto.isCommandKey=function(keyCode){
+			if(KeyManager.commandKeys[keyCode])return true;
+			return false;
+		}
+
+		__proto.keyDown=function(e){
+			if(this.isCommandKey(e.keyCode)){
+				this.isCommandKeyDown=true;
+			}
+			if(Input.isInputting){
+				this.isCommandKeyDown=false;
+			}
+		}
+
+		__proto.keyUp=function(e){
+			if(Input.isInputting){
+				this.isCommandKeyDown=false;
+			}
+			if(this.isCommandKey(e.keyCode)){
+				this.isCommandKeyDown=false;
+			}
+		}
+
+		KeyManager.isABC=function(keyCode){
+			return keyCode>=65&&keyCode<=90;
+		}
+
+		KeyManager.getCharByCode=function(code){
+			return String.fromCharCode(code);
+		}
+
+		KeyManager.setNewFocus=function(item){
+			if(Laya.stage.focus){
+				KeyManager.focusList.push(Laya.stage.focus);
+			}
+			Laya.stage.focus=item;
+		}
+
+		KeyManager.restoreFocus=function(){
+			if(KeyManager.focusList.length>0){
+				Laya.stage.focus=KeyManager.focusList.pop();
+			}
+		}
+
+		KeyManager.focusList=[];
+		__static(KeyManager,
+		['I',function(){return this.I=new KeyManager();},'commandKeys',function(){return this.commandKeys={
+				91:true,
+				93:true,
+				244:true,
+				17:true
+		};}
+
+		]);
+		return KeyManager;
+	})()
+
+
+	/**
+	*封装所有驱动级接口
+	*@author yung
+	*/
+	//class nodetools.devices.Device
+	var Device=(function(){
+		function Device(){};
+		__class(Device,'nodetools.devices.Device');
+		Device.init=function(){
+			Device.electron=Device.require("electron");
+			Device.remote=Device.electron.remote;
+			Device.app=Device.remote.app;
+			Device.Buffer=Buffer;
+		}
+
+		Device.require=function(mod){
+			try{
+				var rst;
+				rst=require(mod);
+				return rst;
+			}catch(e){}
+		}
+
+		Device.requireRemote=function(mod){
+			try{
+				if (!Device.remote)return Device.require(mod);
+				return Device.remote[mod];
+				return Device.remote.require(mod);
+			}catch(e){}
+		}
+
+		Device.app=null
+		Device.appName="LayaAir";
+		Device.appPath=null
+		Device.dataPath=null
+		Device.tempPath=null
+		Device.workPath=null
+		Device.userHome=null
+		Device.extensionPath=null
+		Device.remote=null
+		Device.Buffer=null
+		Device.electron=null
+		Device.win=null
+		return Device;
+	})()
+
+
+	/**文件管理类
+	*@author yung
+	*/
+	//class nodetools.devices.FileManager
+	var FileManager=(function(){
+		function FileManager(){};
+		__class(FileManager,'nodetools.devices.FileManager');
+		FileManager.getPath=function(basePath,relativePath){
+			return FileTools.getPath(basePath,relativePath);
+		}
+
+		FileManager.getRelativePath=function(basePath,targetPath){
+			return FileManager.adptToCommonUrl(FileTools.getRelativePath(basePath,targetPath));
+		}
+
+		FileManager.getAppPath=function(path){
+			return FileManager.getPath(SystemSetting.appPath,path);
+		}
+
+		FileManager.getDataPath=function(path){
+			return FileManager.getPath(Device.dataPath,path);
+		}
+
+		FileManager.getAppRelativePath=function(path){
+			return FileManager.getRelativePath(SystemSetting.appPath,path);
+		}
+
+		FileManager.getWorkPath=function(path){
+			return FileManager.getPath(SystemSetting.workPath,path);
+		}
+
+		FileManager.getWorkRelativePath=function(path){
+			return FileManager.adptToCommonUrl(FileManager.getRelativePath(SystemSetting.workPath,path));
+		}
+
+		FileManager.getResRelativePath=function(path){
+			return FileManager.adptToCommonUrl(""+FileManager.getRelativePath(SystemSetting.assetsPath,path));
+		}
+
+		FileManager.adptToCommonUrl=function(url){
+			return StringTool.getReplace(url,"\\\\","/");
+		}
+
+		FileManager.adptToLocalUrl=function(url){
+			return FileTools.path.normalize(url);
+		}
+
+		FileManager.getResPath=function(path){
+			return FileManager.getPath(SystemSetting.assetsPath,path);
+		}
+
+		FileManager.getPagePath=function(path){
+			return FileManager.getPath(SystemSetting.pagesPath,path);
+		}
+
+		FileManager.getFileName=function(path){
+			return FileTools.path.basename(path).split(".")[0];
+		}
+
+		FileManager.createDirectory=function(path){
+			try {
+				FileTools.createDirectory(path);
+				}catch (e){
+				Sys$1.alert("Create folder failed:"+path);
+			}
+		}
+
+		FileManager.createTxtFile=function(path,value){
+			try {
+				FileTools.createFile(path,value);
+				}catch (e){
+				Sys$1.alert("Create file failed:"+path);
+			}
+		}
+
+		FileManager.createJSONFile=function(path,value){
+			try {
+				FileTools.createFile(path,JSON.stringify(value));
+				}catch (e){
+				Sys$1.alert("Create file failed:"+path+e.message);
+			}
+		}
+
+		FileManager.createBytesFile=function(path,bytes){
+			try {
+				FileTools.createFile(path,bytes);
+				}catch (e){
+				Sys$1.alert("Create file failed:"+path);
+			}
+		}
+
+		FileManager.removeFile=function(path){
+			FileTools.removeE(path);
+		}
+
+		FileManager.copyFile=function(from,to){
+			try {
+				FileTools.copyE(from,to);
+				}catch (e){
+				Sys$1.alert("Copy file failed:(from:"+from+" to:"+to+")");
+				console.log("Copy file failed:(from:"+from+" to:"+to+")");
+			}
+		}
+
+		FileManager.readTxtFile=function(path,errorAlert){
+			(errorAlert===void 0)&& (errorAlert=true);
+			try {
+				return FileTools.readFile(path);
+				}catch (e){
+				if (errorAlert)Sys$1.alert("Read file failed:"+path);
+			}
+			return null;
+		}
+
+		FileManager.readJSONFile=function(path,errorAlert){
+			(errorAlert===void 0)&& (errorAlert=true);
+			try {
+				var str=nodetools.devices.FileManager.readTxtFile(path);
+				return JSON.parse(str);
+				}catch (e){
+				if (errorAlert)Sys$1.alert("Read file failed:"+path);
+				debugger;
+			}
+			return null;
+		}
+
+		FileManager.readByteFile=function(path,errorAlert){
+			(errorAlert===void 0)&& (errorAlert=true);
+			try {
+				return FileTools.readFile(path);
+				}catch (e){
+				if (errorAlert)Sys$1.alert("Read file failed:"+path);
+			}
+			return null;
+		}
+
+		FileManager.getFileList=function(path){
+			return FileTools.getFileList(path);
+		}
+
+		FileManager.exists=function(path){
+			return FileTools.exist(path);
+		}
+
+		FileManager.getFileTree=function(path,hasExtension){
+			(hasExtension===void 0)&& (hasExtension=false);
+			var xml=findFiles(path);
+			function findFiles (path){
+				var node;
+				if (FileTools.exist(path)){
+					var fileName=FileTools.getFileName(path);
+					node=new /*no*/this.XMLElement("<item label='"+fileName+"' path='"+path+"' isDirectory='true'/>");
+					var a=FileTools.getDirFiles(path);
+					var f;
+					for(var $each_f in a){
+						f=a[$each_f];
+						f=FileTools.getPath(path,f);
+						if (FileTools.isDirectory(f)&& f.indexOf(".svn")==-1){
+							node.appendChild(findFiles(f));
+						}
+					}
+					var $each_f;
+					for($each_f in a){
+						f=a[$each_f];
+						f=FileTools.getPath(path,f);
+						if (FileTools.isDirectory(f)==false){
+							if (fileName.indexOf("$")==-1 && fileName.indexOf("@")==-1){
+								node.appendChild(new /*no*/this.XMLElement("<item label='"+fileName+"' path='"+f+"' isDirectory='false'/>"));
+							}
+						}
+					}
+				}
+				return node;
+			}
+			return xml
+		}
+
+		FileManager.rename=function(oldPath,newPath){
+			try {
+				FileTools.rename(oldPath,newPath);
+				}catch (e){
+				Sys$1.alert("Rename file failed:(from:"+oldPath+" to:"+newPath+")");
+			}
+		}
+
+		return FileManager;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nodetools.devices.FileTools
+	var FileTools=(function(){
+		function FileTools(){}
+		__class(FileTools,'nodetools.devices.FileTools');
+		__getset(1,FileTools,'appPath',function(){
+			var rst;
+			var dirName;
+			dirName=__dirname;;
+			rst=FileTools.path.resolve(dirName,"../");
+			return rst;
+			var aPath;
+			aPath=/*no*/this.Browser.window.location.href;
+			aPath=aPath.replace("file:///","");
+			aPath=aPath.replace("/h5/index.html","");
+			aPath=aPath.split("index.")[0];
+			aPath=decodeURI(aPath);
+			return aPath;
+		});
+
+		__getset(1,FileTools,'workPath',function(){
+			return "workPath";
+		});
+
+		FileTools.init=function(){
+			FileTools.fs=Device.require("fs");
+			FileTools.path=Device.require("path");
+			FileTools.shell=Device.requireRemote("shell");
+			FileTools.tempApp=Device.remote.app.getDataPath();
+		}
+
+		FileTools.init2=function(){
+			FileTools.fs=Device.require("fs");
+			FileTools.path=Device.require("path");
+			FileTools.shell=Device.requireRemote("shell");
+		}
+
+		FileTools.getSep=function(){
+			return FileTools.path.sep;
+		}
+
+		FileTools.getAbsPath=function(path){
+			return path;
+		}
+
+		FileTools.isAbsPath=function(path){
+			if(!path)return false;
+			if(path.indexOf(":")>0)return true;
+			if(path.substr(0,1)=="/")return true;
+			return false;
+		}
+
+		FileTools.getPath=function(basePath,relativePath){
+			return FileTools.path.join(basePath,relativePath);
+		}
+
+		FileTools.getRelativePath=function(basePath,targetPath){
+			return FileTools.path.relative(basePath,targetPath);
+		}
+
+		FileTools.getAppPath=function(path){
+			return FileTools.getPath(FileTools.appPath,path);
+		}
+
+		FileTools.getAppRelativePath=function(path){
+			return FileTools.getRelativePath(FileTools.appPath,path);
+		}
+
+		FileTools.getWorkPath=function(path){
+			return FileTools.getPath(FileTools.workPath,path);
+		}
+
+		FileTools.getWorkRelativePath=function(path){
+			return FileTools.getRelativePath(FileTools.workPath,path);
+		}
+
+		FileTools.getFileDir=function(path){
+			if (!path)return path;
+			if(nodetools.devices.FileTools.isDirectory(path))return path;
+			return nodetools.devices.FileTools.path.dirname(path);
+		}
+
+		FileTools.getParent=function(path){
+			if (!path)return path;
+			var lasti=0;
+			lasti=path.lastIndexOf(nodetools.devices.FileTools.path.sep);
+			return path.substring(0,lasti);
+		}
+
+		FileTools.getFileName=function(path){
+			return nodetools.devices.FileTools.path.basename(path).split(".")[0];
+		}
+
+		FileTools.getFileNameWithExtension=function(path){
+			if (path==null)
+				return null;
+			var a=path.split(nodetools.devices.FileTools.path.sep);
+			var file=a[a.length-1];
+			return file;
+		}
+
+		FileTools.getExtensionName=function(path){
+			if (path==null)
+				return null;
+			var a=path.split(".");
+			var file=a[a.length-1];
+			return file;
+		}
+
+		FileTools.createDirectory=function(path){
+			if (Boolean(path)){
+				FileTools.ensurePath(path);
+				if (!FileTools.fs.existsSync(path)){
+					FileTools.fs.mkdirSync(path);
+				}
+			}
+		}
+
+		FileTools.ensurePath=function(pathStr){
+			FileTools.mkdirsSync(pathStr,null);
+			return;
+			if (pathStr==null)return;
+			var sep;
+			sep=FileTools.path.sep;
+			var a=pathStr.split(sep);
+			var i=0,len=0;
+			var tPath;
+			tPath=a[0];
+			len=a.length-1;
+			for (i=1;i < len;i++){
+				tPath+=sep+a[i];
+				if (!FileTools.exist(tPath)){
+					FileTools.createDirectory(tPath);
+				}
+			}
+		}
+
+		FileTools.mkdirsSync=function(dirpath,mode){
+			if (!FileTools.fs.existsSync(dirpath)){
+				var pathtmp;
+				var pathParts=dirpath.split(FileTools.path.sep);
+				pathParts.pop();
+				var onWindows=OSInfo.type.indexOf("Windows")>-1;
+				if(!onWindows){
+					pathtmp="/"+pathParts[1];
+					pathParts.splice(0,2);
+				}
+				pathParts.forEach(function(dirname){
+					if (pathtmp){
+						pathtmp=FileTools.path.join(pathtmp,dirname);
+					}
+					else {
+						pathtmp=dirname;
+					}
+					if (!FileTools.fs.existsSync(pathtmp)){
+						if (!FileTools.fs.mkdirSync(pathtmp,mode)){
+							return false;
+						}
+					}
+				});
+			}
+			return true;
+		}
+
+		FileTools.createFile=function(path,value,option){
+			FileTools.ensurePath(path);
+			if (option){
+				FileTools.fs.writeFileSync(path,value,option);
+				}else{
+				FileTools.fs.writeFileSync(path,value);
+			}
+		}
+
+		FileTools.toBuffer=function(ab){
+			var buffer=new Device.Buffer(ab.byteLength);
+			var view=new Uint8Array(ab);
+			for (var i=0;i < buffer.length;++i){
+				buffer[i]=view[i];
+			}
+			return buffer;
+		}
+
+		FileTools.readFile=function(path,encoding){
+			(encoding===void 0)&& (encoding="utf8");
+			if (FileTools.fs.existsSync(path)){
+				var rst;
+				rst=FileTools.fs.readFileSync(path,encoding);
+				if(((typeof rst=='string'))&&rst.charCodeAt(0)==65279&&encoding=="utf8"){
+					rst=rst.substr(1);
+				}
+				return rst;
+			}
+			return null;
+		}
+
+		FileTools.appendFile=function(path,data){
+			FileTools.fs.appendFileSync(path,data);
+		}
+
+		FileTools.moveToTrash=function(path){
+			if (FileTools.exist(path)){
+				if (FileTools.shell){
+					FileTools.shell.moveItemToTrash(path);
+					}else{
+					FileTools.removeE(path,false);
+				}
+			}
+		}
+
+		FileTools.removeFile=function(path,toTrash){
+			(toTrash===void 0)&& (toTrash=true);
+			if (toTrash){
+				FileTools.moveToTrash(path);
+				return;
+			}
+			if (Boolean(path)){
+				FileTools.fs.unlinkSync(path)
+			}
+		}
+
+		FileTools.removeE=function(path,toTrash){
+			(toTrash===void 0)&& (toTrash=true);
+			if (!FileTools.exist(path))
+				return;
+			if (FileTools.isDirectory(path)){
+				FileTools.removeDir(path,toTrash);
+			}
+			else{
+				FileTools.removeFile(path,toTrash);
+			}
+		}
+
+		FileTools.removeDir=function(path,toTrash){
+			(toTrash===void 0)&& (toTrash=true);
+			if (toTrash){
+				FileTools.moveToTrash(path);
+				return;
+			};
+			var files=[];
+			if (FileTools.fs.existsSync(path)){
+				files=FileTools.fs.readdirSync(path);
+				files.forEach(function(file,index){
+					var curPath=FileTools.getPath(path,file);
+					if (FileTools.fs.statSync(curPath).isDirectory()){
+						FileTools.removeDir(curPath);
+					}
+					else{
+						FileTools.fs.unlinkSync(curPath);
+					}
+				});
+				FileTools.fs.rmdirSync(path);
+			}
+		}
+
+		FileTools.exist=function(path){
+			if(!path)return false;
+			return FileTools.fs.existsSync(path);
+		}
+
+		FileTools.isDirectory=function(path){
+			var st;
+			try{
+				st=FileTools.fs.statSync(path);
+				}catch(e){
+				return false;
+			}
+			if(!st)return false;
+			return st.isDirectory();
+		}
+
+		FileTools.getStat=function(path){
+			return FileTools.fs.statSync(path);
+		}
+
+		FileTools.getMTime=function(path){
+			return FileTools.getStat(path).mtime;
+		}
+
+		FileTools.watch=function(path,callBack){
+			FileTools.watcherDic[path]=FileTools.fs.watch(path,callBack);
+			return FileTools.watcherDic[path];
+		}
+
+		FileTools.isDirWatched=function(path){
+			return FileTools.watcherDic.hasOwnProperty(path);
+		}
+
+		FileTools.unwatch=function(path){
+			if (FileTools.watcherDic[path]){
+				FileTools.watcherDic[path].close();
+				delete FileTools.watcherDic[path];
+			}
+		}
+
+		FileTools.copyE=function(from,to){
+			if (!FileTools.exist(from))
+				return;
+			if (FileTools.isDirectory(from)){
+				FileTools.copyDir(from,to);
+			}
+			else{
+				FileTools.copyFile(from,to);
+			}
+		}
+
+		FileTools.copyFile=function(from,to){
+			FileTools.createFile(to,FileTools.readFile(from,null));
+		}
+
+		FileTools.copyDir=function(from,to){
+			var files=[];
+			if (FileTools.fs.existsSync(from)){
+				FileTools.createDirectory(to);
+				files=FileTools.fs.readdirSync(from);
+				files.forEach(function(file,index){
+					var curPath=FileTools.getPath(from,file);
+					var tPath=FileTools.getPath(to,file);
+					if (FileTools.fs.statSync(curPath).isDirectory()){
+						FileTools.copyDir(curPath,tPath);
+					}
+					else{
+						FileTools.copyFile(curPath,tPath);
+					}
+				});
+			}
+		}
+
+		FileTools.walk=function(path,floor,handleFile,self){
+			(self===void 0)&& (self=false);
+			if(self)
+				handleFile(path,floor);
+			floor++;
+			var files=FileTools.fs.readdirSync(path);
+			files.forEach(function(item){
+				var tmpPath=FileTools.getPath(path,item);
+				if (tmpPath.indexOf(".svn")>-1)
+					return;
+				var stats=FileTools.fs.statSync(tmpPath);
+				if (stats.isDirectory()){
+					FileTools.walk(tmpPath,floor,handleFile);
+				}
+				else{
+					handleFile(tmpPath,floor);
+				}
+			});
+		}
+
+		FileTools.getFileList=function(path){
+			var arr=[];
+			if(!nodetools.devices.FileTools.exist(path))return arr;
+			FileTools.walk(path,0,findFiles);
+			function findFiles (spath,floor){
+				arr.push(spath);
+			}
+			return arr;
+		}
+
+		FileTools.getFileDesO=function(path){
+			if (!FileTools.exist(path))
+				return null;
+			var rst={};
+			rst.label=FileTools.getFileName(path);
+			rst.path=path;
+			if (FileTools.isDirectory(path)){
+				rst.files=[];
+				rst.dirs=[];
+				rst.childs=[];
+				rst.isDirectory=true;
+				}else{
+				rst.isDirectory=false;
+			}
+			return rst;
+		}
+
+		FileTools.getDirChildDirs=function(p){
+			var files=nodetools.devices.FileTools.getDirFiles(p);
+			var i=0,len=0;
+			var rst;
+			rst=[];
+			len=files.length;
+			for(i=0;i<len;i++){
+				files[i]=FileTools.path.join(p,files[i]);
+				if(nodetools.devices.FileTools.isDirectory(files[i])){
+					rst.push(files[i]);
+				}
+			}
+			return rst;
+		}
+
+		FileTools.getDirFiles=function(path){
+			var rst;
+			rst=FileTools.fs.readdirSync(path);
+			rst.sort(FileTools.folderFirst);
+			return rst;
+		}
+
+		FileTools.folderFirst=function(pathA,pathB){
+			var isFolderA=false;
+			isFolderA=pathA.indexOf(".")<0;
+			var isFolderB=false;
+			isFolderB=pathB.indexOf(".")<0;
+			var right=-1;
+			if(isFolderA){
+				if(!isFolderB){
+					return right;
+				}
+				return pathA<pathB?right:-right;
+			}
+			if(isFolderB){
+				return-right;
+			}
+			return pathA<pathB?right:-right;
+		}
+
+		FileTools.getFileTreeArr=function(path){
+			var tTreeO=FileTools.getFileTreeO(path);
+			var rst=[];
+			FileTools.getTreeArr(tTreeO,rst,false);
+			return rst;
+		}
+
+		FileTools.getTreeArr=function(treeO,arr,add){
+			(add===void 0)&& (add=true);
+			if(add)
+				arr.push(treeO);
+			var tArr=treeO.childs;
+			var i=0,len=tArr.length;
+			for(i=0;i<len;i++){
+				if(!add){
+					tArr[i].nodeParent=null;
+				}
+				if(tArr[i].isDirectory){
+					FileTools.getTreeArr(tArr[i],arr);
+					}else{
+					arr.push(tArr[i]);
+				}
+			}
+		}
+
+		FileTools.getFileTreeO=function(path){
+			var rst=FileTools.getFileDesO(path);
+			if (FileTools.fs.existsSync(path)){
+				var files=FileTools.getDirFiles(path);
+				var tO;
+				files.forEach(function(file,index){
+					var curPath=FileTools.getPath(path,file);
+					if (FileTools.fs.statSync(curPath).isDirectory()){
+						tO=FileTools.getFileTreeO(curPath);
+						tO.nodeParent=rst;
+						tO.hasChild=tO.childs.length > 0;
+						rst.dirs.push(tO);
+					}
+					else{
+						tO=FileTools.getFileDesO(curPath);
+						tO.nodeParent=rst;
+						tO.hasChild=false;
+						rst.files.push(tO);
+					}
+					tO.label=file;
+					rst.childs.push(tO);
+				});
+				rst.hasChild=rst.childs.length > 0;
+			}
+			return rst;
+		}
+
+		FileTools.isPathSame=function(a,b){
+			if(a.toLocaleLowerCase()==b.toLocaleLowerCase())return true;
+			return false;
+		}
+
+		FileTools.rename=function(oldPath,newPath){
+			if (!FileTools.exist(oldPath))
+				return;
+			if(FileTools.isPathSame(oldPath,newPath)){
+				console.log("在移动文件到同一个位置！！");
+				return;
+			}
+			FileTools.copyE(oldPath,newPath);
+			FileTools.moveToTrash(oldPath);
+			return;
+			FileTools.fs.renameSync(oldPath,newPath);
+		}
+
+		FileTools.openItem=function(path){
+			FileTools.shell.openItem(path);
+		}
+
+		FileTools.showItemInFolder=function(path){
+			FileTools.shell.showItemInFolder(path);
+		}
+
+		FileTools.getFolder=function(path){
+			path=FileManager.adptToCommonUrl(path);
+			var idx=0;
+			idx=path.lastIndexOf(".");
+			if(idx>=0){
+				idx=path.lastIndexOf("/",idx);
+				if(idx>=0){
+					path=path.substr(0,idx);
+				}
+			}
+			return path;
+		}
+
+		FileTools.win=null
+		FileTools.fs=null
+		FileTools.path=null
+		FileTools.shell=null
+		FileTools.tempApp=null
+		FileTools.watcherDic={};
+		return FileTools;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nodetools.devices.OSInfo
+	var OSInfo=(function(){
+		function OSInfo(){}
+		__class(OSInfo,'nodetools.devices.OSInfo');
+		OSInfo.init=function(){
+			OSInfo.os=Device.require("os");
+			OSInfo.platform=OSInfo.os.platform();
+			OSInfo.tempdir=OSInfo.os.tmpdir();
+			OSInfo.type=OSInfo.os.type();
+			var tProcess;
+			tProcess=process;;
+			OSInfo.process=tProcess;
+			OSInfo.env=OSInfo.process.env;
+			console.log("type:",OSInfo.type);
+		}
+
+		OSInfo.os=null
+		OSInfo.platform=null
+		OSInfo.homedir=null
+		OSInfo.tempdir=null
+		OSInfo.type=null
+		OSInfo.process=null
+		OSInfo.env=null
+		return OSInfo;
+	})()
+
+
+	/**
 	*编辑器全局静态入口
 	*@author ww
 	*/
 	//class nodetools.devices.Sys
-	var Sys=(function(){
+	var Sys$1=(function(){
 		function Sys(){};
-		__class(Sys,'nodetools.devices.Sys');
+		__class(Sys,'nodetools.devices.Sys',null,'Sys$1');
 		Sys.mParseFloat=function(v){
 			v=parseFloat(v);
 			if (isNaN(v))return 0;
@@ -11249,6 +13230,49 @@ var Laya=window.Laya=(function(window,document){
 	})()
 
 
+	/**系统配置
+	*@author ww
+	*/
+	//class nodetools.devices.SystemSetting
+	var SystemSetting=(function(){
+		function SystemSetting(){};
+		__class(SystemSetting,'nodetools.devices.SystemSetting');
+		SystemSetting.setProject=function(path){
+			if (FileTools.exist(path)){
+				SystemSetting.projectPath=path;
+				SystemSetting.projectName=FileTools.getFileName(path).replace(".laya","");
+				SystemSetting.workPath=FileTools.path.dirname(path);
+				SystemSetting.workPath=FileTools.path.dirname(SystemSetting.workPath);
+				SystemSetting.pagesPath=FileManager.getWorkPath("laya/pages");
+				SystemSetting.assetsPath=FileManager.getWorkPath("laya/assets");
+				SystemSetting.stylePath=FileManager.getWorkPath("laya/styles.xml");
+				SystemSetting.pageStylePath=FileManager.getWorkPath("laya/pageStyles.xml");
+				SystemSetting.tempPath=FileManager.getPath(FileTools.tempApp,"data/"+SystemSetting.projectName)
+				FileManager.createDirectory(SystemSetting.pagesPath);
+				FileManager.createDirectory(SystemSetting.assetsPath);
+				FileManager.createDirectory(SystemSetting.tempPath);
+			}
+		}
+
+		SystemSetting.workPath="";
+		SystemSetting.appPath="";
+		SystemSetting.projectName="";
+		SystemSetting.projectPath="";
+		SystemSetting.pagesPath="";
+		SystemSetting.assetsPath="";
+		SystemSetting.stylePath="";
+		SystemSetting.pageStylePath="";
+		SystemSetting.tempResPath="";
+		SystemSetting.tempVerPath="";
+		SystemSetting.tempPath="";
+		SystemSetting.lang="";
+		SystemSetting.ifShowRuleGrid=true;
+		SystemSetting.toCodeModeWhenPublicEnd=false;
+		SystemSetting.isCMDVer=false;
+		return SystemSetting;
+	})()
+
+
 	/**
 	*...
 	*@author ww
@@ -11281,6 +13305,38 @@ var Laya=window.Laya=(function(window,document){
 			return file;
 		}
 
+		FilePathUtils.getFileName=function(path){
+			if (path==null)
+				return null;
+			path=FilePathUtils.adptToCommonUrl(path);
+			var a=path.split("/");
+			var file=a[a.length-1];
+			if (file.indexOf(".")>=0){
+				a=file.split(".");
+				a.pop();
+				file=a.join(".");
+			}
+			return file;
+		}
+
+		FilePathUtils.replaceFileName=function(path,newFileName){
+			if (!path)return null;
+			path=FilePathUtils.adptToCommonUrl(path);
+			var a=path.split("/");
+			var file=a[a.length-1];
+			var b;
+			if (file.indexOf(".")>=0){
+				b=file.split(".");
+				b[0]=newFileName;
+				file=b.join(".");
+				}else{
+				file=newFileName;
+			}
+			a[a.length-1]=file;
+			file=a.join("/");
+			return file;
+		}
+
 		FilePathUtils.adptToCommonUrl=function(url){
 			return StringTool.getReplace(url,"\\\\","/");
 		}
@@ -11301,12 +13357,579 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class webfile.FileReaderTool
+	var FileReaderTool=(function(){
+		function FileReaderTool(){}
+		__class(FileReaderTool,'webfile.FileReaderTool');
+		FileReaderTool.readAsString=function(file,complete){
+			var reader;
+			reader=new FileReader();;
+			reader.onload=function (e){
+				complete.runWith(reader.result);
+			}
+			reader.readAsText(file);
+		}
+
+		return FileReaderTool;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.colorpanel.ColorPickerControl
+	var ColorPickerControl=(function(){
+		function ColorPickerControl(){
+			this.closeWhenOtherClick=false;
+			this.hideCompleteHandler=null;
+			this.colorPicker=null;
+			this.showY=NaN;
+			this.hideY=NaN;
+			this.colorPicker=new colorpanel.colorselectorpanel.SelectorColorPicker();
+			this.colorPicker.on("change",this,this.onColorChange);
+		}
+
+		__class(ColorPickerControl,'commonui.colorpanel.ColorPickerControl');
+		var __proto=ColorPickerControl.prototype;
+		__proto.onColorChange=function(color){
+			if (ColorPickerControl.colorChangeHandler){
+				ColorPickerControl.colorChangeHandler.runWith(color);
+			}
+		}
+
+		__proto.showEffect=function(){
+			Laya.stage.off("click",this,this.onStageClick);
+			this.colorPicker.y=this.hideY;
+			Tween.clearTween(this.colorPicker);
+			Tween.to(this.colorPicker,{y:this.showY },300,Ease.circOut,Handler.create(this,this.onShowComplete));
+		}
+
+		__proto.onShowComplete=function(){
+			Laya.stage.on("click",this,this.onStageClick);
+		}
+
+		__proto.onStageClick=function(e){
+			if (!this.colorPicker.contains(e.target)){
+				this.hideEffect();
+			}
+		}
+
+		__proto.hideEffect=function(){
+			Laya.stage.off("click",this,this.onStageClick);
+			Tween.clearTween(this.colorPicker);
+			Tween.to(this.colorPicker,{y:this.hideY },300,Ease.circIn,Handler.create(this,this.onHideComplete));
+		}
+
+		__proto.onHideComplete=function(){
+			ColorPickerControl.isShow=false;
+			this.colorPicker.removeSelf();
+			if (this.hideCompleteHandler){
+				this.hideCompleteHandler.run();
+			}
+		}
+
+		ColorPickerControl._init=function(){
+			if (!ColorPickerControl._skySettingPanel){
+				ColorPickerControl._skySettingPanel=new ColorPickerControl();
+			}
+		}
+
+		ColorPickerControl.showColorPicker=function(colorChangeHandler,parentBox,parentBottomOffset,childIndex,hasImage,autoClose,hideHandler){
+			(parentBottomOffset===void 0)&& (parentBottomOffset=100);
+			(childIndex===void 0)&& (childIndex=-1);
+			(hasImage===void 0)&& (hasImage=true);
+			(autoClose===void 0)&& (autoClose=false);
+			if (ColorPickerControl.isShow)return;
+			ColorPickerControl._init();
+			commonui.colorpanel.ColorPickerControl.colorChangeHandler=colorChangeHandler;
+			ColorPickerControl._skySettingPanel.colorPicker.setHasImage(hasImage);
+			ColorPickerControl._skySettingPanel.hideY=parentBox.height;
+			ColorPickerControl._skySettingPanel.showY=parentBox.height-ColorPickerControl._skySettingPanel.colorPicker.height-parentBottomOffset;
+			ColorPickerControl.isShow=true;
+			ColorPickerControl._skySettingPanel.closeWhenOtherClick=autoClose;
+			ColorPickerControl._skySettingPanel.hideCompleteHandler=hideHandler;
+			if (childIndex >=0){
+				parentBox.addChildAt(ColorPickerControl._skySettingPanel.colorPicker,childIndex);
+				}else{
+				parentBox.addChild(ColorPickerControl._skySettingPanel.colorPicker);
+			}
+			ColorPickerControl._skySettingPanel.showEffect();
+		}
+
+		ColorPickerControl.hideColorPicker=function(){
+			if (!ColorPickerControl.isShow)return;
+			ColorPickerControl.isShow=false;
+			if (ColorPickerControl._skySettingPanel){
+				ColorPickerControl._skySettingPanel.hideEffect();
+			}
+		}
+
+		ColorPickerControl._skySettingPanel=null
+		ColorPickerControl.colorChangeHandler=null
+		ColorPickerControl.isShow=false;
+		return ColorPickerControl;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.colorpanel.ColorTableTool
+	var ColorTableTool=(function(){
+		function ColorTableTool(){}
+		__class(ColorTableTool,'commonui.colorpanel.ColorTableTool');
+		ColorTableTool.initList=function(start,end,count,includEnd){
+			(includEnd===void 0)&& (includEnd=true);
+			var i=0,len=0;
+			len=count;
+			var d=NaN;
+			d=(end-start)/ count;
+			var rst;
+			rst=[];
+			if (includEnd){
+				start+=d;
+			}
+			for (i=0;i < len;i++){
+				rst.push(start+i*d);
+			}
+			return rst;
+		}
+
+		ColorTableTool.createGrayColor=function(split){
+			(split===void 0)&& (split=8);
+			var arr;
+			arr=[];
+			var i=0,len=0;
+			len=split;
+			var dLen=0;
+			dLen=255 / (split-1);
+			var tValue;
+			for (i=0;i < len;i++){
+				tValue=Math.floor(i*dLen);
+				tValue=ColorTool.getRGBStr([tValue,tValue,tValue]);
+				arr.push(tValue);
+			}
+			return arr;
+		}
+
+		ColorTableTool.createColorTable=function(circleSplit,depthSplit,startS,endS,startB,endB){
+			(circleSplit===void 0)&& (circleSplit=32);
+			(depthSplit===void 0)&& (depthSplit=8);
+			(startS===void 0)&& (startS=0.2);
+			(endS===void 0)&& (endS=1);
+			(startB===void 0)&& (startB=0.1);
+			(endB===void 0)&& (endB=1);
+			ColorTableTool.grayList=ColorTableTool.createGrayColor(depthSplit);
+			ColorTableTool.hueList=ColorTableTool.initList(0,360,circleSplit-1,false);
+			ColorTableTool.saturationList=ColorTableTool.initList(startS,endS,depthSplit);
+			ColorTableTool.birghtList=ColorTableTool.initList(startB,endB,depthSplit);
+			var i=0,len=0;
+			var j=0,jLen=0;
+			len=circleSplit;
+			jLen=depthSplit;
+			var colors;
+			colors=[];
+			for (i=0;i < len;i++){
+				for (j=0;j < jLen;j++){
+					if (i==len-1){
+						colors.push(ColorTableTool.changeColor(ColorTableTool.grayList[j]));
+					}else
+					colors.push(ColorTableTool.changeColor(ColorTool.getRGBStr(ColorTool.hsb2rgb(ColorTableTool.hueList[i],ColorTableTool.saturationList[j],ColorTableTool.birghtList[j]))));
+				}
+			}
+			return colors;
+		}
+
+		ColorTableTool.changeColor=function(str){
+			var ___color=ColorTool.getRGBByRGBStr(str);
+			return ColorTool.getRGBStr([(___color[0] >> 3 << 3),(___color[1] >> 3 << 3),(___color[2] >> 3 << 3)]);
+		}
+
+		ColorTableTool.getHSBByRGB=function(color){
+			var rgb;
+			rgb=ColorTool.getRGBByRGBStr(color);
+			return ColorTool.rgb2hsb(rgb[0],rgb[1],rgb[2]);
+		}
+
+		ColorTableTool.RGB2Gray=function(color){
+			var rgb;
+			rgb=ColorTool.getRGBByRGBStr(color);
+			return rgb[0] *0.299+rgb[1] *0.587+rgb[2] *0.114;
+		}
+
+		ColorTableTool.getTextColor=function(color){
+			return ColorTableTool.RGB2Gray(color)> 200?"#000000":"#ffffff";
+		}
+
+		ColorTableTool.hueList=null
+		ColorTableTool.saturationList=null
+		ColorTableTool.birghtList=null
+		ColorTableTool.grayList=null
+		return ColorTableTool;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class commonui.consts.CommonUIConsts
 	var CommonUIConsts=(function(){
 		function CommonUIConsts(){}
 		__class(CommonUIConsts,'commonui.consts.CommonUIConsts');
 		CommonUIConsts.fileNameRestrict="0-9a-zA-Z_";
+		CommonUIConsts.fileNameRestrictEx="\u4E00-\uFA29\uE7C7-\uE7F30-9a-zA-Z_";
 		return CommonUIConsts;
+	})()
+
+
+	/**
+	*属性面板插件管理器
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2018-5-7 上午10:23:40
+	*/
+	//class commonui.view.prop.PropPluginManager
+	var PropPluginManager=(function(){
+		function PropPluginManager(){}
+		__class(PropPluginManager,'commonui.view.prop.PropPluginManager');
+		PropPluginManager.regPlugin=function(type,clz){
+			type=type.toLowerCase();
+			PropPluginManager.typeToPluginDic[type]=clz;
+		}
+
+		PropPluginManager.createPluginByType=function(type){
+			type=type.toLowerCase();
+			var tClz;
+			tClz=PropPluginManager.typeToPluginDic[type]||PropPluginManager.defaultInputClz;
+			if(!tClz)return null;
+			return new tClz();
+		}
+
+		PropPluginManager.initIDEPlugins=function(){
+			PropPluginManager.defaultInputClz=PropsTextInput;
+			PropPluginManager.regPlugin("number",PropsNumberInput);
+			PropPluginManager.regPlugin("color",PropsColorInput);
+			PropPluginManager.regPlugin("colorarray",PropsColorArrayInput);
+		}
+
+		PropPluginManager.typeToPluginDic={};
+		PropPluginManager.defaultInputClz=null
+		PropPluginManager.__init$=function(){
+			;
+			PropPluginManager.initIDEPlugins();
+		}
+
+		return PropPluginManager;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.PropStyleConst
+	var PropStyleConst=(function(){
+		function PropStyleConst(){}
+		__class(PropStyleConst,'commonui.view.prop.PropStyleConst');
+		PropStyleConst.PropPanelTitleColor="#44a7ff";
+		PropStyleConst.PropPanelScrollBar=" ";
+		PropStyleConst.TreeItemColor="#c5c5c5";
+		PropStyleConst.TreeFolderColor="#c5c5c5";
+		PropStyleConst.PropPanelFontSize=30;
+		PropStyleConst.InputItemSize=38;
+		return PropStyleConst;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.PropUtils
+	var PropUtils=(function(){
+		function PropUtils(){}
+		__class(PropUtils,'commonui.view.prop.PropUtils');
+		PropUtils.getNumberFix=function(value){
+			var str;
+			str=value+"";
+			var index=0;
+			index=str.indexOf(".");
+			if (index < 0)return 0;
+			return str.length-index-1;
+		}
+
+		PropUtils.numberToFixed=function(value,fix){
+			(fix===void 0)&& (fix=0);
+			if (fix <=0){
+				return Math.floor(value);
+			};
+			var p=NaN;
+			p=Math.pow(10,fix);
+			return Math.round(value *p)/ p;
+		}
+
+		PropUtils.mParseInt=function(v){
+			return parseInt(v)||0;
+		}
+
+		PropUtils.mParserFloat=function(v){
+			return parseFloat(v)||0;
+		}
+
+		PropUtils.isNumber=function(value){
+			return (parseFloat(value)==value);
+		}
+
+		PropUtils.isNaNS=function(value){
+			return (value.toString()=="NaN");
+		}
+
+		PropUtils.isNaN=function(value){
+			if(typeof(value)=="number")return false;
+			if(typeof(value)=="string"){
+				if(parseFloat(value).toString()!="NaN"){
+					if(parseFloat(value)==value){
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
+		PropUtils.getDisplayPropObject=function(propO){
+			return propO;
+		}
+
+		PropUtils.getDefaultValueByType=function(valueType){
+			var value;
+			if(valueType.toLowerCase!=null)
+				valueType=valueType.toLowerCase();
+			switch (valueType){
+				case "int":
+				case "number":
+				case "snumber":
+				case "number":
+				case "pnumber":
+				case "unumber":
+					value=0;
+					break ;
+				case "bool":
+					value=false;
+					break ;
+				default :
+					value="";
+				}
+			return value;
+		}
+
+		PropUtils.getAdptValue=function(value,valueType){
+			if (value !=""){
+				if(valueType.toLowerCase!=null)
+					valueType=valueType.toLowerCase();
+				switch (valueType){
+					case "int":
+						value=PropUtils.mParseInt(value);
+					case "number":
+					case "snumber":
+					case "number":
+						value=parseFloat(value);
+						break ;
+					case "pnumber":
+					case "unumber":
+						value=Math.abs(parseFloat(value));
+						break ;
+					case "bool":
+						value=(value=="true"||value==true)? true :false;
+						break ;
+					}
+				if (PropUtils.isNaNS(value)){
+					value=0;
+				}
+			}
+			return value;
+		}
+
+		return PropUtils;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.UIConfigManager
+	var UIConfigManager=(function(){
+		function UIConfigManager(){}
+		__class(UIConfigManager,'commonui.view.prop.UIConfigManager');
+		UIConfigManager.initDatas=function(){
+			UIConfigManager.configedTypeDic["Image"]=true;
+		}
+
+		UIConfigManager.getCompProp=function(type,key){
+			if (!UIConfigManager.nodeConfigDic[type])return null;
+			return UIConfigManager.nodeConfigDic[type][key];
+		}
+
+		UIConfigManager.getCompConfig=function(type){
+			return UIConfigManager.nodeConfigDic[type];
+		}
+
+		UIConfigManager.getCompTreeIcon=function(type){
+			var iconurl;
+			iconurl=commonui.view.prop.UIConfigManager.getCompProp(type,"icon");
+			if(!iconurl){
+				iconurl="Image";
+			}
+			return UIConfigManager.getTypeIcon(iconurl);
+		}
+
+		UIConfigManager.getNickNameFromPropConfig=function(propConfig){
+			return propConfig.nickName || propConfig.title || propConfig.name;
+		}
+
+		UIConfigManager.getTypeIcon=function(type){
+			return type+".png";
+		}
+
+		UIConfigManager.getConfigedType=function(type){
+			if (!UIConfigManager.configedTypeDic[type])return "Image";
+			return type;
+		}
+
+		UIConfigManager.getTypeFromNode=function(node){
+			if (!node || !node.comXml){
+				return "Image";
+			}
+			return UIConfigManager.getConfigedType(node.comXml.type);
+		}
+
+		UIConfigManager.getPropValueFromNode=function(node,key){
+			if (!node || !node.comXml||!node.comXml.props){
+				return null;
+			}
+			return node.comXml.props[key];
+		}
+
+		UIConfigManager.getNodeIDFromNode=function(node){
+			if (!node || !node.comXml){
+				return null;
+			}
+			return node.comXml.compId;
+		}
+
+		UIConfigManager.getTypeConfigPath=function(type){
+			return UIConfigManager.propsConfigRoot+type+".json";
+		}
+
+		UIConfigManager.loadConfigByNode=function(node,complete){
+			var type;
+			type=UIConfigManager.getTypeFromNode(node);
+			if (UIConfigManager.nodeConfigDic[type]){
+				complete.runWith(UIConfigManager.nodeConfigDic[type]);
+				}else{
+				Laya.loader.load(UIConfigManager.getTypeConfigPath(type),Handler.create(null,UIConfigManager.onConfigLoaded,[type,complete]));
+			}
+		}
+
+		UIConfigManager.onConfigLoaded=function(type,complete,dataO){
+			UIConfigManager.nodeConfigDic[type]=dataO;
+			complete.runWith(dataO);
+		}
+
+		UIConfigManager.nodeConfigDic={};
+		UIConfigManager.DefaultType="Image";
+		UIConfigManager.configedTypeDic={};
+		UIConfigManager.propsConfigRoot="props/";
+		UIConfigManager.__init$=function(){
+			;
+			UIConfigManager.initDatas();;
+		}
+
+		return UIConfigManager;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.TipMessage
+	var TipMessage=(function(){
+		function TipMessage(){};
+		__class(TipMessage,'commonui.view.TipMessage');
+		TipMessage.hideTipLabel=function(){
+			if (TipMessage.label)TipMessage.label.removeSelf();
+		}
+
+		TipMessage.getTipLabel=function(){
+			if (!TipMessage.label){
+				TipMessage.label=new Label();
+				TipMessage.label.width=400;
+				TipMessage.label.fontSize=60;
+				TipMessage.label.align="center";
+			}
+			return TipMessage.label;
+		}
+
+		TipMessage.i=null
+		TipMessage.label=null
+		return TipMessage;
+	})()
+
+
+	/**
+	*编辑器全局静态入口
+	*@author yung
+	*/
+	//class Sys
+	var Sys=(function(){
+		function Sys(){};
+		__class(Sys,'Sys');
+		Sys.lang=function(body,__args){
+			var args=[];for(var i=1,sz=arguments.length;i<sz;i++)args.push(arguments[i]);
+			var i=0,len=0;
+			len=args.length;
+			if(Sys.langPack&&Sys.langPack[body]){
+				body=Sys.langPack[body];
+			}
+			for (i=0;i < len;i++){
+				body=body.replace("{"+i+"}",args[i]);
+			}
+			return body;
+		}
+
+		Sys.adptLangPack=function(){
+			if(!Sys.langPack)return;
+			var key;
+			var newKey;
+			for(key in Sys.langPack){
+				if(key.indexOf("\\n")>=0){
+					newKey=StringTool.getReplace(key,"\\\\n","\n");
+					Sys.langPack[newKey]=StringTool.getReplace(Sys.langPack[key],"\\\\n","\n");
+				}
+			}
+		}
+
+		Sys.langArr=function(txtList){
+			if(!Sys.langPack)return txtList;
+			var i=0,len=0;
+			len=txtList.length;
+			var tTxt;
+			for(i=0;i<len;i++){
+				tTxt=txtList[i];
+				if(Sys.langPack[tTxt]){
+					txtList[i]=Sys.langPack[tTxt];
+				}
+			}
+			return txtList;
+		}
+
+		Sys.langPack=null
+		return Sys;
 	})()
 
 
@@ -12049,38 +14672,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*本类用于模块间消息传递
-	*@author ww
-	*/
-	//class laya.debug.tools.Notice extends laya.events.EventDispatcher
-	var Notice=(function(_super){
-		function Notice(){
-			Notice.__super.call(this);
-		}
-
-		__class(Notice,'laya.debug.tools.Notice',_super);
-		Notice.notify=function(type,data){
-			Notice.I.event(type,data);
-		}
-
-		Notice.listen=function(type,_scope,fun,args,cancelBefore){
-			(cancelBefore===void 0)&& (cancelBefore=false);
-			if(cancelBefore)Notice.cancel(type,_scope,fun);
-			Notice.I.on(type,_scope,fun,args);
-		}
-
-		Notice.cancel=function(type,_scope,fun){
-			Notice.I.off(type,_scope,fun);
-		}
-
-		__static(Notice,
-		['I',function(){return this.I=new Notice();}
-		]);
-		return Notice;
-	})(EventDispatcher)
-
-
-	/**
 	*<p> <code>LoaderManager</code> 类用于用于批量加载资源。此类是单例，不要手动实例化此类，请通过Laya.loader访问。</p>
 	*<p>全部队列加载完成，会派发 Event.COMPLETE 事件；如果队列中任意一个加载失败，会派发 Event.ERROR 事件，事件回调参数值为加载出错的资源地址。</p>
 	*<p> <code>LoaderManager</code> 类提供了以下几种功能：<br/>
@@ -12472,115 +15063,34 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*<code>Sound</code> 类是用来播放控制声音的类。
+	*本类用于模块间消息传递
+	*@author ww
 	*/
-	//class laya.media.Sound extends laya.events.EventDispatcher
-	var Sound=(function(_super){
-		function Sound(){Sound.__super.call(this);;
-		};
-
-		__class(Sound,'laya.media.Sound',_super);
-		var __proto=Sound.prototype;
-		/**
-		*加载声音。
-		*@param url 地址。
-		*
-		*/
-		__proto.load=function(url){}
-		/**
-		*播放声音。
-		*@param startTime 开始时间,单位秒
-		*@param loops 循环次数,0表示一直循环
-		*@return 声道 SoundChannel 对象。
-		*
-		*/
-		__proto.play=function(startTime,loops){
-			(startTime===void 0)&& (startTime=0);
-			(loops===void 0)&& (loops=0);
-			return null;
+	//class laya.debug.tools.Notice extends laya.events.EventDispatcher
+	var Notice=(function(_super){
+		function Notice(){
+			Notice.__super.call(this);
 		}
 
-		/**
-		*释放声音资源。
-		*
-		*/
-		__proto.dispose=function(){}
-		/**
-		*获取总时间。
-		*/
-		__getset(0,__proto,'duration',function(){
-			return 0;
-		});
-
-		return Sound;
-	})(EventDispatcher)
-
-
-	/**
-	*<p> <code>SoundChannel</code> 用来控制程序中的声音。每个声音均分配给一个声道，而且应用程序可以具有混合在一起的多个声道。</p>
-	*<p> <code>SoundChannel</code> 类包含控制声音的播放、暂停、停止、音量的方法，以及获取声音的播放状态、总时间、当前播放时间、总循环次数、播放地址等信息的方法。</p>
-	*/
-	//class laya.media.SoundChannel extends laya.events.EventDispatcher
-	var SoundChannel=(function(_super){
-		function SoundChannel(){
-			this.url=null;
-			this.loops=0;
-			this.startTime=NaN;
-			this.isStopped=false;
-			this.completeHandler=null;
-			SoundChannel.__super.call(this);
+		__class(Notice,'laya.debug.tools.Notice',_super);
+		Notice.notify=function(type,data){
+			Notice.I.event(type,data);
 		}
 
-		__class(SoundChannel,'laya.media.SoundChannel',_super);
-		var __proto=SoundChannel.prototype;
-		/**
-		*播放。
-		*/
-		__proto.play=function(){}
-		/**
-		*停止。
-		*/
-		__proto.stop=function(){}
-		/**
-		*暂停。
-		*/
-		__proto.pause=function(){}
-		/**
-		*继续播放。
-		*/
-		__proto.resume=function(){}
-		/**
-		*private
-		*/
-		__proto.__runComplete=function(handler){
-			if (handler){
-				handler.run();
-			}
+		Notice.listen=function(type,_scope,fun,args,cancelBefore){
+			(cancelBefore===void 0)&& (cancelBefore=false);
+			if(cancelBefore)Notice.cancel(type,_scope,fun);
+			Notice.I.on(type,_scope,fun,args);
 		}
 
-		/**
-		*音量范围从 0（静音）至 1（最大音量）。
-		*/
-		__getset(0,__proto,'volume',function(){
-			return 1;
-			},function(v){
-		});
+		Notice.cancel=function(type,_scope,fun){
+			Notice.I.off(type,_scope,fun);
+		}
 
-		/**
-		*获取当前播放时间。
-		*/
-		__getset(0,__proto,'position',function(){
-			return 0;
-		});
-
-		/**
-		*获取总时间。
-		*/
-		__getset(0,__proto,'duration',function(){
-			return 0;
-		});
-
-		return SoundChannel;
+		__static(Notice,
+		['I',function(){return this.I=new Notice();}
+		]);
+		return Notice;
 	})(EventDispatcher)
 
 
@@ -12743,6 +15253,119 @@ var Laya=window.Laya=(function(window,document){
 		AudioSound._audioCache={};
 		AudioSound._musicAudio=null
 		return AudioSound;
+	})(EventDispatcher)
+
+
+	/**
+	*<p> <code>SoundChannel</code> 用来控制程序中的声音。每个声音均分配给一个声道，而且应用程序可以具有混合在一起的多个声道。</p>
+	*<p> <code>SoundChannel</code> 类包含控制声音的播放、暂停、停止、音量的方法，以及获取声音的播放状态、总时间、当前播放时间、总循环次数、播放地址等信息的方法。</p>
+	*/
+	//class laya.media.SoundChannel extends laya.events.EventDispatcher
+	var SoundChannel=(function(_super){
+		function SoundChannel(){
+			this.url=null;
+			this.loops=0;
+			this.startTime=NaN;
+			this.isStopped=false;
+			this.completeHandler=null;
+			SoundChannel.__super.call(this);
+		}
+
+		__class(SoundChannel,'laya.media.SoundChannel',_super);
+		var __proto=SoundChannel.prototype;
+		/**
+		*播放。
+		*/
+		__proto.play=function(){}
+		/**
+		*停止。
+		*/
+		__proto.stop=function(){}
+		/**
+		*暂停。
+		*/
+		__proto.pause=function(){}
+		/**
+		*继续播放。
+		*/
+		__proto.resume=function(){}
+		/**
+		*private
+		*/
+		__proto.__runComplete=function(handler){
+			if (handler){
+				handler.run();
+			}
+		}
+
+		/**
+		*音量范围从 0（静音）至 1（最大音量）。
+		*/
+		__getset(0,__proto,'volume',function(){
+			return 1;
+			},function(v){
+		});
+
+		/**
+		*获取当前播放时间。
+		*/
+		__getset(0,__proto,'position',function(){
+			return 0;
+		});
+
+		/**
+		*获取总时间。
+		*/
+		__getset(0,__proto,'duration',function(){
+			return 0;
+		});
+
+		return SoundChannel;
+	})(EventDispatcher)
+
+
+	/**
+	*<code>Sound</code> 类是用来播放控制声音的类。
+	*/
+	//class laya.media.Sound extends laya.events.EventDispatcher
+	var Sound=(function(_super){
+		function Sound(){Sound.__super.call(this);;
+		};
+
+		__class(Sound,'laya.media.Sound',_super);
+		var __proto=Sound.prototype;
+		/**
+		*加载声音。
+		*@param url 地址。
+		*
+		*/
+		__proto.load=function(url){}
+		/**
+		*播放声音。
+		*@param startTime 开始时间,单位秒
+		*@param loops 循环次数,0表示一直循环
+		*@return 声道 SoundChannel 对象。
+		*
+		*/
+		__proto.play=function(startTime,loops){
+			(startTime===void 0)&& (startTime=0);
+			(loops===void 0)&& (loops=0);
+			return null;
+		}
+
+		/**
+		*释放声音资源。
+		*
+		*/
+		__proto.dispose=function(){}
+		/**
+		*获取总时间。
+		*/
+		__getset(0,__proto,'duration',function(){
+			return 0;
+		});
+
+		return Sound;
 	})(EventDispatcher)
 
 
@@ -14069,14 +16692,30 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.addFolder=function(path,completeHandler){
-			if ((typeof /*no*/this.content=='object')){
-				/*no*/this.content=JSON.stringify(/*no*/this.content);
-			};
 			var dataO;
 			dataO={};
 			dataO.action="addFolder";
 			dataO.token=this.token;
 			dataO.path=path;
+			HttpRequestTool.request(FileKit.root,dataO,completeHandler);
+		}
+
+		__proto.deleteFile=function(path,completeHandler){
+			var dataO;
+			dataO={};
+			dataO.action="deleteFile";
+			dataO.token=this.token;
+			dataO.path=path;
+			HttpRequestTool.request(FileKit.root,dataO,completeHandler);
+		}
+
+		__proto.renameFile=function(path,newPath,completeHandler){
+			var dataO;
+			dataO={};
+			dataO.action="renameFile";
+			dataO.token=this.token;
+			dataO.path=path;
+			dataO.newpath=newPath;
 			HttpRequestTool.request(FileKit.root,dataO,completeHandler);
 		}
 
@@ -19090,6 +21729,231 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*颜色选取类
+	*@author ww
+	*/
+	//class wraps.colorselect.ColorSelector extends laya.display.Sprite
+	var ColorSelector$1=(function(_super){
+		function ColorSelector(){
+			this.sideColor=null;
+			this.mainColor=null;
+			this.demoColor=null;
+			this.posSp=null;
+			this.hPos=null;
+			this.container=null;
+			this._gradientSp=null;
+			this._darkSp=null;
+			this.isChanging=false;
+			this.tColor=null;
+			this.tH=NaN;
+			this._colorFilter=null;
+			ColorSelector.__super.call(this);
+			this.container=this;
+			this.mouseEnabled=true;
+			this.createUI();
+		}
+
+		__class(ColorSelector,'wraps.colorselect.ColorSelector',_super,'ColorSelector$1');
+		var __proto=ColorSelector.prototype;
+		__proto.createUI=function(){
+			this.sideColor=new Sprite();
+			this.container.addChild(this.sideColor);
+			this.sideColor.graphics.drawRect(0,0,150,150,"#ffffff");
+			this._gradientSp=new Sprite();
+			var tex;
+			tex=Loader.getRes(ColorSelector.sideColorPic);
+			this._gradientSp.graphics.drawImage(tex,0,0,150,150);
+			this.sideColor.addChild(this._gradientSp);
+			this._darkSp=new Sprite();
+			this.sideColor.addChild(this._darkSp);
+			tex=Loader.getRes(ColorSelector.overlayPic);
+			this._darkSp.graphics.drawImage(tex,0,0,150,150);
+			this.posSp=new Sprite();
+			this.posSp.pos(100,100);
+			this.posSp.graphics.drawCircle(0,0,5,null,"#ff0000");
+			this.posSp.graphics.drawCircle(0,0,6,null,"#ffff00");
+			this.posSp.autoSize=true;
+			this.sideColor.addChild(this.posSp);
+			this.sideColor.pos(0,0);
+			this.sideColor.size(150,150);
+			this.sideColor.on("mousedown",this,this.sideColorClick);
+			var i=0;
+			this.mainColor=new Sprite();
+			var g;
+			g=this.mainColor.graphics;
+			var h=NaN;
+			var s=NaN;
+			var b=NaN;
+			var rgb;
+			tex=Loader.getRes(ColorSelector.mainColorPic);
+			this.mainColor.graphics.drawImage(tex,0,0,tex.width,150);
+			this.mainColor.pos(150+4,0);
+			this.mainColor.size(tex.width,150);
+			this.hPos=new Sprite();
+			this.hPos.graphics.drawPie(0,0,20,-10,10,"#ff0000");
+			this.hPos.x=this.mainColor.x+this.mainColor.width-20;
+			this.container.addChild(this.mainColor);
+			this.container.addChild(this.hPos);
+			this.mainColor.on("mousedown",this,this.mainColorClick);
+			this.demoColor=new Sprite();
+			this.demoColor.pos(this.sideColor.x+44,this.sideColor.y+this.sideColor.height+4);
+			this.demoColor.size(150,40);
+			this.container.addChild(this.demoColor);
+			this.width=this.mainColor.x+this.mainColor.width;
+			this.setColorByRGBStr("#099599");
+			this.posSp.on("dragmove",this,this.posDraging);
+		}
+
+		// posSp.on(Event.MOUSE_DOWN,this,posMouseDown);
+		__proto.posMouseDown=function(e){}
+		__proto.posDraging=function(){
+			this.updatePosSpAndShowColor();
+			this.event("COLOR_CHANGING");
+		}
+
+		__proto.posDragEnd=function(){
+			this.isChanging=false;
+			this.updatePosSpAndShowColor();
+		}
+
+		__proto.setColorByRGBStr=function(rgbStr){
+			var rgb;
+			rgb=ColorTool.getRGBByRGBStr(rgbStr);
+			this.setColor(rgb[0],rgb[1],rgb[2]);
+		}
+
+		__proto.setColor=function(red,green,blue,notice){
+			(notice===void 0)&& (notice=true);
+			var hsb;
+			hsb=ColorTool.rgb2hsb(red,green,blue);
+			var tRGB;
+			tRGB=ColorTool.hsb2rgb(hsb[0],hsb[1],hsb[2]);
+			this.setColorByHSB(hsb[0],hsb[1],hsb[2],notice);
+		}
+
+		__proto.setColorByHSB=function(h,s,b,notice){
+			(notice===void 0)&& (notice=true);
+			this.hPos.y=this.mainColor.y+h/360*150;
+			this.posSp.x=s *150;
+			this.posSp.y=(1-b)*150;
+			this.updateSideColor(h,notice);
+		}
+
+		__proto.sideColorClick=function(e){
+			this.isChanging=true;
+			this.posSp.startDrag();
+			this.updatePosSpAndShowColor();
+			Laya.stage.off("mouseup",this,this.sideColorMouseUp);
+			Laya.stage.once("mouseup",this,this.sideColorMouseUp);
+		}
+
+		__proto.sideColorMouseUp=function(e){
+			this.isChanging=false;
+			this.updatePosSpAndShowColor();
+		}
+
+		__proto.updatePosSpAndShowColor=function(){
+			this.posSp.x=this.sideColor.mouseX;
+			this.posSp.y=this.sideColor.mouseY;
+			if(this.posSp.x<0)this.posSp.x=0;
+			if(this.posSp.y<0)this.posSp.y=0;
+			if(this.posSp.x>150)this.posSp.x=150;
+			if(this.posSp.y>150)this.posSp.y=150;
+			this.updateDemoColor();
+		}
+
+		__proto.updateDemoColor=function(notice){
+			(notice===void 0)&& (notice=true);
+			var h=NaN;
+			var s=NaN;
+			var b=NaN;
+			h=this.tH;
+			s=this.posSp.x / 150;
+			b=1-this.posSp.y / 150;
+			this.tColor=ColorTool.hsb2rgb(h,s,b);
+			var g;
+			g=this.demoColor.graphics;
+			g.clear();
+			g.drawRect(0,0,this.demoColor.width,this.demoColor.height,ColorTool.getRGBStr(this.tColor));
+			if(this.isChanging)return;
+			if(notice)
+				this.event("ColorChanged",this);
+		}
+
+		__proto.mainColorClick=function(e){
+			this.updateMainColorValue();
+			this.addMainColorEvents();
+		}
+
+		__proto.removeMainColorEvents=function(){
+			Laya.stage.off("mousemove",this,this.onMainColorMouseMove);
+			Laya.stage.off("mouseout",this,this.onMainColorMouseOut);
+			Laya.stage.off("mouseup",this,this.onMainColorMouseOut);
+		}
+
+		__proto.addMainColorEvents=function(){
+			this.removeMainColorEvents();
+			Laya.stage.on("mousemove",this,this.onMainColorMouseMove);
+			Laya.stage.on("mouseout",this,this.onMainColorMouseOut);
+			Laya.stage.on("mouseup",this,this.onMainColorMouseOut);
+		}
+
+		__proto.updateMainColorValue=function(){
+			var yPos=NaN;
+			yPos=this.mainColor.mouseY;
+			if (yPos < 0)yPos=0;
+			if (yPos > 150)yPos=150;
+			this.hPos.y=yPos+this.mainColor.y;
+			var h=NaN;
+			h=yPos / 150 *360;
+			this.updateSideColor(h);
+		}
+
+		__proto.onMainColorMouseMove=function(){
+			this.updateMainColorValue();
+		}
+
+		__proto.onMainColorMouseOut=function(){
+			this.removeMainColorEvents();
+		}
+
+		__proto.createColorFilter=function(arr,colorFilter){
+			if (!colorFilter)colorFilter=new ColorFilter();
+			var mt=[0,0,0,0,arr[0],0,0,0,0,arr[1],0,0,0,0,arr[2],0,0,0,1,0];
+			colorFilter.setByMatrix(mt);
+			return colorFilter;
+		}
+
+		__proto.updateSideColor=function(h,notice){
+			(notice===void 0)&& (notice=true);
+			this.tH=h;
+			var s=NaN;
+			var b=NaN;
+			var g;
+			g=this.sideColor.graphics;
+			var rgb;
+			rgb=ColorTool.hsb2rgb(h,1,1);
+			this._colorFilter=this.createColorFilter(rgb,this._colorFilter);
+			this._gradientSp.filters=[this._colorFilter];
+			this.updateDemoColor(notice);
+		}
+
+		__getset(0,__proto,'curColorStr',function(){
+			return ColorTool.getRGBStr(this.tColor);
+		});
+
+		ColorSelector.COLOR_CHANGED="ColorChanged";
+		ColorSelector.COLOR_CHANGING="COLOR_CHANGING";
+		ColorSelector.COLOR_CLEARED="COLOR_CLEARED";
+		ColorSelector.RecWidth=150;
+		ColorSelector.overlayPic="color/colorpicker_overlay.png";
+		ColorSelector.mainColorPic="color/maincolor.png";
+		ColorSelector.sideColorPic="color/sidecolor.png";
+		return ColorSelector;
+	})(Sprite)
+
+
+	/**
 	*@private
 	*<code>FileBitmap</code> 是图片文件资源类。
 	*/
@@ -24085,6 +26949,123 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-10-24 下午2:58:37
+	*/
+	//class laya.debug.uicomps.ContextMenu extends laya.ui.Box
+	var ContextMenu=(function(_super){
+		function ContextMenu(){
+			this._tY=0;
+			ContextMenu.__super.call(this);
+			StyleConsts.setViewScale(this);
+		}
+
+		__class(ContextMenu,'laya.debug.uicomps.ContextMenu',_super);
+		var __proto=ContextMenu.prototype;
+		__proto.addItem=function(item){
+			this.addChild(item);
+			item.y=this._tY;
+			this._tY+=item.height;
+			item.on("mousedown",this,this.onClick);
+		}
+
+		__proto.onClick=function(e){
+			this.event("select",e);
+			this.removeSelf();
+		}
+
+		__proto.show=function(posX,posY){
+			(posX===void 0)&& (posX=-999);
+			(posY===void 0)&& (posY=-999);
+			Laya.timer.once(100,this,ContextMenu.showMenu,[this,posX,posY]);
+		}
+
+		ContextMenu.init=function(){
+			Laya.stage.on("click",null,ContextMenu.cleanMenu);
+		}
+
+		ContextMenu.cleanMenu=function(e){
+			var i=0;
+			var len=0;
+			len=ContextMenu._menuList.length;
+			for(i=0;i<len;i++){
+				if(ContextMenu._menuList[i]){
+					ContextMenu._menuList[i].removeSelf();
+				}
+			}
+			ContextMenu._menuList.length=0;
+		}
+
+		ContextMenu.showMenu=function(menu,posX,posY){
+			(posX===void 0)&& (posX=-999);
+			(posY===void 0)&& (posY=-999);
+			ContextMenu.cleanMenu();
+			ContextMenu.adptMenu(menu);
+			Laya._currentStage.addChild(menu);
+			DisControlTool.showToStage(menu);
+			if (posX !=-999 && posY !=-999){
+				menu.pos(posX,posY);
+			}
+			ContextMenu._menuList.push(menu);
+		}
+
+		ContextMenu.createMenu=function(__args){
+			var args=arguments;
+			return ContextMenu.createMenuByArray(args);
+		}
+
+		ContextMenu.createMenuByArray=function(args){
+			var menu=new ContextMenu();
+			var separatorBefore=false;
+			var item;
+			for (var i=0,n=args.length;i < n;i++){
+				var obj=args[i];
+				var info={};
+				if ((typeof obj=='string')){
+					info.label=obj;
+					}else {
+					info=obj;
+				}
+				if (info.label !=""){
+					item=new ContextMenuItem(info.label,separatorBefore);
+					item.data=obj;
+					menu.addItem(item);
+					separatorBefore=false;
+					}else {
+					item=new ContextMenuItem("",separatorBefore);
+					item.data=obj;
+					menu.addItem(item);
+					separatorBefore=true;
+				}
+			}
+			menu.zOrder=9999;
+			return menu;
+		}
+
+		ContextMenu.adptMenu=function(menu){
+			var tWidth=80;
+			var maxWidth=80;
+			var i=0,len=menu.numChildren;
+			for (i=0;i < len;i++){
+				tWidth=(menu.getChildAt(i)).width;
+				if (maxWidth < tWidth){
+					maxWidth=tWidth;
+				}
+			}
+			for (i=0;i < len;i++){
+				(menu.getChildAt(i)).width=maxWidth;
+			}
+		}
+
+		ContextMenu._menuList=[];
+		return ContextMenu;
+	})(Box)
+
+
+	/**
 	*<code>List</code> 控件可显示项目列表。默认为垂直方向列表。可通过UI编辑器自定义列表。
 	*
 	*@example <caption>以下示例代码，创建了一个 <code>List</code> 实例。</caption>
@@ -25566,123 +28547,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*
-	*@author ww
-	*@version 1.0
-	*
-	*@created 2015-10-24 下午2:58:37
-	*/
-	//class laya.debug.uicomps.ContextMenu extends laya.ui.Box
-	var ContextMenu=(function(_super){
-		function ContextMenu(){
-			this._tY=0;
-			ContextMenu.__super.call(this);
-			StyleConsts.setViewScale(this);
-		}
-
-		__class(ContextMenu,'laya.debug.uicomps.ContextMenu',_super);
-		var __proto=ContextMenu.prototype;
-		__proto.addItem=function(item){
-			this.addChild(item);
-			item.y=this._tY;
-			this._tY+=item.height;
-			item.on("mousedown",this,this.onClick);
-		}
-
-		__proto.onClick=function(e){
-			this.event("select",e);
-			this.removeSelf();
-		}
-
-		__proto.show=function(posX,posY){
-			(posX===void 0)&& (posX=-999);
-			(posY===void 0)&& (posY=-999);
-			Laya.timer.once(100,this,ContextMenu.showMenu,[this,posX,posY]);
-		}
-
-		ContextMenu.init=function(){
-			Laya.stage.on("click",null,ContextMenu.cleanMenu);
-		}
-
-		ContextMenu.cleanMenu=function(e){
-			var i=0;
-			var len=0;
-			len=ContextMenu._menuList.length;
-			for(i=0;i<len;i++){
-				if(ContextMenu._menuList[i]){
-					ContextMenu._menuList[i].removeSelf();
-				}
-			}
-			ContextMenu._menuList.length=0;
-		}
-
-		ContextMenu.showMenu=function(menu,posX,posY){
-			(posX===void 0)&& (posX=-999);
-			(posY===void 0)&& (posY=-999);
-			ContextMenu.cleanMenu();
-			ContextMenu.adptMenu(menu);
-			Laya._currentStage.addChild(menu);
-			DisControlTool.showToStage(menu);
-			if (posX !=-999 && posY !=-999){
-				menu.pos(posX,posY);
-			}
-			ContextMenu._menuList.push(menu);
-		}
-
-		ContextMenu.createMenu=function(__args){
-			var args=arguments;
-			return ContextMenu.createMenuByArray(args);
-		}
-
-		ContextMenu.createMenuByArray=function(args){
-			var menu=new ContextMenu();
-			var separatorBefore=false;
-			var item;
-			for (var i=0,n=args.length;i < n;i++){
-				var obj=args[i];
-				var info={};
-				if ((typeof obj=='string')){
-					info.label=obj;
-					}else {
-					info=obj;
-				}
-				if (info.label !=""){
-					item=new ContextMenuItem(info.label,separatorBefore);
-					item.data=obj;
-					menu.addItem(item);
-					separatorBefore=false;
-					}else {
-					item=new ContextMenuItem("",separatorBefore);
-					item.data=obj;
-					menu.addItem(item);
-					separatorBefore=true;
-				}
-			}
-			menu.zOrder=9999;
-			return menu;
-		}
-
-		ContextMenu.adptMenu=function(menu){
-			var tWidth=80;
-			var maxWidth=80;
-			var i=0,len=menu.numChildren;
-			for (i=0;i < len;i++){
-				tWidth=(menu.getChildAt(i)).width;
-				if (maxWidth < tWidth){
-					maxWidth=tWidth;
-				}
-			}
-			for (i=0;i < len;i++){
-				(menu.getChildAt(i)).width=maxWidth;
-			}
-		}
-
-		ContextMenu._menuList=[];
-		return ContextMenu;
-	})(Box)
-
-
-	/**
 	*<code>LayoutBox</code> 是一个布局容器类。
 	*/
 	//class laya.ui.LayoutBox extends laya.ui.Box
@@ -26650,33 +29514,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*ww
-	*@author ...
-	*/
-	//class extendui.ui.PixelRatioBox extends laya.ui.Box
-	var PixelRatioBox=(function(_super){
-		function PixelRatioBox(){
-			this.scaleRate=2;
-			PixelRatioBox.__super.call(this);
-			if (Browser.pixelRatio > 1){
-				this.scale(this.scaleRate,this.scaleRate);
-				Laya.stage.on("resize",this,this.onStageResize);
-				this.onStageResize();
-			}
-		}
-
-		__class(PixelRatioBox,'extendui.ui.PixelRatioBox',_super);
-		var __proto=PixelRatioBox.prototype;
-		__proto.onStageResize=function(){
-			this.width=Laya.stage.width /this.scaleRate;
-			this.height=Laya.stage.height/this.scaleRate;
-		}
-
-		return PixelRatioBox;
-	})(Box)
-
-
-	/**
 	*...
 	*@author ww
 	*/
@@ -26722,6 +29559,316 @@ var Laya=window.Laya=(function(window,document){
 		ContextMenuItem.labelColors=null
 		return ContextMenuItem;
 	})(Button)
+
+
+	/**
+	*ww
+	*@author ...
+	*/
+	//class extendui.ui.PixelRatioBox extends laya.ui.Box
+	var PixelRatioBox=(function(_super){
+		function PixelRatioBox(){
+			this.scaleRate=2;
+			PixelRatioBox.__super.call(this);
+			if (Browser.pixelRatio > 1){
+				this.scale(this.scaleRate,this.scaleRate);
+				Laya.stage.on("resize",this,this.onStageResize);
+				this.onStageResize();
+			}
+		}
+
+		__class(PixelRatioBox,'extendui.ui.PixelRatioBox',_super);
+		var __proto=PixelRatioBox.prototype;
+		__proto.onStageResize=function(){
+			this.width=Laya.stage.width /this.scaleRate;
+			this.height=Laya.stage.height/this.scaleRate;
+		}
+
+		return PixelRatioBox;
+	})(Box)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.colorpanel.ColorPickerWithIndex extends laya.ui.Box
+	var ColorPickerWithIndex=(function(_super){
+		function ColorPickerWithIndex(){
+			this.tipRec=null;
+			this.tipImg=null;
+			this.selectFocusSp=null;
+			this._colorTiles=null;
+			this._colors=[];
+			this._gridSize=40;
+			this._imgs=[];
+			this.xCount=18;
+			this._isSelectingColor=false;
+			this._tSelectColor=null;
+			this._tColorIndex=0;
+			this.tipRecWidth=60;
+			this.tipRecOffset=100;
+			this.preHasImage=false;
+			ColorPickerWithIndex.__super.call(this);
+			this.hitTestPrior=false;
+			this.addChild(this._colorTiles=new Sprite());
+			this.selectFocusSp=new Sprite();
+			this.tipRec=new Sprite();
+			this.tipImg=new Image();
+			this.changePanel();
+			this._colorTiles.on("mousedown",this,this.onMouseDown);
+			this._colorTiles.on("mousemove",this,this.onMouseMove);
+			this._colorTiles.on("mouseup",this,this.onMouseUp);
+			this._colorTiles.on("mouseout",this,this._$5_onMouseOut);
+		}
+
+		__class(ColorPickerWithIndex,'commonui.colorpanel.ColorPickerWithIndex',_super);
+		var __proto=ColorPickerWithIndex.prototype;
+		__proto.onMouseDown=function(e){
+			e.stopPropagation();
+			this._isSelectingColor=true;
+			this.checkSelectColor();
+		}
+
+		__proto.onMouseMove=function(){
+			if (this._isSelectingColor){
+				this.checkSelectColor();
+			}
+		}
+
+		__proto.onMouseUp=function(){
+			this._isSelectingColor=false;
+			this.hideSelectColorTip();
+		}
+
+		__proto._$5_onMouseOut=function(){
+			this._isSelectingColor=false;
+			this.hideSelectColorTip();
+		}
+
+		__proto.checkSelectColor=function(){
+			var color;
+			color=this.getColorByMouse();
+			this._tColorIndex=this.getCurColorIndex();
+			if (color !=this._tSelectColor){
+				this.event("change",color);
+			}
+			this._tSelectColor=color;
+			this.showSelectColorTip();
+		}
+
+		__proto.showSelectColorTip=function(){
+			if (!this._tSelectColor){
+				this.hideSelectColorTip();
+				return;
+			};
+			var tRecSp;
+			if ((typeof this._tSelectColor=='string')){
+				this.tipRec.graphics.clear();
+				this.tipRec.graphics.drawRect(-this.tipRecWidth,-this.tipRecWidth,this.tipRecWidth *2,this.tipRecWidth *2,this._tSelectColor,"#ffffff",4);
+				tRecSp=this.tipRec;
+				this.tipImg.removeSelf();
+				}else{
+				this.tipImg.skin=this._tSelectColor.smallPic;
+				this.tipImg.pivot(this.tipRecWidth-4,this.tipRecWidth-4);
+				this.tipImg.size((this.tipRecWidth-4)*2,(this.tipRecWidth-4)*2);
+				this.tipRec.graphics.clear();
+				this.tipRec.addChild(this.tipImg);
+				this.tipRec.graphics.drawRect(-this.tipRecWidth,-this.tipRecWidth,this.tipRecWidth *2,this.tipRecWidth *2,null,"#ffffff",4);
+				tRecSp=this.tipRec;
+			}
+			this.posRecSp(tRecSp);
+			this.addChild(this.selectFocusSp);
+			var curPos;
+			curPos=this.getColorStartPosByMouse();
+			this.selectFocusSp.pos(curPos.x,curPos.y);
+		}
+
+		__proto.posRecSp=function(tRecSp){
+			this.addChild(tRecSp);
+			tRecSp.pos(this.width *0.5,-this.tipRecWidth *2-this.tipRecOffset);
+		}
+
+		__proto.hideSelectColorTip=function(){
+			this.tipRec.removeSelf();
+			this.tipImg.removeSelf();
+		}
+
+		__proto.createColorList=function(){
+			var i=0,len=0;
+			var rst;
+			rst=[];
+			var grayList;
+			grayList=ColorTableTool.createGrayColor(18);
+			for (i=0;i < 12;i++){
+				for (var j=0;j < 18;j++){
+					var color=0;
+					color=(((i *3+j / 6)% 3 << 0)+((i / 6)<< 0)*3)*0x33 << 16 | j % 6 *0x33 << 8 | (i << 0)% 6 *0x33;
+					var strColor=UIUtils.toColor(color);
+					rst.push(strColor);
+				}
+			}
+			rst=rst.concat(grayList);
+			return rst;
+		}
+
+		__proto.getImageList=function(){
+			var i=0,len=0;
+			var rst;
+			rst=[];
+			len=9;
+			var tImageO;
+			var img;
+			var child;
+			var index=0;
+			for (i=0;i < len;i++){
+				index=i+1;
+				tImageO={};
+				tImageO.name="i:"+i;
+				tImageO.smallPic=/*no*/this.Server.url_file+"/scenes/sky/"+index+"/preview.jpg";
+				tImageO.file=/*no*/this.Server.url_file+"/scenes/sky/"+index+"/"+index+".lmat";
+				img=new Image();
+				img.skin=tImageO.smallPic;
+				tImageO.img=img;
+				child=new Sprite();
+				img.addChild(child);
+				tImageO.bg=child;
+				rst.push(tImageO);
+			}
+			return rst;
+		}
+
+		__proto.setHasImage=function(hasImage){
+			if (hasImage==this.preHasImage)return;
+			this.changePanel(hasImage);
+		}
+
+		__proto.createColorListForDraw=function(hasImage){
+			(hasImage===void 0)&& (hasImage=true);
+			this._colors=[];
+			this._colors=this._colors.concat(this.createColorList());
+			if(hasImage)
+				this._colors=this._colors.concat(this.getImageList());
+		}
+
+		/**
+		*改变颜色样本列表面板。
+		*/
+		__proto.changePanel=function(hasImage){
+			(hasImage===void 0)&& (hasImage=true);
+			this.preHasImage=hasImage;
+			this.createColorListForDraw(hasImage);
+			var curPos;
+			curPos=this.renderColors();
+			this.selectFocusSp.graphics.clear();
+			this.selectFocusSp.graphics.drawRect(0,0,this._gridSize,this._gridSize,null,"#ff0000",3);
+			this.setUpSize(curPos);
+		}
+
+		__proto.renderColors=function(){
+			var g;
+			this._colorTiles.removeChildren();
+			g=this._colorTiles.graphics;
+			g.clear(true);
+			var colorList;
+			var i=0,len=0;
+			len=this._colors.length;
+			var curPos;
+			var tImageO;
+			var tImg;
+			var tImgBg;
+			for (i=0;i < len;i++){
+				curPos=this.getIJByIndex(i);
+				tImageO=this._colors[i];
+				if ((typeof tImageO=='string')){
+					g.drawRect(curPos.x*this._gridSize,curPos.y*this._gridSize,this._gridSize,this._gridSize,tImageO,"#000000");
+					}else{
+					tImg=tImageO.img;
+					tImgBg=tImageO.bg;
+					tImg.size(this._gridSize,this._gridSize);
+					tImg.pos(curPos.x *this._gridSize,curPos.y *this._gridSize);
+					tImgBg.graphics.clear();
+					tImgBg.graphics.drawRect(0,0,this._gridSize,this._gridSize,null,"#000000",1);
+					this._colorTiles.addChild(tImg);
+				}
+			}
+			return curPos;
+		}
+
+		__proto.setUpSize=function(curPos){
+			this.width=720;
+			this.height=curPos.y *this._gridSize+this._gridSize;
+			this._colorTiles.size(this.width,this.height);
+		}
+
+		/**
+		*通过鼠标位置取对应的颜色块的颜色值。
+		*/
+		__proto.getColorByMouse=function(){
+			var point=this.getColorIJByMouse();
+			return this._colors[this.getIndexByIJ(point.x,point.y)];
+		}
+
+		__proto.getCurColorIndex=function(){
+			var point=this.getColorIJByMouse();
+			return this.getIndexByIJ(point.x,point.y);
+		}
+
+		__proto.getColorIJByMouse=function(){
+			var point=this._colorTiles.getMousePoint();
+			var x=Math.floor(point.x / this._gridSize);
+			var y=Math.floor(point.y / this._gridSize);
+			return ColorPickerWithIndex._ijPoint.setTo(x,y);
+		}
+
+		__proto.getColorStartPosByMouse=function(){
+			var point;
+			point=this.getColorIJByMouse();
+			point.x=point.x *this._gridSize;
+			point.y=point.y *this._gridSize;
+			return point;
+		}
+
+		__proto.getIJByIndex=function(index){
+			var i=0,j=0;
+			i=index % this.xCount;
+			j=Math.floor(index / this.xCount);
+			ColorPickerWithIndex._ijPoint.setTo(i,j);
+			return ColorPickerWithIndex._ijPoint;
+		}
+
+		__proto.getIndexByIJ=function(i,j){
+			return i+j *this.xCount;
+		}
+
+		__static(ColorPickerWithIndex,
+		['_ijPoint',function(){return this._ijPoint=new Point();}
+		]);
+		return ColorPickerWithIndex;
+	})(Box)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.PropItemBox extends laya.ui.Box
+	var PropItemBox=(function(_super){
+		function PropItemBox(){
+			this.layouter=null;
+			PropItemBox.__super.call(this);
+		}
+
+		__class(PropItemBox,'commonui.view.prop.PropItemBox',_super);
+		var __proto=PropItemBox.prototype;
+		__proto.changeSize=function(){
+			laya.ui.Component.prototype.changeSize.call(this);
+			this.graphics.clear();
+			this.graphics.drawRect(0,0,this.width,this.height,"#333333");
+		}
+
+		return PropItemBox;
+	})(Box)
 
 
 	/**
@@ -28601,28 +31748,6 @@ var Laya=window.Laya=(function(window,document){
 	})(View)
 
 
-	//class ui.mindmap.MapItemUI extends laya.ui.View
-	var MapItemUI=(function(_super){
-		function MapItemUI(){
-			this.text=null;
-			this.downBtn=null;
-			this.upBtn=null;
-			this.selectBtn=null;
-			MapItemUI.__super.call(this);
-		}
-
-		__class(MapItemUI,'ui.mindmap.MapItemUI',_super);
-		var __proto=MapItemUI.prototype;
-		__proto.createChildren=function(){
-			laya.ui.Component.prototype.createChildren.call(this);
-			this.createView(MapItemUI.uiView);
-		}
-
-		MapItemUI.uiView={"type":"View","props":{"width":162,"height":22},"child":[{"type":"TextInput","props":{"var":"text","text":"TextInput","skin":"comp/textinput.png","color":"#93eedf","align":"center"}},{"type":"Button","props":{"y":11,"x":131,"var":"downBtn","skin":"comp/down.png"}},{"type":"Button","props":{"y":-1,"x":131,"var":"upBtn","skin":"comp/up.png"}},{"type":"Radio","props":{"y":4,"x":147,"var":"selectBtn","skin":"comp/selectbtn.png"}}]};
-		return MapItemUI;
-	})(View)
-
-
 	//class ui.mindmap.MindMapEditorUI extends laya.ui.View
 	var MindMapEditorUI=(function(_super){
 		function MindMapEditorUI(){
@@ -28642,6 +31767,165 @@ var Laya=window.Laya=(function(window,document){
 	})(View)
 
 
+	//class ui.mindmap.MapItemUI extends laya.ui.View
+	var MapItemUI=(function(_super){
+		function MapItemUI(){
+			this.text=null;
+			this.downBtn=null;
+			this.upBtn=null;
+			this.selectBtn=null;
+			MapItemUI.__super.call(this);
+		}
+
+		__class(MapItemUI,'ui.mindmap.MapItemUI',_super);
+		var __proto=MapItemUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(MapItemUI.uiView);
+		}
+
+		MapItemUI.uiView={"type":"View","props":{"width":162,"height":22},"child":[{"type":"TextInput","props":{"var":"text","text":"TextInput","skin":"comp/textinput.png","sizeGrid":"7,10,5,5","right":33,"left":0,"color":"#93eedf","align":"center"}},{"type":"Button","props":{"y":11,"var":"downBtn","skin":"comp/down.png","right":19}},{"type":"Button","props":{"y":-1,"var":"upBtn","skin":"comp/up.png","right":19}},{"type":"Radio","props":{"y":4,"var":"selectBtn","skin":"comp/selectbtn.png","right":1}}]};
+		return MapItemUI;
+	})(View)
+
+
+	/**
+	*属性面板输入插件基类
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2018-5-7 上午10:11:55
+	*/
+	//class commonui.view.prop.PropsInputBase extends laya.ui.View
+	var PropsInputBase=(function(_super){
+		function PropsInputBase(){
+			this.isFixHeight=true;
+			this.useIDELabel=true;
+			this.hasSide=true;
+			this.selfAlign=false;
+			this.valueKey=null;
+			this.target=null;
+			this.config=null;
+			this.isSettingValue=false;
+			PropsInputBase.__super.call(this);
+		}
+
+		__class(PropsInputBase,'commonui.view.prop.PropsInputBase',_super);
+		var __proto=PropsInputBase.prototype;
+		/**
+		*设置编辑对象
+		*@param target
+		*
+		*/
+		__proto.setTarget=function(target){
+			this.target=target;
+		}
+
+		__proto.getValueFromTarget=function(){
+			return this.target[this.valueKey];
+		}
+
+		__proto.getValueFromTargetProps=function(){
+			return this.target.comXml.props[this.valueKey];
+		}
+
+		__proto.getDisplayValue=function(){
+			if (this.isPropValueExist())return this.getValueFromTargetProps();
+			if (this.isConfigDefaultExist())return this.getDefaultValue();
+			return this.getValueFromTarget()
+		}
+
+		__proto.isPropValueExist=function(){
+			return this.target.comXml.props.hasOwnProperty(this.valueKey);
+		}
+
+		__proto.isConfigDefaultExist=function(){
+			return this.config.hasOwnProperty("default");
+		}
+
+		__proto.getTitle=function(){
+			return this.config.nickName || this.config.title || this.config.name;
+		}
+
+		__proto.getDefaultValue=function(){
+			return this.config["default"];
+		}
+
+		/**
+		*根据配置文件初始化输入框
+		*@param configO
+		*
+		*/
+		__proto.initByConfig=function(configO){
+			this.config=configO;
+		}
+
+		__proto.setValueToTarget=function(value){
+			this.target.comXml.props[this.valueKey]=value;
+			this.target[this.valueKey]=value;
+		}
+
+		__proto.noticeValueChange=function(){}
+		/**
+		*通知宽高变化
+		*
+		*/
+		__proto.freshSize=function(){
+			this.event("resize");
+		}
+
+		PropsInputBase.regPlugin=function(type,clz){
+			PropPluginManager.regPlugin(type,clz);
+		}
+
+		return PropsInputBase;
+	})(View)
+
+
+	//class commonui.ui.prop.PropGroupUI extends laya.ui.View
+	var PropGroupUI=(function(_super){
+		function PropGroupUI(){
+			this.groupBar=null;
+			this.groupLabl=null;
+			this.arrowClip=null;
+			this.groupBox=null;
+			PropGroupUI.__super.call(this);
+		}
+
+		__class(PropGroupUI,'commonui.ui.prop.PropGroupUI',_super);
+		var __proto=PropGroupUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(PropGroupUI.uiView);
+		}
+
+		PropGroupUI.uiView={"type":"View","props":{"scenecolor":"#dddddd","hitTestPrior":true},"child":[{"type":"Image","props":{"y":76,"width":100,"var":"groupBar","sizeGrid":"0,4,0,4","right":0,"mouseEnabled":true,"left":0,"height":30}},{"type":"Label","props":{"y":81,"x":36,"width":109,"var":"groupLabl","text":"label","mouseEnabled":false,"mouseChildren":false,"height":20,"fontSize":20,"color":"#006666"}},{"type":"Clip","props":{"y":79,"x":4,"width":26,"var":"arrowClip","skin":"comp/clip_tree_arrow.png","scaleY":1,"scaleX":1,"mouseEnabled":false,"mouseChildren":false,"height":26,"clipY":2}},{"type":"VBox","props":{"y":107,"var":"groupBox","right":0,"mouseEnabled":true,"left":0},"child":[{"type":"Button","props":{"y":17,"x":8,"skin":"comp/button.png","labelColors":"#dddddd,#dddddd,#dddddd","label":"label","labelSize":16,"sizeGrid":"0,4,0,4"}}]}]};
+		return PropGroupUI;
+	})(View)
+
+
+	//class commonui.ui.prop.PropPanelUI extends laya.ui.View
+	var PropPanelUI=(function(_super){
+		function PropPanelUI(){
+			this.typeLbl=null;
+			this.propFootBox=null;
+			this.propAddBtn=null;
+			this.cancelBtn=null;
+			PropPanelUI.__super.call(this);
+		}
+
+		__class(PropPanelUI,'commonui.ui.prop.PropPanelUI',_super);
+		var __proto=PropPanelUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(PropPanelUI.uiView);
+		}
+
+		PropPanelUI.uiView={"type":"View","props":{"title":"属性","scenecolor":"#dddddd","recTabSkin":"view/tab_proppanel.png","recBarSkin":"view/bg_proppanel_bar.png","recActionType":"toRight","recActionPos":"right","mouseEnabled":true,"minWidth":220,"hitTestPrior":true},"child":[{"type":"Image","props":{"y":0,"x":0,"width":200,"top":0,"skin":"view/backmain.png","sizeGrid":"7,8,5,9","right":0,"left":0,"height":300,"bottom":0}},{"type":"Label","props":{"y":12,"x":16,"var":"typeLbl","text":"label","styleSkin":"comp/label_highlight.png","fontSize":20,"bold":true,"color":"#cccc00"}},{"type":"Box","props":{"y":304,"x":10,"width":180,"var":"propFootBox","right":10,"left":10,"height":38},"child":[{"type":"Button","props":{"y":7,"x":20,"width":126,"var":"propAddBtn","stateNum":2,"skin":"comp/btn_addcomp.png","sizeGrid":"2,2,2,30","right":5,"left":5,"label":"添加组件","height":21,"labelColors":"#FFFFFF,#FFFFFF,#FFFFFF"}}]},{"type":"Button","props":{"var":"cancelBtn","top":5,"skin":"view/btn_close.png","right":5,"scaleX":0.5,"scaleY":0.5,"y":7}}]};
+		return PropPanelUI;
+	})(View)
+
+
 	/**
 	*...
 	*@author ww
@@ -28650,11 +31934,61 @@ var Laya=window.Laya=(function(window,document){
 	var FileTree=(function(_super){
 		function FileTree(){
 			this._rootNode=null;
+			this.childSortFun=null;
 			FileTree.__super.call(this);
 		}
 
 		__class(FileTree,'filetoolkit.FileTree',_super);
 		var __proto=FileTree.prototype;
+		__proto.filter=function(key){
+			if (!key){
+				this.list.array=this.getArray();
+				return;
+			}
+			if (this._rootNode){
+				this.filtetNodeTree(key);
+			}else
+			_super.prototype.filter.call(this,key);
+		}
+
+		__proto.filtetNodeTree=function(key){
+			this.list.array=this.getFilterdItem(this._rootNode,key.toLowerCase(),null);
+		}
+
+		__proto.getFilterdItem=function(node,key,rst){
+			if (!rst)rst=[];
+			var tLabel;
+			tLabel=node.label;
+			if (tLabel.toLocaleLowerCase().indexOf(key)>=0){
+				if(!node.isFolder)
+					rst.push(node);
+			};
+			var i=0,len=0;
+			var childs;
+			childs=node.childs;
+			if (childs){
+				len=childs.length;
+				for (i=0;i < len;i++){
+					this.getFilterdItem(childs[i],key,rst);
+				}
+			}
+			return rst;
+		}
+
+		__proto.recoverState=function(newTree,oldTree){
+			if (!newTree || !oldTree)return;
+			var newDic;
+			newDic=FileTree.buildTreeLabelDic(newTree);
+			var oldDic;
+			oldDic=FileTree.buildTreeLabelDic(oldTree);
+			var key;
+			for (key in newDic){
+				if (newDic[key] && newDic[key].isFolder && oldDic[key]){
+					newDic[key].isOpen=oldDic[key].isOpen;
+				}
+			}
+		}
+
 		__proto.getArray=function(){
 			var arr;
 			arr=[];
@@ -28670,6 +32004,9 @@ var Laya=window.Laya=(function(window,document){
 			node.hasChild=childs && childs.length;
 			if (!node.isOpen)return;
 			if (!childs)return;
+			if (this.childSortFun !=null && childs.length){
+				childs.sort(this.childSortFun);
+			};
 			var i=0,len=0;
 			len=childs.length;
 			var tChild;
@@ -28687,9 +32024,31 @@ var Laya=window.Laya=(function(window,document){
 		__getset(0,__proto,'rootNode',function(){
 			return this._rootNode;
 			},function(value){
+			this.recoverState(value,this._rootNode);
 			this._rootNode=value;
 			this.list.array=this.getArray();
 		});
+
+		FileTree.buildTreeLabelDic=function(node,parentLabel,rstObj){
+			if (!rstObj){
+				rstObj={};
+			}
+			if (!parentLabel)parentLabel="";
+			var tLabel;
+			tLabel=node.label;
+			tLabel=parentLabel+","+tLabel;
+			rstObj[tLabel]=node;
+			var i=0,len=0;
+			var childs;
+			childs=node.childs;
+			if (childs){
+				len=childs.length;
+				for (i=0;i < len;i++){
+					FileTree.buildTreeLabelDic(childs[i],tLabel,rstObj);
+				}
+			}
+			return rstObj;
+		}
 
 		return FileTree;
 	})(Tree)
@@ -28990,6 +32349,126 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.colorpanel.colorselectorpanel.SelectorColorPicker extends commonui.colorpanel.ColorPickerWithIndex
+	var SelectorColorPicker=(function(_super){
+		function SelectorColorPicker(){
+			this.colorSelector=null;
+			this.resetBtn=null;
+			SelectorColorPicker.__super.call(this);
+		}
+
+		__class(SelectorColorPicker,'commonui.colorpanel.colorselectorpanel.SelectorColorPicker',_super);
+		var __proto=SelectorColorPicker.prototype;
+		__proto.changePanel=function(hasImage){
+			(hasImage===void 0)&& (hasImage=true);
+			this.xCount=13;
+			_super.prototype.changePanel.call(this,hasImage);
+			ColorSelector$1.overlayPic="res/comp/colorpicker_overlay.png";
+			ColorSelector$1.mainColorPic="res/comp/maincolor.png";
+			ColorSelector$1.sideColorPic="res/comp/sidecolor.png";
+			this.colorSelector=new ColorSelector$1();
+			this.colorSelector.x=this.width-this.colorSelector.width-2;
+			this.colorSelector.on("ColorChanged",this,this.onColorSelectorColorChanged);
+			this.addChild(this.colorSelector);
+			this.resetBtn=new Sprite();
+			this.resetBtn.size(40,40);
+			this.resetBtn.graphics.drawImage(Loader.getRes("res/comp/icon_reset.png"),2,2,36,36);
+			this.addChild(this.resetBtn);
+			this.resetBtn.x=this.colorSelector.x;
+			this.resetBtn.y=this.height-this.resetBtn.height-4;
+			this.resetBtn.on("click",this,this.onResetBtn);
+		}
+
+		__proto.onResetBtn=function(){
+			this.resetColorInfo();
+		}
+
+		__proto.onColorSelectorColorChanged=function(){
+			this._colors[this._tColorIndex]=this.colorSelector.curColorStr;
+			this.renderColors();
+			this._tSelectColor=this.colorSelector.curColorStr;
+			this.event("change",this._tSelectColor);
+			this.saveColorInfo();
+		}
+
+		__proto.checkSelectColor=function(){
+			_super.prototype.checkSelectColor.call(this);
+			if (this._tSelectColor){
+				this.colorSelector.setColorByRGBStr(this._tSelectColor);
+			}
+		}
+
+		__proto.recoverColorInfo=function(){
+			try{
+				this._colors=LocalStorage.getJSON(SelectorColorPicker.ColorStateSign);
+				}catch (e){
+			}
+			if (!this._colors){
+				this._colors=this.createColorListWork();
+			}
+		}
+
+		//resetHelpInfo();
+		__proto.saveColorInfo=function(){
+			LocalStorage.setJSON(SelectorColorPicker.ColorStateSign,this._colors);
+		}
+
+		__proto.resetColorInfo=function(){
+			this._colors=this.createColorListWork();
+			this.saveColorInfo();
+			this.renderColors();
+			this._tSelectColor=this._colors[this._tColorIndex];
+			this.event("change",this._tSelectColor);
+		}
+
+		__proto.createColorListForDraw=function(hasImage){
+			(hasImage===void 0)&& (hasImage=true);
+			this.recoverColorInfo();
+		}
+
+		__proto.createColorListWork=function(){
+			var depth=0;
+			depth=5;
+			var colors;
+			colors=/*no*/this.ColorTableTool.createColorTable(this.xCount,depth);
+			var newColors;
+			newColors=[];
+			newColors.length=colors.length;
+			var i=0,len=0;
+			len=newColors.length;
+			var tColor;
+			var curPos;
+			var x=0,y=0;
+			for (i=0;i < len;i++){
+				tColor=colors[i];
+				x=Math.floor(i / depth);
+				y=i % depth;
+				newColors[x+y*this.xCount]=tColor;
+			}
+			return newColors;
+		}
+
+		__proto.getImageList=function(){
+			return [];
+		}
+
+		__proto.setUpSize=function(curPos){
+			this.width=720;
+			this.height=curPos.y *this._gridSize+this._gridSize;
+			this._colorTiles.size(this._gridSize *this.xCount,this.height);
+			this.graphics.clear();
+			this.graphics.drawRect(-2,-2,this.width+4,this.height+4,"#283840","#000000");
+		}
+
+		SelectorColorPicker.ColorStateSign="CommonUI_ColorStateSign";
+		return SelectorColorPicker;
+	})(ColorPickerWithIndex)
+
+
+	/**
 	*<code>TextArea</code> 类用于创建显示对象以显示和输入文本。
 	*@example <caption>以下示例代码，创建了一个 <code>TextArea</code> 实例。</caption>
 	*package
@@ -29256,10 +32735,16 @@ var Laya=window.Laya=(function(window,document){
 			this._menuDir.on("select",this,this.onEmunSelect);
 			this._mutiMenu=ContextMenu.createMenuByArray(["删除"]);
 			this._mutiMenu.on("select",this,this.onEmunSelect);
+			this.resTree.childSortFun=RemoteTreeView.sortFolderFirst;
+			this.fliterTxt.on("input",this,this.onFliterTxtChange);
 		}
 
 		__class(RemoteTreeView,'filekit.RemoteTreeView',_super);
 		var __proto=RemoteTreeView.prototype;
+		__proto.onFliterTxtChange=function(e){
+			this.resTree.filter(this.fliterTxt.text);
+		}
+
 		__proto.onEmunSelect=function(dataO){
 			console.log("onMenuSelect:",dataO);
 			var label;
@@ -29271,8 +32756,10 @@ var Laya=window.Laya=(function(window,document){
 				case "打开所在目录":
 					break ;
 				case "重命名":
+					this.checkRename();
 					break ;
 				case "删除":
+					this.deleteRes();
 					break ;
 				case "新建目录":
 					this.createDir();
@@ -29283,6 +32770,36 @@ var Laya=window.Laya=(function(window,document){
 				}
 		}
 
+		__proto.checkRename=function(){
+			if (Boolean(this.resTree.selectedPath)){
+				var fileName=this.resTree.selectedItem.path;
+				RenameRes.instance.start(fileName,Handler.create(this,this.onRenameUIBack));
+			}
+		}
+
+		__proto.onRenameUIBack=function(oldPath,newPath){
+			var adptNewPath;
+			adptNewPath=FilePathUtils.replaceFileName(oldPath,newPath);
+			this.fileKit.renameFile(oldPath,adptNewPath,Handler.create(this,this.onRenameBack));
+		}
+
+		__proto.onRenameBack=function(dataO){
+			console.log("onRenameBack:",dataO);
+			this.refresh();
+		}
+
+		__proto.deleteRes=function(){
+			if (this.resTree.selectedItem&&this.resTree.selectedItem.path){
+				Confirm.show("是否删除"+this.resTree.selectedItem.path+"?","是否删除文件",Handler.create(this,this.onDeleteBack,[this.resTree.selectedItem.path]));
+			}
+		}
+
+		__proto.onDeleteBack=function(path,sure){
+			if (sure){
+				this.fileKit.deleteFile(path,Handler.create(this,this.refresh));
+			}
+		}
+
 		__proto.createDir=function(){
 			var dataO;
 			dataO={};
@@ -29291,7 +32808,11 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.onAddNewDir=function(dataO){
-			this.fileKit.addFolder(dataO.dir+"/"+dataO.fileName,Handler.create(this,this.onAddFileSuccess));
+			if (dataO.dir){
+				this.fileKit.addFolder(dataO.dir+"/"+dataO.fileName,Handler.create(this,this.onAddFileSuccess));
+				}else{
+				this.fileKit.addFolder(dataO.fileName,Handler.create(this,this.onAddFileSuccess));
+			}
 		}
 
 		__proto.createNew=function(){
@@ -29302,8 +32823,11 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.onAddNew=function(dataO){
-			debugger;
-			this.fileKit.addFile(dataO.dir+"/"+dataO.fileName+".demorender","{}",Handler.create(this,this.onAddFileSuccess));
+			if (dataO.dir){
+				this.fileKit.addFile(dataO.dir+"/"+dataO.fileName+".demorender","{}",Handler.create(this,this.onAddFileSuccess));
+				}else{
+				this.fileKit.addFile(dataO.fileName+".demorender","{}",Handler.create(this,this.onAddFileSuccess));
+			}
 		}
 
 		__proto.onAddFileSuccess=function(){
@@ -29392,6 +32916,7 @@ var Laya=window.Laya=(function(window,document){
 				root=dataO;
 				root.isOpen=true;
 				this.resTree.rootNode=root;
+				this.onFliterTxtChange();
 			}
 		}
 
@@ -29412,6 +32937,16 @@ var Laya=window.Laya=(function(window,document){
 			}
 			return directory;
 		});
+
+		RemoteTreeView.sortFolderFirst=function(dataA,dataB){
+			if (dataA.isFolder==dataB.isFolder){
+				return dataA.label > dataB.label?1:-1;
+			}
+			if (dataA.isFolder){
+				return-1;
+			}
+			return 1;
+		}
 
 		return RemoteTreeView;
 	})(RemoteTreeUI)
@@ -29458,271 +32993,46 @@ var Laya=window.Laya=(function(window,document){
 	})(Dialog)
 
 
-	/**
-	*...
-	*@author ww
-	*/
-	//class mindmap.MindMapItem extends ui.mindmap.MapItemUI
-	var MindMapItem=(function(_super){
-		function MindMapItem(){
-			this.nodeData=null;
-			this.childNodes=[];
-			this._menu=null;
-			this.onMenuSelectHandler=null;
-			this.onItemActionHandler=null;
-			this.parentNode=null;
-			this._downTime=NaN;
-			MindMapItem.__super.call(this);
-			this.hitTestPrior=false;
-			this._menu=ContextMenu.createMenuByArray(["新建同级","新建子","删除"]);
-			this._menu.on("select",this,this.onSelect);
-			this.on("rightmouseup",this,this.onRightMouseUp);
-			this.text.editable=true;
-			this.text.mouseEnabled=false;
-			this.text.on("blur",this,this.onInputBlur);
-			this.on("doubleclick",this,this.onDoubleClick);
-			this.downBtn.on("click",this,this.onBtnAction,["down"]);
-			this.upBtn.on("click",this,this.onBtnAction,["up"]);
-			this.selectBtn.on("click",this,this.onBtnAction,["select"]);
-			this.selectBtn.selected=false;
-			this.on("mousedown",this,this.onMyMouseDown);
-			this.on("mouseup",this,this.onMyMouseUp);
+	//class commonui.ui.ConfirmUI extends laya.ui.Dialog
+	var ConfirmUI=(function(_super){
+		function ConfirmUI(){
+			this.titleLbl=null;
+			this.msgLbl=null;
+			this.cancelBtn=null;
+			this.okBtn=null;
+			ConfirmUI.__super.call(this);
 		}
 
-		__class(MindMapItem,'mindmap.MindMapItem',_super);
-		var __proto=MindMapItem.prototype;
-		__proto.onMyMouseDown=function(){
-			this._downTime=Browser.now();
+		__class(ConfirmUI,'commonui.ui.ConfirmUI',_super);
+		var __proto=ConfirmUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(ConfirmUI.uiView);
 		}
 
-		__proto.onMyMouseUp=function(){
-			if (Browser.now()-this._downTime > 500){
-				this.onRightMouseUp();
-			}
+		ConfirmUI.uiView={"type":"Dialog","props":{"width":500,"scenecolor":"#dddddd","height":250},"child":[{"type":"Image","props":{"y":0,"x":0,"width":500,"skin":"view/bg_dialog.png","height":250,"sizeGrid":"47,20,22,37"}},{"type":"Button","props":{"x":404,"skin":"view/btn_close.png","name":"close","scaleX":0.5,"scaleY":0.5,"right":11,"y":7}},{"type":"Image","props":{"y":7,"x":9,"width":441,"skin":"comp/blank_title_dragrec.png","name":"drag","height":36}},{"type":"Label","props":{"x":21,"var":"titleLbl","text":"确认框","styleSkin":"comp/label_panel_title.png","fontSize":14,"align":"center","color":"#ffffff","centerX":0,"y":16}},{"type":"Label","props":{"y":68,"x":36,"wordWrap":true,"width":427,"var":"msgLbl","valign":"middle","text":"确认内容","styleSkin":"comp/label_intro.png","multiline":true,"mouseEnabled":false,"mouseChildren":false,"isHtml":true,"height":76,"align":"center","fontSize":14,"color":"#C8C8C8"}},{"type":"Button","props":{"y":165,"x":288,"var":"cancelBtn","skin":"comp/btn.png","name":"cancel","label":"取消","labelColors":"#FFFFFF,#FFFFFF,#FFFFFF,#c5c5c5","labelSize":16,"sizeGrid":"0,4,0,4"}},{"type":"Button","props":{"y":165,"x":98,"var":"okBtn","skin":"comp/button.png","name":"sure","label":"确定","labelColors":"#FFFFFF,#FFFFFF,#FFFFFF,#c5c5c5","labelSize":16,"sizeGrid":"0,4,0,4"}}]};
+		return ConfirmUI;
+	})(Dialog)
+
+
+	//class commonui.ui.RenameResUI extends laya.ui.Dialog
+	var RenameResUI=(function(_super){
+		function RenameResUI(){
+			this.nameTxt=null;
+			this.resLbl=null;
+			RenameResUI.__super.call(this);
 		}
 
-		__proto.setSelect=function(isSelect){
-			this.selectBtn.selected=isSelect;
+		__class(RenameResUI,'commonui.ui.RenameResUI',_super);
+		var __proto=RenameResUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(RenameResUI.uiView);
 		}
 
-		__proto.isSelect=function(){
-			return this.selectBtn.selected;
-		}
-
-		__proto.reset=function(){
-			this.parentNode=null;
-			this.childNodes=[];
-			this.selectBtn.selected=false;
-		}
-
-		__proto.updateNodesToDataOrder=function(){
-			this.childNodes.sort(this.sortChildFun.bind(this));
-		}
-
-		__proto.sortChildFun=function(nodeA,nodeB){
-			var childs;
-			childs=this.nodeData.childs;
-			return childs.indexOf(nodeA.nodeData)-childs.indexOf(nodeB.nodeData);
-		}
-
-		__proto.onBtnAction=function(action){
-			if (this.onItemActionHandler){
-				this.onItemActionHandler.runWith([action,this]);
-			}
-		}
-
-		__proto.onDoubleClick=function(){
-			this.text.editable=true;
-			this.text.focus=true;
-		}
-
-		__proto.onInputBlur=function(){
-			this.text.editable=false;
-			this.nodeData.label=this.text.text;
-			this.freshUI();
-		}
-
-		__proto.onSelect=function(dataO){
-			if (this.onMenuSelectHandler){
-				this.onMenuSelectHandler.runWith([dataO,this]);
-			}
-			console.log("onMenuSelect:",dataO);
-			var label;
-			label=dataO.target.data;
-			console.log("Menu:",label);
-		}
-
-		__proto.onRightMouseUp=function(){
-			console.log("mindmapitem rightmouseup");
-			if (!MindMapEditor.isEditorMode)return;
-			this._menu.show();
-		}
-
-		__proto.freshUI=function(){
-			this.text.editable=MindMapEditor.isEditorMode;
-			this.text.text=this.nodeData.label||"";
-		}
-
-		__proto.drawConnections=function(sprite){
-			var i=0,len=0;
-			len=this.childNodes.length;
-			var tChild;
-			for (i=0;i < len;i++){
-				tChild=this.childNodes[i];
-				tChild.drawConnections(sprite);
-				this.drawOneLine(this,tChild,sprite);
-			}
-		}
-
-		__proto.drawOneLine=function(parentItem,childItem,sprite){
-			var leftItem;
-			var rightItem;
-			if (parentItem.x < childItem.x){
-				leftItem=parentItem;
-				rightItem=childItem;
-				}else{
-				leftItem=childItem;
-				rightItem=parentItem;
-			};
-			var lx=NaN,ly=NaN;
-			var rx=NaN,ry=NaN;
-			lx=leftItem.x+leftItem.width;
-			ly=leftItem.y;
-			rx=rightItem.x;
-			ry=rightItem.y;
-			sprite.graphics.drawCurves(0,0,[lx,ly,(lx+rx)/2,ly,rx,ry],"#ff0000");
-		}
-
-		__proto.getItemHeight=function(childNodes){
-			if (!childNodes)childNodes=this.childNodes;
-			if (!childNodes || !childNodes.length)return this.height;
-			var i=0,len=0;
-			len=childNodes.length;
-			var tChild;
-			var tHeight=0;
-			var totalHeight=NaN;
-			totalHeight=0;
-			for (i=0;i < len;i++){
-				tChild=childNodes[i];
-				tHeight=tChild.getItemHeight();
-				totalHeight+=tHeight;
-			}
-			totalHeight+=MindMapItem.YSpace *(len-1);
-			return totalHeight;
-		}
-
-		__proto.setPos=function(x,y,isRight){
-			(isRight===void 0)&& (isRight=true);
-			this.layoutChilds(this.childNodes,x,y,isRight);
-		}
-
-		__proto.layoutAsCenter=function(){
-			if (this.childNodes.length <=1){
-				this.layoutChilds(this.childNodes,this.x,this.y,true);
-				return;
-			};
-			var leftChilds;
-			var rightChilds;
-			var mid=0;
-			mid=Math.floor(this.childNodes.length / 2);
-			leftChilds=[];
-			rightChilds=[];
-			var i=0,len=0;
-			len=this.childNodes.length;
-			for (i=0;i < len;i++){
-				if (i < mid){
-					leftChilds.push(this.childNodes[i]);
-					}else{
-					rightChilds.push(this.childNodes[i]);
-				}
-			}
-			this.layoutChilds(leftChilds,this.x,this.y,false,true);
-			this.layoutChilds(rightChilds,this.x,this.y,true,true);
-		}
-
-		__proto.layoutChilds=function(childNodes,x,y,isRight,lockPos){
-			(isRight===void 0)&& (isRight=true);
-			(lockPos===void 0)&& (lockPos=false);
-			var itemHeight=NaN;
-			itemHeight=this.getItemHeight(childNodes);
-			if (!lockPos){
-				this.pos(x,y+itemHeight *0.5);
-				}else{
-				this.pos(x,y);
-			};
-			var i=0,len=0;
-			len=childNodes.length;
-			var childX=NaN;
-			if (isRight){
-				childX=x+this.width+MindMapItem.XSpace;
-				}else{
-				childX=x-this.width-MindMapItem.XSpace;
-			};
-			var tChild;
-			var tY=NaN;
-			tY=y;
-			if (lockPos){
-				tY-=itemHeight *0.5;
-			};
-			var childItemHeight=NaN;
-			for (i=0;i < len;i++){
-				tChild=childNodes[i];
-				childItemHeight=tChild.getItemHeight();
-				tChild.setPos(childX,tY,isRight);
-				tY+=childItemHeight+MindMapItem.YSpace;
-			}
-		}
-
-		__proto.addChildNode=function(node,addToData){
-			(addToData===void 0)&& (addToData=false);
-			this.childNodes.push(node);
-			node.parentNode=this;
-			if(addToData)
-				this.nodeData.addChild(node.nodeData);
-		}
-
-		__proto.removeChildNode=function(node){
-			var i=0,len=0;
-			len=this.childNodes.length;
-			var tChild;
-			for (i=0;i < len;i++){
-				tChild=this.childNodes[i];
-				if (tChild==node){
-					this.childNodes.splice(i,1);
-					node.parentNode=null;
-					this.nodeData.removeChild(node.nodeData);
-					return;
-				}
-			}
-		}
-
-		__proto.recover=function(){
-			this.reset();
-			Pool.recover("MindMapItem",this);
-		}
-
-		//sprite.graphics.drawLine(leftItem.x+leftItem.width,leftItem.y,rightItem.x,rightItem.y,"#ff0000");
-		__getset(0,__proto,'ID',function(){
-			return this.nodeData.id;
-		});
-
-		MindMapItem.createByData=function(mindMapNodeData,autoBuildTree){
-			(autoBuildTree===void 0)&& (autoBuildTree=false);
-			var rst;
-			rst=MindMapItem.create();
-			rst.nodeData=mindMapNodeData;
-			rst.freshUI();
-			return rst;
-		}
-
-		MindMapItem.create=function(){
-			return Pool.getItemByClass("MindMapItem",MindMapItem);
-		}
-
-		MindMapItem.YSpace=20;
-		MindMapItem.XSpace=20;
-		return MindMapItem;
-	})(MapItemUI)
+		RenameResUI.uiView={"type":"Dialog","props":{"width":500,"scenecolor":"#dddddd","height":250},"child":[{"type":"Image","props":{"y":0,"x":0,"width":500,"skin":"view/bg_dialog.png","height":250,"sizeGrid":"47,20,22,37"}},{"type":"Button","props":{"skin":"view/btn_close.png","name":"close","scaleX":0.5,"scaleY":0.5,"right":11,"y":7}},{"type":"Image","props":{"y":7,"x":9,"width":446,"skin":"comp/blank_title_dragrec.png","name":"drag","height":36}},{"type":"Label","props":{"x":28,"text":"重命名资源","styleSkin":"comp/label_panel_title.png","fontSize":14,"align":"center","color":"#ffffff","centerX":0,"y":16}},{"type":"Label","props":{"y":104,"x":4,"width":127,"text":"新名称：","styleSkin":"comp/label_intro.png","height":18,"align":"right","fontSize":14,"color":"#C8C8C8"}},{"type":"TextInput","props":{"y":99,"x":135,"width":300,"var":"nameTxt","skin":"comp/input_32.png","sizeGrid":"0,3,0,3","color":"#CCCCCC","fontSize":14,"padding":"0,4,0,4","height":32}},{"type":"Label","props":{"y":65,"x":8,"width":123,"text":"原名称：","styleSkin":"comp/label_intro.png","height":18,"align":"right","fontSize":14,"color":"#C8C8C8"}},{"type":"Label","props":{"y":65,"x":135,"width":214,"var":"resLbl","text":"资源内容","styleSkin":"comp/label_highlight.png","height":20,"color":"#cccc00","fontSize":14}},{"type":"Button","props":{"y":178,"x":85,"skin":"comp/button.png","name":"sure","label":"确定","labelColors":"#FFFFFF,#FFFFFF,#FFFFFF,#c5c5c5","labelSize":16,"sizeGrid":"0,4,0,4"}},{"type":"Button","props":{"y":178,"x":295,"skin":"comp/button.png","name":"cancel","label":"取消","labelColors":"#FFFFFF,#FFFFFF,#FFFFFF,#c5c5c5","labelSize":16,"sizeGrid":"0,4,0,4"}}]};
+		return RenameResUI;
+	})(Dialog)
 
 
 	/**
@@ -29833,7 +33143,9 @@ var Laya=window.Laya=(function(window,document){
 			rec.setTo(0,0,this.width,this.height);
 			this.scrollRect=rec;
 			if (this._userChanged)return;
-			this.nodeContainer.pos(this.width*0.5,this.height*0.5);
+			this.nodeContainer.pos(this.width *0.5,this.height *0.5);
+			this.nodeContainer.pivot(0,0);
+			this.containerScale=1;
 		}
 
 		__proto.onRightClick=function(){
@@ -29995,6 +33307,7 @@ var Laya=window.Laya=(function(window,document){
 			},function(value){
 			this.switchPivotCenter();
 			this.nodeContainer.scale(value,value);
+			this._userChanged=true;
 		});
 
 		__getset(0,__proto,'data',function(){
@@ -30005,6 +33318,956 @@ var Laya=window.Laya=(function(window,document){
 		MindMapEditor.isEditorMode=true;
 		return MindMapEditor;
 	})(MindMapEditorUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class mindmap.MindMapItem extends ui.mindmap.MapItemUI
+	var MindMapItem=(function(_super){
+		function MindMapItem(){
+			this.nodeData=null;
+			this.childNodes=[];
+			this._menu=null;
+			this.onMenuSelectHandler=null;
+			this.onItemActionHandler=null;
+			this.parentNode=null;
+			this._downTime=NaN;
+			MindMapItem.__super.call(this);
+			this.hitTestPrior=false;
+			this._menu=ContextMenu.createMenuByArray(["新建同级","新建子","删除"]);
+			this._menu.on("select",this,this.onSelect);
+			this.on("rightmouseup",this,this.onRightMouseUp);
+			this.text.editable=true;
+			this.text.mouseEnabled=false;
+			this.text.on("blur",this,this.onInputBlur);
+			this.on("doubleclick",this,this.onDoubleClick);
+			this.downBtn.on("click",this,this.onBtnAction,["down"]);
+			this.upBtn.on("click",this,this.onBtnAction,["up"]);
+			this.selectBtn.on("click",this,this.onBtnAction,["select"]);
+			this.selectBtn.selected=false;
+			this.on("mousedown",this,this.onMyMouseDown);
+			this.on("mouseup",this,this.onMyMouseUp);
+		}
+
+		__class(MindMapItem,'mindmap.MindMapItem',_super);
+		var __proto=MindMapItem.prototype;
+		__proto.onMyMouseDown=function(){
+			this._downTime=Browser.now();
+		}
+
+		__proto.onMyMouseUp=function(){
+			if (Browser.now()-this._downTime > 500){
+				this.onRightMouseUp();
+			}
+		}
+
+		__proto.setSelect=function(isSelect){
+			this.selectBtn.selected=isSelect;
+		}
+
+		__proto.isSelect=function(){
+			return this.selectBtn.selected;
+		}
+
+		__proto.reset=function(){
+			this.parentNode=null;
+			this.childNodes=[];
+			this.selectBtn.selected=false;
+		}
+
+		__proto.updateNodesToDataOrder=function(){
+			this.childNodes.sort(this.sortChildFun.bind(this));
+		}
+
+		__proto.sortChildFun=function(nodeA,nodeB){
+			var childs;
+			childs=this.nodeData.childs;
+			return childs.indexOf(nodeA.nodeData)-childs.indexOf(nodeB.nodeData);
+		}
+
+		__proto.onBtnAction=function(action){
+			if (this.onItemActionHandler){
+				this.onItemActionHandler.runWith([action,this]);
+			}
+		}
+
+		__proto.onDoubleClick=function(){
+			this.text.editable=true;
+			this.text.focus=true;
+		}
+
+		__proto.onInputBlur=function(){
+			this.text.editable=false;
+			this.nodeData.label=this.text.text;
+			this.freshUI();
+		}
+
+		__proto.onSelect=function(dataO){
+			if (this.onMenuSelectHandler){
+				this.onMenuSelectHandler.runWith([dataO,this]);
+			}
+			console.log("onMenuSelect:",dataO);
+			var label;
+			label=dataO.target.data;
+			console.log("Menu:",label);
+		}
+
+		__proto.onRightMouseUp=function(){
+			console.log("mindmapitem rightmouseup");
+			if (!MindMapEditor.isEditorMode)return;
+			this._menu.show();
+		}
+
+		__proto.freshUI=function(){
+			this.text.editable=MindMapEditor.isEditorMode;
+			this.text.text=this.nodeData.label || "";
+			this.text.width=400;
+			this.text.textField.typeset();
+			this.text.width=this.text.textField.textWidth+20;
+			this.width=this.text.textField.textWidth+20+33;
+		}
+
+		__proto.drawConnections=function(sprite){
+			var i=0,len=0;
+			len=this.childNodes.length;
+			var tChild;
+			for (i=0;i < len;i++){
+				tChild=this.childNodes[i];
+				tChild.drawConnections(sprite);
+				this.drawOneLine(this,tChild,sprite);
+			}
+		}
+
+		__proto.drawOneLine=function(parentItem,childItem,sprite){
+			var leftItem;
+			var rightItem;
+			var isRight=false;
+			if (parentItem.x < childItem.x){
+				leftItem=parentItem;
+				rightItem=childItem;
+				isRight=true;
+				}else{
+				leftItem=childItem;
+				rightItem=parentItem;
+				isRight=false;
+			};
+			var lx=NaN,ly=NaN;
+			var rx=NaN,ry=NaN;
+			lx=leftItem.x+leftItem.width;
+			ly=leftItem.y;
+			rx=rightItem.x;
+			ry=rightItem.y;
+			if (isRight){
+				sprite.graphics.drawCurves(0,0,[lx,ly,(lx+rx)/2,ry,rx,ry],"#ff0000");
+				}else{
+				sprite.graphics.drawCurves(0,0,[lx,ly,(lx+rx)/2,ly,rx,ry],"#ff0000");
+			}
+		}
+
+		__proto.getItemHeight=function(childNodes){
+			if (!childNodes)childNodes=this.childNodes;
+			if (!childNodes || !childNodes.length)return this.height;
+			var i=0,len=0;
+			len=childNodes.length;
+			var tChild;
+			var tHeight=0;
+			var totalHeight=NaN;
+			totalHeight=0;
+			for (i=0;i < len;i++){
+				tChild=childNodes[i];
+				tHeight=tChild.getItemHeight();
+				totalHeight+=tHeight;
+			}
+			totalHeight+=MindMapItem.YSpace *(len-1);
+			return totalHeight;
+		}
+
+		__proto.getItemWidth=function(childNodes){
+			if (!childNodes)childNodes=this.childNodes;
+			if (!childNodes || !childNodes.length)return 0;
+			var maxWidth=0;
+			var i=0,len=0;
+			len=childNodes.length;
+			var tChild;
+			for (i=0;i < len;i++){
+				tChild=childNodes[i];
+				maxWidth=Math.max(maxWidth,tChild.width);
+			}
+			return maxWidth;
+		}
+
+		__proto.setPos=function(x,y,isRight){
+			(isRight===void 0)&& (isRight=true);
+			this.layoutChilds(this.childNodes,x,y,isRight);
+		}
+
+		__proto.layoutAsCenter=function(){
+			if (this.childNodes.length <=1){
+				this.layoutChilds(this.childNodes,this.x,this.y,true);
+				return;
+			};
+			var leftChilds;
+			var rightChilds;
+			var mid=0;
+			mid=Math.floor(this.childNodes.length / 2);
+			leftChilds=[];
+			rightChilds=[];
+			var i=0,len=0;
+			len=this.childNodes.length;
+			for (i=0;i < len;i++){
+				if (i < mid){
+					leftChilds.push(this.childNodes[i]);
+					}else{
+					rightChilds.push(this.childNodes[i]);
+				}
+			}
+			this.layoutChilds(leftChilds,this.x,this.y,false,true);
+			this.layoutChilds(rightChilds,this.x,this.y,true,true);
+		}
+
+		__proto.layoutChilds=function(childNodes,x,y,isRight,lockPos){
+			(isRight===void 0)&& (isRight=true);
+			(lockPos===void 0)&& (lockPos=false);
+			var itemHeight=NaN;
+			itemHeight=this.getItemHeight(childNodes);
+			var itemWidth=NaN;
+			itemWidth=this.getItemWidth(childNodes);
+			itemWidth=Math.max(this.width,itemWidth);
+			if (!lockPos){
+				this.pos(x,y+itemHeight *0.5);
+				}else{
+				this.pos(x,y);
+			};
+			var i=0,len=0;
+			len=childNodes.length;
+			var childX=NaN;
+			if (isRight){
+				childX=x+this.width+MindMapItem.XSpace;
+				}else{
+				childX=x-itemWidth-MindMapItem.XSpace;
+			};
+			var tChild;
+			var tY=NaN;
+			tY=y;
+			if (lockPos){
+				tY-=itemHeight *0.5;
+			};
+			var childItemHeight=NaN;
+			for (i=0;i < len;i++){
+				tChild=childNodes[i];
+				childItemHeight=tChild.getItemHeight();
+				if (isRight){
+					tChild.setPos(childX,tY,isRight);
+					}else{
+					tChild.setPos(x-tChild.width-MindMapItem.XSpace,tY,isRight);
+				}
+				tY+=childItemHeight+MindMapItem.YSpace;
+			}
+		}
+
+		__proto.addChildNode=function(node,addToData){
+			(addToData===void 0)&& (addToData=false);
+			this.childNodes.push(node);
+			node.parentNode=this;
+			if(addToData)
+				this.nodeData.addChild(node.nodeData);
+		}
+
+		__proto.removeChildNode=function(node){
+			var i=0,len=0;
+			len=this.childNodes.length;
+			var tChild;
+			for (i=0;i < len;i++){
+				tChild=this.childNodes[i];
+				if (tChild==node){
+					this.childNodes.splice(i,1);
+					node.parentNode=null;
+					this.nodeData.removeChild(node.nodeData);
+					return;
+				}
+			}
+		}
+
+		__proto.recover=function(){
+			this.reset();
+			Pool.recover("MindMapItem",this);
+		}
+
+		//sprite.graphics.drawLine(leftItem.x+leftItem.width,leftItem.y,rightItem.x,rightItem.y,"#ff0000");
+		__getset(0,__proto,'ID',function(){
+			return this.nodeData.id;
+		});
+
+		MindMapItem.createByData=function(mindMapNodeData,autoBuildTree){
+			(autoBuildTree===void 0)&& (autoBuildTree=false);
+			var rst;
+			rst=MindMapItem.create();
+			rst.nodeData=mindMapNodeData;
+			rst.freshUI();
+			return rst;
+		}
+
+		MindMapItem.create=function(){
+			return Pool.getItemByClass("MindMapItem",MindMapItem);
+		}
+
+		MindMapItem.YSpace=20;
+		MindMapItem.XSpace=20;
+		return MindMapItem;
+	})(MapItemUI)
+
+
+	//class commonui.ui.prop.NumberInputUI extends commonui.view.prop.PropsInputBase
+	var NumberInputUI=(function(_super){
+		function NumberInputUI(){
+			this.input=null;
+			this.leftBtn=null;
+			this.rightBtn=null;
+			NumberInputUI.__super.call(this);
+			this.createUI(NumberInputUI.uiView);
+		}
+
+		__class(NumberInputUI,'commonui.ui.prop.NumberInputUI',_super);
+		var __proto=NumberInputUI.prototype;
+		__proto.createUI=function(uiData){
+			ClassUtils.createByJson(uiData,this,this);
+		}
+
+		NumberInputUI.uiView={"type":"PropsInputBase","props":{"width":150,"height":47},"child":[{"type":"TextInput","props":{"var":"input","top":2,"text":"123","skin":"comp/input_32.png","right":24,"padding":"0,10,0,10","left":24,"fontSize":20,"bottom":2,"align":"center","sizeGrid":"0,3,0,3","color":"#CCCCCC","height":32}},{"type":"Box","props":{"width":69,"var":"leftBtn","top":0,"left":0,"bottom":0},"child":[{"type":"Image","props":{"x":0,"skin":"view/arrow_left.png","height":36,"centerY":0}}]},{"type":"Box","props":{"width":71,"var":"rightBtn","top":0,"right":0,"bottom":0},"child":[{"type":"Image","props":{"x":52,"skin":"view/arrow_right.png","right":0,"height":36,"centerY":0}}]}]};
+		return NumberInputUI;
+	})(PropsInputBase)
+
+
+	//class commonui.ui.prop.PropTextInputUI extends commonui.view.prop.PropsInputBase
+	var PropTextInputUI=(function(_super){
+		function PropTextInputUI(){
+			this.input=null;
+			PropTextInputUI.__super.call(this);
+			this.createUI(PropTextInputUI.uiView);
+		}
+
+		__class(PropTextInputUI,'commonui.ui.prop.PropTextInputUI',_super);
+		var __proto=PropTextInputUI.prototype;
+		__proto.createUI=function(uiData){
+			ClassUtils.createByJson(uiData,this,this);
+		}
+
+		PropTextInputUI.uiView={"type":"PropsInputBase","props":{"width":150,"height":47},"child":[{"type":"Label","props":{"var":"input","valign":"middle","top":0,"text":"111","styleSkin":"comp/input_32.png","right":0,"mouseEnabled":false,"left":0,"fontSize":30,"editable":false,"color":"#000000","bottom":0,"sizeGrid":"0,3,0,3","padding":"0,4,0,4","height":32}}]};
+		return PropTextInputUI;
+	})(PropsInputBase)
+
+
+	/**属性组
+	*@author ww
+	*/
+	//class commonui.view.prop.PropGroup extends commonui.ui.prop.PropGroupUI
+	var PropGroup=(function(_super){
+		function PropGroup(name,props){
+			this._props=[];
+			this._isSettingValue=false;
+			this.type=null;
+			this.layouter=null;
+			this._items=null;
+			this.ItemHeight=60;
+			this.ItemD=5;
+			this.nameTypeO={};
+			this._nameList=[];
+			this.labelDic={};
+			this.labelInitLabel={};
+			this._enableClickSwitch=true;
+			this.groupData=null;
+			this.node=null;
+			this._nameItemDic={};
+			this.isSettingValue=false;
+			this._curBox=null;
+			this._boxOffsetY=0;
+			this._data=null;
+			this.itemType=null;
+			PropGroup.__super.call(this);
+			this.groupBar.on("mousedown",this,this.onGroupBarClick);
+			this.groupBox.y+=this.ItemD;
+			this.groupBox.space=this.ItemD;
+			if (!name)return;
+			this.createBy(name,props);
+		}
+
+		__class(PropGroup,'commonui.view.prop.PropGroup',_super);
+		var __proto=PropGroup.prototype;
+		__proto.setClickSwitchEnable=function(value){
+			this._enableClickSwitch=value;
+			this.arrowClip.visible=value;
+			if(value){
+				this.groupLabl.x=19;
+				}else{
+				this.groupLabl.x=PropGroup.x1;
+			}
+		}
+
+		__proto.setGroupState=function(show){
+			if(show){
+				this.addChild(this.groupBox);
+				this.arrowClip.index=1;
+				}else{
+				this.groupBox.removeSelf();
+				this.arrowClip.index=0;
+			}
+			this.event("resize");
+		}
+
+		__proto.getItemByName=function(name){
+			return this._nameItemDic[name];
+		}
+
+		__proto.createBy=function(name,props,groupData){
+			this.groupData=groupData;
+			this._props.length=0;
+			this.groupLabl.text=name;
+			this.groupLabl.color=PropStyleConst.TreeFolderColor;
+			this.groupLabl.bold=true;
+			this.groupBox.removeChildren();
+			this.arrowClip.index=1;
+			this._items=[];
+			var tY=NaN;
+			for (var i=0,n=props.length;i < n;i++){
+				var prop=PropUtils.getDisplayPropObject(props[i]);
+				tY=i *this.ItemHeight+this.ItemD;
+				if (prop.type=="group"){
+					this.createGroupProp(props[i],tY);
+					}else {
+					this.createPropUI(prop,150,tY);
+				}
+			};
+			var len=0;
+			var lItems;
+			lItems=[];
+			len=this._items.length;
+			var tLayout;
+			var items;
+			if (this._items.length > 0){
+				this.layouter=LayoutFuns.getFullFillLayout(this._items,0,20);
+			}
+		}
+
+		__proto.reset=function(){
+			var childs;
+			childs=this.groupBox._children;
+			var i=0,len=0;
+			var tChild;
+			for (i=0;i < len;i++){
+				tChild=childs[i];
+				this.clearCurBox(tChild);
+			}
+			this.groupBox.removeChildren();
+			this._nameItemDic={};
+			this._nameList.length=0;
+			this.node=null;
+		}
+
+		__proto.changeSize=function(){
+			laya.ui.Component.prototype.changeSize.call(this);
+			if (this.layouter){
+				this.layouter.width=this.width;
+			}
+		}
+
+		__proto.freshMySize=function(){
+			if (this.layouter){
+				this.layouter.width=this.width;
+			}
+		}
+
+		__proto.onGroupBarClick=function(e){
+			if(!this._enableClickSwitch)return;
+			this.setGroupState(!this.groupBox.parent);
+		}
+
+		__proto.createGroupProp=function(groupData,tY){
+			var tgLayout;
+			var props;
+			props=groupData.cList;
+			var i=0,len=0;
+			len=props.length;
+			var nickName;
+			var items;
+			items=[];
+			var labelWidth=NaN;
+			labelWidth=150*0.6;
+			if (len > 2){
+				labelWidth=150*0.5;
+			}
+			if (PropUtils.mParseInt(groupData["labelWidth"])){
+				labelWidth=PropUtils.mParseInt(groupData["labelWidth"]);
+			};
+			var propBox;
+			propBox=new PropItemBox();
+			for (i=0;i < len;i++){
+				var prop=PropUtils.getDisplayPropObject(props[i]);
+				var tLabelWidth=NaN;
+				tLabelWidth=PropUtils.mParseInt(prop["labelWidth"]);
+				tLabelWidth=tLabelWidth ? tLabelWidth :labelWidth;
+				var tLayout;
+				tLayout=this.createPropUI(prop,labelWidth,tY,propBox);
+				if(tLayout)
+					items.push(tLayout);
+			}
+			tgLayout=LayoutFuns.getSameWidthLayout(items,5);
+			this._items.push(tgLayout);
+		}
+
+		__proto.clearCurBox=function(box){
+			if(!box["BBoxSign"])return;
+			var childs;
+			childs=box._children;
+			var i=0,len=0;
+			var tChild;
+			for (i=0;i < len;i++){
+				tChild=childs[i];
+				tChild.offAll();
+			}
+			box.removeChildren();
+		}
+
+		__proto.adptAllChild=function(container,dY){
+			var i=0,len=0;
+			var childs;
+			childs=container._children;
+			len=childs.length;
+			for(i=0;i<len;i++){
+				childs[i].y+=dY;
+			}
+		}
+
+		__proto.addFixHeightItem=function(item){
+			this.CurBox.addChild(item);
+			if(!this._boxOffsetY){
+				this._boxOffsetY=item.y;
+				item.y=0;
+				}else{
+				item.y-=this._boxOffsetY;
+			}
+			if(item.y<0){
+				this._boxOffsetY+=item.y;
+				this.adptAllChild(this.CurBox,-item.y);
+			}
+			if(item.name){
+				this._nameItemDic[item.name]=item;
+			}
+		}
+
+		__proto.addNoFixHeightItem=function(item){
+			this._curBox=null;
+			if(item.name){
+				this._nameItemDic[item.name]=item;
+			}
+			this.groupBox.addChild(item);
+		}
+
+		/**创建属性设置面板*/
+		__proto.createPropUI=function(data,labelWidth,y,propBox){
+			(labelWidth===void 0)&& (labelWidth=150);
+			(y===void 0)&& (y=0);
+			if (!propBox){
+				propBox=new PropItemBox();
+			}
+			propBox.left=propBox.right=0;
+			propBox.y=y;
+			this.groupBox.addChild(propBox);
+			var name;
+			name=data.name;
+			var type;
+			type=data.type;
+			var nickName;
+			nickName=UIConfigManager.getNickNameFromPropConfig(data);
+			this._props.push(data);
+			this._nameList.push(name);
+			if (PropGroup.typeTrans[type]){
+				type=PropGroup.typeTrans[type];
+			}
+			if (!type)type="string";
+			type=type.toLowerCase();
+			var tItems;
+			tItems=[];
+			var tLayout;
+			this.nameTypeO[name]=type;
+			var label;
+			var propsInput;
+			propsInput=PropPluginManager.createPluginByType(type);
+			if(propsInput){
+				this._nameItemDic[name]=propsInput;
+				if (!propsInput.selfAlign){
+					propsInput.right=PropGroup.rightD;
+					propsInput.left=PropGroup.x1;
+				}
+				if(!propsInput.hasSide){
+					propsInput.right=0;
+					propsInput.left=0;
+				}
+				propsInput.name=name;
+				propsInput.valueKey=name;
+				propsInput.initByConfig(data);
+				propsInput.y=y;
+				propsInput.y=0;
+				if(propsInput.useIDELabel){
+					label=new Label();
+					label.text=nickName;
+					label.fontSize=PropStyleConst.PropPanelFontSize;
+					label.height=label.fontSize+2;
+					label.pos(PropGroup.x1,(this.ItemHeight-label.height)*0.5);
+					label.color=PropStyleConst.TreeItemColor;
+					label.width=labelWidth;
+					label.textField.overflow=Text.HIDDEN;
+					this.labelDic[name]=label;
+					this.labelInitLabel[name]=label.toolTip;
+					PropGroup.x2=label.width;
+					if (!propsInput.selfAlign){
+						LayoutFuns.clearItemRelativeInfo(propsInput);
+						propsInput.x=PropGroup.x2;
+					}
+					propBox.addChild(label);
+				}
+				propBox.addChild(propsInput);
+				if(propsInput.isFixHeight){
+					propsInput.height=this.ItemHeight;
+					}else{
+				}
+				if (propsInput.useIDELabel&&!propsInput.selfAlign){
+					tItems.push(label);
+					tItems.push(propsInput);
+					LayoutFuns.clearItemsRelativeInfo(tItems);
+					tLayout=LayoutFuns.getFixPos(tItems,5,false);
+					this._items.push(tLayout);
+					return tLayout;
+				}
+				return null;
+			}
+			return null;
+		}
+
+		__proto.setValueD=function(node){
+			this.itemType=this.itemType;
+			this._data=node.comXml;
+			var data;
+			data=this._data.props;
+			this.node=node;
+			var defaultData;
+			this._isSettingValue=true;
+			for (var i=0,n=this._props.length;i < n;i++){
+				var prop=PropUtils.getDisplayPropObject(this._props[i]);
+				var name=prop.name;
+				var dataName;
+				dataName=prop.hasOwnProperty("_$dataName")?prop._$dataName:name;
+				var value="";
+				if (!data.hasOwnProperty(dataName)){
+					if (defaultData && defaultData.hasOwnProperty(dataName)){
+						value=ObjectTools.getAutoValue(defaultData[dataName]);
+						if (prop.type=="bool"){
+							value=value ? "true" :"false";
+						}
+					}
+					}else {
+					value=data[dataName];
+					if (prop.type=="bool"){
+						value=value ? "true" :"false";
+					}
+				};
+				var target=this.getItemByName(name);
+				target.isSettingValue=true;
+				target.setTarget(node);
+				target.isSettingValue=false;
+			}
+			this._isSettingValue=false;
+		}
+
+		__getset(0,__proto,'CurBox',function(){
+			if(!this._curBox){
+				this._curBox=new Box();
+				this._curBox.left=this._curBox.right=0;
+				this._curBox.mouseEnabled=true;
+				this._boxOffsetY=0;
+				this._curBox["BBoxSign"]="BBoxSign";
+			}
+			this.groupBox.addChild(this._curBox);
+			return this._curBox;
+		});
+
+		PropGroup.Prop="Prop";
+		PropGroup.Node="Node";
+		PropGroup.LabelX=19;
+		PropGroup.x2=85;
+		PropGroup.x1=15;
+		PropGroup.rightD=15;
+		PropGroup.DefaultLabelWidth=150;
+		PropGroup.BBoxSign="BBoxSign";
+		__static(PropGroup,
+		['typeTrans',function(){return this.typeTrans={"Boolean":"bool","String":"string"};}
+		]);
+		return PropGroup;
+	})(PropGroupUI)
+
+
+	/**属性面板
+	*@author ww
+	*/
+	//class commonui.view.prop.PropPanel extends commonui.ui.prop.PropPanelUI
+	var PropPanel=(function(_super){
+		function PropPanel(){
+			this._panel=null;
+			this._panelMap={};
+			this.scrollValueDic={};
+			this._preCompID=0;
+			this._preCompScrollValue=NaN;
+			this.node=null;
+			PropPanel.__super.call(this);
+			PropPanel.initStaticDatas();
+			this.width=400;
+			this.height=600;
+			this.cancelBtn.on("click",this,this.onCloseBtn);
+			this.clear();
+		}
+
+		__class(PropPanel,'commonui.view.prop.PropPanel',_super);
+		var __proto=PropPanel.prototype;
+		__proto.onCloseBtn=function(){
+			this.hide();
+		}
+
+		__proto.hide=function(){
+			this.clear();
+			this.removeSelf();
+		}
+
+		/**清理*/
+		__proto.clear=function(){
+			if (this._panel){
+				this.recordPrePanelScroll();
+				this._panel.removeSelf();
+				this._panel=null;
+			}
+			this.node=null;
+			this.typeLbl.text="";
+			this.propFootBox.removeSelf();
+		}
+
+		__proto.recordPrePanelScroll=function(){
+			if (this._panel){
+				this.scrollValueDic[this._panel.contentHeight]=this._panel.vScrollBar.value;
+				if (this.node){
+					this._preCompID=UIConfigManager.getNodeIDFromNode(this.node);
+					this._preCompScrollValue=this._panel.vScrollBar.value;
+					}else{
+					this._preCompID=-1;
+				}
+			}
+		}
+
+		__proto.initByObj=function(node){
+			this.clear();
+			this.node=node;
+			if (node){
+				UIConfigManager.loadConfigByNode(node,Handler.create(this,this.onUIConfigLoaded));
+			}
+		}
+
+		//TweenUtils.tweenToShow(instance);
+		__proto.onUIConfigLoaded=function(){
+			if (this.node){
+				var type=UIConfigManager.getTypeFromNode(this.node);
+				this.typeLbl.text=type;
+				this.typeLbl.color=PropStyleConst.PropPanelTitleColor;
+				this._panel=this.createPanel(this.node);
+				this.addChild(this._panel);
+				this.refreshGroupsPosition();
+				var dataO;
+				dataO=this.node.comXml;
+				var propO;
+				propO=dataO;
+				for (var i=0,n=this._panel.numChildren;i < n;i++){
+					var propGroup=this._panel.getChildAt(i);
+					if (!((propGroup instanceof commonui.view.prop.PropGroup )))continue ;
+					if (propGroup.type !="Node")
+						propGroup.setValueD(this.node);
+				}
+				if(this.scrollValueDic[this._panel.contentHeight]){
+					this._panel.vScrollBar.value=this.scrollValueDic[this._panel.contentHeight];
+					}else{
+					if (propO && propO.compId==this._preCompID){
+						this._panel.vScrollBar.value=this._preCompScrollValue;
+					}
+				}
+			}
+		}
+
+		__proto.refresh=function(){}
+		__proto.clearPanelCache=function(type){
+			delete this._panelMap[type];
+		}
+
+		__proto.createPanel=function(node){
+			var type;
+			type=UIConfigManager.getTypeFromNode(node);
+			var cacheKey;
+			cacheKey=type;
+			var isSameType=false;
+			var panel=this._panelMap[cacheKey];
+			if (panel==null){
+				panel=new Panel();
+				panel.mouseEnabled=true;
+				panel.content.mouseEnabled=true;
+				panel.vScrollBarSkin=PropStyleConst.PropPanelScrollBar;
+				panel.left=panel.right=0;
+				panel.bottom=2;
+				panel.top=50;
+				var props=UIConfigManager.getCompConfig(type);
+				if (props){
+					var labels=props.groups;
+					var groupLabels=labels ? labels.split(","):[];
+					groupLabels=Sys.langArr(groupLabels);
+					groupLabels.push(Sys.lang("其他"));
+					var groups=[];
+					for (var j=0,m=groupLabels.length;j < m;j++){
+						groups.push([]);
+					};
+					var otherGroupIndex=groupLabels.indexOf(Sys.lang("其他"));
+					var list=props.prop;
+					for (var i=0,n=list.length;i < n;i++){
+						var prop=list[i];
+						var group=Sys.lang(prop.group);
+						if (!Boolean(group)){
+							var index=otherGroupIndex;
+							}else {
+							index=groupLabels.indexOf(group);
+							if (index==-1){
+								index=otherGroupIndex;
+							}
+						}
+						groups[index].push(prop);
+					}
+					index=groupLabels.indexOf(Sys.lang("公用"));
+					if (index==-1){
+						index=otherGroupIndex;
+					};
+					var otherGroup=groups[otherGroupIndex];
+					otherGroup.sort(PropPanel.sortByNameHH);
+					for (var k=0,t=groups.length;k < t;k++){
+						var arr=groups[k];
+						if (arr.length > 0){
+							var propGroup=new PropGroup(groupLabels[k],arr);
+							propGroup.left=0;
+							propGroup.right=1;
+							propGroup.on("resize",this,this.freshPositionsLater);
+							if(groupLabels[k]==Sys.lang("其他")){
+								propGroup.setGroupState(false);
+							}
+							panel.addChild(propGroup);
+						}
+					}
+				}
+				this._panelMap[cacheKey]=panel;
+			}
+			return panel;
+		}
+
+		__proto.freshPositionsLater=function(){
+			Laya.timer.callLater(this,this.refreshGroupsPosition);
+		}
+
+		/**刷新属性面板位置*/
+		__proto.refreshGroupsPosition=function(){
+			PropPanel.refreshPanelChilds(this._panel,this.propFootBox);
+		}
+
+		__getset(1,PropPanel,'instance',function(){
+			return PropPanel._instance ? PropPanel._instance :PropPanel._instance=new PropPanel();
+		},commonui.ui.prop.PropPanelUI._$SET_instance);
+
+		PropPanel.showPropPanel=function(node){
+			PropPanel.instance.initByObj(node);
+			Laya.stage.addChild(PropPanel.instance);
+			PropPanel.instance.x=Laya.stage.width-PropPanel.instance.width;
+			PropPanel.instance.y=(Laya.stage.height-PropPanel.instance.height)*0.5;
+		}
+
+		PropPanel.initStaticDatas=function(){}
+		PropPanel.sortByNameHH=function(obj0,obj1){
+			return obj0.p.name < obj1.p.name ?-1 :1;
+		}
+
+		PropPanel.refreshPanelChilds=function(panel,propFootBox){
+			var y=0;
+			if(!panel)return 0;
+			for (var i=0,n=panel.numChildren;i < n;i++){
+				var propGroup=panel.getChildAt(i);
+				if (propGroup==propFootBox)continue ;
+				if (propGroup){
+					propGroup.y=y;
+					y=y+propGroup.height+10;
+				}
+			}
+			if(propFootBox){
+				propFootBox.y=y;
+			}
+			panel.refresh();
+			return y;
+		}
+
+		PropPanel._instance=null
+		PropPanel.spaceY=10;
+		return PropPanel;
+	})(PropPanelUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.PropsColorInput extends commonui.view.prop.PropsInputBase
+	var PropsColorInput=(function(_super){
+		function PropsColorInput(){
+			this.colorBox=null;
+			this._color=null;
+			this._changeHandler=null;
+			PropsColorInput.__super.call(this);
+			this._changeHandler=new Handler(this,this.onColorChanged);
+			this.colorBox=new Box();
+			this.colorBox.left=this.colorBox.right=this.colorBox.top=this.colorBox.bottom=2;
+			this.addChild(this.colorBox);
+			this.on("click",this,this.onClick);
+			this.colorBox.on("resize",this,this.freshColorRec);
+		}
+
+		__class(PropsColorInput,'commonui.view.prop.PropsColorInput',_super);
+		var __proto=PropsColorInput.prototype;
+		__proto.onClick=function(){
+			ColorPickerControl.showColorPicker(this._changeHandler,Laya.stage,0,-1,false,true);
+		}
+
+		__proto.freshColorRec=function(){
+			this.colorBox.graphics.clear();
+			this.colorBox.graphics.drawRect(0,0,this.colorBox.width,this.colorBox.height,this._color);
+		}
+
+		__proto.onColorChanged=function(color){
+			if(color)
+				this.updateColor(color);
+		}
+
+		__proto.updateColor=function(color){
+			if (!this.isSettingValue && this._color !=color){
+				this.setValueToTarget(color);
+			}
+			this._color=color;
+			this.freshColorRec();
+		}
+
+		__proto.setTarget=function(target){
+			_super.prototype.setTarget.call(this,target);
+			this.updateColor(this.getDisplayValue()||"#000000");
+		}
+
+		return PropsColorInput;
+	})(PropsInputBase)
 
 
 	/**
@@ -30074,8 +34337,8 @@ var Laya=window.Laya=(function(window,document){
 			if (!dataO)return;
 			this._complete=complete;
 			this.dataO=dataO;
-			this.titleTxt.text=Sys.lang("新建");
-			this.nameTip.text=Sys.lang("名称：");
+			this.titleTxt.text=Sys$1.lang("新建");
+			this.nameTip.text=Sys$1.lang("名称：");
 			this.nameTxt.restrict="0-9a-zA-Z_";
 			this.nameTxt.text="";
 			this.popup();
@@ -30089,7 +34352,7 @@ var Laya=window.Laya=(function(window,document){
 					this.dataO.fileName=this.nameTxt.text;
 					this._complete.runWith(this.dataO);
 					}else {
-					Alert.show(Sys.lang("名称不能为空"));
+					Alert.show(Sys$1.lang("名称不能为空"));
 				}
 				}else{
 				laya.ui.Dialog.prototype.close.call(this,type);
@@ -30128,7 +34391,7 @@ var Laya=window.Laya=(function(window,document){
 		Alert.show=function(msg,title){
 			(title===void 0)&& (title="提示");
 			if(title=="提示"){
-				title=Sys.lang("提示");
+				title=Sys$1.lang("提示");
 			}
 			Alert.instance.start(msg,title);
 		}
@@ -30138,14 +34401,357 @@ var Laya=window.Laya=(function(window,document){
 	})(AlertUI)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,Render,View,Browser,Timer,LocalStorage,GraphicAnimation]);
+	/**确认框
+	*@author ww
+	*/
+	//class view.Confirm extends commonui.ui.ConfirmUI
+	var Confirm=(function(_super){
+		function Confirm(){
+			this._handler=null;
+			this._args=null;
+			Confirm.__super.call(this);
+			this.on("keydown",this,this.onKeyDown);
+		}
+
+		__class(Confirm,'view.Confirm',_super);
+		var __proto=Confirm.prototype;
+		__proto.start=function(msg,title,handler,args){
+			this.titleLbl.text=title;
+			this.msgLbl.text=msg;
+			this._handler=handler;
+			this._args=args;
+			this.popup();
+			KeyManager.setNewFocus(this);
+		}
+
+		__proto.close=function(type){
+			laya.ui.Dialog.prototype.close.call(this,type);
+			if (this._handler !=null){
+				var data=[type=="sure",type];
+				if((this._handler instanceof laya.utils.Handler )){
+					(this._handler).runWith(data);
+				}else
+				this._handler.apply(null,this._args ? this._args.concat(data):data);
+			}
+			KeyManager.restoreFocus();
+		}
+
+		__proto.onKeyDown=function(e){
+			switch(e.keyCode){
+				case 13:
+					this.close("sure");
+					break ;
+				case 27:
+					this.close("cancel");
+					break ;
+				}
+		}
+
+		__getset(1,Confirm,'instance',function(){
+			return Confirm._instance ? Confirm._instance :Confirm._instance=new Confirm();
+		},commonui.ui.ConfirmUI._$SET_instance);
+
+		Confirm.show=function(msg,title,handler,args,okName,cancelName){
+			if(!okName)okName=Sys$1.lang("确定");
+			if(!cancelName)cancelName=Sys$1.lang("取消");
+			Confirm.instance.okBtn.label=okName;
+			Confirm.instance.cancelBtn.label=cancelName;
+			Confirm.instance.start(msg,title,handler,args);
+		}
+
+		Confirm._instance=null
+		return Confirm;
+	})(ConfirmUI)
+
+
+	/**重命名资源
+	*@author ww
+	*/
+	//class view.RenameRes extends commonui.ui.RenameResUI
+	var RenameRes=(function(_super){
+		function RenameRes(){
+			this._oldPath=null;
+			this._complete=null;
+			RenameRes.__super.call(this);
+		}
+
+		__class(RenameRes,'view.RenameRes',_super);
+		var __proto=RenameRes.prototype;
+		__proto.initListener=function(){}
+		__proto.start=function(oldPath,complete){
+			this._oldPath=oldPath;
+			this._complete=complete;
+			var oldName;
+			oldName=FilePathUtils.getFileName(oldPath);
+			this.resLbl.text=oldName;
+			this.nameTxt.restrict="0-9a-zA-Z_";
+			this.nameTxt.restrict="\u4E00-\uFA29\uE7C7-\uE7F30-9a-zA-Z_";
+			this.nameTxt.text=oldName;
+			this.popup();
+			Laya.stage.focus=this.nameTxt.textField;
+		}
+
+		__proto.close=function(type){
+			if (type=="sure"){
+				if(StringTool.isOkFileName(this.nameTxt.text)){
+					if(FileTools.isPathSame(this.nameTxt.text,this.resLbl.text)){
+						Alert.show(Sys$1.lang("文件名不能相同！！"));
+						return;
+					}
+					this._complete.runWith([this._oldPath,this.nameTxt.text]);
+					laya.ui.Dialog.prototype.close.call(this,type);
+					}else{
+					Alert.show(Sys$1.lang("文件名不合法"));
+				}
+				}else{
+				laya.ui.Dialog.prototype.close.call(this,type);
+			}
+		}
+
+		__getset(1,RenameRes,'instance',function(){
+			return RenameRes._instance ? RenameRes._instance :RenameRes._instance=new RenameRes();
+		},commonui.ui.RenameResUI._$SET_instance);
+
+		RenameRes._instance=null
+		return RenameRes;
+	})(RenameResUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.PropsNumberInput extends commonui.ui.prop.NumberInputUI
+	var PropsNumberInput=(function(_super){
+		function PropsNumberInput(){
+			this.tick=1;
+			this.fix=1;
+			this._dValue=NaN;
+			PropsNumberInput.__super.call(this);
+			this.input.editable=false;
+			this.input.mouseEnabled=false;
+			this.leftBtn.on("mousedown",this,this.onBtnAction,["left"]);
+			this.rightBtn.on("mousedown",this,this.onBtnAction,["right"]);
+			this.leftBtn.on("mouseup",this,this.onBtnAction,["stopAllTimer"]);
+			this.rightBtn.on("mouseup",this,this.onBtnAction,["stopAllTimer"]);
+			this.leftBtn.on("mouseout",this,this.onBtnAction,["stopAllTimer"]);
+			this.rightBtn.on("mouseout",this,this.onBtnAction,["stopAllTimer"]);
+		}
+
+		__class(PropsNumberInput,'commonui.view.prop.PropsNumberInput',_super);
+		var __proto=PropsNumberInput.prototype;
+		__proto.onBtnAction=function(type){
+			var curValue=NaN;
+			curValue=this.getCurValue();
+			switch(type){
+				case "left":
+					this.setUpTipLabel();
+					curValue-=this.tick;
+					this.updateValueTo(curValue);
+					this.tryStartAutoUpdate(-this.tick);
+					break ;
+				case "right":
+					this.setUpTipLabel();
+					curValue+=this.tick;
+					this.updateValueTo(curValue);
+					this.tryStartAutoUpdate(this.tick);
+					break ;
+				case "stopAllTimer":
+					this.hideTipLabel();
+					Laya.timer.clear(this,this.startAutoUpdate);
+					this.stopAutoUpdate();
+					break ;
+				}
+		}
+
+		__proto.setUpTipLabel=function(){
+			var label;
+			label=TipMessage.getTipLabel();
+			this.addChild(label);
+			label.y=-150;
+			label.x=this.width *0.5-label.width *0.5;
+		}
+
+		__proto.updateTipLabelText=function(){
+			var label;
+			label=TipMessage.getTipLabel();
+			if (label.parent){
+				label.text=this.input.text;
+			}
+		}
+
+		__proto.hideTipLabel=function(){
+			TipMessage.hideTipLabel();
+		}
+
+		__proto.tryStartAutoUpdate=function(dValue){
+			Laya.timer.once(500,this,this.startAutoUpdate,[dValue]);
+		}
+
+		__proto.startAutoUpdate=function(dValue){
+			this._dValue=dValue;
+			this.stopAutoUpdate();
+			Laya.timer.frameLoop(1,this,this.autoUpdateLoop);
+		}
+
+		__proto.getCurValue=function(){
+			return PropUtils.mParserFloat(this.input.text);
+		}
+
+		__proto.stopAutoUpdate=function(){
+			Laya.timer.clear(this,this.autoUpdateLoop);
+		}
+
+		__proto.autoUpdateLoop=function(){
+			this.updateValueTo(this.getCurValue()+this._dValue);
+		}
+
+		__proto.updateValueTo=function(value){
+			if(this.tick!=1)
+				value=PropUtils.numberToFixed(value,this.fix);
+			this.input.text=value+"";
+			this.updateTipLabelText();
+			this.onInput();
+		}
+
+		__proto.initByConfig=function(configO){
+			commonui.view.prop.PropsInputBase.prototype.initByConfig.call(this,configO);
+			this.tick=configO.tick || 1;
+			this.fix=PropUtils.getNumberFix(this.tick);
+		}
+
+		__proto.onInput=function(){
+			this.setValueToTarget(PropUtils.mParserFloat(this.input.text));
+		}
+
+		__proto.setTarget=function(target){
+			commonui.view.prop.PropsInputBase.prototype.setTarget.call(this,target);
+			this.input.text=""+(this.getDisplayValue()||"");
+		}
+
+		return PropsNumberInput;
+	})(NumberInputUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.PropsTextInput extends commonui.ui.prop.PropTextInputUI
+	var PropsTextInput=(function(_super){
+		//protected var input:TextInput;
+		function PropsTextInput(){
+			PropsTextInput.__super.call(this);
+			this.input.fontSize=PropStyleConst.PropPanelFontSize;
+			this.mouseEnabled=true;
+			this.input.on("enter",this,this.onInput);
+			this.input.on("blur",this,this.onInput);
+		}
+
+		__class(PropsTextInput,'commonui.view.prop.PropsTextInput',_super);
+		var __proto=PropsTextInput.prototype;
+		__proto.onInputPageBack=function(value,ifSave){
+			console.log("onInputPageBack:",value,ifSave);
+			if (ifSave){
+				if (this.input.text !=value){
+					this.input.text=value;
+					this.setValueToTarget(value);
+				}
+			}
+		}
+
+		__proto.onInput=function(){
+			console.log("valueChange:",this.input.text);
+			this.setValueToTarget(this.input.text);
+		}
+
+		__proto.setTarget=function(target){
+			commonui.view.prop.PropsInputBase.prototype.setTarget.call(this,target);
+			this.input.text=this.getDisplayValue()||"";
+		}
+
+		__proto.initByConfig=function(configO){
+			commonui.view.prop.PropsInputBase.prototype.initByConfig.call(this,configO);
+		}
+
+		return PropsTextInput;
+	})(PropTextInputUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonui.view.prop.PropsColorArrayInput extends commonui.view.prop.PropsColorInput
+	var PropsColorArrayInput=(function(_super){
+		function PropsColorArrayInput(){
+			this._colorArr=null;
+			PropsColorArrayInput.__super.call(this);
+		}
+
+		__class(PropsColorArrayInput,'commonui.view.prop.PropsColorArrayInput',_super);
+		var __proto=PropsColorArrayInput.prototype;
+		__proto.getAlpha=function(){
+			return this._colorArr[3];
+		}
+
+		__proto.setTarget=function(target){
+			_super.prototype.setTarget.call(this,target);
+			this.initColor(this.getDisplayValue()||[1,1,1,1]);
+		}
+
+		__proto.updateColor=function(color){
+			if (!this.isSettingValue && this._color !=color){
+				this.setValueToTarget(PropsColorArrayInput.colorStrToColorArray(color,this.getAlpha()));
+			}
+			this._color=color;
+			this.freshColorRec();
+		}
+
+		__proto.initColor=function(colorArr){
+			this._colorArr=colorArr;
+			var colorStr;
+			colorStr=PropsColorArrayInput.getColorStrByColorArr(colorArr);
+			this.updateColor(colorStr);
+		}
+
+		PropsColorArrayInput.getColorStrByColorArr=function(colorArr,rate){
+			(rate===void 0)&& (rate=255);
+			return "#"+ColorTool.getColorBit(colorArr[0]*rate)+ColorTool.getColorBit(colorArr[1]*rate)+ColorTool.getColorBit(colorArr[2]*rate);
+		}
+
+		PropsColorArrayInput.colorStrToColorArray=function(tColorStr,alpha){
+			(alpha===void 0)&& (alpha=1);
+			var rgbs;
+			rgbs=ColorTool.getRGBByRGBStr(tColorStr);
+			var i=0,len=0;
+			len=rgbs.length;
+			var _colorArr;
+			_colorArr=[];
+			_colorArr.length=4;
+			for(i=0;i<len;i++){
+				_colorArr[i]=rgbs[i]/255;
+			}
+			_colorArr[3]=alpha;
+			return _colorArr;
+		}
+
+		return PropsColorArrayInput;
+	})(PropsColorInput)
+
+
+	Laya.__init([EventDispatcher,LoaderManager,Browser,View,Render,Timer,GraphicAnimation,LocalStorage,PropPluginManager,UIConfigManager]);
 	new TestRemoteView();
 
 })(window,document,Laya);
 
 
 /*
-1 file:///E:/onewaymyway/codes/playground/playground/libs/filetoolkit/client/src/filetoolkit/FileKit.as (102):warning:content This variable is not defined.
-2 file:///E:/onewaymyway/codes/playground/playground/libs/filetoolkit/client/src/filetoolkit/FileKit.as (104):warning:content This variable is not defined.
-3 file:///E:/onewaymyway/codes/playground/playground/libs/filetoolkit/client/src/filetoolkit/FileKit.as (104):warning:content This variable is not defined.
+1 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as (225):warning:XMLElement This variable is not defined.
+2 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
+3 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+4 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+5 file:///D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/ColorPickerWithIndex.as (176):warning:Server.url_file This variable is not defined.
+6 file:///D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/ColorPickerWithIndex.as (177):warning:Server.url_file This variable is not defined.
+7 file:///D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/colorselectorpanel/SelectorColorPicker.as (108):warning:ColorTableTool.createColorTable This variable is not defined.
 */

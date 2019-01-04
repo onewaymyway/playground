@@ -1,5 +1,6 @@
 package commonlayout.mindmaptree 
 {
+	import commontools.EventTools;
 	import laya.debug.tools.ClassTool;
 	import laya.events.Event;
 	import laya.ui.TextInput;
@@ -27,7 +28,8 @@ package commonlayout.mindmaptree
 			if (parentNode)
 			{
 				MindMapViewer.removeChildNode(parentNode, this);
-				Notice.notify("DataChanged");
+				//Notice.notify("DataChanged");
+				EventTools.sendEventOnTree(this, "DataChanged");
 			}
 		}
 		protected function setUpTextInput(input:TextInput, key:String):void
@@ -39,7 +41,8 @@ package commonlayout.mindmaptree
 		{
 			if (_dataO.props[key] == input.text) return;
 			_dataO.props[key] = input.text;
-			Notice.notify("DataChanged");
+			//Notice.notify("DataChanged");
+			EventTools.sendEventOnTree(this, "DataChanged");
 		}
 		public function setLayoutPos(x:Number, y:Number):void
 		{
