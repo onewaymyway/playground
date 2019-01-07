@@ -36644,6 +36644,36 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class commoncomponent.CommonInput extends laya.ui.TextInput
+	var CommonInput=(function(_super){
+		function CommonInput(text){
+			(text===void 0)&& (text="");
+			CommonInput.__super.call(this,text);
+			this.editable=false;
+			this.textField.mouseEnabled=false;
+			this.on("blur",this,this.onBlur);
+			this.on("doubleclick",this,this.onDoubleClick);
+		}
+
+		__class(CommonInput,'commoncomponent.CommonInput',_super);
+		var __proto=CommonInput.prototype;
+		__proto.onDoubleClick=function(){
+			this.editable=true;
+			this.focus=true;
+		}
+
+		__proto.onBlur=function(){
+			this.editable=false;
+		}
+
+		return CommonInput;
+	})(TextInput)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class laya.debug.uicomps.RankListItem extends laya.debug.ui.debugui.comps.RankListItemUI
 	var RankListItem=(function(_super){
 		function RankListItem(){
@@ -36729,6 +36759,25 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
+	var FindNodeSmall=(function(_super){
+		function FindNodeSmall(){
+			FindNodeSmall.__super.call(this);
+			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
+			this.createView(FindNodeSmallUI.uiView);
+		}
+
+		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
+		var __proto=FindNodeSmall.prototype;
+		__proto.createChildren=function(){}
+		return FindNodeSmall;
+	})(FindNodeSmallUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class laya.debug.view.nodeInfo.nodetree.FindNode extends laya.debug.ui.debugui.FindNodeUI
 	var FindNode=(function(_super){
 		function FindNode(){
@@ -36745,25 +36794,6 @@ var Laya=window.Laya=(function(window,document){
 
 		return FindNode;
 	})(FindNodeUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
-	var FindNodeSmall=(function(_super){
-		function FindNodeSmall(){
-			FindNodeSmall.__super.call(this);
-			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
-			this.createView(FindNodeSmallUI.uiView);
-		}
-
-		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
-		var __proto=FindNodeSmall.prototype;
-		__proto.createChildren=function(){}
-		return FindNodeSmall;
-	})(FindNodeSmallUI)
 
 
 	/**

@@ -15,6 +15,7 @@ package answerflow
 		public static const AnswerFlow:String = "ansflow";
 		public static const QGame:String = "qgame";
 		public var dataO:Object;
+		private var itemActionHandler:Handler;
 		public function AnswerFlowEditor() 
 		{
 			actionList.renderHandler = new Handler(this, itemRender);
@@ -25,6 +26,7 @@ package answerflow
 			addItemBtn.on(Event.CLICK, this, onAddItemBtn);
 			
 			itemList.renderHandler = new Handler(this, itemListItemRender);
+			itemActionHandler = new Handler(this.onItemAction);
 		}
 		
 		
@@ -34,7 +36,7 @@ package answerflow
 			{
 				dataO.items = [];
 			}
-			dataO.items.push("new item");
+			dataO.items.push( { "type":"Item", props: { "label":"new item" }} );
 			freshUI();
 		}
 		private function onSaveBtn():void
@@ -54,15 +56,24 @@ package answerflow
 			}
 		}
 		
-		private function itemListItemRender(cell:*, index:int):void
+		private function itemListItemRender(cell:ItemListItem, index:int):void
 		{
-			var label:Label;
-			label = cell.getChildByName("label");
-			var dataO:Object;
-			dataO = cell.dataSource;
-			label.text = dataO;
+			//var label:Label;
+			//label = cell.getChildByName("label");
+			//var dataO:Object;
+			//dataO = cell.dataSource;
+			//label.text = dataO;
+			cell.actionHandler = itemActionHandler;
+			cell.initByData(cell.dataSource);
 		}
 		
+		private function onItemAction(type:String, item:ItemListItem):void
+		{
+			switch(type)
+			{
+				
+			}
+		}
 		private function onDoubleClick():void
 		{
 			if (actionList.selectedItem)
