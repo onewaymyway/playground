@@ -255,6 +255,7 @@ package answerflow
 				itemList.visible = true;
 				itemList.array = dataO.items;
 			}
+			actionTipTxt.text = "操作(" + dataO.actions.length+")";
 			if(actionEditor.visible)
 			actionEditor.freshLayout();
 		}

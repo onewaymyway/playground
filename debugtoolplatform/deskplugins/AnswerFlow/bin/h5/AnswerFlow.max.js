@@ -201,6 +201,7 @@
 	//class ui.answerflow.AnswerFlowEditorUI extends laya.ui.View
 	var AnswerFlowEditorUI=(function(_super){
 		function AnswerFlowEditorUI(){
+			this.actionTipTxt=null;
 			this.actionList=null;
 			this.actionEditor=null;
 			this.saveBtn=null;
@@ -218,7 +219,7 @@
 			this.createView(AnswerFlowEditorUI.uiView);
 		}
 
-		AnswerFlowEditorUI.uiView={"type":"View","props":{"width":600,"height":600},"child":[{"type":"Label","props":{"y":6,"x":20,"width":53,"text":"操作","styleSkin":"comp/label.png","height":15,"color":"#ef3431"}},{"type":"List","props":{"x":19,"width":96,"var":"actionList","vScrollBarSkin":"comp/vscroll.png","top":30,"repeatX":1,"height":565,"bottom":5},"child":[{"type":"Box","props":{"name":"render"},"child":[{"type":"Label","props":{"width":53,"text":"label","styleSkin":"comp/label.png","name":"label","height":15,"color":"#ef3431"}}]}]},{"type":"Action","props":{"var":"actionEditor","top":30,"runtime":"answerflow.Action","right":20,"left":131,"bottom":20}},{"type":"Button","props":{"var":"saveBtn","top":5,"skin":"comp/button.png","right":5,"label":"save"}},{"type":"List","props":{"var":"itemList","vScrollBarSkin":"comp/vscroll.png","top":5,"spaceY":5,"spaceX":5,"right":200,"left":132,"height":39},"child":[{"type":"ItemListItem","props":{"runtime":"answerflow.ItemListItem","name":"render"}}]},{"type":"Button","props":{"width":28,"var":"addItemBtn","top":11,"skin":"comp/button.png","right":151,"label":"+","height":24}}]};
+		AnswerFlowEditorUI.uiView={"type":"View","props":{"width":600,"height":600},"child":[{"type":"Label","props":{"y":6,"x":20,"width":53,"var":"actionTipTxt","text":"操作","styleSkin":"comp/label.png","height":15,"color":"#ef3431"}},{"type":"List","props":{"x":19,"width":96,"var":"actionList","vScrollBarSkin":"comp/vscroll.png","top":30,"repeatX":1,"height":565,"bottom":5},"child":[{"type":"Box","props":{"name":"render"},"child":[{"type":"Label","props":{"width":53,"text":"label","styleSkin":"comp/label.png","name":"label","height":15,"color":"#ef3431"}}]}]},{"type":"Action","props":{"var":"actionEditor","top":30,"runtime":"answerflow.Action","right":20,"left":131,"bottom":20}},{"type":"Button","props":{"var":"saveBtn","top":5,"skin":"comp/button.png","right":5,"label":"save"}},{"type":"List","props":{"var":"itemList","vScrollBarSkin":"comp/vscroll.png","top":5,"spaceY":5,"spaceX":5,"right":200,"left":132,"height":39},"child":[{"type":"ItemListItem","props":{"runtime":"answerflow.ItemListItem","name":"render"}}]},{"type":"Button","props":{"width":28,"var":"addItemBtn","top":11,"skin":"comp/button.png","right":151,"label":"+","height":24}}]};
 		return AnswerFlowEditorUI;
 	})(View)
 
@@ -467,6 +468,7 @@
 				this.itemList.visible=true;
 				this.itemList.array=this.dataO.items;
 			}
+			this.actionTipTxt.text="操作("+this.dataO.actions.length+")";
 			if(this.actionEditor.visible)
 				this.actionEditor.freshLayout();
 		}
