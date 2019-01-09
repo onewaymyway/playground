@@ -24,6 +24,7 @@ package answerflow
 			this.on(AnswerFlowEvents.DataChanged, this, freshUI);
 			saveBtn.on(Event.CLICK, this, onSaveBtn);
 			addItemBtn.on(Event.CLICK, this, onAddItemBtn);
+			addActionBtn.on(Event.CLICK, this, addNewAction);
 			
 			itemList.renderHandler = new Handler(this, itemListItemRender);
 			itemActionHandler = new Handler(this.onItemAction);

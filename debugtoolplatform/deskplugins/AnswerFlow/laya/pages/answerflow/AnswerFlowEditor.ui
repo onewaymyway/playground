@@ -2,7 +2,7 @@
     "x":0,
     "type":"View",
     "selectedBox":1,
-    "selecteID":6,
+    "selecteID":22,
     "props":{"width":600,"sceneColor":"#000000","height":600},
     "nodeParent":-1,
     "label":"View",
@@ -128,6 +128,19 @@
             "isAniNode":true,
             "hasChild":false,
             "compId":20,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Button",
+            "props":{"x":77,"width":28,"var":"addActionBtn","top":1,"skin":"comp/button.png","label":"+","height":24},
+            "nodeParent":1,
+            "label":"Button(addActionBtn)",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":22,
             "child":[
                 ]
         }],
