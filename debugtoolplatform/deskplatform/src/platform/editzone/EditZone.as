@@ -60,9 +60,12 @@ package platform.editzone {
 		private function mouseWheel(e:Event):void
 		{
 			
-			EditZone.instance.setScale(2*e.delta/100);
+			//EditZone.instance.setScale(2 * e.delta / 100);
+			
 		
 		}
+		
+		
 		public function initListener():void
 		{
 			Notice.listen(PlatformEvents.CLOSE_PAGE, this, closePage);

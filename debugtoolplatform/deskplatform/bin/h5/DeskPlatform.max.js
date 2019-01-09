@@ -1883,7 +1883,13 @@
 					var renderPath;
 					renderPath=FileManager.getPath(folder,configO.url);
 					if(FileManager.exists(renderPath)){
-						EditRenderManager.regRender(configO.extension,renderPath);
+						var extensions;
+						extensions=configO.extension.split(",");
+						var i=0,len=0;
+						len=extensions.length;
+						for (i=0;i < len;i++){
+							EditRenderManager.regRender(extensions[i],renderPath);
+						}
 					}
 				}
 				if (configO.createMenus){
@@ -5000,10 +5006,8 @@
 
 		__class(EditZone,'platform.editzone.EditZone',_super);
 		var __proto=EditZone.prototype;
-		__proto.mouseWheel=function(e){
-			platform.editzone.EditZone.instance.setScale(2*e.delta/100);
-		}
-
+		__proto.mouseWheel=function(e){}
+		//EditZone.instance.setScale(2 *e.delta / 100);
 		__proto.initListener=function(){
 			Notice.listen("closePage",this,this.closePage);
 			Notice.listen("openPAGE",this,this.openPage);
