@@ -124,6 +124,12 @@ package commonlayout.mindmaptree
 		{
 			clearPreItems();
 			_root = createNodeByData(_dataO);
+			freshLayout();
+		}
+		
+		public function freshLayout():void
+		{
+			if (!_root) return;
 			_layouter.layoutAsCenter(_root, true);
 			_layouter.drawConnections(_root, nodeContainer);
 		}
