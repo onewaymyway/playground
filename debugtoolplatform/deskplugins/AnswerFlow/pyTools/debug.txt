@@ -16,8 +16,8 @@ Project configuration:D:\codes\playground.git\trunk\debugtoolplatform\deskplugin
 7,88.14,D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/colorselectorpanel/ColorSelectorControl.as,17,ColorPickerWithIndex This variable is not defined.
 7,88.20,D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/colorselectorpanel/SelectorColorPicker.as,108,ColorTableTool.createColorTable This variable is not defined.
 1,89.95,,0,Disable Flash3D D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/AnswerFlow/src/TestDemo.as
-12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/AnswerFlow.max.js,24918,
-12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/laya.js,1239078,
+12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/AnswerFlow.max.js,25100,
+12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/laya.js,1239172,
 11,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/AnswerFlow.max.html,827,
 ******************************************************************************
 14,89.95,,0,

@@ -4,10 +4,10 @@
 
 	var AutoSizeTextInput=commoncomponent.AutoSizeTextInput,Button=laya.ui.Button,CommonInput=commoncomponent.CommonInput;
 	var ContextMenu=laya.debug.uicomps.ContextMenu,ContextMenuItem=laya.debug.uicomps.ContextMenuItem,EditorRenderBase=viewRender.EditorRenderBase;
-	var Event=laya.events.Event,Handler=laya.utils.Handler,Label=laya.ui.Label,List=laya.ui.List,Loader=laya.net.Loader;
-	var MindMapTreeBase=commonlayout.mindmaptree.MindMapTreeBase,MindMapViewer=commonlayout.mindmaptree.MindMapViewer;
-	var Notice$1=platform.tools.Notice,ObjectTools=laya.debug.tools.ObjectTools,Stage=laya.display.Stage,Text=laya.display.Text;
-	var TextInput=laya.ui.TextInput,View=laya.ui.View;
+	var Event=laya.events.Event,EventTools=commontools.EventTools,Handler=laya.utils.Handler,Label=laya.ui.Label;
+	var List=laya.ui.List,Loader=laya.net.Loader,MindMapTreeBase=commonlayout.mindmaptree.MindMapTreeBase,MindMapViewer=commonlayout.mindmaptree.MindMapViewer;
+	var ObjectTools=laya.debug.tools.ObjectTools,Stage=laya.display.Stage,Text=laya.display.Text,TextInput=laya.ui.TextInput;
+	var View=laya.ui.View;
 	/**
 	*...
 	*@author ww
@@ -218,7 +218,7 @@
 			this.createView(AnswerFlowEditorUI.uiView);
 		}
 
-		AnswerFlowEditorUI.uiView={"type":"View","props":{"width":600,"height":600},"child":[{"type":"Label","props":{"y":6,"x":20,"width":53,"text":"操作","styleSkin":"comp/label.png","height":15,"color":"#ef3431"}},{"type":"List","props":{"x":19,"width":67,"var":"actionList","vScrollBarSkin":"comp/vscroll.png","top":30,"bottom":5},"child":[{"type":"Box","props":{"name":"render"},"child":[{"type":"Label","props":{"width":53,"text":"label","styleSkin":"comp/label.png","name":"label","height":15,"color":"#ef3431"}}]}]},{"type":"Action","props":{"var":"actionEditor","top":30,"runtime":"answerflow.Action","right":20,"left":80,"bottom":20}},{"type":"Button","props":{"var":"saveBtn","top":5,"skin":"comp/button.png","right":5,"label":"save"}},{"type":"List","props":{"var":"itemList","vScrollBarSkin":"comp/vscroll.png","top":5,"spaceY":5,"spaceX":5,"right":200,"left":110,"height":39},"child":[{"type":"ItemListItem","props":{"runtime":"answerflow.ItemListItem","name":"render"}}]},{"type":"Button","props":{"width":28,"var":"addItemBtn","top":11,"skin":"comp/button.png","right":151,"label":"+","height":24}}]};
+		AnswerFlowEditorUI.uiView={"type":"View","props":{"width":600,"height":600},"child":[{"type":"Label","props":{"y":6,"x":20,"width":53,"text":"操作","styleSkin":"comp/label.png","height":15,"color":"#ef3431"}},{"type":"List","props":{"x":19,"width":96,"var":"actionList","vScrollBarSkin":"comp/vscroll.png","top":30,"repeatX":1,"height":565,"bottom":5},"child":[{"type":"Box","props":{"name":"render"},"child":[{"type":"Label","props":{"width":53,"text":"label","styleSkin":"comp/label.png","name":"label","height":15,"color":"#ef3431"}}]}]},{"type":"Action","props":{"var":"actionEditor","top":30,"runtime":"answerflow.Action","right":20,"left":131,"bottom":20}},{"type":"Button","props":{"var":"saveBtn","top":5,"skin":"comp/button.png","right":5,"label":"save"}},{"type":"List","props":{"var":"itemList","vScrollBarSkin":"comp/vscroll.png","top":5,"spaceY":5,"spaceX":5,"right":200,"left":132,"height":39},"child":[{"type":"ItemListItem","props":{"runtime":"answerflow.ItemListItem","name":"render"}}]},{"type":"Button","props":{"width":28,"var":"addItemBtn","top":11,"skin":"comp/button.png","right":151,"label":"+","height":24}}]};
 		return AnswerFlowEditorUI;
 	})(View)
 
@@ -359,7 +359,7 @@
 			this.actionList.renderHandler=new Handler(this,this.itemRender);
 			this.actionList.selectEnable=true;
 			this.actionList.on("doubleclick",this,this.onDoubleClick);
-			Notice$1.listen("DataChanged",this,this.freshUI);
+			this.on("DataChanged",this,this.freshUI);
 			this.saveBtn.on("click",this,this.onSaveBtn);
 			this.addItemBtn.on("click",this,this.onAddItemBtn);
 			this.itemList.renderHandler=new Handler(this,this.itemListItemRender);
@@ -688,7 +688,7 @@
 		__proto.onAddBtn=function(){
 			if (!this._dataO.props.tpl)return;
 			this._dataO.childs.push(ObjectTools.copyObjFast(this._dataO.props.tpl));
-			Notice$1.notify("DataChanged");
+			EventTools.sendEventOnTree(this,"DataChanged");
 		}
 
 		return AddAbleNode;

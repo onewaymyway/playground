@@ -1,5 +1,6 @@
 package answerflow 
 {
+	import commontools.EventTools;
 	import laya.debug.tools.ObjectTools;
 	import laya.events.Event;
 	import platform.tools.Notice;
@@ -32,7 +33,8 @@ package answerflow
 			if (!_dataO.props.tpl) return;
 			
 			_dataO.childs.push(ObjectTools.copyObjFast(_dataO.props.tpl));
-			Notice.notify(AnswerFlowEvents.DataChanged);
+			//Notice.notify(AnswerFlowEvents.DataChanged);
+			EventTools.sendEventOnTree(this, "DataChanged");
 		}
 	}
 

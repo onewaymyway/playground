@@ -32352,6 +32352,7 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.freshLayout=function(){
+			if (!this._root)return;
 			this._layouter.layoutAsCenter(this._root,true);
 			this._layouter.drawConnections(this._root,this.nodeContainer);
 		}
@@ -37345,5 +37346,5 @@ var Laya=window.Laya=(function(window,document){
 	})(ToolBarUI)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,Render,Timer,Browser,View,GraphicAnimation,LocalStorage]);
+	Laya.__init([EventDispatcher,LoaderManager,Render,Timer,Browser,View,GraphicAnimation,LocalStorage]);
 })(window,document,Laya);

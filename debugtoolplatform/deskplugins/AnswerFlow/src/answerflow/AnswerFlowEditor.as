@@ -21,7 +21,7 @@ package answerflow
 			actionList.renderHandler = new Handler(this, itemRender);
 			actionList.selectEnable = true;
 			actionList.on(Event.DOUBLE_CLICK, this, onDoubleClick);
-			Notice.listen(AnswerFlowEvents.DataChanged, this, freshUI);
+			this.on(AnswerFlowEvents.DataChanged, this, freshUI);
 			saveBtn.on(Event.CLICK, this, onSaveBtn);
 			addItemBtn.on(Event.CLICK, this, onAddItemBtn);
 			
