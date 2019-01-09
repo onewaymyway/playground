@@ -23,6 +23,8 @@ package answerflow
 			super.renderByData();
 			txt.text = _dataO.props.label;
 			txt.editable = _dataO.props.editable == true;
+			addBtn.x = txt.x + txt.width + 10;
+			this.width = addBtn.x + addBtn.width + 5;
 		}
 		
 		private function onAddBtn():void

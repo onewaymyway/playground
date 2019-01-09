@@ -20,6 +20,7 @@ package answerflow
 			super.renderByData();
 			desTxt.text = _dataO.props.des;
 			actionTxt.text = _dataO.props.label;
+			this.width = Math.max(desTxt.width, actionTxt.width);
 		}
 	}
 

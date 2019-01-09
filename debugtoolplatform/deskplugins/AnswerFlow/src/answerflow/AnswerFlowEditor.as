@@ -255,6 +255,8 @@ package answerflow
 				itemList.visible = true;
 				itemList.array = dataO.items;
 			}
+			if(actionEditor.visible)
+			actionEditor.freshLayout();
 		}
 	}
 

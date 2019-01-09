@@ -15,7 +15,7 @@
         {
             "x":15,
             "type":"TextInput",
-            "props":{"y":1,"x":1,"width":71,"var":"txt","text":"触发方式","skin":"comp/input_22.png","height":21,"color":"#e72320"},
+            "props":{"y":1,"x":1,"width":71,"var":"txt","text":"触发方式","skin":"comp/input_22.png","runtime":"commoncomponent.AutoSizeTextInput","height":21,"color":"#e72320"},
             "nodeParent":1,
             "label":"TextInput(txt)",
             "isDirectory":false,

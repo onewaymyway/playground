@@ -2,7 +2,7 @@
     "x":0,
     "type":"MindMapTreeBase",
     "selectedBox":1,
-    "selecteID":3,
+    "selecteID":2,
     "props":{"width":63,"sceneColor":"#000000","height":55},
     "nodeParent":-1,
     "label":"MindMapTreeBase",
@@ -15,7 +15,7 @@
         {
             "x":15,
             "type":"TextInput",
-            "props":{"x":0,"width":63,"var":"actionTxt","text":"操作","styleSkin":"comp/label.png","skin":"comp/input_22.png","height":21,"color":"#e72320"},
+            "props":{"x":0,"width":63,"var":"actionTxt","text":"操作","styleSkin":"comp/label.png","skin":"comp/input_22.png","runtime":"commoncomponent.AutoSizeTextInput","height":21,"color":"#e72320"},
             "nodeParent":1,
             "label":"TextInput(actionTxt)",
             "isDirectory":false,

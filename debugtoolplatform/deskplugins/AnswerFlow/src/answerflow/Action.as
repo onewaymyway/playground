@@ -44,6 +44,10 @@ package answerflow
 		{
 			viewer.setData(_dataO);
 		}
+		public function freshLayout():void
+		{
+			viewer.freshLayout();
+		}
 		public function setData(dataO:Object):void
 		{
 			_dataO = dataO;

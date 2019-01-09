@@ -32348,6 +32348,10 @@ var Laya=window.Laya=(function(window,document){
 		__proto.createMindMapItems=function(){
 			this.clearPreItems();
 			this._root=this.createNodeByData(this._dataO);
+			this.freshLayout();
+		}
+
+		__proto.freshLayout=function(){
 			this._layouter.layoutAsCenter(this._root,true);
 			this._layouter.drawConnections(this._root,this.nodeContainer);
 		}
@@ -36644,6 +36648,30 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class commoncomponent.AutoSizeTextInput extends laya.ui.TextInput
+	var AutoSizeTextInput=(function(_super){
+		function AutoSizeTextInput(text){
+			(text===void 0)&& (text="");
+			AutoSizeTextInput.__super.call(this,text);
+		}
+
+		__class(AutoSizeTextInput,'commoncomponent.AutoSizeTextInput',_super);
+		var __proto=AutoSizeTextInput.prototype;
+		__getset(0,__proto,'text',_super.prototype._$get_text,function(value){
+			this.width=9999;
+			_super.prototype._$set_text.call(this,value);
+			this.textField.typeset();
+			this.width=this.textField.textWidth+5;
+		});
+
+		return AutoSizeTextInput;
+	})(TextInput)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class commoncomponent.CommonInput extends laya.ui.TextInput
 	var CommonInput=(function(_super){
 		function CommonInput(text){
@@ -36904,6 +36932,26 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class laya.debug.view.nodeInfo.nodetree.NodeTreeSetting extends laya.debug.ui.debugui.NodeTreeSettingUI
+	var NodeTreeSetting=(function(_super){
+		function NodeTreeSetting(){
+			NodeTreeSetting.__super.call(this);
+			Base64AtlasManager.replaceRes(NodeTreeSettingUI.uiView);
+			this.createView(NodeTreeSettingUI.uiView);
+		}
+
+		__class(NodeTreeSetting,'laya.debug.view.nodeInfo.nodetree.NodeTreeSetting',_super);
+		var __proto=NodeTreeSetting.prototype;
+		//inits();
+		__proto.createChildren=function(){}
+		return NodeTreeSetting;
+	})(NodeTreeSettingUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class laya.debug.view.nodeInfo.nodetree.NodeTree extends laya.debug.ui.debugui.NodeTreeUI
 	var NodeTree=(function(_super){
 		function NodeTree(){
@@ -37141,26 +37189,6 @@ var Laya=window.Laya=(function(window,document){
 		]);
 		return NodeTree;
 	})(NodeTreeUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class laya.debug.view.nodeInfo.nodetree.NodeTreeSetting extends laya.debug.ui.debugui.NodeTreeSettingUI
-	var NodeTreeSetting=(function(_super){
-		function NodeTreeSetting(){
-			NodeTreeSetting.__super.call(this);
-			Base64AtlasManager.replaceRes(NodeTreeSettingUI.uiView);
-			this.createView(NodeTreeSettingUI.uiView);
-		}
-
-		__class(NodeTreeSetting,'laya.debug.view.nodeInfo.nodetree.NodeTreeSetting',_super);
-		var __proto=NodeTreeSetting.prototype;
-		//inits();
-		__proto.createChildren=function(){}
-		return NodeTreeSetting;
-	})(NodeTreeSettingUI)
 
 
 	/**
