@@ -16062,6 +16062,25 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*...
+	*@author ww
+	*/
+	//class commontools.EventTools
+	var EventTools=(function(){
+		function EventTools(){}
+		__class(EventTools,'commontools.EventTools');
+		EventTools.sendEventOnTree=function(tar,event){
+			while (tar){
+				tar.event(event);
+				tar=tar.parent;
+			}
+		}
+
+		return EventTools;
+	})()
+
+
+	/**
 	*<code>Node</code> 类是可放在显示列表中的所有对象的基类。该显示列表管理 Laya 运行时中显示的所有对象。使用 Node 类排列显示列表中的显示对象。Node 对象可以有子显示对象。
 	*/
 	//class laya.display.Node extends laya.events.EventDispatcher
@@ -32329,11 +32348,17 @@ var Laya=window.Laya=(function(window,document){
 		__proto.createMindMapItems=function(){
 			this.clearPreItems();
 			this._root=this.createNodeByData(this._dataO);
+			this.freshLayout();
+		}
+
+		__proto.freshLayout=function(){
+			if (!this._root)return;
 			this._layouter.layoutAsCenter(this._root,true);
 			this._layouter.drawConnections(this._root,this.nodeContainer);
 		}
 
 		__proto.createNodeByData=function(dataO){
+			if (!dataO)debugger;
 			var tItem;
 			tItem=this.createByType(dataO.type);
 			tItem.setData(dataO);
@@ -35502,7 +35527,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.removeFromParent=function(){
 			if (this.parentNode){
 				MindMapViewer.removeChildNode(this.parentNode,this);
-				Notice$1.notify("DataChanged");
+				EventTools.sendEventOnTree(this,"DataChanged");
 			}
 		}
 
@@ -35513,7 +35538,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.onTextInputChange=function(input,key){
 			if (this._dataO.props[key]==input.text)return;
 			this._dataO.props[key]=input.text;
-			Notice$1.notify("DataChanged");
+			EventTools.sendEventOnTree(this,"DataChanged");
 		}
 
 		__proto.setLayoutPos=function(x,y){
@@ -36624,6 +36649,60 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class commoncomponent.AutoSizeTextInput extends laya.ui.TextInput
+	var AutoSizeTextInput=(function(_super){
+		function AutoSizeTextInput(text){
+			(text===void 0)&& (text="");
+			AutoSizeTextInput.__super.call(this,text);
+		}
+
+		__class(AutoSizeTextInput,'commoncomponent.AutoSizeTextInput',_super);
+		var __proto=AutoSizeTextInput.prototype;
+		__getset(0,__proto,'text',_super.prototype._$get_text,function(value){
+			this.width=9999;
+			_super.prototype._$set_text.call(this,value);
+			this.textField.typeset();
+			this.width=this.textField.textWidth+5;
+		});
+
+		return AutoSizeTextInput;
+	})(TextInput)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commoncomponent.CommonInput extends laya.ui.TextInput
+	var CommonInput=(function(_super){
+		function CommonInput(text){
+			(text===void 0)&& (text="");
+			CommonInput.__super.call(this,text);
+			this.editable=false;
+			this.textField.mouseEnabled=false;
+			this.on("blur",this,this.onBlur);
+			this.on("doubleclick",this,this.onDoubleClick);
+		}
+
+		__class(CommonInput,'commoncomponent.CommonInput',_super);
+		var __proto=CommonInput.prototype;
+		__proto.onDoubleClick=function(){
+			this.editable=true;
+			this.focus=true;
+		}
+
+		__proto.onBlur=function(){
+			this.editable=false;
+		}
+
+		return CommonInput;
+	})(TextInput)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class laya.debug.uicomps.RankListItem extends laya.debug.ui.debugui.comps.RankListItemUI
 	var RankListItem=(function(_super){
 		function RankListItem(){
@@ -36848,6 +36927,26 @@ var Laya=window.Laya=(function(window,document){
 		__proto.createChildren=function(){}
 		return NodeTool;
 	})(NodeToolUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.view.nodeInfo.nodetree.NodeTreeSetting extends laya.debug.ui.debugui.NodeTreeSettingUI
+	var NodeTreeSetting=(function(_super){
+		function NodeTreeSetting(){
+			NodeTreeSetting.__super.call(this);
+			Base64AtlasManager.replaceRes(NodeTreeSettingUI.uiView);
+			this.createView(NodeTreeSettingUI.uiView);
+		}
+
+		__class(NodeTreeSetting,'laya.debug.view.nodeInfo.nodetree.NodeTreeSetting',_super);
+		var __proto=NodeTreeSetting.prototype;
+		//inits();
+		__proto.createChildren=function(){}
+		return NodeTreeSetting;
+	})(NodeTreeSettingUI)
 
 
 	/**
@@ -37097,26 +37196,6 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class laya.debug.view.nodeInfo.nodetree.NodeTreeSetting extends laya.debug.ui.debugui.NodeTreeSettingUI
-	var NodeTreeSetting=(function(_super){
-		function NodeTreeSetting(){
-			NodeTreeSetting.__super.call(this);
-			Base64AtlasManager.replaceRes(NodeTreeSettingUI.uiView);
-			this.createView(NodeTreeSettingUI.uiView);
-		}
-
-		__class(NodeTreeSetting,'laya.debug.view.nodeInfo.nodetree.NodeTreeSetting',_super);
-		var __proto=NodeTreeSetting.prototype;
-		//inits();
-		__proto.createChildren=function(){}
-		return NodeTreeSetting;
-	})(NodeTreeSettingUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
 	//class laya.debug.view.nodeInfo.nodetree.ObjectCreate extends laya.debug.ui.debugui.ObjectCreateUI
 	var ObjectCreate=(function(_super){
 		function ObjectCreate(){
@@ -37267,5 +37346,5 @@ var Laya=window.Laya=(function(window,document){
 	})(ToolBarUI)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,Render,Timer,Browser,View,GraphicAnimation,LocalStorage]);
+	Laya.__init([EventDispatcher,LoaderManager,Render,Timer,Browser,View,GraphicAnimation,LocalStorage]);
 })(window,document,Laya);

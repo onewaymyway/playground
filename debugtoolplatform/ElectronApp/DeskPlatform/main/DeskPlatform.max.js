@@ -5006,10 +5006,8 @@
 
 		__class(EditZone,'platform.editzone.EditZone',_super);
 		var __proto=EditZone.prototype;
-		__proto.mouseWheel=function(e){
-			platform.editzone.EditZone.instance.setScale(2*e.delta/100);
-		}
-
+		__proto.mouseWheel=function(e){}
+		//EditZone.instance.setScale(2 *e.delta / 100);
 		__proto.initListener=function(){
 			Notice.listen("closePage",this,this.closePage);
 			Notice.listen("openPAGE",this,this.openPage);
