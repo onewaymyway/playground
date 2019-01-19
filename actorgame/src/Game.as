@@ -1,9 +1,11 @@
 package  
 {
 	import carotutils.CarotDataManager;
+	import laya.display.Stage;
 	import laya.net.Loader;
 	import laya.utils.Handler;
 	import simulator.DrowningMachine;
+	import view.actorgame.GameMain;
 	import view.PlayMainView;
 	import view.tarot.TarotMain;
 	/**
@@ -15,7 +17,10 @@ package
 		
 		public function Game() 
 		{
-			Laya.init(1000, 900);
+			Laya.init(720, 1280);
+			Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
+			Laya.stage.alignH = Stage.ALIGN_CENTER;
+			Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 			var loadList:Array;
 			loadList = [];
 			loadList.push( { url:"res/atlas/comp.json", type:Loader.ATLAS } );
@@ -30,12 +35,12 @@ package
 		private function initGameView():void
 		{
 			//CarotDataManager.initByCardDatas(Loader.getRes("data/cardconfig.json"));
-			//var mainView:TarotMain;
-			//mainView = new TarotMain();
-			//mainView.pos(50, 50);
-			//mainView.top = 0;
-			//mainView.bottom = 0;
-			//Laya.stage.addChild(mainView);
+			var mainView:GameMain;
+			mainView = new GameMain();
+			mainView.pos(50, 50);
+			mainView.top = 0;
+			mainView.bottom = 0;
+			Laya.stage.addChild(mainView);
 		}
 		
 	}

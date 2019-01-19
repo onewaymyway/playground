@@ -13,6 +13,11 @@ package view.actorgame
 		{
 			
 		}
+		private var _dataO:Object;
+		public function initByData(dataO:Object):void
+		{
+			_dataO = dataO;
+		}
 		
 	}
 

@@ -401,53 +401,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*...
-	*@author ww
-	*/
-	//class carotutils.CarotDataManager
-	var CarotDataManager=(function(){
-		function CarotDataManager(){}
-		__class(CarotDataManager,'carotutils.CarotDataManager');
-		CarotDataManager.initByCardDatas=function(datas){
-			CarotDataManager.cardList=datas;
-		}
-
-		CarotDataManager.getCardByID=function(id){
-			return CarotDataManager.cardList[id];
-		}
-
-		CarotDataManager.getRandomID=function(){
-			return Math.floor(Math.random()*9999999)% CarotDataManager.cardList.length;
-		}
-
-		CarotDataManager.getRamdomCard=function(cardCount){
-			(cardCount===void 0)&& (cardCount=3);
-			var cardDic;
-			cardDic={};
-			var tID=0;
-			var rst;
-			rst=[];
-			var tDataO;
-			while (cardCount > 0){
-				tID=CarotDataManager.getRandomID();
-				if (!cardDic[tID]){
-					cardCount--;
-					cardDic[tID]=true;
-					tDataO={};
-					tDataO.id=tID;
-					tDataO.isRevert=Math.random()> 0.5;
-					rst.push(tDataO);
-				}
-			}
-			return rst;
-		}
-
-		CarotDataManager.cardList=null
-		return CarotDataManager;
-	})()
-
-
-	/**
 	*<code>EventDispatcher</code> 类是可调度事件的所有类的基类。
 	*/
 	//class laya.events.EventDispatcher
@@ -747,7 +700,10 @@ var Laya=window.Laya=(function(window,document){
 	//class Game
 	var Game=(function(){
 		function Game(){
-			Laya.init(1000,900);
+			Laya.init(720,1280);
+			Laya.stage.scaleMode="showall";
+			Laya.stage.alignH="center";
+			Laya.stage.alignV="middle";
 			var loadList;
 			loadList=[];
 			loadList.push({url:"res/atlas/comp.json",type:"atlas" });
@@ -758,9 +714,8 @@ var Laya=window.Laya=(function(window,document){
 		__class(Game,'Game');
 		var __proto=Game.prototype;
 		__proto.initGameView=function(){
-			CarotDataManager.initByCardDatas(Loader.getRes("data/cardconfig.json"));
 			var mainView;
-			mainView=new TarotMain();
+			mainView=new GameMain();
 			mainView.pos(50,50);
 			mainView.top=0;
 			mainView.bottom=0;
@@ -25349,50 +25304,44 @@ var Laya=window.Laya=(function(window,document){
 	})(FrameAnimation)
 
 
-	//class ui.tarot.TarotCardUI extends laya.ui.View
-	var TarotCardUI=(function(_super){
-		function TarotCardUI(){
-			this.titleTxt=null;
-			this.contentBox=null;
-			this.img=null;
+	//class ui.actorgame.ActorItemUI extends laya.ui.View
+	var ActorItemUI=(function(_super){
+		function ActorItemUI(){
+			this.icon=null;
 			this.nameTxt=null;
-			this.detailBtn=null;
-			TarotCardUI.__super.call(this);
+			ActorItemUI.__super.call(this);
 		}
 
-		__class(TarotCardUI,'ui.tarot.TarotCardUI',_super);
-		var __proto=TarotCardUI.prototype;
+		__class(ActorItemUI,'ui.actorgame.ActorItemUI',_super);
+		var __proto=ActorItemUI.prototype;
 		__proto.createChildren=function(){
 			laya.ui.Component.prototype.createChildren.call(this);
-			this.createView(TarotCardUI.uiView);
+			this.createView(ActorItemUI.uiView);
 		}
 
-		TarotCardUI.uiView={"type":"View","props":{"width":130,"height":300},"child":[{"type":"Label","props":{"y":4,"x":0,"width":128,"var":"titleTxt","text":"过去","styleSkin":"comp/label.png","height":26,"fontSize":20,"color":"#f6e3e2","align":"center"}},{"type":"Box","props":{"y":29,"x":0,"width":130,"var":"contentBox","height":250},"child":[{"type":"Image","props":{"y":91,"x":65,"width":130,"var":"img","skin":"cards/death.jpg","height":180,"anchorY":0.5,"anchorX":0.5}},{"type":"Label","props":{"y":191,"x":1,"width":128,"var":"nameTxt","text":"Death\\n死亡","styleSkin":"comp/label.png","height":26,"fontSize":20,"color":"#f6e3e2","align":"center"}},{"type":"Button","props":{"y":237,"x":3,"width":125,"var":"detailBtn","skin":"comp/button.png","label":"牌解","height":28,"labelColors":"#fffff"}}]}]};
-		return TarotCardUI;
+		ActorItemUI.uiView={"type":"View","props":{"width":177,"height":275},"child":[{"type":"Image","props":{"y":0,"x":0,"width":177,"var":"icon","skin":"comp/image.png","height":177}},{"type":"Label","props":{"y":230,"x":1,"width":167,"var":"nameTxt","text":"名字","styleSkin":"comp/label.png","height":45,"fontSize":30,"color":"#ffffff","align":"center"}}]};
+		return ActorItemUI;
 	})(View)
 
 
-	//class ui.tarot.TarotMainUI extends laya.ui.View
-	var TarotMainUI=(function(_super){
-		function TarotMainUI(){
-			this.past=null;
-			this.now=null;
-			this.feature=null;
-			this.detailTxt=null;
-			this.workBtn=null;
-			TarotMainUI.__super.call(this);
+	//class ui.actorgame.GameMainUI extends laya.ui.View
+	var GameMainUI=(function(_super){
+		function GameMainUI(){
+			this.startBtn=null;
+			this.roleList=null;
+			GameMainUI.__super.call(this);
 		}
 
-		__class(TarotMainUI,'ui.tarot.TarotMainUI',_super);
-		var __proto=TarotMainUI.prototype;
+		__class(GameMainUI,'ui.actorgame.GameMainUI',_super);
+		var __proto=GameMainUI.prototype;
 		__proto.createChildren=function(){
-			View.regComponent("view.tarot.TarotCard",TarotCard);
+			View.regComponent("ui.actorgame.ActorItemUI",ActorItemUI);
 			laya.ui.Component.prototype.createChildren.call(this);
-			this.createView(TarotMainUI.uiView);
+			this.createView(GameMainUI.uiView);
 		}
 
-		TarotMainUI.uiView={"type":"View","props":{"width":800,"height":600},"child":[{"type":"TarotCard","props":{"y":40,"x":71,"var":"past","runtime":"view.tarot.TarotCard"}},{"type":"TarotCard","props":{"y":40,"x":327,"var":"now","runtime":"view.tarot.TarotCard"}},{"type":"TarotCard","props":{"y":40,"x":583,"var":"feature","runtime":"view.tarot.TarotCard"}},{"type":"Label","props":{"y":367,"x":66,"wordWrap":true,"width":649,"var":"detailTxt","text":"label","styleSkin":"comp/label.png","height":168,"fontSize":18,"color":"#f4e6e6"}},{"type":"Button","props":{"y":1,"x":1,"width":96,"var":"workBtn","skin":"comp/button.png","label":"预测","height":41,"labelColors":"#fffff"}}]};
-		return TarotMainUI;
+		GameMainUI.uiView={"type":"View","props":{"width":720,"height":1280},"child":[{"type":"Button","props":{"y":959,"x":234,"width":252,"var":"startBtn","skin":"comp/button.png","labelSize":30,"labelColors":"#ffffff","label":"开始","height":97}},{"type":"List","props":{"y":122,"x":41,"width":630,"var":"roleList","spaceY":20,"spaceX":40,"repeatY":2,"repeatX":3,"height":605},"child":[{"type":"ActorItem","props":{"name":"render","runtime":"ui.actorgame.ActorItemUI"}}]}]};
+		return GameMainUI;
 	})(View)
 
 
@@ -25916,129 +25865,18 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class view.tarot.TarotCard extends ui.tarot.TarotCardUI
-	var TarotCard=(function(_super){
-		function TarotCard(){
-			this.cardData=null;
-			this.tDataO=null;
-			this.detailTxt=null;
-			TarotCard.__super.call(this);
-			this.detailBtn.on("click",this,this.showDetail);
-			this.img.on("click",this,this.showCardInfo);
+	//class view.actorgame.GameMain extends ui.actorgame.GameMainUI
+	var GameMain=(function(_super){
+		function GameMain(){
+			GameMain.__super.call(this);
+			this.startBtn.on("click",this,this.onStartBtn);
 		}
 
-		__class(TarotCard,'view.tarot.TarotCard',_super);
-		var __proto=TarotCard.prototype;
-		__proto.initCardItem=function(dataO){
-			this.titleTxt.text=dataO.title;
-			this.contentBox.visible=false;
-		}
-
-		__proto.setCard=function(dataO){
-			this.tDataO=dataO;
-			this.cardData=CarotDataManager.getCardByID(dataO.id);
-			this.freshUI();
-		}
-
-		__proto.freshUI=function(){
-			this.img.scaleY=this.isRevert?-1:1;
-			this.nameTxt.text=this.cardData.name.replace("　","\n");
-			this.img.skin="cards/"+this.cardData.image+".jpg";
-			this.contentBox.visible=true;
-		}
-
-		__proto.showCardInfo=function(){
-			var arr;
-			arr=[];
-			arr.push(this.cardData.description);
-			this.detailTxt.text=arr.join("\n\n");
-		}
-
-		__proto.showDetail=function(){
-			var text;
-			var arr;
-			arr=[];
-			if (this.isRevert){
-				arr.push("逆位");
-				arr.push(this.cardData.invert);
-				}else{
-				arr.push("正位");
-				arr.push(this.cardData.normal);
-			}
-			this.detailTxt.text=arr.join("\n\n");
-		}
-
-		__getset(0,__proto,'isRevert',function(){
-			if (!this.tDataO)return false;
-			return this.tDataO.isRevert;
-		});
-
-		return TarotCard;
-	})(TarotCardUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class view.tarot.TarotMain extends ui.tarot.TarotMainUI
-	var TarotMain=(function(_super){
-		function TarotMain(){
-			this.cardItems=null;
-			this.resetDatas=null;
-			TarotMain.__super.call(this);
-			this.init();
-		}
-
-		__class(TarotMain,'view.tarot.TarotMain',_super);
-		var __proto=TarotMain.prototype;
-		__proto.init=function(){
-			var datas;
-			datas=[];
-			var tData;
-			tData={};
-			tData.title="过去";
-			datas.push(tData);
-			tData={};
-			tData.title="现在";
-			datas.push(tData);
-			tData={};
-			tData.title="未来";
-			datas.push(tData);
-			this.resetDatas=datas;
-			this.cardItems=[];
-			this.cardItems=[this.past,this.now,this.feature];
-			this.resetCards();
-			this.workBtn.on("click",this,this.onPlay);
-			this.detailTxt.text="";
-		}
-
-		__proto.resetCards=function(){
-			var i=0,len=0;
-			len=this.cardItems.length;
-			var tCard;
-			for (i=0;i < len;i++){
-				tCard=this.cardItems[i];
-				tCard.initCardItem(this.resetDatas[i]);
-				tCard.detailTxt=this.detailTxt;
-			}
-		}
-
-		__proto.onPlay=function(){
-			var datas;
-			datas=CarotDataManager.getRamdomCard(3);
-			var i=0,len=0;
-			len=this.cardItems.length;
-			var tCard;
-			for (i=0;i < len;i++){
-				tCard=this.cardItems[i];
-				tCard.setCard(datas[i]);
-			}
-			this.detailTxt.text="";
-		}
-
-		return TarotMain;
-	})(TarotMainUI)
+		__class(GameMain,'view.actorgame.GameMain',_super);
+		var __proto=GameMain.prototype;
+		__proto.onStartBtn=function(){}
+		return GameMain;
+	})(GameMainUI)
 
 
 	Laya.__init([LoaderManager,EventDispatcher,Render,Browser,View,Timer,GraphicAnimation,LocalStorage]);

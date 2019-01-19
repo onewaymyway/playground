@@ -1,5 +1,7 @@
 package view.actorgame 
 {
+	import laya.events.Event;
+	import laya.utils.Handler;
 	import ui.actorgame.ReportPageUI;
 	
 	/**
@@ -11,7 +13,22 @@ package view.actorgame
 		
 		public function ReportPage() 
 		{
-			
+			reportList.renderHandler = new Handler(this, itemRender);
+			continueBtn.on(Event.CLICK, this, onBtnAction, ["continue"]);
+		}
+		
+		private function itemRender(cell:*, index:int):void
+		{
+		}
+		
+		private function onBtnAction(type:String):void
+		{
+			switch(type)
+			{
+				case "continue":
+					
+					break;
+			}
 		}
 		
 	}
