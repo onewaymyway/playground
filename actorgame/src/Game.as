@@ -4,6 +4,7 @@ package
 	import laya.display.Stage;
 	import laya.net.Loader;
 	import laya.utils.Handler;
+	import scenetools.SceneSwitcher;
 	import simulator.DrowningMachine;
 	import view.actorgame.GameMain;
 	import view.PlayMainView;
@@ -35,12 +36,8 @@ package
 		private function initGameView():void
 		{
 			//CarotDataManager.initByCardDatas(Loader.getRes("data/cardconfig.json"));
-			var mainView:GameMain;
-			mainView = new GameMain();
-			mainView.pos(50, 50);
-			mainView.top = 0;
-			mainView.bottom = 0;
-			Laya.stage.addChild(mainView);
+			SceneSwitcher.I = new SceneSwitcher();
+			SceneSwitcher.I.showPage(GameMain, null, true, true);
 		}
 		
 	}

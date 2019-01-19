@@ -2,6 +2,7 @@ package view.actorgame
 {
 	import laya.events.Event;
 	import laya.utils.Handler;
+	import scenetools.SceneSwitcher;
 	import ui.actorgame.ReportPageUI;
 	
 	/**
@@ -10,6 +11,12 @@ package view.actorgame
 	 */
 	public class ReportPage extends ReportPageUI 
 	{
+		private static var _I:ReportPage;
+		public static function get I():ReportPage
+		{
+			if (!_I) _I = new ReportPage();
+			return _I;
+		}
 		
 		public function ReportPage() 
 		{
@@ -26,10 +33,12 @@ package view.actorgame
 			switch(type)
 			{
 				case "continue":
-					
+					this.close();
 					break;
 			}
 		}
+		
+		
 		
 	}
 

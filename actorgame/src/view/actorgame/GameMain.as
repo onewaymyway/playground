@@ -14,7 +14,9 @@ package view.actorgame
 		public function GameMain() 
 		{
 			startBtn.on(Event.CLICK, this, onStartBtn);
+			roleList.mouseEnabled = true;
 			roleList.renderHandler = new Handler(this, itemRender);
+			roleList.visible = false;
 		}
 		
 		
@@ -24,7 +26,8 @@ package view.actorgame
 		
 		private function onStartBtn():void
 		{
-			
+			roleList.visible = true;
+			startBtn.visible = false;
 		}
 	}
 

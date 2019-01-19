@@ -9,6 +9,12 @@ package view.actorgame
 	 */
 	public class QuestionPage extends QuestionPageUI 
 	{
+		private static var _I:QuestionPage;
+		public static function get I():QuestionPage
+		{
+			if (!_I) _I = new QuestionPage();
+			return _I;
+		}
 		
 		public function QuestionPage() 
 		{
@@ -17,6 +23,11 @@ package view.actorgame
 		
 		private function itemRender(cell:*, index:int):void
 		{
+		}
+		
+		public function start():void
+		{
+			this.popup();
 		}
 		
 	}
