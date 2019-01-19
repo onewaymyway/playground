@@ -15,9 +15,9 @@
         {
             "x":15,
             "type":"Image",
-            "props":{"y":0,"x":0,"width":80,"skin":"comp/image.png","height":80},
+            "props":{"y":0,"x":0,"width":80,"var":"icon","skin":"comp/image.png","height":80},
             "nodeParent":1,
-            "label":"Image",
+            "label":"Image(icon)",
             "isDirectory":false,
             "isAniNode":true,
             "hasChild":false,
@@ -27,68 +27,43 @@
         },
         {
             "x":15,
-            "type":"Image",
-            "props":{"y":3,"x":128,"skin":"comp/prop.png"},
-            "nodeParent":1,
-            "label":"Image",
-            "isDirectory":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":3,
-            "child":[
-                ]
-        },
-        {
-            "x":15,
-            "type":"Image",
-            "props":{"y":3,"x":167,"skin":"comp/prop.png"},
-            "nodeParent":1,
-            "label":"Image",
-            "isDirectory":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":4,
-            "child":[
-                ]
-        },
-        {
-            "x":15,
-            "type":"Image",
-            "props":{"y":3,"x":205,"skin":"comp/prop.png"},
-            "nodeParent":1,
-            "label":"Image",
-            "isDirectory":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":5,
-            "child":[
-                ]
-        },
-        {
-            "x":15,
-            "type":"Image",
-            "props":{"y":3,"x":244,"skin":"comp/prop.png"},
-            "nodeParent":1,
-            "label":"Image",
-            "isDirectory":false,
-            "isAniNode":true,
-            "hasChild":false,
-            "compId":6,
-            "child":[
-                ]
-        },
-        {
-            "x":15,
             "type":"Label",
-            "props":{"y":14,"x":372,"width":167,"text":"+1","styleSkin":"comp/label.png","height":45,"fontSize":30,"color":"#ffffff","align":"center"},
+            "props":{"y":21,"x":426,"width":99,"var":"changeTxt","text":"+1","styleSkin":"comp/label.png","height":45,"fontSize":30,"color":"#ffffff","align":"center"},
             "nodeParent":1,
-            "label":"Label",
+            "label":"Label(changeTxt)",
             "isDirectory":false,
             "isAniNode":true,
             "hasChild":false,
             "compId":7,
             "child":[
                 ]
+        },
+        {
+            "x":15,
+            "type":"List",
+            "props":{"y":11,"x":108,"width":301,"var":"starList","spaceY":2,"spaceX":2,"repeatY":2,"repeatX":10,"height":65},
+            "nodeParent":1,
+            "label":"List(starList)",
+            "isOpen":true,
+            "isDirectory":true,
+            "isAniNode":true,
+            "hasChild":true,
+            "compId":9,
+            "child":[
+                {
+                    "x":30,
+                    "type":"UIView",
+                    "source":"actorgame/StarItem.ui",
+                    "props":{"name":"render"},
+                    "nodeParent":9,
+                    "label":"UIView(render)",
+                    "isDirectory":false,
+                    "isAniNode":false,
+                    "hasChild":false,
+                    "compId":8,
+                    "child":[
+                        ]
+                }]
         }],
     "animations":[
         {
