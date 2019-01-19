@@ -2,8 +2,8 @@
     "x":0,
     "type":"Dialog",
     "selectedBox":1,
-    "selecteID":11,
-    "props":{"width":720,"sceneColor":"#000000","height":1280},
+    "selecteID":12,
+    "props":{"width":720,"sceneColor":"#000000","height":1100},
     "nodeParent":-1,
     "label":"Dialog",
     "isOpen":true,
@@ -12,6 +12,19 @@
     "hasChild":true,
     "compId":1,
     "child":[
+        {
+            "x":15,
+            "type":"Image",
+            "props":{"top":0,"text":"TextInput","skin":"comp/input_22_selected.png","sizeGrid":"6,7,5,12","right":0,"left":0,"bottom":0},
+            "nodeParent":1,
+            "label":"Image",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":13,
+            "child":[
+                ]
+        },
         {
             "x":15,
             "type":"Label",
@@ -68,7 +81,7 @@
         {
             "x":15,
             "type":"Button",
-            "props":{"y":1079,"x":234,"width":252,"var":"continueBtn","skin":"comp/button.png","labelSize":30,"labelColors":"#ffffff","label":"继续","height":97},
+            "props":{"y":939,"x":234,"width":252,"var":"continueBtn","skin":"comp/button.png","labelSize":30,"labelColors":"#ffffff","label":"继续","height":97},
             "nodeParent":1,
             "label":"Button(continueBtn)",
             "isDirectory":false,

@@ -1,8 +1,8 @@
 {
     "x":0,
     "type":"Dialog",
-    "selectedBox":8,
-    "selecteID":7,
+    "selectedBox":1,
+    "selecteID":9,
     "props":{"width":599,"sceneColor":"#000000","height":543},
     "nodeParent":-1,
     "label":"Dialog",
@@ -12,6 +12,19 @@
     "hasChild":true,
     "compId":1,
     "child":[
+        {
+            "x":15,
+            "type":"Image",
+            "props":{"y":0,"x":0,"top":0,"text":"TextInput","skin":"comp/input_22_selected.png","sizeGrid":"6,7,5,12","right":0,"left":0,"bottom":0},
+            "nodeParent":1,
+            "label":"Image",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":9,
+            "child":[
+                ]
+        },
         {
             "x":15,
             "type":"Label",

@@ -16425,10 +16425,10 @@ var Laya=window.Laya=(function(window,document){
 			this.lockLayer=null;
 			this.popupEffect=function(dialog){
 				dialog.scale(1,1);
-				Tween.from(dialog,{x:Laya.stage.width / 2,y:Laya.stage.height / 2,scaleX:0,scaleY:0},300,Ease.backOut,Handler.create(this,this.doOpen,[dialog]));
+				Tween.from(dialog,{x:Laya.stage.width / 2,y:Laya.stage.height / 2,scaleX:0.05,scaleY:0.05},300,Ease.backOut,Handler.create(this,this.doOpen,[dialog]));
 			}
 			this.closeEffect=function(dialog,type){
-				Tween.to(dialog,{x:Laya.stage.width / 2,y:Laya.stage.height / 2,scaleX:0,scaleY:0},300,Ease.strongOut,Handler.create(this,this.doClose,[dialog,type]));
+				Tween.to(dialog,{x:Laya.stage.width / 2,y:Laya.stage.height / 2,scaleX:0.05,scaleY:0.05},300,Ease.strongOut,Handler.create(this,this.doClose,[dialog,type]));
 			}
 			DialogManager.__super.call(this);
 			this.maskLayer=new Sprite();
@@ -26487,7 +26487,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(QuestionPageUI.uiView);
 		}
 
-		QuestionPageUI.uiView={"type":"Dialog","props":{"width":599,"height":543},"child":[{"type":"Label","props":{"y":20,"x":0,"width":599,"var":"questionTxt","text":"游戏市场数据不错，是否换皮刷钱","styleSkin":"comp/label.png","height":149,"fontSize":30,"color":"#ffffff","align":"center"}},{"type":"List","props":{"y":254,"x":164,"width":275,"var":"selectList","spaceY":20,"height":248},"child":[{"type":"QuestionSelectItem","props":{"runtime":"view.actorgame.QuestionSelectItem","name":"render"}}]}]};
+		QuestionPageUI.uiView={"type":"Dialog","props":{"width":599,"height":543},"child":[{"type":"Image","props":{"y":0,"x":0,"top":0,"text":"TextInput","skin":"comp/input_22_selected.png","sizeGrid":"6,7,5,12","right":0,"left":0,"bottom":0}},{"type":"Label","props":{"y":20,"x":0,"width":599,"var":"questionTxt","text":"游戏市场数据不错，是否换皮刷钱","styleSkin":"comp/label.png","height":149,"fontSize":30,"color":"#ffffff","align":"center"}},{"type":"List","props":{"y":254,"x":164,"width":275,"var":"selectList","spaceY":20,"height":248},"child":[{"type":"QuestionSelectItem","props":{"runtime":"view.actorgame.QuestionSelectItem","name":"render"}}]}]};
 		return QuestionPageUI;
 	})(Dialog)
 
@@ -26536,7 +26536,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(ReportPageUI.uiView);
 		}
 
-		ReportPageUI.uiView={"type":"Dialog","props":{"width":720,"height":1280},"child":[{"type":"Label","props":{"y":74,"x":276,"width":167,"var":"titleTxt","text":"报告","styleSkin":"comp/label.png","height":45,"fontSize":30,"color":"#ffffff","align":"center"}},{"type":"Label","props":{"y":187,"x":60,"width":599,"var":"infoTxt","text":"各种统计信息","styleSkin":"comp/label.png","height":45,"fontSize":30,"color":"#ffffff","align":"center"}},{"type":"List","props":{"y":291,"x":102,"width":539,"var":"reportList","spaceY":20,"repeatY":6,"repeatX":1,"height":600},"child":[{"type":"ReportItem","props":{"runtime":"view.actorgame.ReportItem","name":"render"}}]},{"type":"Button","props":{"y":1079,"x":234,"width":252,"var":"continueBtn","skin":"comp/button.png","labelSize":30,"labelColors":"#ffffff","label":"继续","height":97}}]};
+		ReportPageUI.uiView={"type":"Dialog","props":{"width":720,"height":1100},"child":[{"type":"Image","props":{"top":0,"text":"TextInput","skin":"comp/input_22_selected.png","sizeGrid":"6,7,5,12","right":0,"left":0,"bottom":0}},{"type":"Label","props":{"y":74,"x":276,"width":167,"var":"titleTxt","text":"报告","styleSkin":"comp/label.png","height":45,"fontSize":30,"color":"#ffffff","align":"center"}},{"type":"Label","props":{"y":187,"x":60,"width":599,"var":"infoTxt","text":"各种统计信息","styleSkin":"comp/label.png","height":45,"fontSize":30,"color":"#ffffff","align":"center"}},{"type":"List","props":{"y":291,"x":102,"width":539,"var":"reportList","spaceY":20,"repeatY":6,"repeatX":1,"height":600},"child":[{"type":"ReportItem","props":{"runtime":"view.actorgame.ReportItem","name":"render"}}]},{"type":"Button","props":{"y":939,"x":234,"width":252,"var":"continueBtn","skin":"comp/button.png","labelSize":30,"labelColors":"#ffffff","label":"继续","height":97}}]};
 		return ReportPageUI;
 	})(Dialog)
 
