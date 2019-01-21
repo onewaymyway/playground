@@ -32,12 +32,12 @@ package laya.ui {
 		/**@private 全局默认弹出对话框效果，可以设置一个效果代替默认的弹出效果，如果不想有任何效果，可以赋值为null*/
 		public var popupEffect:Function = function(dialog:Sprite):void {
 			dialog.scale(1, 1);
-			Tween.from(dialog, {x: Laya.stage.width / 2, y: Laya.stage.height / 2, scaleX: 0, scaleY: 0}, 300, Ease.backOut, Handler.create(this, this.doOpen, [dialog]));
+			Tween.from(dialog, {x: Laya.stage.width / 2, y: Laya.stage.height / 2, scaleX: 0.05, scaleY: 0.05}, 300, Ease.backOut, Handler.create(this, this.doOpen, [dialog]));
 		}
 		
 		/**@private 全局默认关闭对话框效果，可以设置一个效果代替默认的关闭效果，如果不想有任何效果，可以赋值为null*/
 		public var closeEffect:Function = function(dialog:Sprite, type:String):void {
-			Tween.to(dialog, {x: Laya.stage.width / 2, y: Laya.stage.height / 2, scaleX: 0, scaleY: 0}, 300, Ease.strongOut, Handler.create(this, this.doClose, [dialog, type]));
+			Tween.to(dialog, {x: Laya.stage.width / 2, y: Laya.stage.height / 2, scaleX: 0.05, scaleY: 0.05}, 300, Ease.strongOut, Handler.create(this, this.doClose, [dialog, type]));
 		}
 		
 		/**全局默认关闭对话框效果，可以设置一个效果代替默认的关闭效果，如果不想有任何效果，可以赋值为null*/
