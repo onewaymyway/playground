@@ -21,12 +21,22 @@ package view.actorgame
 			selectList.renderHandler = new Handler(this, itemRender);
 		}
 		
-		private function itemRender(cell:*, index:int):void
+		private function itemRender(cell:QuestionSelectItem, index:int):void
 		{
+			cell.initByData(cell.dataSource);
+		}
+		
+		private function setData():void
+		{
+			var questionO:Object;
+			questionO = QGameDataManager.I.getRandomQuestion();
+			questionTxt.text = questionO.label;
+			selectList.array = questionO.ops;
 		}
 		
 		public function start():void
 		{
+			setData();
 			this.popup();
 		}
 		

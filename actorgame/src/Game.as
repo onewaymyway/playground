@@ -7,6 +7,8 @@ package
 	import scenetools.SceneSwitcher;
 	import simulator.DrowningMachine;
 	import view.actorgame.GameMain;
+	import view.actorgame.QGameDataManager;
+	import view.actorgame.QGameState;
 	import view.PlayMainView;
 	import view.tarot.TarotMain;
 	/**
@@ -25,7 +27,7 @@ package
 			var loadList:Array;
 			loadList = [];
 			loadList.push( { url:"res/atlas/comp.json", type:Loader.ATLAS } );
-			loadList.push({url:"data/cardconfig.json",type:Loader.JSON });
+			loadList.push({url:"data/TT.qgame",type:Loader.JSON });
 			Laya.loader.load( loadList, new Handler(this, initGameView));
 			
 		}
@@ -35,6 +37,8 @@ package
 		
 		private function initGameView():void
 		{
+			QGameDataManager.initData(Loader.getRes("data/TT.qgame"));
+			QGameState.initByData(QGameDataManager.I);
 			//CarotDataManager.initByCardDatas(Loader.getRes("data/cardconfig.json"));
 			SceneSwitcher.I = new SceneSwitcher();
 			SceneSwitcher.I.showPage(GameMain, null, true, true);

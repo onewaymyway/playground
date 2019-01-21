@@ -20,12 +20,13 @@ package view.actorgame
 		public function initByData(dataO:Object):void
 		{
 			_dataO = dataO;
+			actionBtn.label = dataO.label;
 		}
 		
 		private function onClick():void
 		{
 			QuestionPage.I.close();
-			SceneSwitcher.I.showDialog(ReportPage, null, true, true);
+			SceneSwitcher.I.showDialog(ReportPage, _dataO, true, true);
 		}
 	}
 

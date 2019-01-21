@@ -707,13 +707,15 @@ var Laya=window.Laya=(function(window,document){
 			var loadList;
 			loadList=[];
 			loadList.push({url:"res/atlas/comp.json",type:"atlas" });
-			loadList.push({url:"data/cardconfig.json",type:"json" });
+			loadList.push({url:"data/TT.qgame",type:"json" });
 			Laya.loader.load(loadList,new Handler(this,this.initGameView));
 		}
 
 		__class(Game,'Game');
 		var __proto=Game.prototype;
 		__proto.initGameView=function(){
+			QGameDataManager.initData(Loader.getRes("data/TT.qgame"));
+			QGameState.initByData(QGameDataManager.I);
 			SceneSwitcher.I=new SceneSwitcher();
 			SceneSwitcher.I.showPage(GameMain,null,true,true);
 		}
@@ -786,6 +788,278 @@ var Laya=window.Laya=(function(window,document){
 
 		SceneSwitcher.I=null
 		return SceneSwitcher;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class view.actorgame.ActorData
+	var ActorData=(function(){
+		function ActorData(){
+			this.count=0;
+			this.lastOpCount=0;
+			this.label=null;
+			this.lowCount=0;
+			this.highCount=0;
+		}
+
+		__class(ActorData,'view.actorgame.ActorData');
+		var __proto=ActorData.prototype;
+		__proto.reset=function(){
+			this.lowCount=0;
+			this.highCount=0;
+		}
+
+		__proto.next=function(){
+			if (this.count <=3){
+				this.lowCount++;
+				this.highCount=0;
+			}else
+			if(this.count>=10){
+				this.highCount++;
+				this.lowCount=0;
+				}else{
+				this.lowCount=0;
+				this.highCount=0;
+			}
+		}
+
+		__proto.getChangeMoney=function(){
+			if (this.count > 10)return (this.count-10)*1000;
+			if (this.count <3)return-(3-this.count)*3000;
+			return 0;
+		}
+
+		return ActorData;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class view.actorgame.QGameDataManager
+	var QGameDataManager=(function(){
+		function QGameDataManager(){
+			this._dataO=null;
+			this._roles=null;
+			this._questions=null;
+		}
+
+		__class(QGameDataManager,'view.actorgame.QGameDataManager');
+		var __proto=QGameDataManager.prototype;
+		__proto.setUpByData=function(dataO){
+			this._dataO=dataO;
+			this._roles=[];
+			this._roles=dataO.items;
+			this._questions=this.getAdptQuestions(dataO.actions);
+		}
+
+		//debugger;
+		__proto.getRandomQuestion=function(){
+			var index=0;
+			index=Math.round(Math.random()*9999999);
+			return this._questions[index%this._questions.length];
+		}
+
+		__proto.getAdptQuestions=function(qList){
+			var rst;
+			rst=[];
+			var i=0,len=0;
+			len=qList.length;
+			var tQestionO;
+			for (i=0;i < len;i++){
+				tQestionO=qList[i];
+				if (tQestionO.type=="addnew")continue ;
+				rst.push(this.getAdptQuestion(qList[i]));
+			}
+			return rst;
+		}
+
+		__proto.getAdptQuestion=function(qO){
+			var tQData;
+			tQData=qO.data;
+			var rst;
+			rst={};
+			rst.label=tQData.props.label;
+			rst.ops=this.getSelections(tQData.childs[0].childs);
+			return rst;
+		}
+
+		__proto.getSelections=function(selectList){
+			var i=0,len=0;
+			len=selectList.length;
+			var rst;
+			rst=[];
+			for (i=0;i < len;i++){
+				rst.push(this.getAdptSelection(selectList[i]));
+			}
+			return rst;
+		}
+
+		__proto.getAdptSelection=function(selectO){
+			var rst;
+			rst={};
+			rst.label=selectO.props.label;
+			rst.ops=this.getItemOps(selectO.childs);
+			return rst;
+		}
+
+		__proto.getItemOps=function(itemList){
+			var i=0,len=0;
+			len=itemList.length;
+			var rst;
+			rst=[];
+			for (i=0;i < len;i++){
+				rst.push(this.getAdptItemOp(itemList[i]));
+			}
+			return rst;
+		}
+
+		__proto.getAdptItemOp=function(itemOp){
+			var rst;
+			rst={};
+			rst.item=itemOp.props.item;
+			rst.count=parseInt(itemOp.props.count)||0;
+			return rst;
+		}
+
+		__getset(0,__proto,'roles',function(){
+			return this._roles;
+		});
+
+		QGameDataManager.initData=function(dataO){
+			QGameDataManager.I=new QGameDataManager();
+			QGameDataManager.I.setUpByData(dataO);
+		}
+
+		QGameDataManager.I=null
+		return QGameDataManager;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class view.actorgame.QGameState
+	var QGameState=(function(){
+		function QGameState(){
+			this.money=0;
+			this.roleStates=null;
+			this.roleDic=null;
+			this.day=0;
+			this.eventList=[];
+			this.changedMoney=0;
+		}
+
+		__class(QGameState,'view.actorgame.QGameState');
+		var __proto=QGameState.prototype;
+		__proto.initByGameData=function(dataO){
+			this.roleStates=[];
+			this.roleDic={};
+			var roles;
+			roles=dataO.roles;
+			var i=0,len=0;
+			len=roles.length;
+			var tDataO;
+			var tRoleO;
+			for (i=0;i < len;i++){
+				tRoleO=roles[i];
+				tDataO=new ActorData();
+				tDataO.label=tRoleO.props.label;
+				tDataO.count=5;
+				tDataO.lastOpCount=0;
+				this.roleDic[tDataO.label]=tDataO;
+				this.roleStates.push(tDataO);
+			}
+			this.money=500000;
+			this.day=0;
+		}
+
+		__proto.clearLastOp=function(){
+			var i=0,len=0;
+			len=this.roleStates.length;
+			for (i=0;i < len;i++){
+				this.roleStates[i].lastOpCount=0;
+			}
+		}
+
+		__proto.todayInfo=function(){
+			this.eventList.length=0;
+			var i=0,len=0;
+			len=this.roleStates.length;
+			var preMoney=NaN;
+			preMoney=this.money;
+			this.changedMoney=0;
+			var tActor;
+			for (i=0;i < len;i++){
+				tActor=this.roleStates[i];
+				this.money+=tActor.getChangeMoney();
+			}
+			this.money-=10000;
+			this.changedMoney=this.money-preMoney;
+		}
+
+		//money=preMoney;
+		__proto.nextDay=function(){
+			this.day++;
+			this.eventList.length=0;
+			var i=0,len=0;
+			len=this.roleStates.length;
+			var tActor;
+			for (i=0;i < len;i++){
+				tActor=this.roleStates[i];
+				tActor.next();
+			}
+			if (this.money <=0){
+				this.addEvent("钱花完了，公司倒闭了！！",true);
+			}
+		}
+
+		__proto.addEvent=function(eventName,isOver){
+			(isOver===void 0)&& (isOver=false);
+			var tEvent;
+			tEvent={};
+			tEvent.label=eventName;
+			tEvent.isOver=isOver;
+			this.eventList.push(tEvent);
+		}
+
+		__proto.updateRoleState=function(ops){
+			this.clearLastOp();
+			var i=0,len=0;
+			var tOp;
+			len=ops.length;
+			for (i=0;i < len;i++){
+				this.excuteOp(ops[i]);
+			}
+		}
+
+		__proto.excuteOp=function(opO){
+			var tRoleO;
+			tRoleO=this.roleDic[opO.item];
+			if (!tRoleO)debugger;
+			tRoleO.lastOpCount=opO.count;
+			tRoleO.count+=opO.count;
+			if (tRoleO.count < 0)tRoleO.count=0;
+			if (tRoleO.count > 20)tRoleO.count=20;
+		}
+
+		QGameState.getSignedInt=function(value){
+			if (value > 0)return "+"+value;
+			return value;
+		}
+
+		QGameState.initByData=function(dataO){
+			QGameState.I=new QGameState();
+			QGameState.I.initByGameData(dataO);
+		}
+
+		QGameState.I=null
+		return QGameState;
 	})()
 
 
@@ -1573,6 +1847,950 @@ var Laya=window.Laya=(function(window,document){
 
 		Graphics._cache=[];
 		return Graphics;
+	})()
+
+
+	/**
+	*本类提供obj相关的一些操作
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-10-21 下午2:03:36
+	*/
+	//class laya.debug.tools.ObjectTools
+	var ObjectTools=(function(){
+		function ObjectTools(){}
+		__class(ObjectTools,'laya.debug.tools.ObjectTools');
+		ObjectTools.getFlatKey=function(tKey,aKey){
+			if(tKey=="")return aKey;
+			return tKey+ObjectTools.sign+aKey;
+		}
+
+		ObjectTools.flatObj=function(obj,rst,tKey){
+			(tKey===void 0)&& (tKey="");
+			rst=rst?rst:{};
+			var key;
+			var tValue;
+			for(key in obj){
+				if((typeof (obj[key])=='object')){
+					ObjectTools.flatObj(obj[key],rst,ObjectTools.getFlatKey(tKey,key));
+					}else{
+					tValue=obj[key];
+					rst[ObjectTools.getFlatKey(tKey,key)]=obj[key];
+				}
+			}
+			return rst;
+		}
+
+		ObjectTools.recoverObj=function(obj){
+			var rst={};
+			var tKey;
+			for(tKey in obj){
+				ObjectTools.setKeyValue(rst,tKey,obj[tKey]);
+			}
+			return rst;
+		}
+
+		ObjectTools.differ=function(objA,objB){
+			var tKey;
+			var valueA;
+			var valueB;
+			objA=ObjectTools.flatObj(objA);
+			objB=ObjectTools.flatObj(objB);
+			var rst={};
+			for(tKey in objA){
+				if(!objB.hasOwnProperty(tKey)){
+					rst[tKey]="被删除";
+				}
+			}
+			for(tKey in objB){
+				if(objB[tKey]!=objA[tKey]){
+					rst[tKey]={"pre":objA[tKey],"now":objB[tKey]};
+				}
+			}
+			return rst;
+		}
+
+		ObjectTools.traceDifferObj=function(obj){
+			var key;
+			var tO;
+			for(key in obj){
+				if((typeof (obj[key])=='string')){
+					console.log(key+":",obj[key]);
+					}else{
+					tO=obj[key];
+					console.log(key+":","now:",tO["now"],"pre:",tO["pre"]);
+				}
+			}
+		}
+
+		ObjectTools.setKeyValue=function(obj,flatKey,value){
+			if(flatKey.indexOf(ObjectTools.sign)>=0){
+				var keys=flatKey.split(ObjectTools.sign);
+				var tKey;
+				while(keys.length>1){
+					tKey=keys.shift();
+					if(!obj[tKey]){
+						obj[tKey]={};
+						console.log("addKeyObj:",tKey);
+					}
+					obj=obj[tKey];
+					if(!obj){
+						console.log("wrong flatKey:",flatKey);
+						return;
+					}
+				}
+				obj[keys.shift()]=value;
+				}else{
+				obj[flatKey]=value;
+			}
+		}
+
+		ObjectTools.clearObj=function(obj){
+			var key;
+			for (key in obj){
+				delete obj[key];
+			}
+		}
+
+		ObjectTools.copyObjFast=function(obj){
+			var jsStr;
+			jsStr=laya.debug.tools.ObjectTools.getJsonString(obj);
+			return laya.debug.tools.ObjectTools.getObj(jsStr);
+		}
+
+		ObjectTools.copyObj=function(obj){
+			if((obj instanceof Array))return ObjectTools.copyArr(obj);
+			var rst={};
+			var key;
+			for(key in obj){
+				if(obj[key]===null||obj[key]===undefined){
+					rst[key]=obj[key];
+				}else
+				if(((obj[key])instanceof Array)){
+					rst[key]=ObjectTools.copyArr(obj[key]);
+				}
+				else
+				if((typeof (obj[key])=='object')){
+					rst[key]=ObjectTools.copyObj(obj[key]);
+					}else{
+					rst[key]=obj[key];
+				}
+			}
+			return rst;
+		}
+
+		ObjectTools.copyArr=function(arr){
+			var rst;
+			rst=[];
+			var i=0,len=0;
+			len=arr.length;
+			for(i=0;i<len;i++){
+				rst.push(ObjectTools.copyObj(arr[i]));
+			}
+			return rst;
+		}
+
+		ObjectTools.concatArr=function(src,a){
+			if (!a)return src;
+			if (!src)return a;
+			var i=0,len=a.length;
+			for (i=0;i < len;i++){
+				src.push(a[i]);
+			}
+			return src;
+		}
+
+		ObjectTools.insertArrToArr=function(src,insertArr,pos){
+			(pos===void 0)&& (pos=0);
+			if (pos < 0)pos=0;
+			if (pos > src.length)pos=src.length;
+			var preLen=src.length;
+			var i=0,len=0;
+			src.length+=insertArr.length;
+			var moveLen=0;
+			moveLen=insertArr.length;
+			for (i=src.length-1;i >=pos;i--){
+				src[i]=src[i-moveLen];
+			}
+			len=insertArr.length;
+			for (i=0;i < len;i++){
+				src[pos+i]=insertArr[i];
+			}
+			return src;
+		}
+
+		ObjectTools.clearArr=function(arr){
+			if (!arr)return arr;
+			arr.length=0;
+			return arr;
+		}
+
+		ObjectTools.removeFromArr=function(arr,item){
+			var i=0,len=0;
+			len=arr.length;
+			for(i=0;i<len;i++){
+				if(arr[i]==item){
+					arr.splice(i,1);
+					return item;
+				}
+			}
+			return null;
+		}
+
+		ObjectTools.setValueArr=function(src,v){
+			src || (src=[]);
+			src.length=0;
+			return ObjectTools.concatArr(src,v);
+		}
+
+		ObjectTools.getFrom=function(rst,src,count){
+			var i=0;
+			for (i=0;i < count;i++){
+				rst.push(src[i]);
+			}
+			return rst;
+		}
+
+		ObjectTools.getFromR=function(rst,src,count){
+			var i=0;
+			for (i=0;i < count;i++){
+				rst.push(src.pop());
+			}
+			return rst;
+		}
+
+		ObjectTools.enableDisplayTree=function(dis){
+			while (dis){
+				dis.mouseEnabled=true;
+				dis=dis.parent;
+			}
+		}
+
+		ObjectTools.getJsonString=function(obj){
+			var rst;
+			rst=JSON.stringify(obj);
+			return rst;
+		}
+
+		ObjectTools.getObj=function(jsonStr){
+			var rst;
+			rst=JSON.parse(jsonStr);
+			return rst;
+		}
+
+		ObjectTools.getKeyArr=function(obj){
+			var rst;
+			var key;
+			rst=[];
+			for(key in obj){
+				rst.push(key);
+			}
+			return rst;
+		}
+
+		ObjectTools.getObjValues=function(dataList,key){
+			var rst;
+			var i=0,len=0;
+			len=dataList.length;
+			rst=[];
+			for(i=0;i<len;i++){
+				rst.push(dataList[i][key]);
+			}
+			return rst;
+		}
+
+		ObjectTools.hasKeys=function(obj,keys){
+			var i=0,len=0;
+			len=keys.length;
+			for(i=0;i<len;i++){
+				if(!obj.hasOwnProperty(keys[i]))return false;
+			}
+			return true;
+		}
+
+		ObjectTools.copyValueByArr=function(tar,src,keys){
+			var i=0,len=keys.length;
+			for(i=0;i<len;i++){
+				if(!(src[keys[i]]===null))
+					tar[keys[i]]=src[keys[i]];
+			}
+		}
+
+		ObjectTools.getNoSameArr=function(arr){
+			var i=0,len=0;
+			var rst;
+			rst=[];
+			var tItem;
+			len=arr.length;
+			for (i=0;i < len;i++){
+				tItem=arr[i];
+				if (rst.indexOf(tItem)< 0){
+					rst.push(tItem);
+				}
+			}
+			return rst;
+		}
+
+		ObjectTools.insertValue=function(tar,src){
+			var key;
+			for (key in src){
+				tar[key]=src[key];
+			}
+		}
+
+		ObjectTools.replaceValue=function(obj,replaceO){
+			var key;
+			for(key in obj){
+				if(replaceO.hasOwnProperty(obj[key])){
+					obj[key]=replaceO[obj[key]];
+				}
+				if((typeof (obj[key])=='object')){
+					ObjectTools.replaceValue(obj[key],replaceO);
+				}
+			}
+		}
+
+		ObjectTools.setKeyValues=function(items,key,value){
+			var i=0,len=0;
+			len=items.length;
+			for(i=0;i<len;i++){
+				items[i][key]=value;
+			}
+		}
+
+		ObjectTools.findItemPos=function(items,sign,value){
+			var i=0,len=0;
+			len=items.length;
+			for(i=0;i<len;i++){
+				if(items[i][sign]==value){
+					return i;
+				}
+			}
+			return-1;
+		}
+
+		ObjectTools.setObjValue=function(obj,key,value){
+			obj[key]=value;
+			return obj;
+		}
+
+		ObjectTools.setAutoTypeValue=function(obj,key,value){
+			if(obj.hasOwnProperty(key)){
+				if(ObjectTools.isNumber(obj[key])){
+					obj[key]=parseFloat(value);
+					}else{
+					obj[key]=value;
+				}
+				}else{
+				obj[key]=value;
+			}
+			return obj;
+		}
+
+		ObjectTools.getAutoValue=function(value){
+			var tFloat=parseFloat(value);
+			if(typeof(value)=="string"){
+				if(tFloat+""===StringTool.trimSide(value))return tFloat;
+			}
+			return value;
+		}
+
+		ObjectTools.isNumber=function(value){
+			return (parseFloat(value)==value);
+		}
+
+		ObjectTools.isNaNS=function(value){
+			return (value.toString()=="NaN");
+		}
+
+		ObjectTools.isNaN=function(value){
+			if(typeof(value)=="number")return false;
+			if(typeof(value)=="string"){
+				if(parseFloat(value).toString()!="NaN"){
+					if(parseFloat(value)==value){
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+
+		ObjectTools.getStrTypedValue=function(value){
+			if(value=="false"){
+				return false;
+			}else
+			if(value=="true"){
+				return true;
+			}else
+			if(value=="null"){
+				return null;
+			}else
+			if(value=="undefined"){
+				return null;
+				}else{
+				return ObjectTools.getAutoValue(value);
+			}
+		}
+
+		ObjectTools.createKeyValueDic=function(dataList,keySign){
+			var rst;
+			rst={};
+			var i=0,len=0;
+			len=dataList.length;
+			var tItem;
+			var tKey;
+			for(i=0;i<len;i++){
+				tItem=dataList[i];
+				tKey=tItem[keySign];
+				rst[tKey]=tItem;
+			}
+			return rst;
+		}
+
+		ObjectTools.sign="_";
+		return ObjectTools;
+	})()
+
+
+	/**
+	*一些字符串操作函数
+	*@author ww
+	*
+	*/
+	//class laya.debug.tools.StringTool
+	var StringTool=(function(){
+		function StringTool(){}
+		__class(StringTool,'laya.debug.tools.StringTool');
+		StringTool.toUpCase=function(str){
+			return str.toUpperCase();
+		}
+
+		StringTool.toLowCase=function(str){
+			return str.toLowerCase();
+		}
+
+		StringTool.toUpHead=function(str){
+			var rst;
+			if(str.length<=1)return str.toUpperCase();
+			rst=str.charAt(0).toUpperCase()+str.substr(1);
+			return rst;
+		}
+
+		StringTool.toLowHead=function(str){
+			var rst;
+			if(str.length<=1)return str.toLowerCase();
+			rst=str.charAt(0).toLowerCase()+str.substr(1);
+			return rst;
+		}
+
+		StringTool.packageToFolderPath=function(packageName){
+			var rst;
+			rst=packageName.replace(".","/");
+			return rst;
+		}
+
+		StringTool.insert=function(str,iStr,index){
+			return str.substring(0,index)+iStr+str.substr(index);
+		}
+
+		StringTool.insertAfter=function(str,iStr,tarStr,isLast){
+			(isLast===void 0)&& (isLast=false);
+			var i=0;
+			if(isLast){
+				i=str.lastIndexOf(tarStr);
+				}else{
+				i=str.indexOf(tarStr);
+			}
+			if(i>=0){
+				return StringTool.insert(str,iStr,i+tarStr.length);
+			}
+			return str;
+		}
+
+		StringTool.insertBefore=function(str,iStr,tarStr,isLast){
+			(isLast===void 0)&& (isLast=false);
+			var i=0;
+			if(isLast){
+				i=str.lastIndexOf(tarStr);
+				}else{
+				i=str.indexOf(tarStr);
+			}
+			if(i>=0){
+				return StringTool.insert(str,iStr,i);
+			}
+			return str;
+		}
+
+		StringTool.insertParamToFun=function(funStr,params){
+			var oldParam;
+			oldParam=StringTool.getParamArr(funStr);
+			var inserStr;
+			inserStr=params.join(",");
+			if(oldParam.length>0){
+				inserStr=","+inserStr;
+			}
+			return StringTool.insertBefore(funStr,inserStr,")",true);
+		}
+
+		StringTool.trim=function(str,vList){
+			if(!vList){
+				vList=[" ","\r","\n","\t",String.fromCharCode(65279)];
+			};
+			var rst;
+			var i=0;
+			var len=0;
+			rst=str;
+			len=vList.length;
+			for(i=0;i<len;i++){
+				rst=StringTool.getReplace(rst,vList[i],"");
+			}
+			return rst;
+		}
+
+		StringTool.isEmpty=function(str){
+			if(str.length<1)return true;
+			return StringTool.emptyStrDic.hasOwnProperty(str);
+		}
+
+		StringTool.trimLeft=function(str){
+			var i=0;
+			i=0;
+			var len=0;
+			len=str.length;
+			while(StringTool.isEmpty(str.charAt(i))&&i<len){
+				i++;
+			}
+			if(i<len){
+				return str.substr(i);
+			}
+			return "";
+		}
+
+		StringTool.trimRight=function(str){
+			var i=0;
+			i=str.length-1;
+			while(StringTool.isEmpty(str.charAt(i))&&i>=0){
+				i--;
+			};
+			var rst;
+			rst=str.substring(0,i)
+			if(i>=0){
+				return str.substring(0,i+1);
+			}
+			return "";
+		}
+
+		StringTool.trimSide=function(str){
+			var rst;
+			rst=StringTool.trimLeft(str);
+			rst=StringTool.trimRight(rst);
+			return rst;
+		}
+
+		StringTool.isOkFileName=function(fileName){
+			if(laya.debug.tools.StringTool.trimSide(fileName)=="")return false;
+			var i=0,len=0;
+			len=fileName.length;
+			for(i=0;i<len;i++){
+				if(StringTool.specialChars[fileName.charAt(i)])return false;
+			}
+			return true;
+		}
+
+		StringTool.trimButEmpty=function(str){
+			return StringTool.trim(str,["\r","\n","\t"]);
+		}
+
+		StringTool.removeEmptyStr=function(strArr){
+			var i=0;
+			i=strArr.length-1;
+			var str;
+			for(i=i;i>=0;i--){
+				str=strArr[i];
+				str=laya.debug.tools.StringTool.trimSide(str);
+				if(StringTool.isEmpty(str)){
+					strArr.splice(i,1);
+					}else{
+					strArr[i]=str;
+				}
+			}
+			return strArr;
+		}
+
+		StringTool.ifNoAddToTail=function(str,sign){
+			if(str.indexOf(sign)>=0){
+				return str;
+			}
+			return str+sign;
+		}
+
+		StringTool.trimEmptyLine=function(str){
+			var i=0;
+			var len=0;
+			var tLines;
+			var tLine;
+			tLines=str.split("\n");
+			for(i=tLines.length-1;i>=0;i--){
+				tLine=tLines[i];
+				if(StringTool.isEmptyLine(tLine)){
+					tLines.splice(i,1);
+				}
+			}
+			return tLines.join("\n");
+		}
+
+		StringTool.isEmptyLine=function(str){
+			str=laya.debug.tools.StringTool.trim(str);
+			if(str=="")return true;
+			return false;
+		}
+
+		StringTool.removeCommentLine=function(lines){
+			var rst;
+			rst=[];
+			var i=0;
+			var tLine;
+			var adptLine;
+			i=0;
+			var len=0;
+			var index=0;
+			len=lines.length;
+			while(i<len){
+				adptLine=tLine=lines[i];
+				index=tLine.indexOf("/**");
+				if(index>=0){
+					adptLine=tLine.substring(0,index-1);
+					StringTool.addIfNotEmpty(rst,adptLine);
+					while(i<len){
+						tLine=lines[i];
+						index=tLine.indexOf("*/");
+						if(index>=0){
+							adptLine=tLine.substring(index+2);
+							StringTool.addIfNotEmpty(rst,adptLine);
+							break ;
+						}
+						i++;
+					}
+					}else if(tLine.indexOf("//")>=0){
+					if(laya.debug.tools.StringTool.trim(tLine).indexOf("//")==0){
+						}else{
+						StringTool.addIfNotEmpty(rst,adptLine);
+					}
+					}else{
+					StringTool.addIfNotEmpty(rst,adptLine);
+				}
+				i++;
+			}
+			return rst;
+		}
+
+		StringTool.addIfNotEmpty=function(arr,str){
+			if(!str)return;
+			var tStr;
+			tStr=StringTool.trim(str);
+			if(tStr!=""){
+				arr.push(str);
+			}
+		}
+
+		StringTool.trimExt=function(str,vars){
+			var rst;
+			rst=StringTool.trim(str);
+			var i=0;
+			var len=0;
+			len=vars.length;
+			for(i=0;i<len;i++){
+				rst=StringTool.getReplace(rst,vars[i],"");
+			}
+			return rst;
+		}
+
+		StringTool.getBetween=function(str,left,right,ifMax){
+			(ifMax===void 0)&& (ifMax=false);
+			if(!str)return "";
+			if(!left)return "";
+			if(!right)return "";
+			var lId=0;
+			var rId=0;
+			lId=str.indexOf(left);
+			if(lId<0)return"";
+			if(ifMax){
+				rId=str.lastIndexOf(right);
+				if(rId<lId)return "";
+				}else{
+				rId=str.indexOf(right,lId+1);
+			}
+			if(rId<0)return "";
+			return str.substring(lId+left.length,rId);
+		}
+
+		StringTool.getSplitLine=function(line,split){
+			(split===void 0)&& (split=" ");
+			return line.split(split);
+		}
+
+		StringTool.getLeft=function(str,sign){
+			var i=0;
+			i=str.indexOf(sign);
+			return str.substr(0,i);
+		}
+
+		StringTool.getRight=function(str,sign){
+			var i=0;
+			i=str.indexOf(sign);
+			return str.substr(i+1);
+		}
+
+		StringTool.delelteItem=function(arr){
+			while (arr.length>0){
+				if(arr[0]==""){
+					arr.shift();
+					}else{
+					break ;
+				}
+			}
+		}
+
+		StringTool.getWords=function(line){
+			var rst=StringTool.getSplitLine(line);
+			StringTool.delelteItem(rst);
+			return rst;
+		}
+
+		StringTool.getLinesI=function(startLine,endLine,lines){
+			var i=0;
+			var rst=[];
+			for(i=startLine;i<=endLine;i++){
+				rst.push(lines[i]);
+			}
+			return rst;
+		}
+
+		StringTool.structfy=function(str,inWidth,removeEmpty){
+			(inWidth===void 0)&& (inWidth=4);
+			(removeEmpty===void 0)&& (removeEmpty=true);
+			if(removeEmpty){
+				str=laya.debug.tools.StringTool.trimEmptyLine(str);
+			};
+			var lines;
+			var tIn=0;
+			tIn=0;
+			var tInStr;
+			tInStr=StringTool.getEmptyStr(0);
+			lines=str.split("\n");
+			var i=0;
+			var len=0;
+			var tLineStr;
+			len=lines.length;
+			for(i=0;i<len;i++){
+				tLineStr=lines[i];
+				tLineStr=laya.debug.tools.StringTool.trimLeft(tLineStr);
+				tLineStr=laya.debug.tools.StringTool.trimRight(tLineStr);
+				tIn+=StringTool.getPariCount(tLineStr);
+				if(tLineStr.indexOf("}")>=0){
+					tInStr=StringTool.getEmptyStr(tIn*inWidth);
+				}
+				tLineStr=tInStr+tLineStr;
+				lines[i]=tLineStr;
+				tInStr=StringTool.getEmptyStr(tIn*inWidth);
+			}
+			return lines.join("\n");
+		}
+
+		StringTool.getEmptyStr=function(width){
+			if(!StringTool.emptyDic.hasOwnProperty(width)){
+				var i=0;
+				var len=0;
+				len=width;
+				var rst;
+				rst="";
+				for(i=0;i<len;i++){
+					rst+=" ";
+				}
+				StringTool.emptyDic[width]=rst;
+			}
+			return StringTool.emptyDic[width];
+		}
+
+		StringTool.getPariCount=function(str,inChar,outChar){
+			(inChar===void 0)&& (inChar="{");
+			(outChar===void 0)&& (outChar="}");
+			var varDic;
+			varDic={};
+			varDic[inChar]=1;
+			varDic[outChar]=-1;
+			var i=0;
+			var len=0;
+			var tChar;
+			len=str.length;
+			var rst=0;
+			rst=0;
+			for(i=0;i<len;i++){
+				tChar=str.charAt(i);
+				if(varDic.hasOwnProperty(tChar)){
+					rst+=varDic[tChar];
+				}
+			}
+			return rst;
+		}
+
+		StringTool.readInt=function(str,startI){
+			(startI===void 0)&& (startI=0);
+			var rst=NaN;
+			rst=0;
+			var tNum=0;
+			var tC;
+			var i=0;
+			var isBegin=false;
+			isBegin=false;
+			var len=0;
+			len=str.length;
+			for(i=startI;i<len;i++){
+				tC=str.charAt(i);
+				if(Number(tC)>0||tC=="0"){
+					rst=10*rst+Number(tC);
+					if(rst>0)isBegin=true;
+					}else{
+					if(isBegin)return rst;
+				}
+			}
+			return rst;
+		}
+
+		StringTool.getReplace=function(str,oStr,nStr){
+			if(!str)return "";
+			var rst;
+			rst=str.replace(new RegExp(oStr,"g"),nStr);
+			return rst;
+		}
+
+		StringTool.getWordCount=function(str,findWord){
+			var rg=new RegExp(findWord,"g")
+			return str.match(rg).length;
+		}
+
+		StringTool.getResolvePath=function(path,basePath){
+			if(StringTool.isAbsPath(path)){
+				return path;
+			};
+			var tSign;
+			tSign="\\";
+			if(basePath.indexOf("/")>=0){
+				tSign="/";
+			}
+			if(basePath.charAt(basePath.length-1)==tSign){
+				basePath=basePath.substr(0,basePath.length-1);
+			};
+			var parentSign;
+			parentSign=".."+tSign;
+			var tISign;
+			tISign="."+tSign;
+			var pCount=0;
+			pCount=StringTool.getWordCount(path,parentSign);
+			path=laya.debug.tools.StringTool.getReplace(path,parentSign,"");
+			path=laya.debug.tools.StringTool.getReplace(path,tISign,"");
+			var i=0;
+			var len=0;
+			len=pCount;
+			var iPos=0;
+			for(i=0;i<len;i++){
+				basePath=StringTool.removeLastSign(path,tSign);
+			}
+			return basePath+tSign+path;
+		}
+
+		StringTool.isAbsPath=function(path){
+			if(path.indexOf(":")>=0)return true;
+			return false;
+		}
+
+		StringTool.removeLastSign=function(str,sign){
+			var iPos=0;
+			iPos=str.lastIndexOf(sign);
+			str=str.substring(0,iPos);
+			return str;
+		}
+
+		StringTool.getParamArr=function(str){
+			var paramStr;
+			paramStr=laya.debug.tools.StringTool.getBetween(str,"(",")",true);
+			if(StringTool.trim(paramStr).length<1)return [];
+			return paramStr.split(",");
+		}
+
+		StringTool.copyStr=function(str){
+			return str.substring();
+		}
+
+		StringTool.ArrayToString=function(arr){
+			var rst;
+			rst="[{items}]".replace(new RegExp("\\{items\\}","g"),StringTool.getArrayItems(arr));
+			return rst;
+		}
+
+		StringTool.getArrayItems=function(arr){
+			var rst;
+			if(arr.length<1)return "";
+			rst=StringTool.parseItem(arr[0]);
+			var i=0;
+			var len=0;
+			len=arr.length;
+			for(i=1;i<len;i++){
+				rst+=","+StringTool.parseItem(arr[i]);
+			}
+			return rst;
+		}
+
+		StringTool.parseItem=function(item){
+			var rst;
+			rst="\""+item+"\"";
+			return "";
+		}
+
+		StringTool.initAlphaSign=function(){
+			if (StringTool.alphaSigns)return;
+			StringTool.alphaSigns={};
+			StringTool.addSign("a","z",StringTool.alphaSigns);
+			StringTool.addSign("A","Z",StringTool.alphaSigns);
+			StringTool.addSign("0","9",StringTool.alphaSigns);
+		}
+
+		StringTool.addSign=function(ss,e,tar){
+			var i=0;
+			var len=0;
+			var s=0;
+			s=ss.charCodeAt(0);
+			len=e.charCodeAt(0);
+			for(i=s;i<=len;i++){
+				tar[String.fromCharCode(i)]=true;
+				console.log("add :"+String.fromCharCode(i));
+			}
+		}
+
+		StringTool.isPureAlphaNum=function(str){
+			StringTool.initAlphaSign();
+			if (!str)return true;
+			var i=0,len=0;
+			len=str.length;
+			for (i=0;i < len;i++){
+				if (!StringTool.alphaSigns[str.charAt(i)])return false;
+			}
+			return true;
+		}
+
+		StringTool.emptyDic={};
+		StringTool.alphaSigns=null;
+		__static(StringTool,
+		['emptyStrDic',function(){return this.emptyStrDic={
+				" ":true,
+				"\r":true,
+				"\n":true,
+				"\t":true
+		};},'specialChars',function(){return this.specialChars={"*":true,"&":true,"%":true,"#":true,"?":true};}
+
+		]);
+		return StringTool;
 	})()
 
 
@@ -25575,7 +26793,10 @@ var Laya=window.Laya=(function(window,document){
 	var GameMainUI=(function(_super){
 		function GameMainUI(){
 			this.startBtn=null;
+			this.dayTip=null;
 			this.roleList=null;
+			this.welcomeTxt=null;
+			this.gameInfo=null;
 			GameMainUI.__super.call(this);
 		}
 
@@ -25587,7 +26808,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(GameMainUI.uiView);
 		}
 
-		GameMainUI.uiView={"type":"View","props":{"width":720,"height":1280},"child":[{"type":"Button","props":{"y":959,"x":234,"width":252,"var":"startBtn","skin":"comp/button.png","labelSize":30,"labelColors":"#ffffff","label":"开始","height":97}},{"type":"List","props":{"y":122,"x":41,"width":630,"var":"roleList","spaceY":20,"spaceX":40,"repeatY":2,"repeatX":3,"height":605},"child":[{"type":"ActorItem","props":{"runtime":"view.actorgame.ActorItem","name":"render"}}]}]};
+		GameMainUI.uiView={"type":"View","props":{"width":720,"height":1280},"child":[{"type":"Button","props":{"y":959,"x":234,"width":252,"var":"startBtn","skin":"comp/button.png","labelSize":30,"labelColors":"#ffffff","label":"开始","height":97}},{"type":"Label","props":{"y":783,"x":60,"wordWrap":true,"width":599,"var":"dayTip","text":"新的一天开始了，今天你要处理哪方面的事务","styleSkin":"comp/label.png","height":333,"fontSize":30,"color":"#ffffff","align":"center"}},{"type":"List","props":{"y":122,"x":41,"width":630,"var":"roleList","spaceY":20,"spaceX":40,"repeatY":2,"repeatX":3,"height":605},"child":[{"type":"ActorItem","props":{"runtime":"view.actorgame.ActorItem","name":"render"}}]},{"type":"Label","props":{"y":197,"x":70,"wordWrap":true,"width":599,"var":"welcomeTxt","text":"一觉醒来你成了游戏公司的CEO,你的任务是让公司稳健的运行","styleSkin":"comp/label.png","height":333,"fontSize":30,"color":"#ffffff","align":"center"}},{"type":"Label","props":{"y":26,"x":39,"wordWrap":true,"width":599,"var":"gameInfo","text":"剩余资金:100000","styleSkin":"comp/label.png","height":54,"fontSize":30,"color":"#ffffff","align":"left"}}]};
 		return GameMainUI;
 	})(View)
 
@@ -25909,7 +27130,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(QuestionSelectItemUI.uiView);
 		}
 
-		QuestionSelectItemUI.uiView={"type":"View","props":{"width":275,"height":67},"child":[{"type":"Button","props":{"width":275,"var":"actionBtn","skin":"comp/button.png","labelSize":30,"labelColors":"#ffffff","label":"选项1","height":67}}]};
+		QuestionSelectItemUI.uiView={"type":"View","props":{"width":275,"height":67},"child":[{"type":"Button","props":{"var":"actionBtn","skin":"comp/button.png","right":0,"left":0,"labelSize":30,"labelColors":"#ffffff","label":"选项1","height":67}}]};
 		return QuestionSelectItemUI;
 	})(View)
 
@@ -25920,6 +27141,8 @@ var Laya=window.Laya=(function(window,document){
 			this.icon=null;
 			this.changeTxt=null;
 			this.starList=null;
+			this.nameTxt=null;
+			this.moneyChangeTxt=null;
 			ReportItemUI.__super.call(this);
 		}
 
@@ -25931,7 +27154,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(ReportItemUI.uiView);
 		}
 
-		ReportItemUI.uiView={"type":"View","props":{"width":539,"height":80},"child":[{"type":"Image","props":{"y":0,"x":0,"width":80,"var":"icon","skin":"comp/image.png","height":80}},{"type":"Label","props":{"y":21,"x":426,"width":99,"var":"changeTxt","text":"+1","styleSkin":"comp/label.png","height":45,"fontSize":30,"color":"#ffffff","align":"center"}},{"type":"List","props":{"y":11,"x":108,"width":301,"var":"starList","spaceY":2,"spaceX":2,"repeatY":2,"repeatX":10,"height":65},"child":[{"type":"StarItem","props":{"runtime":"view.actorgame.StarItem","name":"render"}}]}]};
+		ReportItemUI.uiView={"type":"View","props":{"width":539,"height":80},"child":[{"type":"Image","props":{"y":0,"x":0,"width":80,"var":"icon","skin":"comp/image.png","height":80}},{"type":"Label","props":{"y":21,"x":416,"width":57,"var":"changeTxt","text":"+1","styleSkin":"comp/label.png","height":45,"fontSize":30,"color":"#ffffff","align":"center"}},{"type":"List","props":{"y":11,"x":108,"width":301,"var":"starList","spaceY":2,"spaceX":2,"repeatY":2,"repeatX":10,"height":65},"child":[{"type":"StarItem","props":{"runtime":"view.actorgame.StarItem","name":"render"}}]},{"type":"Label","props":{"y":53,"x":1,"width":79,"var":"nameTxt","text":"名字","styleSkin":"comp/label.png","height":28,"fontSize":22,"color":"#ffffff","align":"center"}},{"type":"Label","props":{"y":23,"x":485,"width":57,"var":"moneyChangeTxt","text":"+5000","styleSkin":"comp/label.png","height":45,"fontSize":30,"color":"#e33c39","align":"center"}}]};
 		return ReportItemUI;
 	})(View)
 
@@ -26487,7 +27710,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(QuestionPageUI.uiView);
 		}
 
-		QuestionPageUI.uiView={"type":"Dialog","props":{"width":599,"height":543},"child":[{"type":"Image","props":{"y":0,"x":0,"top":0,"text":"TextInput","skin":"comp/input_22_selected.png","sizeGrid":"6,7,5,12","right":0,"left":0,"bottom":0}},{"type":"Label","props":{"y":20,"x":0,"width":599,"var":"questionTxt","text":"游戏市场数据不错，是否换皮刷钱","styleSkin":"comp/label.png","height":149,"fontSize":30,"color":"#ffffff","align":"center"}},{"type":"List","props":{"y":254,"x":164,"width":275,"var":"selectList","spaceY":20,"height":248},"child":[{"type":"QuestionSelectItem","props":{"runtime":"view.actorgame.QuestionSelectItem","name":"render"}}]}]};
+		QuestionPageUI.uiView={"type":"Dialog","props":{"width":599,"height":543},"child":[{"type":"Image","props":{"y":0,"x":0,"top":0,"text":"TextInput","skin":"comp/input_22_selected.png","sizeGrid":"6,7,5,12","right":0,"left":0,"bottom":0}},{"type":"Label","props":{"y":40,"x":49,"wordWrap":true,"width":500,"var":"questionTxt","text":"游戏市场数据不错，是否换皮刷钱","styleSkin":"comp/label.png","height":144,"fontSize":30,"color":"#ffffff","align":"center"}},{"type":"List","props":{"y":254,"x":80,"width":437,"var":"selectList","spaceY":20,"repeatX":1,"height":248},"child":[{"type":"QuestionSelectItem","props":{"runtime":"view.actorgame.QuestionSelectItem","right":0,"name":"render","left":0}}]}]};
 		return QuestionPageUI;
 	})(Dialog)
 
@@ -26508,6 +27731,15 @@ var Laya=window.Laya=(function(window,document){
 		var __proto=ActorItem.prototype;
 		__proto.initByData=function(dataO){
 			this._dataO=dataO;
+			this.nameTxt.text=dataO.label+"("+dataO.count+")";
+			if (dataO.count > 15){
+				this.nameTxt.color="#ffff00";
+			}else
+			if (dataO.count < 3){
+				this.nameTxt.color="#ff0000";
+				}else{
+				this.nameTxt.color="#ffffff";
+			}
 		}
 
 		__proto.onClick=function(){
@@ -26553,16 +27785,44 @@ var Laya=window.Laya=(function(window,document){
 			this.roleList.mouseEnabled=true;
 			this.roleList.renderHandler=new Handler(this,this.itemRender);
 			this.roleList.visible=false;
+			this.dayTip.visible=false;
+			this.gameInfo.visible=false;
+			this.init();
 		}
 
 		__class(GameMain,'view.actorgame.GameMain',_super);
 		var __proto=GameMain.prototype;
-		__proto.itemRender=function(cell,index){}
+		__proto.init=function(){
+			this.freshUI();
+		}
+
+		__proto.nextDay=function(){
+			QGameState.I.nextDay();
+			this.freshUI();
+		}
+
+		__proto.freshUI=function(){
+			this.gameInfo.text="剩余资金:"+QGameState.I.money+" 第"+QGameState.I.day+"天";
+			this.roleList.array=QGameState.I.roleStates;
+			if (QGameState.I.money <=0){
+				this.gameInfo.text="钱用完了，公司倒闭。Game Over!您总共坚持了"+QGameState.I.day+"天";
+				this.roleList.visible=false;
+			}
+		}
+
+		__proto.itemRender=function(cell,index){
+			cell.initByData(cell.dataSource);
+		}
+
 		__proto.onStartBtn=function(){
 			this.roleList.visible=true;
 			this.startBtn.visible=false;
+			this.welcomeTxt.visible=false;
+			this.dayTip.visible=true;
+			this.gameInfo.visible=true;
 		}
 
+		GameMain.I=null
 		return GameMain;
 	})(GameMainUI)
 
@@ -26583,11 +27843,12 @@ var Laya=window.Laya=(function(window,document){
 		var __proto=QuestionSelectItem.prototype;
 		__proto.initByData=function(dataO){
 			this._dataO=dataO;
+			this.actionBtn.label=dataO.label;
 		}
 
 		__proto.onClick=function(){
 			QuestionPage.I.close();
-			SceneSwitcher.I.showDialog(ReportPage,null,true,true);
+			SceneSwitcher.I.showDialog(ReportPage,this._dataO,true,true);
 		}
 
 		return QuestionSelectItem;
@@ -26602,15 +27863,55 @@ var Laya=window.Laya=(function(window,document){
 	var ReportItem=(function(_super){
 		function ReportItem(){
 			this._dataO=null;
+			this._starList=[];
 			ReportItem.__super.call(this);
 			this.starList.renderHandler=new Handler(this,this.itemRender);
 		}
 
 		__class(ReportItem,'view.actorgame.ReportItem',_super);
 		var __proto=ReportItem.prototype;
-		__proto.itemRender=function(cell,index){}
+		__proto.itemRender=function(cell,index){
+			cell.initByData(cell.dataSource);
+		}
+
 		__proto.initByData=function(dataO){
 			this._dataO=dataO;
+			var opCount=0;
+			opCount=dataO.lastOpCount;
+			if (opCount > 0){
+				this.changeTxt.text="+"+opCount+"";
+				}else{
+				this.changeTxt.text=opCount+"";
+			}
+			this.changeTxt.visible=opCount !=0;
+			this.moneyChangeTxt.visible=false;
+			var changeMoney=0;
+			changeMoney=dataO.getChangeMoney();
+			if (changeMoney !=0){
+				this.moneyChangeTxt.text="钱"+QGameState.getSignedInt(changeMoney);
+				this.moneyChangeTxt.visible=true;
+			};
+			var curCount=0;
+			curCount=dataO.count;
+			this._starList.length=dataO.count;
+			this.nameTxt.text=dataO.label;
+			var i=0,len=0;
+			len=this._starList.length;
+			for (i=0;i < len;i++){
+				this._starList[i]=0;
+			}
+			if (opCount > 0){
+				for (i=0;i < opCount;i++){
+					this._starList[curCount-1-i]=1;
+				}
+			}
+			if (opCount < 0){
+				opCount=-opCount;
+				for (i=0;i < opCount;i++){
+					this._starList.push(2);
+				}
+			}
+			this.starList.array=this._starList;
 		}
 
 		return ReportItem;
@@ -26632,6 +27933,17 @@ var Laya=window.Laya=(function(window,document){
 		var __proto=StarItem.prototype;
 		__proto.initByData=function(dataO){
 			this._dataO=dataO;
+			switch(dataO){
+				case 0:
+					this.icon.skin="comp/prop.png";
+					break ;
+				case 2:
+					this.icon.skin="comp/prop_gray.png";
+					break ;
+				case 1:
+					this.icon.skin="comp/prop_green.png";
+					break ;
+				}
 		}
 
 		return StarItem;
@@ -26651,8 +27963,19 @@ var Laya=window.Laya=(function(window,document){
 
 		__class(QuestionPage,'view.actorgame.QuestionPage',_super);
 		var __proto=QuestionPage.prototype;
-		__proto.itemRender=function(cell,index){}
+		__proto.itemRender=function(cell,index){
+			cell.initByData(cell.dataSource);
+		}
+
+		__proto.setData=function(){
+			var questionO;
+			questionO=QGameDataManager.I.getRandomQuestion();
+			this.questionTxt.text=questionO.label;
+			this.selectList.array=questionO.ops;
+		}
+
 		__proto.start=function(){
+			this.setData();
 			this.popup();
 		}
 
@@ -26673,6 +27996,7 @@ var Laya=window.Laya=(function(window,document){
 	//class view.actorgame.ReportPage extends ui.actorgame.ReportPageUI
 	var ReportPage=(function(_super){
 		function ReportPage(){
+			this.paramO=null;
 			ReportPage.__super.call(this);
 			this.reportList.renderHandler=new Handler(this,this.itemRender);
 			this.continueBtn.on("click",this,this.onBtnAction,["continue"]);
@@ -26680,10 +28004,22 @@ var Laya=window.Laya=(function(window,document){
 
 		__class(ReportPage,'view.actorgame.ReportPage',_super);
 		var __proto=ReportPage.prototype;
-		__proto.itemRender=function(cell,index){}
+		__proto.itemRender=function(cell,index){
+			cell.initByData(cell.dataSource);
+		}
+
+		__proto.onSetParam=function(paramO){
+			this.paramO=paramO;
+			QGameState.I.updateRoleState(paramO.ops);
+			QGameState.I.todayInfo();
+			this.infoTxt.text="剩余资金:"+QGameState.I.money+" 今日:"+QGameState.I.changedMoney;
+			this.reportList.array=QGameState.I.roleStates;
+		}
+
 		__proto.onBtnAction=function(type){
 			switch(type){
 				case "continue":
+					GameMain.I.nextDay();
 					this.close();
 					break ;
 				}
@@ -26699,7 +28035,7 @@ var Laya=window.Laya=(function(window,document){
 	})(ReportPageUI)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,Render,Browser,View,Timer,GraphicAnimation,LocalStorage]);
+	Laya.__init([EventDispatcher,LoaderManager,Render,Browser,View,Timer,GraphicAnimation,LocalStorage]);
 	new Game();
 
 })(window,document,Laya);

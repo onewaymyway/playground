@@ -1,8 +1,8 @@
 {
     "x":0,
     "type":"View",
-    "selectedBox":9,
-    "selecteID":8,
+    "selectedBox":1,
+    "selecteID":11,
     "props":{"width":539,"sceneWidth":539,"sceneHeight":80,"sceneColor":"#000000","height":80},
     "nodeParent":-1,
     "label":"View",
@@ -28,7 +28,7 @@
         {
             "x":15,
             "type":"Label",
-            "props":{"y":21,"x":426,"width":99,"var":"changeTxt","text":"+1","styleSkin":"comp/label.png","height":45,"fontSize":30,"color":"#ffffff","align":"center"},
+            "props":{"y":21,"x":416,"width":57,"var":"changeTxt","text":"+1","styleSkin":"comp/label.png","height":45,"fontSize":30,"color":"#ffffff","align":"center"},
             "nodeParent":1,
             "label":"Label(changeTxt)",
             "isDirectory":false,
@@ -64,6 +64,32 @@
                     "child":[
                         ]
                 }]
+        },
+        {
+            "x":15,
+            "type":"Label",
+            "props":{"y":53,"x":1,"width":79,"var":"nameTxt","text":"名字","styleSkin":"comp/label.png","height":28,"fontSize":22,"color":"#ffffff","align":"center"},
+            "nodeParent":1,
+            "label":"Label(nameTxt)",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":10,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Label",
+            "props":{"y":23,"x":485,"width":57,"var":"moneyChangeTxt","text":"+5000","styleSkin":"comp/label.png","height":45,"fontSize":30,"color":"#e33c39","align":"center"},
+            "nodeParent":1,
+            "label":"Label(moneyChangeTxt)",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":11,
+            "child":[
+                ]
         }],
     "animations":[
         {

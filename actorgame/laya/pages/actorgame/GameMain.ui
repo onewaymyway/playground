@@ -1,8 +1,8 @@
 {
     "x":0,
     "type":"View",
-    "selectedBox":12,
-    "selecteID":6,
+    "selectedBox":1,
+    "selecteID":15,
     "props":{"width":720,"sceneColor":"#000000","height":1280},
     "nodeParent":-1,
     "label":"View",
@@ -22,6 +22,19 @@
             "isAniNode":true,
             "hasChild":false,
             "compId":2,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Label",
+            "props":{"y":783,"x":60,"wordWrap":true,"width":599,"var":"dayTip","text":"新的一天开始了，今天你要处理哪方面的事务","styleSkin":"comp/label.png","height":333,"fontSize":30,"color":"#ffffff","align":"center"},
+            "nodeParent":1,
+            "label":"Label(dayTip)",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":14,
             "child":[
                 ]
         },
@@ -51,6 +64,32 @@
                     "child":[
                         ]
                 }]
+        },
+        {
+            "x":15,
+            "type":"Label",
+            "props":{"y":197,"x":70,"wordWrap":true,"width":599,"var":"welcomeTxt","text":"一觉醒来你成了游戏公司的CEO,你的任务是让公司稳健的运行","styleSkin":"comp/label.png","height":333,"fontSize":30,"color":"#ffffff","align":"center"},
+            "nodeParent":1,
+            "label":"Label(welcomeTxt)",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":13,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Label",
+            "props":{"y":26,"x":39,"wordWrap":true,"width":599,"var":"gameInfo","text":"剩余资金:100000","styleSkin":"comp/label.png","height":54,"fontSize":30,"color":"#ffffff","align":"left"},
+            "nodeParent":1,
+            "label":"Label(gameInfo)",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":15,
+            "child":[
+                ]
         }],
     "animations":[
         {

@@ -18,6 +18,19 @@ package view.actorgame
 		public function initByData(dataO:Object):void
 		{
 			_dataO = dataO;
+			//nameTxt.text = dataO.label;
+			nameTxt.text = dataO.label + "(" + dataO.count + ")";
+			if (dataO.count > 15)
+			{
+				nameTxt.color = "#ffff00";
+			}else
+			if (dataO.count < 3)
+			{
+				nameTxt.color = "#ff0000";
+			}else
+			{
+				nameTxt.color = "#ffffff";
+			}
 		}
 		
 		private function onClick():void
