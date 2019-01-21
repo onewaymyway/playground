@@ -27805,7 +27805,7 @@ var Laya=window.Laya=(function(window,document){
 			this.gameInfo.text="剩余资金:"+QGameState.I.money+" 第"+QGameState.I.day+"天";
 			this.roleList.array=QGameState.I.roleStates;
 			if (QGameState.I.money <=0){
-				this.gameInfo.text="钱用完了，公司倒闭。Game Over!";
+				this.gameInfo.text="钱用完了，公司倒闭。Game Over!您总共坚持了"+QGameState.I.day+"天";
 				this.roleList.visible=false;
 			}
 		}
