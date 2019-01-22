@@ -818,11 +818,11 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.next=function(){
-			if (this.count <=3){
+			if (this.count < 3){
 				this.lowCount++;
 				this.highCount=0;
 			}else
-			if(this.count>=10){
+			if(this.count>=15){
 				this.highCount++;
 				this.lowCount=0;
 				}else{
@@ -27866,8 +27866,11 @@ var Laya=window.Laya=(function(window,document){
 		__proto.initByData=function(dataO){
 			this._dataO=dataO;
 			this.nameTxt.text=dataO.label+"("+dataO.count+")";
-			if (dataO.count > 15){
+			if (dataO.count >=15){
 				this.nameTxt.color="#ffff00";
+			}else
+			if (dataO.count > 10){
+				this.nameTxt.color="#ff00ff";
 			}else
 			if (dataO.count < 3){
 				this.nameTxt.color="#ff0000";
