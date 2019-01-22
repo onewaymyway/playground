@@ -705,6 +705,7 @@ var Laya=window.Laya=(function(window,document){
 			Laya.stage.scaleMode="showall";
 			Laya.stage.alignH="center";
 			Laya.stage.alignV="middle";
+			UIConfig.closeDialogOnSide=false;
 			var loadList;
 			loadList=[];
 			this.configName="data/TT.qgame"+"?v="+Math.random();
@@ -866,7 +867,7 @@ var Laya=window.Laya=(function(window,document){
 				if (this.highActions.length < 0)return null;
 				return this.getRandomFromArr(this.highActions);
 			}
-			if (this.tooHighCount >=5){
+			if (this.tooHighCount >=3){
 				if (this.tooHighActions.length < 0)return null;
 				return this.getRandomFromArr(this.tooHighActions);
 			}
