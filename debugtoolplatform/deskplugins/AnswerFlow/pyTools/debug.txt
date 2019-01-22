@@ -10,14 +10,14 @@ Project configuration:D:\codes\playground.git\trunk\debugtoolplatform\deskplugin
 1,0.00,D:/codes/playground.git/trunk/libs/platformapi/src,0,Collect
 1,0.00,D:/codes/playground.git/trunk/libs/commonui/src,0,Collect
 1,2.00,,0,read class message
-7,87.98,D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/ColorPickerWithIndex.as,176,Server.url_file This variable is not defined.
-7,87.98,D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/ColorPickerWithIndex.as,177,Server.url_file This variable is not defined.
+7,87.99,D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/ColorPickerWithIndex.as,176,Server.url_file This variable is not defined.
+7,87.99,D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/ColorPickerWithIndex.as,177,Server.url_file This variable is not defined.
 7,88.04,D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/ColorRing.as,407,callLater This variable is not defined.
-7,88.14,D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/colorselectorpanel/ColorSelectorControl.as,17,ColorPickerWithIndex This variable is not defined.
+7,88.15,D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/colorselectorpanel/ColorSelectorControl.as,17,ColorPickerWithIndex This variable is not defined.
 7,88.20,D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/colorselectorpanel/SelectorColorPicker.as,108,ColorTableTool.createColorTable This variable is not defined.
 1,89.95,,0,Disable Flash3D D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/AnswerFlow/src/TestDemo.as
-12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/AnswerFlow.max.js,25427,
-12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/laya.js,1239172,
+12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/AnswerFlow.max.js,28601,
+12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/laya.js,1257884,
 11,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/AnswerFlow/bin/h5/AnswerFlow.max.html,827,
 ******************************************************************************
 14,89.95,,0,

@@ -3,11 +3,12 @@
 	var __un=Laya.un,__uns=Laya.uns,__static=Laya.static,__class=Laya.class,__getset=Laya.getset,__newvec=Laya.__newvec;
 
 	var AutoSizeTextInput=commoncomponent.AutoSizeTextInput,Button=laya.ui.Button,CommonInput=commoncomponent.CommonInput;
-	var ContextMenu=laya.debug.uicomps.ContextMenu,ContextMenuItem=laya.debug.uicomps.ContextMenuItem,EditorRenderBase=viewRender.EditorRenderBase;
-	var Event=laya.events.Event,EventTools=commontools.EventTools,Handler=laya.utils.Handler,Label=laya.ui.Label;
-	var List=laya.ui.List,Loader=laya.net.Loader,MindMapTreeBase=commonlayout.mindmaptree.MindMapTreeBase,MindMapViewer=commonlayout.mindmaptree.MindMapViewer;
-	var ObjectTools=laya.debug.tools.ObjectTools,Stage=laya.display.Stage,Text=laya.display.Text,TextInput=laya.ui.TextInput;
-	var View=laya.ui.View;
+	var ContextMenu=laya.debug.uicomps.ContextMenu,ContextMenuItem=laya.debug.uicomps.ContextMenuItem,Dialog=laya.ui.Dialog;
+	var EditorRenderBase=viewRender.EditorRenderBase,Event=laya.events.Event,EventTools=commontools.EventTools;
+	var Handler=laya.utils.Handler,JsonTool=laya.debug.tools.JsonTool,Label=laya.ui.Label,List=laya.ui.List,Loader=laya.net.Loader;
+	var MessageManager=commontools.MessageManager,MindMapTreeBase=commonlayout.mindmaptree.MindMapTreeBase,MindMapViewer=commonlayout.mindmaptree.MindMapViewer;
+	var ObjectTools=laya.debug.tools.ObjectTools,Stage=laya.display.Stage,Text=laya.display.Text,TextArea=laya.ui.TextArea;
+	var TextInput=laya.ui.TextInput,View=laya.ui.View;
 	/**
 	*...
 	*@author ww
@@ -330,23 +331,6 @@
 	})(MindMapTreeBase)
 
 
-	//class ui.answerflow.DataOperateUI extends commonlayout.mindmaptree.MindMapTreeBase
-	var DataOperateUI=(function(_super){
-		function DataOperateUI(){DataOperateUI.__super.call(this);;
-		};
-
-		__class(DataOperateUI,'ui.answerflow.DataOperateUI',_super);
-		var __proto=DataOperateUI.prototype;
-		__proto.createChildren=function(){
-			laya.ui.Component.prototype.createChildren.call(this);
-			this.createView(DataOperateUI.uiView);
-		}
-
-		DataOperateUI.uiView={"type":"MindMapTreeBase","props":{"width":240,"height":30},"child":[{"type":"TextInput","props":{"y":4,"x":10,"width":95,"text":"TextInput","skin":"comp/input_22.png","promptColor":"#f31713","height":22,"color":"#e80d09"}},{"type":"ComboBox","props":{"y":5,"x":114,"width":53,"skin":"comp/combobox.png","sizeGrid":"0,31,0,0","selectedIndex":0,"labels":"+,-","height":22}},{"type":"TextInput","props":{"y":5,"x":174,"width":60,"text":"TextInput","skin":"comp/input_22.png","height":22,"color":"#ec130f"}}]};
-		return DataOperateUI;
-	})(MindMapTreeBase)
-
-
 	/**
 	*...
 	*@author ...
@@ -549,7 +533,7 @@
 								"editable":true,
 								"tpl":{
 									"type":"ItemData",
-									"props":{},
+									"props":{"count":"-1"},
 									"childs":[]
 								}
 							},
@@ -567,6 +551,23 @@
 		AnswerFlowEditor.QGame="qgame";
 		return AnswerFlowEditor;
 	})(AnswerFlowEditorUI)
+
+
+	//class ui.answerflow.DataOperateUI extends commonlayout.mindmaptree.MindMapTreeBase
+	var DataOperateUI=(function(_super){
+		function DataOperateUI(){DataOperateUI.__super.call(this);;
+		};
+
+		__class(DataOperateUI,'ui.answerflow.DataOperateUI',_super);
+		var __proto=DataOperateUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(DataOperateUI.uiView);
+		}
+
+		DataOperateUI.uiView={"type":"MindMapTreeBase","props":{"width":240,"height":30},"child":[{"type":"TextInput","props":{"y":4,"x":10,"width":95,"text":"TextInput","skin":"comp/input_22.png","promptColor":"#f31713","height":22,"color":"#e80d09"}},{"type":"ComboBox","props":{"y":5,"x":114,"width":53,"skin":"comp/combobox.png","sizeGrid":"0,31,0,0","selectedIndex":0,"labels":"+,-","height":22}},{"type":"TextInput","props":{"y":5,"x":174,"width":60,"text":"TextInput","skin":"comp/input_22.png","height":22,"color":"#ec130f"}}]};
+		return DataOperateUI;
+	})(MindMapTreeBase)
 
 
 	//class ui.answerflow.ItemDataUI extends commonlayout.mindmaptree.MindMapTreeBase
@@ -620,10 +621,20 @@
 			this._dataO=null;
 			ItemListItem.__super.call(this);
 			this.setUpTextInput(this.label,"label");
+			this.on("rightmousedown",this,this.onTextMouseDown);
 		}
 
 		__class(ItemListItem,'answerflow.ItemListItem',_super);
 		var __proto=ItemListItem.prototype;
+		__proto.onTextMouseDown=function(){
+			SimpleJsonEditor.I.start(this._dataO.props,Handler.create(this,this.onJsonBack));
+		}
+
+		__proto.onJsonBack=function(dataO){
+			console.log("onJsonBack:",dataO);
+			this._dataO.props=dataO;
+		}
+
 		__proto.initByData=function(dataO){
 			this._dataO=dataO;
 			this.label.text=dataO.props.label;
@@ -640,6 +651,27 @@
 
 		return ItemListItem;
 	})(ItemListItemUI)
+
+
+	//class ui.answerflow.SimpleJsonEditorUI extends laya.ui.Dialog
+	var SimpleJsonEditorUI=(function(_super){
+		function SimpleJsonEditorUI(){
+			this.editTxt=null;
+			this.saveBtn=null;
+			this.cancelBtn=null;
+			SimpleJsonEditorUI.__super.call(this);
+		}
+
+		__class(SimpleJsonEditorUI,'ui.answerflow.SimpleJsonEditorUI',_super);
+		var __proto=SimpleJsonEditorUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(SimpleJsonEditorUI.uiView);
+		}
+
+		SimpleJsonEditorUI.uiView={"type":"Dialog","props":{"width":371,"height":287},"child":[{"type":"Image","props":{"y":0,"x":0,"top":0,"text":"TextInput","skin":"comp/textinput.png","sizeGrid":"5,5,5,7","right":0,"left":0,"bottom":0}},{"type":"TextArea","props":{"y":10,"x":8,"width":356,"var":"editTxt","text":"TextArea","skin":"comp/textarea.png","sizeGrid":"6,18,8,27","height":240,"color":"#f4eeee"}},{"type":"Button","props":{"y":259,"x":296,"var":"saveBtn","skin":"comp/button.png","label":"save"}},{"type":"Button","props":{"y":257,"x":8,"var":"cancelBtn","skin":"comp/button.png","label":"cancel"}}]};
+		return SimpleJsonEditorUI;
+	})(Dialog)
 
 
 	/**
@@ -764,6 +796,68 @@
 
 		return SimpleNode;
 	})(SimpleNodeUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class answerflow.SimpleJsonEditor extends ui.answerflow.SimpleJsonEditorUI
+	var SimpleJsonEditor=(function(_super){
+		function SimpleJsonEditor(){
+			this.complete=null;
+			SimpleJsonEditor.__super.call(this);
+			this.saveBtn.on("click",this,this.onBtnClick,["saveBtn"]);
+			this.cancelBtn.on("click",this,this.onBtnClick,["cancelBtn"]);
+		}
+
+		__class(SimpleJsonEditor,'answerflow.SimpleJsonEditor',_super);
+		var __proto=SimpleJsonEditor.prototype;
+		__proto.start=function(editData,complete){
+			this.complete=complete;
+			this.editTxt.text=JsonTool.getJsonString(editData,false);
+			this.popup();
+		}
+
+		__proto.checkJson=function(){
+			var dataO;
+			try{
+				dataO=JSON.parse(this.editTxt.text);
+				}catch (e){
+				console.log("parse err:",e);
+				dataO=null;
+			}
+			return dataO;
+		}
+
+		__proto.onBtnClick=function(type){
+			switch(type){
+				case "saveBtn":;
+					var tData;
+					tData=this.checkJson();
+					if (!tData){
+						MessageManager.I.show("格式错误");
+						}else{
+						if (this.complete){
+							this.complete.runWith(tData);
+						}
+						this.close();
+					}
+					break ;
+				case "cancelBtn":
+					this.close();
+					break ;
+				}
+		}
+
+		__getset(1,SimpleJsonEditor,'I',function(){
+			if (!SimpleJsonEditor._I)SimpleJsonEditor._I=new SimpleJsonEditor();
+			return SimpleJsonEditor._I;
+		},ui.answerflow.SimpleJsonEditorUI._$SET_I);
+
+		SimpleJsonEditor._I=null
+		return SimpleJsonEditor;
+	})(SimpleJsonEditorUI)
 
 
 

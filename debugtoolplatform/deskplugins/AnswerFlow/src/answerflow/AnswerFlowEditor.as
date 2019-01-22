@@ -202,7 +202,7 @@ package answerflow
 										"editable":true,
 										"tpl": {
 												"type":"ItemData",
-												"props": { },
+												"props": {"count":"-1"},
 												"childs":[]
 												}
 										},

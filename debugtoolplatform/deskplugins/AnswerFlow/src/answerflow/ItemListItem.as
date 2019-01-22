@@ -15,6 +15,18 @@ package answerflow
 		public function ItemListItem() 
 		{
 			setUpTextInput(label, "label");
+			this.on(Event.RIGHT_MOUSE_DOWN, this, onTextMouseDown);
+		}
+		
+		private function onTextMouseDown():void
+		{
+			SimpleJsonEditor.I.start(_dataO.props, Handler.create(this, onJsonBack));
+		}
+		
+		private function onJsonBack(dataO:Object):void
+		{
+			trace("onJsonBack:", dataO);
+			_dataO.props = dataO;
 		}
 		
 		public var actionHandler:Handler;
