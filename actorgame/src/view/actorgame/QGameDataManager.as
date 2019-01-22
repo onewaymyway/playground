@@ -81,6 +81,11 @@ package view.actorgame
 				rst.type = "high";
 				rst.actor = des.split(":")[0];
 			}
+			if (des.indexOf(":tooHigh") >= 0)
+			{
+				rst.type = "tooHigh";
+				rst.actor = des.split(":")[0];
+			}
 			rst.ops = getSelections(tQData.childs[0].childs, actorDic);
 			rst.actorDic = actorDic;
 			

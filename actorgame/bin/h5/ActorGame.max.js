@@ -805,9 +805,11 @@ var Laya=window.Laya=(function(window,document){
 			this.label=null;
 			this.lowCount=0;
 			this.highCount=0;
+			this.tooHighCount=0;
 			this.questions=[];
 			this.lowActions=[];
 			this.highActions=[];
+			this.tooHighActions=[];
 		}
 
 		__class(ActorData,'view.actorgame.ActorData');
@@ -820,14 +822,18 @@ var Laya=window.Laya=(function(window,document){
 		__proto.next=function(){
 			if (this.count < 3){
 				this.lowCount++;
-				this.highCount=0;
-			}else
-			if(this.count>=15){
-				this.highCount++;
-				this.lowCount=0;
 				}else{
 				this.lowCount=0;
+			}
+			if(this.count>=15){
+				this.highCount++;
+				}else{
 				this.highCount=0;
+			}
+			if (this.count >=18){
+				this.tooHighCount++;
+				}else{
+				this.tooHighCount=0;
 			}
 		}
 
@@ -859,6 +865,10 @@ var Laya=window.Laya=(function(window,document){
 			if (this.highCount >=5){
 				if (this.highActions.length < 0)return null;
 				return this.getRandomFromArr(this.highActions);
+			}
+			if (this.tooHighCount >=5){
+				if (this.tooHighActions.length < 0)return null;
+				return this.getRandomFromArr(this.tooHighActions);
 			}
 			return null;
 		}
@@ -930,6 +940,10 @@ var Laya=window.Laya=(function(window,document){
 			}
 			if (des.indexOf(":high")>=0){
 				rst.type="high";
+				rst.actor=des.split(":")[0];
+			}
+			if (des.indexOf(":tooHigh")>=0){
+				rst.type="tooHigh";
 				rst.actor=des.split(":")[0];
 			}
 			rst.ops=this.getSelections(tQData.childs[0].childs,actorDic);
@@ -1016,6 +1030,8 @@ var Laya=window.Laya=(function(window,document){
 		function QGameState(){
 			this.money=0;
 			this.roleStates=null;
+			this.hiddenStates=null;
+			this.allStates=null;
 			this.roleDic=null;
 			this.day=0;
 			this.preActor=null;
@@ -1028,6 +1044,8 @@ var Laya=window.Laya=(function(window,document){
 		var __proto=QGameState.prototype;
 		__proto.initByGameData=function(dataO){
 			this.roleStates=[];
+			this.hiddenStates=[];
+			this.allStates=[];
 			this.roleDic={};
 			this.preActor=null;
 			var roles;
@@ -1043,7 +1061,12 @@ var Laya=window.Laya=(function(window,document){
 				tDataO.count=5;
 				tDataO.lastOpCount=0;
 				this.roleDic[tDataO.label]=tDataO;
-				this.roleStates.push(tDataO);
+				this.allStates.push(tDataO);
+				if (tRoleO.props.hidden){
+					this.hiddenStates.push(tDataO);
+					}else{
+					this.roleStates.push(tDataO);
+				}
 			};
 			var questions;
 			questions=dataO.questions;
@@ -1079,6 +1102,13 @@ var Laya=window.Laya=(function(window,document){
 				tActor=this.roleDic[questionO.actor];
 				if (tActor){
 					tActor.highActions.push(questionO);
+				}
+				return;
+			}
+			if (questionO.type=="tooHigh"){
+				tActor=this.roleDic[questionO.actor];
+				if (tActor){
+					tActor.tooHighActions.push(questionO);
 				}
 				return;
 			};
@@ -1122,10 +1152,10 @@ var Laya=window.Laya=(function(window,document){
 			this.day++;
 			this.eventList.length=0;
 			var i=0,len=0;
-			len=this.roleStates.length;
+			len=this.allStates.length;
 			var tActor;
 			for (i=0;i < len;i++){
-				tActor=this.roleStates[i];
+				tActor=this.allStates[i];
 				tActor.next();
 			}
 			if (this.money <=0){
@@ -1135,11 +1165,11 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.getTriggerAction=function(){
 			var i=0,len=0;
-			len=this.roleStates.length;
+			len=this.allStates.length;
 			var tActor;
 			var tAction;
 			for (i=0;i < len;i++){
-				tActor=this.roleStates[i];
+				tActor=this.allStates[i];
 				tAction=tActor.getAction();
 				if (tAction){
 					tActor.clearState();

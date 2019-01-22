@@ -11,9 +11,11 @@ package view.actorgame
 		public var label:String;
 		public var lowCount:int=0;
 		public var highCount:int = 0;
+		public var tooHighCount:int = 0;
 		public var questions:Array = [];
 		public var lowActions:Array = [];
 		public var highActions:Array = [];
+		public var tooHighActions:Array = [];
 		public function ActorData() 
 		{
 			
@@ -30,16 +32,24 @@ package view.actorgame
 			if (count < 3)
 			{
 				lowCount++;
-				highCount = 0;
 			}else
+			{
+				lowCount = 0;
+			}
 			if(count>=15)
 			{
 				highCount++;
-				lowCount = 0;
 			}else
 			{
-				lowCount = 0;
 				highCount = 0;
+			}
+			
+			if (count >= 18)
+			{
+				tooHighCount++;
+			}else
+			{
+				tooHighCount = 0;
 			}
 		}
 		
@@ -77,6 +87,11 @@ package view.actorgame
 			{
 				if (highActions.length < 0) return null;
 				return getRandomFromArr(highActions);
+			}
+			if (tooHighCount >= 5)
+			{
+				if (tooHighActions.length < 0) return null;
+				return getRandomFromArr(tooHighActions);
 			}
 			return null;
 		}

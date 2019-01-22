@@ -13,12 +13,16 @@ package view.actorgame
 		}
 		public var money:int;
 		public var roleStates:Array;
+		public var hiddenStates:Array;
+		public var allStates:Array;
 		public var roleDic:Object;
 		public var day:int = 0;
 		public var preActor:String = null;
 		public function initByGameData(dataO:QGameDataManager):void
 		{
 			roleStates = [];
+			hiddenStates = [];
+			allStates = [];
 			roleDic = { };
 			preActor = null;
 			var roles:Array;
@@ -35,7 +39,15 @@ package view.actorgame
 				tDataO.count = 5;
 				tDataO.lastOpCount = 0;
 				roleDic[tDataO.label] = tDataO;
-				roleStates.push(tDataO);
+				allStates.push(tDataO);
+				if (tRoleO.props.hidden)
+				{
+					hiddenStates.push(tDataO);
+				}else
+				{
+					roleStates.push(tDataO);
+				}
+				
 			}
 			var questions:Array;
 			questions = dataO.questions;
@@ -80,6 +92,15 @@ package view.actorgame
 				if (tActor)
 				{
 					tActor.highActions.push(questionO);
+				}
+				return;
+			}
+			if (questionO.type == "tooHigh")
+			{
+				tActor = roleDic[questionO.actor];
+				if (tActor)
+				{
+					tActor.tooHighActions.push(questionO);
 				}
 				return;
 			}
@@ -135,11 +156,11 @@ package view.actorgame
 			day++;
 			eventList.length = 0;
 			var i:int, len:int;
-			len = roleStates.length;
+			len = allStates.length;
 			var tActor:ActorData;
 			for (i = 0; i < len; i++)
 			{
-				tActor = roleStates[i];
+				tActor = allStates[i];
 				tActor.next();
 			}
 			if (money <= 0)
@@ -151,12 +172,12 @@ package view.actorgame
 		public function getTriggerAction():Object
 		{
 			var i:int, len:int;
-			len = roleStates.length;
+			len = allStates.length;
 			var tActor:ActorData;
 			var tAction:Object;
 			for (i = 0; i < len; i++)
 			{
-				tActor = roleStates[i];
+				tActor = allStates[i];
 				tAction = tActor.getAction();
 				if (tAction)
 				{
