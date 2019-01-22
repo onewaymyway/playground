@@ -25,6 +25,7 @@ package
 			Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 			Laya.stage.alignH = Stage.ALIGN_CENTER;
 			Laya.stage.alignV = Stage.ALIGN_MIDDLE;
+			UIConfig.closeDialogOnSide = false;
 			var loadList:Array;
 			loadList = [];
 			configName = "data/TT.qgame" + "?v="+Math.random();

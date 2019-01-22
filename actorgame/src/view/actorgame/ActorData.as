@@ -88,7 +88,7 @@ package view.actorgame
 				if (highActions.length < 0) return null;
 				return getRandomFromArr(highActions);
 			}
-			if (tooHighCount >= 5)
+			if (tooHighCount >= 3)
 			{
 				if (tooHighActions.length < 0) return null;
 				return getRandomFromArr(tooHighActions);
