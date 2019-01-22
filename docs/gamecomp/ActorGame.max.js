@@ -700,21 +700,23 @@ var Laya=window.Laya=(function(window,document){
 	//class Game
 	var Game=(function(){
 		function Game(){
+			this.configName=null;
 			Laya.init(720,1280);
 			Laya.stage.scaleMode="showall";
 			Laya.stage.alignH="center";
 			Laya.stage.alignV="middle";
 			var loadList;
 			loadList=[];
+			this.configName="data/TT.qgame"+"?v="+Math.random();
 			loadList.push({url:"res/atlas/comp.json",type:"atlas" });
-			loadList.push({url:"data/TT.qgame",type:"json" });
+			loadList.push({url:this.configName,type:"json" });
 			Laya.loader.load(loadList,new Handler(this,this.initGameView));
 		}
 
 		__class(Game,'Game');
 		var __proto=Game.prototype;
 		__proto.initGameView=function(){
-			QGameDataManager.initData(Loader.getRes("data/TT.qgame"));
+			QGameDataManager.initData(Loader.getRes(this.configName));
 			QGameState.initByData(QGameDataManager.I);
 			SceneSwitcher.I=new SceneSwitcher();
 			SceneSwitcher.I.showPage(GameMain,null,true,true);
