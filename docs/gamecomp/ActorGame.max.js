@@ -982,8 +982,9 @@ var Laya=window.Laya=(function(window,document){
 			var rst;
 			rst={};
 			rst.item=itemOp.props.item;
-			actorDic[rst.item]=true;
-			rst.count=parseInt(itemOp.props.count)||0;
+			rst.count=parseInt(itemOp.props.count)|| 0;
+			if(rst.count>0)
+				actorDic[rst.item]=true;
 			return rst;
 		}
 
