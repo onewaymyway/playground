@@ -27790,10 +27790,10 @@ var Laya=window.Laya=(function(window,document){
 			}
 			if (dataO.label==QGameState.I.preActor){
 				this.mouseEnabled=false;
-				UIUtils.gray(this);
+				UIUtils.gray(this.icon);
 				}else{
 				this.mouseEnabled=true;
-				this.filters=null;
+				this.icon.filters=null;
 			}
 		}
 
