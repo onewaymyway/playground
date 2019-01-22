@@ -26,17 +26,17 @@ package view.actorgame
 			cell.initByData(cell.dataSource);
 		}
 		
-		private function setData():void
+		private function setData(questionO:Object):void
 		{
-			var questionO:Object;
+			if(!questionO)
 			questionO = QGameDataManager.I.getRandomQuestion();
 			questionTxt.text = questionO.label;
 			selectList.array = questionO.ops;
 		}
 		
-		public function start():void
+		public function start(questionO:Object=null):void
 		{
-			setData();
+			setData(questionO);
 			this.popup();
 		}
 		

@@ -30,6 +30,10 @@ package view.actorgame
 			//debugger;
 		}
 		
+		public function get questions():Array
+		{
+			return _questions;
+		}
 		public function getRandomQuestion():Object
 		{
 			var index:int;
@@ -62,12 +66,15 @@ package view.actorgame
 			var rst:Object;
 			rst = { };
 			rst.label = tQData.props.label;
-			rst.ops = getSelections(tQData.childs[0].childs);
+			var actorDic:Object;
+			actorDic = { };
+			rst.ops = getSelections(tQData.childs[0].childs, actorDic);
+			rst.actorDic = actorDic;
 			
 			return rst;
 		}
 		
-		private function getSelections(selectList:Array):Array
+		private function getSelections(selectList:Array,actorDic:Object):Array
 		{
 			var i:int, len:int;
 			len = selectList.length;
@@ -75,23 +82,23 @@ package view.actorgame
 			rst = [];
 			for (i = 0; i < len; i++)
 			{
-				rst.push(getAdptSelection(selectList[i]));
+				rst.push(getAdptSelection(selectList[i],actorDic));
 			}
 			return rst;
 		}
 		
-		private function getAdptSelection(selectO:Object):Object
+		private function getAdptSelection(selectO:Object,actorDic:Object):Object
 		{
 			//debugger;
 			var rst:Object;
 			rst = { };
 			rst.label = selectO.props.label;
-			rst.ops = getItemOps(selectO.childs);
+			rst.ops = getItemOps(selectO.childs,actorDic);
 			
 			return rst;
 		}
 		
-		private function getItemOps(itemList:Array):Array
+		private function getItemOps(itemList:Array,actorDic:Object):Array
 		{
 			var i:int, len:int;
 			len = itemList.length;
@@ -99,16 +106,17 @@ package view.actorgame
 			rst = [];
 			for (i = 0; i < len; i++)
 			{
-				rst.push(getAdptItemOp(itemList[i]));
+				rst.push(getAdptItemOp(itemList[i],actorDic));
 			}
 			return rst;
 		}
 		
-		private function getAdptItemOp(itemOp:Object):Object
+		private function getAdptItemOp(itemOp:Object,actorDic:Object):Object
 		{
 			var rst:Object;
 			rst = { };
 			rst.item = itemOp.props.item;
+			actorDic[rst.item] = true;
 			rst.count = parseInt(itemOp.props.count)||0;
 			return rst;
 		}

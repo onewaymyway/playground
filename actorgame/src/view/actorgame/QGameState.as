@@ -15,15 +15,17 @@ package view.actorgame
 		public var roleStates:Array;
 		public var roleDic:Object;
 		public var day:int = 0;
+		public var preActor:String = null;
 		public function initByGameData(dataO:QGameDataManager):void
 		{
 			roleStates = [];
 			roleDic = { };
+			preActor = null;
 			var roles:Array;
 			roles = dataO.roles;
 			var i:int, len:int;
 			len = roles.length;
-			var tDataO:Object;
+			var tDataO:ActorData;
 			var tRoleO:Object;
 			for (i = 0; i < len; i++)
 			{
@@ -35,8 +37,42 @@ package view.actorgame
 				roleDic[tDataO.label] = tDataO;
 				roleStates.push(tDataO);
 			}
+			var questions:Array;
+			questions = dataO.questions;
+			len = questions.length;
+			var tQuestion:Object;
+			for (i = 0; i < len; i++)
+			{
+				tQuestion = questions[i];
+				addQuestionToRole(tQuestion);
+			}
 			money = 500000;
 			day = 0;
+		}
+		
+		public function getQuestionByRole(role:String):Object
+		{
+			var tActor:ActorData;
+			tActor = roleDic[role];
+			if (tActor)
+			{
+				return tActor.getRandomQuestion();
+			}
+			return QGameDataManager.I.getRandomQuestion();
+		}
+		
+		private function addQuestionToRole(questionO:Object):void
+		{
+			var actorDic:Object;
+			actorDic = questionO.actorDic;
+			var key:String;
+			var tActor:ActorData;
+			for (key in actorDic)
+			{
+				tActor = roleDic[key];
+				if (!tActor) continue;
+				tActor.questions.push(questionO);
+			}
 		}
 		
 		private function clearLastOp():void

@@ -1,6 +1,7 @@
 package view.actorgame 
 {
 	import laya.events.Event;
+	import laya.ui.UIUtils;
 	import ui.actorgame.ActorItemUI;
 	
 	/**
@@ -31,11 +32,21 @@ package view.actorgame
 			{
 				nameTxt.color = "#ffffff";
 			}
+			if (dataO.label == QGameState.I.preActor)
+			{
+				this.mouseEnabled = false;
+				UIUtils.gray(this);
+			}else
+			{
+				this.mouseEnabled = true;
+				this.filters = null;
+			}
 		}
 		
 		private function onClick():void
 		{
-			QuestionPage.I.start();
+			QGameState.I.preActor = _dataO.label;
+			QuestionPage.I.start(QGameState.I.getQuestionByRole(_dataO.label));
 		}
 		
 	}

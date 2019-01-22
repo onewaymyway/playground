@@ -10,7 +10,8 @@ package view.actorgame
 		public var lastOpCount:int = 0;
 		public var label:String;
 		public var lowCount:int=0;
-		public var highCount:int=0;
+		public var highCount:int = 0;
+		public var questions:Array=[];
 		public function ActorData() 
 		{
 			
@@ -38,6 +39,13 @@ package view.actorgame
 				lowCount = 0;
 				highCount = 0;
 			}
+		}
+		
+		public function getRandomQuestion():Object
+		{
+			var index:int;
+			index = Math.round(Math.random() * 9999999);
+			return questions[index%questions.length];
 		}
 		
 		public function getChangeMoney():int
