@@ -851,11 +851,12 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.getAction=function(){
-			if (this.lowCount > 5){
+			if (Math.random()> 0.3)return null;
+			if (this.lowCount >=5){
 				if (this.lowActions.length < 0)return null;
 				return this.getRandomFromArr(this.lowActions);
 			}
-			if (this.highCount > 5){
+			if (this.highCount >=5){
 				if (this.highActions.length < 0)return null;
 				return this.getRandomFromArr(this.highActions);
 			}
@@ -960,7 +961,7 @@ var Laya=window.Laya=(function(window,document){
 			for (i=0;i < len;i++){
 				tOp=ops[i];
 				if (tOp.item=="money"){
-					rst.labelEx=rst.label+"(钱"+tOp.count+")";
+					rst.labelEx=rst.label+"(钱"+QGameState.getSignedInt(tOp.count)+")";
 				}
 			}
 			return rst;
