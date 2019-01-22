@@ -20,7 +20,7 @@ package view.actorgame
 		public function initByData(dataO:Object):void
 		{
 			_dataO = dataO;
-			actionBtn.label = dataO.label;
+			actionBtn.label = dataO.labelEx||dataO.label;
 		}
 		
 		private function onClick():void

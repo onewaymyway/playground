@@ -68,6 +68,19 @@ package view.actorgame
 			rst.label = tQData.props.label;
 			var actorDic:Object;
 			actorDic = { };
+			var des:String;
+			des = tQData.props.des;
+			rst.type = "normal";
+			if (des.indexOf(":low") >= 0)
+			{
+				rst.type = "low";
+				rst.actor = des.split(":")[0];
+			}
+			if (des.indexOf(":high") >= 0)
+			{
+				rst.type = "high";
+				rst.actor = des.split(":")[0];
+			}
 			rst.ops = getSelections(tQData.childs[0].childs, actorDic);
 			rst.actorDic = actorDic;
 			
@@ -93,7 +106,20 @@ package view.actorgame
 			var rst:Object;
 			rst = { };
 			rst.label = selectO.props.label;
-			rst.ops = getItemOps(selectO.childs,actorDic);
+			rst.ops = getItemOps(selectO.childs, actorDic);
+			var ops:Array;
+			ops = rst.ops;
+			var i:int, len:int;
+			len = ops.length;
+			var tOp:Object;
+			for (i = 0; i < len; i++)
+			{
+				tOp = ops[i];
+				if (tOp.item == "money")
+				{
+					rst.labelEx = rst.label + "(钱" +QGameState.getSignedInt(tOp.count)+ ")";
+				}
+			}
 			
 			return rst;
 		}

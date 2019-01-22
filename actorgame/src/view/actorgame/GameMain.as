@@ -30,6 +30,12 @@ package view.actorgame
 		public function nextDay():void
 		{
 			QGameState.I.nextDay();
+			var tAction:Object;
+			tAction = QGameState.I.getTriggerAction();
+			if (tAction)
+			{
+				QuestionPage.I.start(tAction);
+			}
 			freshUI();
 		}
 		

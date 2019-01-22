@@ -21,9 +21,13 @@ package view.actorgame
 			_dataO = dataO;
 			//nameTxt.text = dataO.label;
 			nameTxt.text = dataO.label + "(" + dataO.count + ")";
-			if (dataO.count > 15)
+			if (dataO.count >= 15)
 			{
 				nameTxt.color = "#ffff00";
+			}else
+			if (dataO.count > 10)
+			{
+				nameTxt.color = "#ff00ff";
 			}else
 			if (dataO.count < 3)
 			{
@@ -35,11 +39,11 @@ package view.actorgame
 			if (dataO.label == QGameState.I.preActor)
 			{
 				this.mouseEnabled = false;
-				UIUtils.gray(this);
+				UIUtils.gray(icon);
 			}else
 			{
 				this.mouseEnabled = true;
-				this.filters = null;
+				icon.filters = null;
 			}
 		}
 		

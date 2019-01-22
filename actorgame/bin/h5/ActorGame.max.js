@@ -700,21 +700,23 @@ var Laya=window.Laya=(function(window,document){
 	//class Game
 	var Game=(function(){
 		function Game(){
+			this.configName=null;
 			Laya.init(720,1280);
 			Laya.stage.scaleMode="showall";
 			Laya.stage.alignH="center";
 			Laya.stage.alignV="middle";
 			var loadList;
 			loadList=[];
+			this.configName="data/TT.qgame"+"?v="+Math.random();
 			loadList.push({url:"res/atlas/comp.json",type:"atlas" });
-			loadList.push({url:"data/TT.qgame",type:"json" });
+			loadList.push({url:this.configName,type:"json" });
 			Laya.loader.load(loadList,new Handler(this,this.initGameView));
 		}
 
 		__class(Game,'Game');
 		var __proto=Game.prototype;
 		__proto.initGameView=function(){
-			QGameDataManager.initData(Loader.getRes("data/TT.qgame"));
+			QGameDataManager.initData(Loader.getRes(this.configName));
 			QGameState.initByData(QGameDataManager.I);
 			SceneSwitcher.I=new SceneSwitcher();
 			SceneSwitcher.I.showPage(GameMain,null,true,true);
@@ -804,6 +806,8 @@ var Laya=window.Laya=(function(window,document){
 			this.lowCount=0;
 			this.highCount=0;
 			this.questions=[];
+			this.lowActions=[];
+			this.highActions=[];
 		}
 
 		__class(ActorData,'view.actorgame.ActorData');
@@ -814,11 +818,11 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.next=function(){
-			if (this.count <=3){
+			if (this.count < 3){
 				this.lowCount++;
 				this.highCount=0;
 			}else
-			if(this.count>=10){
+			if(this.count>=15){
 				this.highCount++;
 				this.lowCount=0;
 				}else{
@@ -833,10 +837,35 @@ var Laya=window.Laya=(function(window,document){
 			return this.questions[index%this.questions.length];
 		}
 
+		__proto.getRandomFromArr=function(arr){
+			if (arr.length==1)return arr[0];
+			var index=0;
+			index=Math.round(Math.random()*9999999);
+			return arr[index%arr.length];
+		}
+
 		__proto.getChangeMoney=function(){
 			if (this.count > 10)return (this.count-10)*1000;
 			if (this.count <3)return-(3-this.count)*3000;
 			return 0;
+		}
+
+		__proto.getAction=function(){
+			if (Math.random()> 0.3)return null;
+			if (this.lowCount >=5){
+				if (this.lowActions.length < 0)return null;
+				return this.getRandomFromArr(this.lowActions);
+			}
+			if (this.highCount >=5){
+				if (this.highActions.length < 0)return null;
+				return this.getRandomFromArr(this.highActions);
+			}
+			return null;
+		}
+
+		__proto.clearState=function(){
+			this.lowCount=0;
+			this.highCount=0;
 		}
 
 		return ActorData;
@@ -892,6 +921,17 @@ var Laya=window.Laya=(function(window,document){
 			rst.label=tQData.props.label;
 			var actorDic;
 			actorDic={};
+			var des;
+			des=tQData.props.des;
+			rst.type="normal";
+			if (des.indexOf(":low")>=0){
+				rst.type="low";
+				rst.actor=des.split(":")[0];
+			}
+			if (des.indexOf(":high")>=0){
+				rst.type="high";
+				rst.actor=des.split(":")[0];
+			}
 			rst.ops=this.getSelections(tQData.childs[0].childs,actorDic);
 			rst.actorDic=actorDic;
 			return rst;
@@ -913,6 +953,17 @@ var Laya=window.Laya=(function(window,document){
 			rst={};
 			rst.label=selectO.props.label;
 			rst.ops=this.getItemOps(selectO.childs,actorDic);
+			var ops;
+			ops=rst.ops;
+			var i=0,len=0;
+			len=ops.length;
+			var tOp;
+			for (i=0;i < len;i++){
+				tOp=ops[i];
+				if (tOp.item=="money"){
+					rst.labelEx=rst.label+"(钱"+QGameState.getSignedInt(tOp.count)+")";
+				}
+			}
 			return rst;
 		}
 
@@ -969,6 +1020,7 @@ var Laya=window.Laya=(function(window,document){
 			this.preActor=null;
 			this.eventList=[];
 			this.changedMoney=0;
+			this.opCostMoney=0;
 		}
 
 		__class(QGameState,'view.actorgame.QGameState');
@@ -1014,10 +1066,24 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.addQuestionToRole=function(questionO){
+			var tActor;
+			if (questionO.type=="low"){
+				tActor=this.roleDic[questionO.actor];
+				if (tActor){
+					tActor.lowActions.push(questionO);
+				}
+				return;
+			}
+			if (questionO.type=="high"){
+				tActor=this.roleDic[questionO.actor];
+				if (tActor){
+					tActor.highActions.push(questionO);
+				}
+				return;
+			};
 			var actorDic;
 			actorDic=questionO.actorDic;
 			var key;
-			var tActor;
 			for (key in actorDic){
 				tActor=this.roleDic[key];
 				if (!tActor)continue ;
@@ -1045,6 +1111,7 @@ var Laya=window.Laya=(function(window,document){
 				tActor=this.roleStates[i];
 				this.money+=tActor.getChangeMoney();
 			}
+			this.money+=this.opCostMoney;
 			this.money-=10000;
 			this.changedMoney=this.money-preMoney;
 		}
@@ -1065,6 +1132,22 @@ var Laya=window.Laya=(function(window,document){
 			}
 		}
 
+		__proto.getTriggerAction=function(){
+			var i=0,len=0;
+			len=this.roleStates.length;
+			var tActor;
+			var tAction;
+			for (i=0;i < len;i++){
+				tActor=this.roleStates[i];
+				tAction=tActor.getAction();
+				if (tAction){
+					tActor.clearState();
+					return tAction;
+				}
+			}
+			return null;
+		}
+
 		__proto.addEvent=function(eventName,isOver){
 			(isOver===void 0)&& (isOver=false);
 			var tEvent;
@@ -1076,6 +1159,7 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.updateRoleState=function(ops){
 			this.clearLastOp();
+			this.opCostMoney=0;
 			var i=0,len=0;
 			var tOp;
 			len=ops.length;
@@ -1085,6 +1169,10 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.excuteOp=function(opO){
+			if (opO.item=="money"){
+				this.opCostMoney+=opO.count;
+				return;
+			};
 			var tRoleO;
 			tRoleO=this.roleDic[opO.item];
 			if (!tRoleO)debugger;
@@ -27778,8 +27866,11 @@ var Laya=window.Laya=(function(window,document){
 		__proto.initByData=function(dataO){
 			this._dataO=dataO;
 			this.nameTxt.text=dataO.label+"("+dataO.count+")";
-			if (dataO.count > 15){
+			if (dataO.count >=15){
 				this.nameTxt.color="#ffff00";
+			}else
+			if (dataO.count > 10){
+				this.nameTxt.color="#ff00ff";
 			}else
 			if (dataO.count < 3){
 				this.nameTxt.color="#ff0000";
@@ -27788,10 +27879,10 @@ var Laya=window.Laya=(function(window,document){
 			}
 			if (dataO.label==QGameState.I.preActor){
 				this.mouseEnabled=false;
-				UIUtils.gray(this);
+				UIUtils.gray(this.icon);
 				}else{
 				this.mouseEnabled=true;
-				this.filters=null;
+				this.icon.filters=null;
 			}
 		}
 
@@ -27852,6 +27943,11 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.nextDay=function(){
 			QGameState.I.nextDay();
+			var tAction;
+			tAction=QGameState.I.getTriggerAction();
+			if (tAction){
+				QuestionPage.I.start(tAction);
+			}
 			this.freshUI();
 		}
 
@@ -27897,7 +27993,7 @@ var Laya=window.Laya=(function(window,document){
 		var __proto=QuestionSelectItem.prototype;
 		__proto.initByData=function(dataO){
 			this._dataO=dataO;
-			this.actionBtn.label=dataO.label;
+			this.actionBtn.label=dataO.labelEx||dataO.label;
 		}
 
 		__proto.onClick=function(){

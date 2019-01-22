@@ -11,7 +11,9 @@ package view.actorgame
 		public var label:String;
 		public var lowCount:int=0;
 		public var highCount:int = 0;
-		public var questions:Array=[];
+		public var questions:Array = [];
+		public var lowActions:Array = [];
+		public var highActions:Array = [];
 		public function ActorData() 
 		{
 			
@@ -25,12 +27,12 @@ package view.actorgame
 		
 		public function next():void
 		{
-			if (count <= 3)
+			if (count < 3)
 			{
 				lowCount++;
 				highCount = 0;
 			}else
-			if(count>=10)
+			if(count>=15)
 			{
 				highCount++;
 				lowCount = 0;
@@ -48,11 +50,41 @@ package view.actorgame
 			return questions[index%questions.length];
 		}
 		
+		public function getRandomFromArr(arr:Array):Object
+		{
+			if (arr.length == 1) return arr[0];
+			var index:int;
+			index = Math.round(Math.random() * 9999999);
+			return arr[index%arr.length];
+		}
+		
 		public function getChangeMoney():int
 		{
 			if (count > 10) return (count-10)*1000;
 			if (count <3) return -(3-count)*3000;
 			return 0;
+		}
+		
+		public function getAction():Object
+		{
+			if (Math.random() > 0.3) return null;
+			if (lowCount >= 5)
+			{
+				if (lowActions.length < 0) return null;
+				return getRandomFromArr(lowActions);
+			}
+			if (highCount >= 5)
+			{
+				if (highActions.length < 0) return null;
+				return getRandomFromArr(highActions);
+			}
+			return null;
+		}
+		
+		public function clearState():void
+		{
+			lowCount = 0;
+			highCount = 0;
 		}
 		
 	}

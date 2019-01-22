@@ -63,10 +63,30 @@ package view.actorgame
 		
 		private function addQuestionToRole(questionO:Object):void
 		{
+			var tActor:ActorData;
+			
+			if (questionO.type == "low")
+			{
+				tActor = roleDic[questionO.actor];
+				if (tActor)
+				{
+					tActor.lowActions.push(questionO);
+				}
+				return;
+			}
+			if (questionO.type == "high")
+			{
+				tActor = roleDic[questionO.actor];
+				if (tActor)
+				{
+					tActor.highActions.push(questionO);
+				}
+				return;
+			}
 			var actorDic:Object;
 			actorDic = questionO.actorDic;
 			var key:String;
-			var tActor:ActorData;
+			
 			for (key in actorDic)
 			{
 				tActor = roleDic[key];
@@ -105,6 +125,7 @@ package view.actorgame
 				tActor = roleStates[i];
 				money += tActor.getChangeMoney();
 			}
+			money += opCostMoney;
 			money -= 10000;
 			changedMoney = money - preMoney;
 			//money = preMoney;
@@ -126,6 +147,25 @@ package view.actorgame
 				addEvent("钱花完了，公司倒闭了！！", true);
 			}
 		}
+		
+		public function getTriggerAction():Object
+		{
+			var i:int, len:int;
+			len = roleStates.length;
+			var tActor:ActorData;
+			var tAction:Object;
+			for (i = 0; i < len; i++)
+			{
+				tActor = roleStates[i];
+				tAction = tActor.getAction();
+				if (tAction)
+				{
+					tActor.clearState();
+					return tAction;
+				} 
+			}
+			return null;
+		}
 		public function addEvent(eventName:String, isOver:Boolean = false):void
 		{
 			var tEvent:Object;
@@ -134,9 +174,12 @@ package view.actorgame
 			tEvent.isOver = isOver;
 			eventList.push(tEvent);
 		}
+		
+		private var opCostMoney:int = 0;
 		public function updateRoleState(ops:Array):void
 		{
 			clearLastOp();
+			opCostMoney = 0;
 			var i:int, len:int;
 			var tOp:Object;
 			len = ops.length;
@@ -147,6 +190,11 @@ package view.actorgame
 		}
 		private function excuteOp(opO:Object):void
 		{
+			if (opO.item == "money")
+			{
+				opCostMoney += opO.count;
+				return;
+			}
 			var tRoleO:Object;
 			tRoleO = roleDic[opO.item];
 			if (!tRoleO) debugger;

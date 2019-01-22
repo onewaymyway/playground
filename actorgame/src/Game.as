@@ -18,6 +18,7 @@ package
 	public class Game 
 	{
 		
+		private var configName:String;
 		public function Game() 
 		{
 			Laya.init(720, 1280);
@@ -26,8 +27,9 @@ package
 			Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 			var loadList:Array;
 			loadList = [];
+			configName = "data/TT.qgame" + "?v="+Math.random();
 			loadList.push( { url:"res/atlas/comp.json", type:Loader.ATLAS } );
-			loadList.push({url:"data/TT.qgame",type:Loader.JSON });
+			loadList.push({url:configName,type:Loader.JSON });
 			Laya.loader.load( loadList, new Handler(this, initGameView));
 			
 		}
@@ -37,7 +39,7 @@ package
 		
 		private function initGameView():void
 		{
-			QGameDataManager.initData(Loader.getRes("data/TT.qgame"));
+			QGameDataManager.initData(Loader.getRes(configName));
 			QGameState.initByData(QGameDataManager.I);
 			//CarotDataManager.initByCardDatas(Loader.getRes("data/cardconfig.json"));
 			SceneSwitcher.I = new SceneSwitcher();
