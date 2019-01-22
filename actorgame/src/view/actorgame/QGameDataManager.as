@@ -142,8 +142,10 @@ package view.actorgame
 			var rst:Object;
 			rst = { };
 			rst.item = itemOp.props.item;
+			
+			rst.count = parseInt(itemOp.props.count) || 0;
+			if(rst.count>0)
 			actorDic[rst.item] = true;
-			rst.count = parseInt(itemOp.props.count)||0;
 			return rst;
 		}
 		
