@@ -46,7 +46,7 @@ package view.actorgame
 				tQuestion = questions[i];
 				addQuestionToRole(tQuestion);
 			}
-			money = 500000;
+			money = 800000;
 			day = 0;
 		}
 		
@@ -197,7 +197,12 @@ package view.actorgame
 			}
 			var tRoleO:Object;
 			tRoleO = roleDic[opO.item];
-			if (!tRoleO) debugger;
+			if (!tRoleO)
+			{
+				trace("role not found:",opO.item,opO)
+				debugger;
+				return;
+			} 
 			tRoleO.lastOpCount = opO.count;
 			tRoleO.count += opO.count;
 			if (tRoleO.count < 0) tRoleO.count = 0;

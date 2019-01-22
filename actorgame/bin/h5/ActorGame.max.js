@@ -1052,7 +1052,7 @@ var Laya=window.Laya=(function(window,document){
 				tQuestion=questions[i];
 				this.addQuestionToRole(tQuestion);
 			}
-			this.money=500000;
+			this.money=800000;
 			this.day=0;
 		}
 
@@ -1175,7 +1175,11 @@ var Laya=window.Laya=(function(window,document){
 			};
 			var tRoleO;
 			tRoleO=this.roleDic[opO.item];
-			if (!tRoleO)debugger;
+			if (!tRoleO){
+				console.log("role not found:",opO.item,opO)
+				debugger;
+				return;
+			}
 			tRoleO.lastOpCount=opO.count;
 			tRoleO.count+=opO.count;
 			if (tRoleO.count < 0)tRoleO.count=0;
