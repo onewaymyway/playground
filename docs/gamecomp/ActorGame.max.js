@@ -804,6 +804,7 @@ var Laya=window.Laya=(function(window,document){
 			this.count=0;
 			this.lastOpCount=0;
 			this.label=null;
+			this.sign=null;
 			this.lowCount=0;
 			this.highCount=0;
 			this.tooHighCount=0;
@@ -1063,6 +1064,7 @@ var Laya=window.Laya=(function(window,document){
 				tDataO=new ActorData();
 				tDataO.label=tRoleO.props.label;
 				tDataO.count=5;
+				tDataO.sign=tRoleO.props.icon;
 				tDataO.lastOpCount=0;
 				this.roleDic[tDataO.label]=tDataO;
 				this.allStates.push(tDataO);
@@ -27915,12 +27917,15 @@ var Laya=window.Laya=(function(window,document){
 				}else{
 				this.nameTxt.color="#ffffff";
 			}
+			if (dataO.sign){
+				this.icon.skin="icons/"+dataO.sign+".png";
+			}
+			this.icon.filters=null;
 			if (dataO.label==QGameState.I.preActor){
 				this.mouseEnabled=false;
 				UIUtils.gray(this.icon);
 				}else{
 				this.mouseEnabled=true;
-				this.icon.filters=null;
 			}
 		}
 
@@ -28073,6 +28078,9 @@ var Laya=window.Laya=(function(window,document){
 				this.changeTxt.text=opCount+"";
 			}
 			this.changeTxt.visible=opCount !=0;
+			if (dataO.sign){
+				this.icon.skin="icons/"+dataO.sign+".png";
+			}
 			this.moneyChangeTxt.visible=false;
 			var changeMoney=0;
 			changeMoney=dataO.getChangeMoney();
