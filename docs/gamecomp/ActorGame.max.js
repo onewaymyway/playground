@@ -27984,7 +27984,8 @@ var Laya=window.Laya=(function(window,document){
 			var tAction;
 			tAction=QGameState.I.getTriggerAction();
 			if (tAction){
-				QuestionPage.I.start(tAction);
+				if(QGameState.I.money>0)
+					QuestionPage.I.start(tAction);
 			}
 			this.freshUI();
 		}
