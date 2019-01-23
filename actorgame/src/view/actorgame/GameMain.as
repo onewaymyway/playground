@@ -34,6 +34,7 @@ package view.actorgame
 			tAction = QGameState.I.getTriggerAction();
 			if (tAction)
 			{
+				if(QGameState.I.money>0)
 				QuestionPage.I.start(tAction);
 			}
 			freshUI();

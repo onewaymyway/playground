@@ -705,6 +705,7 @@ var Laya=window.Laya=(function(window,document){
 			Laya.stage.scaleMode="showall";
 			Laya.stage.alignH="center";
 			Laya.stage.alignV="middle";
+			UIConfig.closeDialogOnSide=false;
 			var loadList;
 			loadList=[];
 			this.configName="data/TT.qgame"+"?v="+Math.random();
@@ -830,7 +831,7 @@ var Laya=window.Laya=(function(window,document){
 				}else{
 				this.highCount=0;
 			}
-			if (this.count >=18){
+			if (this.count >=17){
 				this.tooHighCount++;
 				}else{
 				this.tooHighCount=0;
@@ -858,17 +859,20 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.getAction=function(){
 			if (Math.random()> 0.3)return null;
+			if (this.tooHighCount >=3){
+				this.tooHighCount=0;
+				if (this.tooHighActions.length < 0)return null;
+				return this.getRandomFromArr(this.tooHighActions);
+			}
 			if (this.lowCount >=5){
+				this.lowCount=0;
 				if (this.lowActions.length < 0)return null;
 				return this.getRandomFromArr(this.lowActions);
 			}
 			if (this.highCount >=5){
+				this.highCount=0;
 				if (this.highActions.length < 0)return null;
 				return this.getRandomFromArr(this.highActions);
-			}
-			if (this.tooHighCount >=5){
-				if (this.tooHighActions.length < 0)return null;
-				return this.getRandomFromArr(this.tooHighActions);
 			}
 			return null;
 		}
@@ -1172,7 +1176,6 @@ var Laya=window.Laya=(function(window,document){
 				tActor=this.allStates[i];
 				tAction=tActor.getAction();
 				if (tAction){
-					tActor.clearState();
 					return tAction;
 				}
 			}
@@ -27981,7 +27984,8 @@ var Laya=window.Laya=(function(window,document){
 			var tAction;
 			tAction=QGameState.I.getTriggerAction();
 			if (tAction){
-				QuestionPage.I.start(tAction);
+				if(QGameState.I.money>0)
+					QuestionPage.I.start(tAction);
 			}
 			this.freshUI();
 		}

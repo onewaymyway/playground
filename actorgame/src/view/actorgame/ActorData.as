@@ -44,7 +44,7 @@ package view.actorgame
 				highCount = 0;
 			}
 			
-			if (count >= 18)
+			if (count >= 17)
 			{
 				tooHighCount++;
 			}else
@@ -78,21 +78,27 @@ package view.actorgame
 		public function getAction():Object
 		{
 			if (Math.random() > 0.3) return null;
+			
+			if (tooHighCount >= 3)
+			{
+				tooHighCount = 0;
+				if (tooHighActions.length < 0) return null;
+				return getRandomFromArr(tooHighActions);
+			}
+			
 			if (lowCount >= 5)
 			{
+				lowCount = 0;
 				if (lowActions.length < 0) return null;
 				return getRandomFromArr(lowActions);
 			}
 			if (highCount >= 5)
 			{
+				highCount = 0;
 				if (highActions.length < 0) return null;
 				return getRandomFromArr(highActions);
 			}
-			if (tooHighCount >= 3)
-			{
-				if (tooHighActions.length < 0) return null;
-				return getRandomFromArr(tooHighActions);
-			}
+			
 			return null;
 		}
 		

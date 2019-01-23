@@ -181,7 +181,7 @@ package view.actorgame
 				tAction = tActor.getAction();
 				if (tAction)
 				{
-					tActor.clearState();
+					//tActor.clearState();
 					return tAction;
 				} 
 			}
