@@ -27,6 +27,7 @@ package view.actorgame
 			freshUI();
 		}
 		
+		private var isEnd:Boolean = false;
 		public function nextDay():void
 		{
 			QGameState.I.nextDay();
@@ -42,6 +43,7 @@ package view.actorgame
 		
 		private function toEndState():void
 		{
+			isEnd = true;
 			roleList.visible = false;
 			startBtn.visible = true;
 			startBtn.label = "再挣扎一次";
@@ -74,7 +76,13 @@ package view.actorgame
 		}
 		private function onStartBtn():void
 		{
+			if (isEnd)
+			{
+				QGameState.initByData(QGameDataManager.I);
+				freshUI();
+			}
 			toStartState();
+			isEnd = false;
 		}
 	}
 
