@@ -84,7 +84,7 @@ package view.actorgame
 		public function getAction():Object
 		{
 			
-			if (tooHighCount >= 4&&getIsRandomOK())
+			if (tooHighCount >= 6&&getIsRandomOK())
 			{
 				tooHighCount = 0;
 				if (tooHighActions.length > 0)
