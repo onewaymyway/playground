@@ -27968,6 +27968,7 @@ var Laya=window.Laya=(function(window,document){
 	//class view.actorgame.GameMain extends ui.actorgame.GameMainUI
 	var GameMain=(function(_super){
 		function GameMain(){
+			this.isEnd=false;
 			GameMain.__super.call(this);
 			this.startBtn.on("click",this,this.onStartBtn);
 			this.roleList.mouseEnabled=true;
@@ -27996,6 +27997,7 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.toEndState=function(){
+			this.isEnd=true;
 			this.roleList.visible=false;
 			this.startBtn.visible=true;
 			this.startBtn.label="再挣扎一次";
@@ -28024,7 +28026,12 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.onStartBtn=function(){
+			if (this.isEnd){
+				QGameState.initByData(QGameDataManager.I);
+				this.freshUI();
+			}
 			this.toStartState();
+			this.isEnd=false;
 		}
 
 		GameMain.I=null
