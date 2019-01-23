@@ -9,6 +9,7 @@ package view.actorgame
 		public var count:int = 0;
 		public var lastOpCount:int = 0;
 		public var label:String;
+		public var sign:String;
 		public var lowCount:int=0;
 		public var highCount:int = 0;
 		public var tooHighCount:int = 0;

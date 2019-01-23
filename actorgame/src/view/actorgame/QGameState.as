@@ -37,6 +37,7 @@ package view.actorgame
 				tDataO = new ActorData();
 				tDataO.label = tRoleO.props.label;
 				tDataO.count = 5;
+				tDataO.sign = tRoleO.props.icon;
 				tDataO.lastOpCount = 0;
 				roleDic[tDataO.label] = tDataO;
 				allStates.push(tDataO);

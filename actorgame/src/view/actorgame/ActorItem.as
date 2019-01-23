@@ -16,7 +16,7 @@ package view.actorgame
 			icon.on(Event.CLICK, this, onClick);
 		}
 		private var _dataO:Object;
-		public function initByData(dataO:Object):void
+		public function initByData(dataO:ActorData):void
 		{
 			_dataO = dataO;
 			//nameTxt.text = dataO.label;
@@ -36,6 +36,11 @@ package view.actorgame
 			{
 				nameTxt.color = "#ffffff";
 			}
+			if (dataO.sign)
+			{
+				icon.skin = "icons/" + dataO.sign + ".png";
+			}
+			icon.filters = null;
 			if (dataO.label == QGameState.I.preActor)
 			{
 				this.mouseEnabled = false;
@@ -43,7 +48,7 @@ package view.actorgame
 			}else
 			{
 				this.mouseEnabled = true;
-				icon.filters = null;
+				
 			}
 		}
 		

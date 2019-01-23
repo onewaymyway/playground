@@ -35,7 +35,10 @@ package view.actorgame
 				changeTxt.text = opCount + "";
 			}
 			changeTxt.visible = opCount != 0;
-			
+			if (dataO.sign)
+			{
+				icon.skin = "icons/" + dataO.sign + ".png";
+			}
 			moneyChangeTxt.visible = false;
 			var changeMoney:int;
 			changeMoney = dataO.getChangeMoney();
