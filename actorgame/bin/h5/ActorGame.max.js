@@ -858,22 +858,29 @@ var Laya=window.Laya=(function(window,document){
 			return 0;
 		}
 
+		__proto.getIsRandomOK=function(){
+			return Math.random()< 0.3;
+		}
+
 		__proto.getAction=function(){
-			if (Math.random()> 0.3)return null;
-			if (this.tooHighCount >=3){
+			if (this.tooHighCount >=4&&this.getIsRandomOK()){
 				this.tooHighCount=0;
-				if (this.tooHighActions.length < 0)return null;
-				return this.getRandomFromArr(this.tooHighActions);
+				if (this.tooHighActions.length > 0){
+					return this.getRandomFromArr(this.tooHighActions);
+				}
 			}
-			if (this.lowCount >=5){
+			if (this.lowCount >=5&&this.getIsRandomOK()){
 				this.lowCount=0;
-				if (this.lowActions.length < 0)return null;
-				return this.getRandomFromArr(this.lowActions);
+				if (this.lowActions.length > 0){
+					return this.getRandomFromArr(this.lowActions);
+				}
 			}
-			if (this.highCount >=5){
+			if (this.highCount >=5&&this.getIsRandomOK()){
 				this.highCount=0;
-				if (this.highActions.length < 0)return null;
-				return this.getRandomFromArr(this.highActions);
+				if (this.highActions.length > 0){
+					this.tooHighCount=0;
+					return this.getRandomFromArr(this.highActions);
+				}
 			}
 			return null;
 		}

@@ -76,28 +76,43 @@ package view.actorgame
 			return 0;
 		}
 		
+		private function getIsRandomOK():Boolean
+		{
+			return Math.random() < 0.3;
+		}
+		
 		public function getAction():Object
 		{
-			if (Math.random() > 0.3) return null;
 			
-			if (tooHighCount >= 3)
+			if (tooHighCount >= 4&&getIsRandomOK())
 			{
 				tooHighCount = 0;
-				if (tooHighActions.length < 0) return null;
-				return getRandomFromArr(tooHighActions);
+				if (tooHighActions.length > 0)
+				{
+					//highCount = 0;
+					return getRandomFromArr(tooHighActions);
+				}
+				
 			}
 			
-			if (lowCount >= 5)
+			if (lowCount >= 5&&getIsRandomOK())
 			{
 				lowCount = 0;
-				if (lowActions.length < 0) return null;
-				return getRandomFromArr(lowActions);
+				if (lowActions.length > 0)
+				{
+					return getRandomFromArr(lowActions);
+				}
+				
 			}
-			if (highCount >= 5)
+			if (highCount >= 5&&getIsRandomOK())
 			{
 				highCount = 0;
-				if (highActions.length < 0) return null;
-				return getRandomFromArr(highActions);
+				if (highActions.length > 0)
+				{
+					tooHighCount = 0;
+					return getRandomFromArr(highActions);
+				}
+				
 			}
 			
 			return null;
