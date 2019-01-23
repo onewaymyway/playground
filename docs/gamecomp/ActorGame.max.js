@@ -831,7 +831,7 @@ var Laya=window.Laya=(function(window,document){
 				}else{
 				this.highCount=0;
 			}
-			if (this.count >=18){
+			if (this.count >=17){
 				this.tooHighCount++;
 				}else{
 				this.tooHighCount=0;
@@ -859,6 +859,10 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.getAction=function(){
 			if (Math.random()> 0.3)return null;
+			if (this.tooHighCount >=3){
+				if (this.tooHighActions.length < 0)return null;
+				return this.getRandomFromArr(this.tooHighActions);
+			}
 			if (this.lowCount >=5){
 				if (this.lowActions.length < 0)return null;
 				return this.getRandomFromArr(this.lowActions);
@@ -866,10 +870,6 @@ var Laya=window.Laya=(function(window,document){
 			if (this.highCount >=5){
 				if (this.highActions.length < 0)return null;
 				return this.getRandomFromArr(this.highActions);
-			}
-			if (this.tooHighCount >=3){
-				if (this.tooHighActions.length < 0)return null;
-				return this.getRandomFromArr(this.tooHighActions);
 			}
 			return null;
 		}
