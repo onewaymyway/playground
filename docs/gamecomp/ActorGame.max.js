@@ -860,14 +860,17 @@ var Laya=window.Laya=(function(window,document){
 		__proto.getAction=function(){
 			if (Math.random()> 0.3)return null;
 			if (this.tooHighCount >=3){
+				this.tooHighCount=0;
 				if (this.tooHighActions.length < 0)return null;
 				return this.getRandomFromArr(this.tooHighActions);
 			}
 			if (this.lowCount >=5){
+				this.lowCount=0;
 				if (this.lowActions.length < 0)return null;
 				return this.getRandomFromArr(this.lowActions);
 			}
 			if (this.highCount >=5){
+				this.highCount=0;
 				if (this.highActions.length < 0)return null;
 				return this.getRandomFromArr(this.highActions);
 			}
@@ -1173,7 +1176,6 @@ var Laya=window.Laya=(function(window,document){
 				tActor=this.allStates[i];
 				tAction=tActor.getAction();
 				if (tAction){
-					tActor.clearState();
 					return tAction;
 				}
 			}
