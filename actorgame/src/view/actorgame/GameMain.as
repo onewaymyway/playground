@@ -40,6 +40,14 @@ package view.actorgame
 			freshUI();
 		}
 		
+		private function toEndState():void
+		{
+			roleList.visible = false;
+			startBtn.visible = true;
+			startBtn.label = "再挣扎一次";
+			dayTip.visible = false;
+		}
+		
 		public function freshUI():void
 		{
 			gameInfo.text = "剩余资金:" + QGameState.I.money+" 第"+QGameState.I.day+"天";
@@ -47,7 +55,7 @@ package view.actorgame
 			if (QGameState.I.money <= 0)
 			{
 				gameInfo.text = "钱用完了，公司倒闭。Game Over!您总共坚持了"+QGameState.I.day+"天";
-				roleList.visible = false;
+				toEndState();
 			}
 		}
 		private function itemRender(cell:ActorItem, index:int):void
@@ -55,13 +63,18 @@ package view.actorgame
 			cell.initByData(cell.dataSource);
 		}
 		
-		private function onStartBtn():void
+		
+		private function toStartState():void
 		{
 			roleList.visible = true;
 			startBtn.visible = false;
 			welcomeTxt.visible = false;
 			dayTip.visible = true;
 			gameInfo.visible = true;
+		}
+		private function onStartBtn():void
+		{
+			toStartState();
 		}
 	}
 
