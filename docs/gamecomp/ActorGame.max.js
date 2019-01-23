@@ -863,7 +863,7 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.getAction=function(){
-			if (this.tooHighCount >=5&&this.getIsRandomOK()){
+			if (this.tooHighCount >=4&&this.getIsRandomOK()){
 				this.tooHighCount=0;
 				if (this.tooHighActions.length > 0){
 					return this.getRandomFromArr(this.tooHighActions);
@@ -878,6 +878,7 @@ var Laya=window.Laya=(function(window,document){
 			if (this.highCount >=5&&this.getIsRandomOK()){
 				this.highCount=0;
 				if (this.highActions.length > 0){
+					this.tooHighCount=0;
 					return this.getRandomFromArr(this.highActions);
 				}
 			}
