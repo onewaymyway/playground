@@ -1,6 +1,7 @@
 package commonlayout 
 {
 	import laya.debug.tools.ClassTool;
+	import laya.utils.Handler;
 	import laya.utils.Pool;
 	/**
 	 * ...
@@ -13,7 +14,7 @@ package commonlayout
 		{
 			
 		}
-		
+		public var createHandler:Handler;
 		private var _typeClassDic:Object = { };
 		public function regItemCreater(type:String, clz:Class):void
 		{
@@ -34,7 +35,13 @@ package commonlayout
 		{
 			var clz:Class;
 			clz = _typeClassDic[type];
-			return Pool.getItemByClass(ClassTool.getClassName(clz), clz);
+			var rst:*;
+			rst = Pool.getItemByClass(ClassTool.getClassName(clz), clz);
+			if (createHandler)
+			{
+				createHandler.runWith(rst);
+			}
+			return rst;
 			//return _typeClassDic[type]();
 		}
 	}

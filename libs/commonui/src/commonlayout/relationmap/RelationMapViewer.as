@@ -1,6 +1,7 @@
 package commonlayout.relationmap 
 {
 	import commonlayout.ItemCreater;
+	import commonlayout.ItemDic;
 	import laya.debug.tools.ClassTool;
 	import laya.ui.Box;
 	import laya.utils.Pool;
@@ -14,10 +15,12 @@ package commonlayout.relationmap
 		public function RelationMapViewer() 
 		{
 			_itemCreater = new ItemCreater();
+			_itemDic = new ItemDic();
 		}
 		
 		
 		private var _itemCreater:ItemCreater;
+		private var _itemDic:ItemDic;
 		private var _dataO:Object;
 		public function setData(dataO:Object):void
 		{
@@ -25,36 +28,29 @@ package commonlayout.relationmap
 			createMapItems();
 		}
 		
+		private function onCreateItem(item:RelationMapItemBase):void
+		{
+			item.itemDic = _itemDic;
+		}
 		private function createMapItems():void
 		{
+			_itemDic.recoverItems();
 			if (!_dataO.nodes) _dataO.nodes = [];
 			if (!_dataO.lines) _dataO.lines = [];
+			_itemDic.reset();
+			_itemDic.createMapItems(_dataO.nodes);
+			_itemDic.createMapItems(_dataO.lines);
+			_itemDic.solveIDs();
 			
-			var idNodeDic:Object = { };
-			var unSolveList:Array;
-			unSolveList = [];
-			var nodeList:Array;
-			nodeList = _dataO.nodes;
+			var nodes:Array;
+			nodes = _itemDic.allNodeList;
 			var i:int, len:int;
-			len = nodeList.length;
+			len = nodes.length;
 			var tItem:RelationMapItemBase;
-			var tData:Object;
-			var tID:int;
-			var curMax:int;
-			curMax = 1;
 			for (i = 0; i < len; i++)
 			{
-				tData = nodeList[i];
-				tItem = _itemCreater.createByType(tData.type);
-				tID = tData.id;
-				if (tID && !idNodeDic[tID])
-				{
-					if (tID > curMax)
-					{
-						curMax = tID;
-					}
-					idNodeDic[tID] = tItem;
-				}
+				tItem = nodes[i];
+				addChild(tItem);
 			}
 		}
 		

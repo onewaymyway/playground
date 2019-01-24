@@ -1,5 +1,6 @@
 package commonlayout.relationmap 
 {
+	import commonlayout.ItemDic;
 	import commontools.EventTools;
 	import laya.debug.tools.ClassTool;
 	import laya.events.Event;
@@ -15,10 +16,17 @@ package commonlayout.relationmap
 	 */
 	public class RelationMapItemBase extends View
 	{
+		public var itemDic:ItemDic;
 		protected var _dataO:Object;
 		public function RelationMapItemBase() 
 		{
 			reset();
+		}
+		
+		public function getItemByID(id:int):*
+		{
+			if (!itemDic) return null;
+			return itemDic.getItemByID(id);
 		}
 		
 		protected function setUpTextInput(input:TextInput, key:String):void
