@@ -47,11 +47,11 @@ def copyFileToTar(srcFile,tarFile):
 def sOpen(exe,param):
     win32api.ShellExecute(0, 'open', exe,param,'',1)
 
-compileParam=getAbsPath("../AnswerFlow.as3proj")+";iflash=false;chromerun=false;outlaya=true";
+compileParam=getAbsPath("../RelationMapEditor.as3proj")+";iflash=false;chromerun=false;outlaya=true";
 #sOpen(compileExe,compileParam);
 os.system(compileExe+" "+compileParam)
 print("compile complete");
-copyFileToTar(getAbsPath("../bin/h5"),getAbsPath("../../../ElectronApp/DeskPlatform/plugins/AnswerFlow"))
+copyFileToTar(getAbsPath("../bin/h5"),getAbsPath("../../../ElectronApp/DeskPlatform/plugins/RelationMapEditor"))
 print("copy complete")
 exePath=getAbsPath("../../../Electron/EasyDesk.exe")+" "+getAbsPath("../../../ElectronApp/DeskPlatform");
 print("exe:",exePath)

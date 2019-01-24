@@ -1,6 +1,5 @@
 package  
 {
-	import answerflow.AnswerFlowEditor;
 	import laya.debug.DebugPanel;
 	import laya.debug.uicomps.ContextMenu;
 	import laya.debug.uicomps.ContextMenuItem;
@@ -10,6 +9,7 @@ package
 	import laya.utils.Handler;
 	import nodetools.devices.FileManager;
 	import nodetools.devices.FileTools;
+	import relationmap.RelationMapEditor;
 	import test.MakeAnsFlowFile;
 	import viewRender.EditorRenderBase;
 	/**
@@ -35,7 +35,7 @@ package
 			//DebugPanel.init();
 		}
 		private var text:Text;
-		private var mindMapEditor:AnswerFlowEditor;
+		private var mindMapEditor:RelationMapEditor;
 		
 		private function test():void
 		{
@@ -47,7 +47,7 @@ package
 			text.pos(100, 100);
 			Laya.stage.addChild(text);
 			
-			mindMapEditor = new AnswerFlowEditor();
+			mindMapEditor = new RelationMapEditor();
 			mindMapEditor.left = mindMapEditor.right = mindMapEditor.top = mindMapEditor.bottom = 2;
 			mindMapEditor.on("save", this, onMindMapSave);
 			Laya.stage.addChild(mindMapEditor);
