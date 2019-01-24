@@ -18,7 +18,7 @@ package answerflow
 			this.removeChildren();
 			viewer = new MindMapViewer();
 			var clzList:Array;
-			clzList = [ActionRoot, AddAbleNode, DataOperate, SimpleNode, ItemData];
+			clzList = [ActionRoot, AddAbleNode, DataOperate, SimpleNode, ItemData,PropData];
 			viewer.regItemClassList(clzList);
 			addChild(viewer);
 			viewer.centerY = 0;

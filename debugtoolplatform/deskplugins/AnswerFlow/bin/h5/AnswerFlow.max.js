@@ -259,7 +259,7 @@
 			this.removeChildren();
 			this.viewer=new MindMapViewer();
 			var clzList;
-			clzList=[ActionRoot,AddAbleNode,DataOperate,SimpleNode,ItemData];
+			clzList=[ActionRoot,AddAbleNode,DataOperate,SimpleNode,ItemData,PropData];
 			this.viewer.regItemClassList(clzList);
 			this.addChild(this.viewer);
 			this.viewer.centerY=0;
@@ -328,6 +328,23 @@
 
 		AddAbleNodeUI.uiView={"type":"MindMapTreeBase","props":{"width":105,"height":23},"child":[{"type":"TextInput","props":{"y":1,"x":1,"width":71,"var":"txt","text":"触发方式","skin":"comp/input_22.png","runtime":"commoncomponent.AutoSizeTextInput","height":21,"color":"#e72320"}},{"type":"Button","props":{"y":0,"x":79,"width":26,"var":"addBtn","skin":"comp/button.png","label":"+","height":24}}]};
 		return AddAbleNodeUI;
+	})(MindMapTreeBase)
+
+
+	//class ui.answerflow.DataOperateUI extends commonlayout.mindmaptree.MindMapTreeBase
+	var DataOperateUI=(function(_super){
+		function DataOperateUI(){DataOperateUI.__super.call(this);;
+		};
+
+		__class(DataOperateUI,'ui.answerflow.DataOperateUI',_super);
+		var __proto=DataOperateUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(DataOperateUI.uiView);
+		}
+
+		DataOperateUI.uiView={"type":"MindMapTreeBase","props":{"width":240,"height":30},"child":[{"type":"TextInput","props":{"y":4,"x":10,"width":95,"text":"TextInput","skin":"comp/input_22.png","promptColor":"#f31713","height":22,"color":"#e80d09"}},{"type":"ComboBox","props":{"y":5,"x":114,"width":53,"skin":"comp/combobox.png","sizeGrid":"0,31,0,0","selectedIndex":0,"labels":"+,-","height":22}},{"type":"TextInput","props":{"y":5,"x":174,"width":60,"text":"TextInput","skin":"comp/input_22.png","height":22,"color":"#ec130f"}}]};
+		return DataOperateUI;
 	})(MindMapTreeBase)
 
 
@@ -553,23 +570,6 @@
 	})(AnswerFlowEditorUI)
 
 
-	//class ui.answerflow.DataOperateUI extends commonlayout.mindmaptree.MindMapTreeBase
-	var DataOperateUI=(function(_super){
-		function DataOperateUI(){DataOperateUI.__super.call(this);;
-		};
-
-		__class(DataOperateUI,'ui.answerflow.DataOperateUI',_super);
-		var __proto=DataOperateUI.prototype;
-		__proto.createChildren=function(){
-			laya.ui.Component.prototype.createChildren.call(this);
-			this.createView(DataOperateUI.uiView);
-		}
-
-		DataOperateUI.uiView={"type":"MindMapTreeBase","props":{"width":240,"height":30},"child":[{"type":"TextInput","props":{"y":4,"x":10,"width":95,"text":"TextInput","skin":"comp/input_22.png","promptColor":"#f31713","height":22,"color":"#e80d09"}},{"type":"ComboBox","props":{"y":5,"x":114,"width":53,"skin":"comp/combobox.png","sizeGrid":"0,31,0,0","selectedIndex":0,"labels":"+,-","height":22}},{"type":"TextInput","props":{"y":5,"x":174,"width":60,"text":"TextInput","skin":"comp/input_22.png","height":22,"color":"#ec130f"}}]};
-		return DataOperateUI;
-	})(MindMapTreeBase)
-
-
 	//class ui.answerflow.ItemDataUI extends commonlayout.mindmaptree.MindMapTreeBase
 	var ItemDataUI=(function(_super){
 		function ItemDataUI(){
@@ -588,6 +588,27 @@
 
 		ItemDataUI.uiView={"type":"MindMapTreeBase","props":{"width":200,"height":30},"child":[{"type":"TextInput","props":{"y":4,"x":5,"width":95,"var":"item","text":"物品","skin":"comp/input_22.png","promptColor":"#f31713","height":22,"color":"#e80d09"}},{"type":"TextInput","props":{"y":4,"x":108,"width":60,"var":"count","text":"数量","skin":"comp/input_22.png","height":22,"color":"#ec130f"}},{"type":"Button","props":{"y":3,"x":173,"width":26,"var":"removeBtn","skin":"comp/button.png","label":"-","height":24}}]};
 		return ItemDataUI;
+	})(MindMapTreeBase)
+
+
+	//class ui.answerflow.PropDataUI extends commonlayout.mindmaptree.MindMapTreeBase
+	var PropDataUI=(function(_super){
+		function PropDataUI(){
+			this.keyInput=null;
+			this.valueInput=null;
+			this.removeBtn=null;
+			PropDataUI.__super.call(this);
+		}
+
+		__class(PropDataUI,'ui.answerflow.PropDataUI',_super);
+		var __proto=PropDataUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(PropDataUI.uiView);
+		}
+
+		PropDataUI.uiView={"type":"MindMapTreeBase","props":{"width":200,"height":30},"child":[{"type":"TextInput","props":{"y":4,"x":5,"width":63,"var":"keyInput","text":"key","skin":"comp/input_22.png","promptColor":"#f31713","height":22,"color":"#e80d09"}},{"type":"TextInput","props":{"y":4,"x":79,"width":89,"var":"valueInput","text":"value","skin":"comp/input_22.png","height":22,"color":"#ec130f"}},{"type":"Button","props":{"y":3,"x":173,"width":26,"var":"removeBtn","skin":"comp/button.png","label":"-","height":24}}]};
+		return PropDataUI;
 	})(MindMapTreeBase)
 
 
@@ -774,6 +795,31 @@
 
 		return ItemData;
 	})(ItemDataUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class answerflow.PropData extends ui.answerflow.PropDataUI
+	var PropData=(function(_super){
+		function PropData(){
+			PropData.__super.call(this);
+			this.setUpTextInput(this.keyInput,"key");
+			this.setUpTextInput(this.valueInput,"value");
+			this.removeBtn.on("click",this,this.removeFromParent);
+		}
+
+		__class(PropData,'answerflow.PropData',_super);
+		var __proto=PropData.prototype;
+		__proto.renderByData=function(){
+			commonlayout.mindmaptree.MindMapTreeBase.prototype.renderByData.call(this);
+			this.keyInput.text=this._dataO.props["key"] || "";
+			this.valueInput.text=this._dataO.props["value"] || "";
+		}
+
+		return PropData;
+	})(PropDataUI)
 
 
 	/**
