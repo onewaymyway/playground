@@ -100,6 +100,7 @@ package mindmap
 			text.editable = false;
 			nodeData.label = text.text;
 			freshUI();
+			onBtnAction("freshLayout");
 		}
 		private function onSelect(dataO:Object):void
 		{

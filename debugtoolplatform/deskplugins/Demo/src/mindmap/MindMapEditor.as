@@ -177,6 +177,9 @@ package mindmap
 			parentNode = target.parentNode;
 			switch(action)
 			{
+				case "freshLayout":
+					freshLayout();
+					break;
 				case "新建子":
 					target.nodeData.addChild(MindMapNodeData.createByLabel("new"));
 					freshUI();
