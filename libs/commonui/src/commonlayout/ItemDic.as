@@ -26,7 +26,7 @@ package commonlayout
 			idNodeDic = { };
 			unSolveList = [];
 			allNodeList = [];
-			curMax = 0;
+			curMax = 1;
 			groupDic = { };
 		}
 		
@@ -93,7 +93,7 @@ package commonlayout
 				
 			nodeList = nodeDataList;
 			len = nodeList.length;
-			curMax = 1;
+			
 			for (i = 0; i < len; i++)
 			{
 				tData = nodeList[i];
