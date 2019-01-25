@@ -31,6 +31,8 @@ package commonlayout
 		{
 			if (!allNodeList) return;
 			var tItem:*;
+			var i:int, len:int;
+			len = allNodeList.length;
 			for (i = 0; i < len; i++)
 			{
 				tItem = allNodeList[i];

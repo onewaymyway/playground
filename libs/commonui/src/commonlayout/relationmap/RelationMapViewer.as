@@ -14,14 +14,16 @@ package commonlayout.relationmap
 		
 		public function RelationMapViewer() 
 		{
-			_itemCreater = new ItemCreater();
+			itemCreater = new ItemCreater();
 			_itemDic = new ItemDic();
+			_itemDic.itemCreater = itemCreater;
 		}
 		
 		
-		private var _itemCreater:ItemCreater;
+		public var itemCreater:ItemCreater;
 		private var _itemDic:ItemDic;
 		private var _dataO:Object;
+		
 		public function setData(dataO:Object):void
 		{
 			this._dataO = dataO;
