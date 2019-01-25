@@ -390,6 +390,7 @@
 			mY=mY || 0;
 			this.startPoint.visible=false;
 			this.endPoint.visible=false;
+			this.input.text=this.propO.label||"";
 			this.pos(mX,mY);
 		}
 
@@ -435,6 +436,7 @@
 		__proto.renderByData=function(){
 			commonlayout.relationmap.RelationMapItemBase.prototype.renderByData.call(this);
 			this.pos(this._dataO.props.x,this._dataO.props.y);
+			this.input.text=this._dataO.props.label||"";
 		}
 
 		__proto.onMouseClick=function(){

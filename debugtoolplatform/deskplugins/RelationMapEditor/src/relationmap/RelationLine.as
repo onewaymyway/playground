@@ -46,6 +46,8 @@ package relationmap
 			startPoint.visible = false;
 			endPoint.visible = false;
 			
+			input.text = propO.label||"";
+			
 			this.pos(mX, mY);
 		}
 		

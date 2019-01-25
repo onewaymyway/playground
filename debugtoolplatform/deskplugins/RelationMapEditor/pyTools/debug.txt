@@ -17,8 +17,8 @@ Project configuration:D:\codes\playground.git\trunk\debugtoolplatform\deskplugin
 7,88.18,D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/colorselectorpanel/ColorSelectorControl.as,17,ColorPickerWithIndex This variable is not defined.
 7,88.23,D:/codes/playground.git/trunk/libs/commonui/src/commonui/colorpanel/colorselectorpanel/SelectorColorPicker.as,108,ColorTableTool.createColorTable This variable is not defined.
 1,89.95,,0,Disable Flash3D D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/RelationMapEditor/src/TestDemo.as
-12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/RelationMapEditor/bin/h5/RelationMapEditor.max.js,14133,
-12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/RelationMapEditor/bin/h5/laya.js,1245516,
+12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/RelationMapEditor/bin/h5/RelationMapEditor.max.js,14224,
+12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/RelationMapEditor/bin/h5/laya.js,1245497,
 11,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplugins/RelationMapEditor/bin/h5/RelationMapEditor.max.html,851,
 ******************************************************************************
 Error or warning message:RelationMapEditor.max.js

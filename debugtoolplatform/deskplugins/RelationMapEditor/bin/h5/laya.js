@@ -15964,7 +15964,7 @@ var Laya=window.Laya=(function(window,document){
 			this.idNodeDic={};
 			this.unSolveList=[];
 			this.allNodeList=[];
-			this.curMax=0;
+			this.curMax=1;
 			this.groupDic={};
 		}
 
@@ -16020,7 +16020,6 @@ var Laya=window.Laya=(function(window,document){
 			}
 			nodeList=nodeDataList;
 			len=nodeList.length;
-			this.curMax=1;
 			for (i=0;i < len;i++){
 				tData=nodeList[i];
 				tItem=this.itemCreater.createByType(tData.type);

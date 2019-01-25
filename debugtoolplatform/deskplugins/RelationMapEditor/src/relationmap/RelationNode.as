@@ -22,6 +22,7 @@ package relationmap
 		{
 			super.renderByData();
 			this.pos(_dataO.props.x, _dataO.props.y);
+			input.text =  _dataO.props.label||"";
 		}
 		
 		private function onMouseClick():void
