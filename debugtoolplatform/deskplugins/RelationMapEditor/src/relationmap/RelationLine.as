@@ -13,6 +13,7 @@ package relationmap
 		
 		public function RelationLine() 
 		{
+			input.isAutoSize = true;
 			setUpTextInput(input, "label");
 		}
 		
@@ -47,9 +48,17 @@ package relationmap
 			endPoint.visible = false;
 			
 			input.text = propO.label || "";
-			this.pivot(this.width*0.5,this.height*0.5);
+			
+			
+			updateMySize();
 			
 			this.pos(mX, mY);
+		}
+		
+		override protected function updateMySize():void 
+		{
+			this.width = input.width;
+			this.pivot(this.width*0.5,this.height*0.5);
 		}
 		
 		public function drawLineToGraphics(g:Graphics):void
