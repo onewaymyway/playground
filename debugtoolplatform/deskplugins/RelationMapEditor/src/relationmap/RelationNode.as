@@ -16,13 +16,16 @@ package relationmap
 			this.on(Event.MOUSE_DOWN, this, onMouseDown);
 			this.on(Event.CLICK, this, onMouseClick);
 			this.on(Event.DRAG_END, this, onEndDrag);
+			
+			setUpTextInput(input, "label");
 		}
 		
 		override protected function renderByData():void 
 		{
 			super.renderByData();
 			this.pos(_dataO.props.x, _dataO.props.y);
-			input.text =  _dataO.props.label||"";
+			input.text =  _dataO.props.label || "";
+			this.pivot(this.width*0.5,this.height*0.5);
 		}
 		
 		private function onMouseClick():void

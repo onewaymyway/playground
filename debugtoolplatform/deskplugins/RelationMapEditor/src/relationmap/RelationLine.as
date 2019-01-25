@@ -13,7 +13,7 @@ package relationmap
 		
 		public function RelationLine() 
 		{
-			
+			setUpTextInput(input, "label");
 		}
 		
 		private var propO:Object;
@@ -46,7 +46,8 @@ package relationmap
 			startPoint.visible = false;
 			endPoint.visible = false;
 			
-			input.text = propO.label||"";
+			input.text = propO.label || "";
+			this.pivot(this.width*0.5,this.height*0.5);
 			
 			this.pos(mX, mY);
 		}

@@ -364,6 +364,7 @@
 		function RelationLine(){
 			this.propO=null;
 			RelationLine.__super.call(this);
+			this.setUpTextInput(this.input,"label");
 		}
 
 		__class(RelationLine,'relationmap.RelationLine',_super);
@@ -390,7 +391,8 @@
 			mY=mY || 0;
 			this.startPoint.visible=false;
 			this.endPoint.visible=false;
-			this.input.text=this.propO.label||"";
+			this.input.text=this.propO.label || "";
+			this.pivot(this.width*0.5,this.height*0.5);
 			this.pos(mX,mY);
 		}
 
@@ -429,6 +431,7 @@
 			this.on("mousedown",this,this.onMouseDown);
 			this.on("click",this,this.onMouseClick);
 			this.on("dragend",this,this.onEndDrag);
+			this.setUpTextInput(this.input,"label");
 		}
 
 		__class(RelationNode,'relationmap.RelationNode',_super);
@@ -436,7 +439,8 @@
 		__proto.renderByData=function(){
 			commonlayout.relationmap.RelationMapItemBase.prototype.renderByData.call(this);
 			this.pos(this._dataO.props.x,this._dataO.props.y);
-			this.input.text=this._dataO.props.label||"";
+			this.input.text=this._dataO.props.label || "";
+			this.pivot(this.width*0.5,this.height*0.5);
 		}
 
 		__proto.onMouseClick=function(){
