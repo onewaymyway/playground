@@ -39,7 +39,16 @@ package commonlayout.relationmap
 			if (_dataO.props[key] == input.text) return;
 			_dataO.props[key] = input.text;
 			//Notice.notify("DataChanged");
+			if (input.isAutoSize)
+			{
+				updateMySize();
+			}
 			EventTools.sendEventOnTree(this, "DataChanged");
+		}
+		
+		protected function updateMySize():void
+		{
+			
 		}
 		public function setLayoutPos(x:Number, y:Number):void
 		{

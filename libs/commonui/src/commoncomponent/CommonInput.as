@@ -9,7 +9,7 @@ package commoncomponent
 	 */
 	public class CommonInput extends TextInput 
 	{
-		
+		public var isAutoSize:Boolean = false;
 		public function CommonInput(text:String="") 
 		{
 			super(text);
@@ -25,9 +25,28 @@ package commoncomponent
 			this.focus = true;
 		}
 		
+		override public function set text(value:String):void 
+		{
+			if (!isAutoSize)
+			{
+				super.text = value;
+				return;
+			}
+			this.width = 9999;
+			super.text = value;
+			this.textField.typeset();
+			this.width = this.textField.textWidth + 5;
+		}
+	
+		
 		private function onBlur():void
 		{
 			this.editable = false;
+			if (isAutoSize)
+			{
+				text = text;
+			}
+			
 		}
 		
 	}
