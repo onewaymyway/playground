@@ -3,6 +3,7 @@ package ui.answerflow {
 	import laya.ui.*;
 	import laya.display.*; 
 	import commonlayout.mindmaptree.MindMapTreeBase;
+	import commonlayout.relationmap.RelationMapItemBase;
 	import commoncomponent.AutoSizeTextInput;
 
 	public class AddAbleNodeUI extends MindMapTreeBase {

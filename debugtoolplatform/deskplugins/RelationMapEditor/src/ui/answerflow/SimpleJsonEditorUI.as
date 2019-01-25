@@ -3,6 +3,7 @@ package ui.answerflow {
 	import laya.ui.*;
 	import laya.display.*; 
 	import commonlayout.mindmaptree.MindMapTreeBase;
+	import commonlayout.relationmap.RelationMapItemBase;
 
 	public class SimpleJsonEditorUI extends Dialog {
 		public var editTxt:TextArea;

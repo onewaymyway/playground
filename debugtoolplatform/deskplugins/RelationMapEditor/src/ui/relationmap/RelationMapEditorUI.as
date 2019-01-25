@@ -3,6 +3,7 @@ package ui.relationmap {
 	import laya.ui.*;
 	import laya.display.*; 
 	import commonlayout.mindmaptree.MindMapTreeBase;
+	import commonlayout.relationmap.RelationMapItemBase;
 
 	public class RelationMapEditorUI extends View {
 		public var saveBtn:Button;

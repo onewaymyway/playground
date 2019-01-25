@@ -91,7 +91,7 @@ package
 		private function updateUIContent():void
 		{
 			if (!_data || !mindMapEditor) return;
-			mindMapEditor.setEditType(FileTools.getExtensionName(_data.url));
+			//mindMapEditor.setEditType(FileTools.getExtensionName(_data.url));
 			mindMapEditor.setData(_data.data);
 			text.text = JSON.stringify(_data);
 		}

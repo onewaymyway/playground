@@ -3,6 +3,7 @@ package ui.answerflow {
 	import laya.ui.*;
 	import laya.display.*; 
 	import commonlayout.mindmaptree.MindMapTreeBase;
+	import commonlayout.relationmap.RelationMapItemBase;
 	import ui.answerflow.ItemDataUI;
 	import ui.answerflow.ActionRootUI;
 	import ui.answerflow.SimpleNodeUI;

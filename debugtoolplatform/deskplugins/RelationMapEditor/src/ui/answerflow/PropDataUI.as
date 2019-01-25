@@ -3,6 +3,7 @@ package ui.answerflow {
 	import laya.ui.*;
 	import laya.display.*; 
 	import commonlayout.mindmaptree.MindMapTreeBase;
+	import commonlayout.relationmap.RelationMapItemBase;
 
 	public class PropDataUI extends MindMapTreeBase {
 		public var keyInput:TextInput;

@@ -24,6 +24,32 @@
             "compId":2,
             "child":[
                 ]
+        },
+        {
+            "x":15,
+            "type":"Radio",
+            "props":{"y":-29,"x":-35,"var":"startPoint","skin":"comp/radio.png"},
+            "nodeParent":1,
+            "label":"Radio(startPoint)",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":3,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Radio",
+            "props":{"y":-43,"x":120,"var":"endPoint","skin":"comp/radio.png"},
+            "nodeParent":1,
+            "label":"Radio(endPoint)",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":4,
+            "child":[
+                ]
         }],
     "animations":[
         {

@@ -1,23 +1,24 @@
 <project version="0.9.8">
-   <asynRes>img,temp,sound         </asynRes>
-   <unDealRes>embed         </unDealRes>
+   <asynRes>img,temp,sound            </asynRes>
+   <unDealRes>embed            </unDealRes>
    <resTypes>png,jpg   </resTypes>
    <resExportPath>bin/h5/res/atlas   </resExportPath>
    <asynResExportPath>bin/h5   </asynResExportPath>
    <codeExportPath>src/ui   </codeExportPath>
    <codeImports><![CDATA[import laya.ui.*;
 import laya.display.*; 
-import commonlayout.mindmaptree.MindMapTreeBase;]]>   </codeImports>
+import commonlayout.mindmaptree.MindMapTreeBase;
+import commonlayout.relationmap.RelationMapItemBase;]]>   </codeImports>
    <codeImportsJS><![CDATA[var View=laya.ui.View;
 var Dialog=laya.ui.Dialog;]]>   </codeImportsJS>
    <uiType>0   </uiType>
    <uiExportPath>bin/ui.json   </uiExportPath>
    <boxTypes>Box,List,Tab,RadioGroup,ViewStack,Panel,HBox,VBox,Tree,Sprite   </boxTypes>
-   <pageTypes>View,Dialog,MindMapTreeBase   </pageTypes>
+   <pageTypes>View,Dialog,MindMapTreeBase,RelationMapItemBase   </pageTypes>
    <shareResPath/>
    <codeType>0   </codeType>
    <resCanCompress/>
-   <resPublishQuality>80         </resPublishQuality>
+   <resPublishQuality>80            </resPublishQuality>
    <langPath/>
    <defaultFont/>
    <codeImportsTS><![CDATA[import View=laya.ui.View;
