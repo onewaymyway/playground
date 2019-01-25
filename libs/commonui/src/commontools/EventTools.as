@@ -13,11 +13,11 @@ package commontools
 			
 		}
 		
-		public static function sendEventOnTree(tar:Sprite,event:String):void
+		public static function sendEventOnTree(tar:Sprite,event:String,data:*=null):void
 		{
 			while (tar)
 			{
-				tar.event(event);
+				tar.event(event,data);
 				tar = tar.parent as Sprite;
 			}
 		}

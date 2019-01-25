@@ -78,6 +78,12 @@ package commonlayout.relationmap
 		{
 			return _dataO;
 		}
+		
+		public function getID():int
+		{
+			if (!_dataO) return 0;
+			return _dataO.id;
+		}
 	}
 
 }

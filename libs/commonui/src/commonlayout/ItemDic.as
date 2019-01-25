@@ -10,6 +10,8 @@ package commonlayout
 		public var unSolveList:Array;
 		public var allNodeList:Array;
 		
+		public var groupDic:Object={};
+		
 		public var itemCreater:ItemCreater;
 		public var curMax:int;
 		
@@ -25,8 +27,17 @@ package commonlayout
 			unSolveList = [];
 			allNodeList = [];
 			curMax = 0;
+			groupDic = { };
 		}
 		
+		public function getGroupItems(group:String):Array
+		{
+			if (!groupDic[group])
+			{
+				groupDic[group] = [];
+			}
+			return groupDic[group];
+		}
 		public function recoverItems():void
 		{
 			if (!allNodeList) return;
@@ -60,10 +71,11 @@ package commonlayout
 				tData = tItem.getData();
 				tData.id = curMax;
 				idNodeDic[tData.id] = tItem;
+				curMax++;
 			}
 		}
 		
-		public function createMapItems(nodeDataList:Array):void
+		public function createMapItems(nodeDataList:Array,group:String=null):void
 		{
 			if (!nodeDataList) return;
 			var nodeList:Array;	
@@ -71,6 +83,13 @@ package commonlayout
 			var tItem:*;
 			var tData:Object;
 			var tID:int;
+			
+			var tGroupList:Array;
+			if (group)
+			{
+				tGroupList = getGroupItems(group);
+			}
+		
 				
 			nodeList = nodeDataList;
 			len = nodeList.length;
@@ -80,6 +99,11 @@ package commonlayout
 				tData = nodeList[i];
 				tItem = itemCreater.createByType(tData.type);
 				allNodeList.push(tItem);
+				if (tGroupList)
+				{
+					tGroupList.push(tItem);
+				}
+				tItem.itemDic = this;
 				tItem.setData(tData);
 				tID = tData.id;
 				if (tID && !idNodeDic[tID])
