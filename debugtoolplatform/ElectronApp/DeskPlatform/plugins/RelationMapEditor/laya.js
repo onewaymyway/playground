@@ -15905,6 +15905,150 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class commonlayout.ItemCreater
+	var ItemCreater=(function(){
+		function ItemCreater(){
+			this.createHandler=null;
+			this._typeClassDic={};
+		}
+
+		__class(ItemCreater,'commonlayout.ItemCreater');
+		var __proto=ItemCreater.prototype;
+		__proto.regItemCreater=function(type,clz){
+			this._typeClassDic[type]=clz;
+		}
+
+		__proto.regItemClassList=function(clzList){
+			var i=0,len=0;
+			len=clzList.length;
+			var tClz;
+			for (i=0;i < len;i++){
+				tClz=clzList[i];
+				this.regItemCreater(ClassTool.getClassName(tClz),tClz);
+			}
+		}
+
+		__proto.createByType=function(type){
+			var clz;
+			clz=this._typeClassDic[type];
+			var rst;
+			rst=Pool.getItemByClass(ClassTool.getClassName(clz),clz);
+			if (this.createHandler){
+				this.createHandler.runWith(rst);
+			}
+			return rst;
+		}
+
+		return ItemCreater;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonlayout.ItemDic
+	var ItemDic=(function(){
+		function ItemDic(){
+			this.idNodeDic={};
+			this.unSolveList=null;
+			this.allNodeList=null;
+			this.groupDic={};
+			this.itemCreater=null;
+			this.curMax=0;
+		}
+
+		__class(ItemDic,'commonlayout.ItemDic');
+		var __proto=ItemDic.prototype;
+		__proto.reset=function(){
+			this.idNodeDic={};
+			this.unSolveList=[];
+			this.allNodeList=[];
+			this.curMax=1;
+			this.groupDic={};
+		}
+
+		__proto.getGroupItems=function(group){
+			if (!this.groupDic[group]){
+				this.groupDic[group]=[];
+			}
+			return this.groupDic[group];
+		}
+
+		__proto.recoverItems=function(){
+			if (!this.allNodeList)return;
+			var tItem;
+			var i=0,len=0;
+			len=this.allNodeList.length;
+			for (i=0;i < len;i++){
+				tItem=this.allNodeList[i];
+				tItem.recover();
+				tItem.removeSelf();
+			}
+			this.reset();
+		}
+
+		__proto.getItemByID=function(id){
+			return this.idNodeDic[id];
+		}
+
+		__proto.solveIDs=function(){
+			var i=0,len=0;
+			len=this.unSolveList.length;
+			var tItem;
+			var tData;
+			this.curMax++;
+			for (i=0;i < len;i++){
+				tItem=this.unSolveList[i];
+				tData=tItem.getData();
+				tData.id=this.curMax;
+				this.idNodeDic[tData.id]=tItem;
+				this.curMax++;
+			}
+		}
+
+		__proto.createMapItems=function(nodeDataList,group){
+			if (!nodeDataList)return;
+			var nodeList;
+			var i=0,len=0;
+			var tItem;
+			var tData;
+			var tID=0;
+			var tGroupList;
+			if (group){
+				tGroupList=this.getGroupItems(group);
+			}
+			nodeList=nodeDataList;
+			len=nodeList.length;
+			for (i=0;i < len;i++){
+				tData=nodeList[i];
+				tItem=this.itemCreater.createByType(tData.type);
+				this.allNodeList.push(tItem);
+				if (tGroupList){
+					tGroupList.push(tItem);
+				}
+				tItem.itemDic=this;
+				tItem.setData(tData);
+				tID=tData.id;
+				if (tID && !this.idNodeDic[tID]){
+					if (tID > this.curMax){
+						this.curMax=tID;
+					}
+					this.idNodeDic[tID]=tItem;
+					}else{
+					this.unSolveList.push(tItem);
+				}
+			}
+		}
+
+		return ItemDic;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class commonlayout.mindmaptree.MindMapTreeLayouter
 	var MindMapTreeLayouter=(function(){
 		function MindMapTreeLayouter(){
@@ -16069,9 +16213,9 @@ var Laya=window.Laya=(function(window,document){
 	var EventTools=(function(){
 		function EventTools(){}
 		__class(EventTools,'commontools.EventTools');
-		EventTools.sendEventOnTree=function(tar,event){
+		EventTools.sendEventOnTree=function(tar,event,data){
 			while (tar){
-				tar.event(event);
+				tar.event(event,data);
 				tar=tar.parent;
 			}
 		}
@@ -32262,6 +32406,27 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class commonlayout.AutoScrollRecBox extends laya.ui.Box
+	var AutoScrollRecBox=(function(_super){
+		function AutoScrollRecBox(){
+			AutoScrollRecBox.__super.call(this);
+			this.on("resize",this,this.onMySizeChanged);
+		}
+
+		__class(AutoScrollRecBox,'commonlayout.AutoScrollRecBox',_super);
+		var __proto=AutoScrollRecBox.prototype;
+		__proto.onMySizeChanged=function(){
+			this.scrollRect=new Rectangle(0,0,this.width,this.height);
+		}
+
+		return AutoScrollRecBox;
+	})(Box)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class commonlayout.mindmaptree.MindMapViewer extends laya.ui.Box
 	var MindMapViewer=(function(_super){
 		function MindMapViewer(){
@@ -32416,6 +32581,74 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		return MindMapViewer;
+	})(Box)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonlayout.relationmap.RelationMapViewer extends laya.ui.Box
+	var RelationMapViewer=(function(_super){
+		function RelationMapViewer(){
+			this.itemCreater=null;
+			this._itemDic=null;
+			this._dataO=null;
+			this.lines=null;
+			RelationMapViewer.__super.call(this);
+			this.itemCreater=new ItemCreater();
+			this._itemDic=new ItemDic();
+			this._itemDic.itemCreater=this.itemCreater;
+		}
+
+		__class(RelationMapViewer,'commonlayout.relationmap.RelationMapViewer',_super);
+		var __proto=RelationMapViewer.prototype;
+		__proto.setData=function(dataO){
+			this._dataO=dataO;
+			this.createMapItems();
+		}
+
+		__proto.onCreateItem=function(item){
+			item.itemDic=this._itemDic;
+		}
+
+		__proto.createMapItems=function(){
+			this._itemDic.recoverItems();
+			if (!this._dataO.nodes)this._dataO.nodes=[];
+			if (!this._dataO.lines)this._dataO.lines=[];
+			this._itemDic.reset();
+			this._itemDic.createMapItems(this._dataO.nodes);
+			this._itemDic.createMapItems(this._dataO.lines,"line");
+			this._itemDic.solveIDs();
+			this.lines=this._itemDic.getGroupItems("line");
+			var nodes;
+			nodes=this._itemDic.allNodeList;
+			var i=0,len=0;
+			len=nodes.length;
+			var tItem;
+			for (i=0;i < len;i++){
+				tItem=nodes[i];
+				this.addChild(tItem);
+			}
+		}
+
+		__proto.render=function(context,x,y){
+			this.graphics.clear();
+			if (this.lines){
+				var g;
+				g=this.graphics;
+				var i=0,len=0;
+				len=this.lines.length;
+				var tLine;
+				for (i=0;i < len;i++){
+					tLine=this.lines[i];
+					tLine.drawLineToGraphics(g);
+				}
+			}
+			laya.display.Sprite.prototype.render.call(this,context,x,y);
+		}
+
+		return RelationMapViewer;
 	})(Box)
 
 
@@ -35573,6 +35806,73 @@ var Laya=window.Laya=(function(window,document){
 	})(View)
 
 
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonlayout.relationmap.RelationMapItemBase extends laya.ui.View
+	var RelationMapItemBase=(function(_super){
+		function RelationMapItemBase(){
+			this.itemDic=null;
+			this._dataO=null;
+			RelationMapItemBase.__super.call(this);
+			this.reset();
+		}
+
+		__class(RelationMapItemBase,'commonlayout.relationmap.RelationMapItemBase',_super);
+		var __proto=RelationMapItemBase.prototype;
+		__proto.getItemByID=function(id){
+			if (!this.itemDic)return null;
+			return this.itemDic.getItemByID(id);
+		}
+
+		__proto.setUpTextInput=function(input,key){
+			input.on("blur",this,this.onTextInputChange,[input,key]);
+		}
+
+		__proto.onTextInputChange=function(input,key){
+			if (this._dataO.props[key]==input.text)return;
+			this._dataO.props[key]=input.text;
+			EventTools.sendEventOnTree(this,"DataChanged");
+		}
+
+		__proto.setLayoutPos=function(x,y){
+			this.pos(x,y);
+		}
+
+		__proto.recover=function(){
+			this.reset();
+			Pool.recover(ClassTool.getClassName(this),this);
+		}
+
+		__proto.reset=function(){
+			this._dataO=null;
+			this.pos(0,0);
+		}
+
+		__proto.setData=function(dataO){
+			this._dataO=dataO;
+			this.renderByData();
+		}
+
+		__proto.renderByData=function(){}
+		__proto.getData=function(){
+			return this._dataO;
+		}
+
+		__proto.getID=function(){
+			if (!this._dataO)return 0;
+			return this._dataO.id;
+		}
+
+		__getset(0,__proto,'childNodes',function(){
+			return /*no*/this._childNodes;
+		});
+
+		return RelationMapItemBase;
+	})(View)
+
+
 	//class laya.debug.ui.debugui.comps.ListItemUI extends laya.ui.View
 	var ListItemUI=(function(_super){
 		function ListItemUI(){
@@ -36649,6 +36949,36 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class commoncomponent.CommonInput extends laya.ui.TextInput
+	var CommonInput=(function(_super){
+		function CommonInput(text){
+			(text===void 0)&& (text="");
+			CommonInput.__super.call(this,text);
+			this.editable=false;
+			this.textField.mouseEnabled=false;
+			this.on("blur",this,this.onBlur);
+			this.on("doubleclick",this,this.onDoubleClick);
+		}
+
+		__class(CommonInput,'commoncomponent.CommonInput',_super);
+		var __proto=CommonInput.prototype;
+		__proto.onDoubleClick=function(){
+			this.editable=true;
+			this.focus=true;
+		}
+
+		__proto.onBlur=function(){
+			this.editable=false;
+		}
+
+		return CommonInput;
+	})(TextInput)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class laya.debug.uicomps.RankListItem extends laya.debug.ui.debugui.comps.RankListItemUI
 	var RankListItem=(function(_super){
 		function RankListItem(){
@@ -36734,6 +37064,25 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
+	var FindNodeSmall=(function(_super){
+		function FindNodeSmall(){
+			FindNodeSmall.__super.call(this);
+			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
+			this.createView(FindNodeSmallUI.uiView);
+		}
+
+		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
+		var __proto=FindNodeSmall.prototype;
+		__proto.createChildren=function(){}
+		return FindNodeSmall;
+	})(FindNodeSmallUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class laya.debug.view.nodeInfo.nodetree.FindNode extends laya.debug.ui.debugui.FindNodeUI
 	var FindNode=(function(_super){
 		function FindNode(){
@@ -36750,25 +37099,6 @@ var Laya=window.Laya=(function(window,document){
 
 		return FindNode;
 	})(FindNodeUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
-	var FindNodeSmall=(function(_super){
-		function FindNodeSmall(){
-			FindNodeSmall.__super.call(this);
-			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
-			this.createView(FindNodeSmallUI.uiView);
-		}
-
-		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
-		var __proto=FindNodeSmall.prototype;
-		__proto.createChildren=function(){}
-		return FindNodeSmall;
-	})(FindNodeSmallUI)
 
 
 	/**
@@ -37292,5 +37622,10 @@ var Laya=window.Laya=(function(window,document){
 	})(ToolBarUI)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,Render,Timer,Browser,View,GraphicAnimation,LocalStorage]);
+	Laya.__init([LoaderManager,EventDispatcher,Timer,Browser,View,GraphicAnimation,LocalStorage,Render]);
 })(window,document,Laya);
+
+
+/*
+1 file:///D:/codes/playground.git/trunk/libs/commonui/src/commonlayout/relationmap/RelationMapItemBase.as (55):warning:_childNodes This variable is not defined.
+*/
