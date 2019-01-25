@@ -41,6 +41,7 @@ package relationmap
 		{
 			if (target is RelationNode)
 			{
+				trace("ItemClick:",target.getID(),target);
 				if (isLineMode())
 				{
 					var tNode:RelationNode;
@@ -77,6 +78,7 @@ package relationmap
 			tProp.startY = _lineStart.y;
 			tProp.endX = _lineEnd.x;
 			tProp.endY = _lineEnd.y;
+			tProp.label = "R";
 			tData.props = tProp;
 			this.dataO.lines.push(tData);
 			resetLineInfo();
@@ -100,7 +102,7 @@ package relationmap
 			var tData:Object;
 			tData = { };
 			tData.type = "RelationNode";
-			tData.props = { x:x, y:y };
+			tData.props = { x:x, y:y ,label:"Node"};
 			this.dataO.nodes.push(tData);
 			freshUI();
 		}

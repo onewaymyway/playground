@@ -239,6 +239,7 @@
 		var __proto=RelationMapEditor.prototype;
 		__proto.onItemClick=function(target){
 			if ((target instanceof relationmap.RelationNode )){
+				console.log("ItemClick:",target.getID(),target);
 				if (this.isLineMode()){
 					var tNode;
 					tNode=target;
@@ -269,6 +270,7 @@
 			tProp.startY=this._lineStart.y;
 			tProp.endX=this._lineEnd.x;
 			tProp.endY=this._lineEnd.y;
+			tProp.label="R";
 			tData.props=tProp;
 			this.dataO.lines.push(tData);
 			this.resetLineInfo();
@@ -288,7 +290,7 @@
 			var tData;
 			tData={};
 			tData.type="RelationNode";
-			tData.props={x:x,y:y };
+			tData.props={x:x,y:y ,label:"Node"};
 			this.dataO.nodes.push(tData);
 			this.freshUI();
 		}
