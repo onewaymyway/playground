@@ -15953,6 +15953,7 @@ var Laya=window.Laya=(function(window,document){
 			this.idNodeDic={};
 			this.unSolveList=null;
 			this.allNodeList=null;
+			this.groupDic={};
 			this.itemCreater=null;
 			this.curMax=0;
 		}
@@ -15964,6 +15965,14 @@ var Laya=window.Laya=(function(window,document){
 			this.unSolveList=[];
 			this.allNodeList=[];
 			this.curMax=0;
+			this.groupDic={};
+		}
+
+		__proto.getGroupItems=function(group){
+			if (!this.groupDic[group]){
+				this.groupDic[group]=[];
+			}
+			return this.groupDic[group];
 		}
 
 		__proto.recoverItems=function(){
@@ -15994,16 +16003,21 @@ var Laya=window.Laya=(function(window,document){
 				tData=tItem.getData();
 				tData.id=this.curMax;
 				this.idNodeDic[tData.id]=tItem;
+				this.curMax++;
 			}
 		}
 
-		__proto.createMapItems=function(nodeDataList){
+		__proto.createMapItems=function(nodeDataList,group){
 			if (!nodeDataList)return;
 			var nodeList;
 			var i=0,len=0;
 			var tItem;
 			var tData;
 			var tID=0;
+			var tGroupList;
+			if (group){
+				tGroupList=this.getGroupItems(group);
+			}
 			nodeList=nodeDataList;
 			len=nodeList.length;
 			this.curMax=1;
@@ -16011,6 +16025,10 @@ var Laya=window.Laya=(function(window,document){
 				tData=nodeList[i];
 				tItem=this.itemCreater.createByType(tData.type);
 				this.allNodeList.push(tItem);
+				if (tGroupList){
+					tGroupList.push(tItem);
+				}
+				tItem.itemDic=this;
 				tItem.setData(tData);
 				tID=tData.id;
 				if (tID && !this.idNodeDic[tID]){
@@ -16196,9 +16214,9 @@ var Laya=window.Laya=(function(window,document){
 	var EventTools=(function(){
 		function EventTools(){}
 		__class(EventTools,'commontools.EventTools');
-		EventTools.sendEventOnTree=function(tar,event){
+		EventTools.sendEventOnTree=function(tar,event,data){
 			while (tar){
-				tar.event(event);
+				tar.event(event,data);
 				tar=tar.parent;
 			}
 		}
@@ -32577,6 +32595,7 @@ var Laya=window.Laya=(function(window,document){
 			this.itemCreater=null;
 			this._itemDic=null;
 			this._dataO=null;
+			this.lines=null;
 			RelationMapViewer.__super.call(this);
 			this.itemCreater=new ItemCreater();
 			this._itemDic=new ItemDic();
@@ -32600,8 +32619,9 @@ var Laya=window.Laya=(function(window,document){
 			if (!this._dataO.lines)this._dataO.lines=[];
 			this._itemDic.reset();
 			this._itemDic.createMapItems(this._dataO.nodes);
-			this._itemDic.createMapItems(this._dataO.lines);
+			this._itemDic.createMapItems(this._dataO.lines,"line");
 			this._itemDic.solveIDs();
+			this.lines=this._itemDic.getGroupItems("line");
 			var nodes;
 			nodes=this._itemDic.allNodeList;
 			var i=0,len=0;
@@ -32611,6 +32631,22 @@ var Laya=window.Laya=(function(window,document){
 				tItem=nodes[i];
 				this.addChild(tItem);
 			}
+		}
+
+		__proto.render=function(context,x,y){
+			this.graphics.clear();
+			if (this.lines){
+				var g;
+				g=this.graphics;
+				var i=0,len=0;
+				len=this.lines.length;
+				var tLine;
+				for (i=0;i < len;i++){
+					tLine=this.lines[i];
+					tLine.drawLineToGraphics(g);
+				}
+			}
+			laya.display.Sprite.prototype.render.call(this,context,x,y);
 		}
 
 		return RelationMapViewer;
@@ -35825,6 +35861,11 @@ var Laya=window.Laya=(function(window,document){
 			return this._dataO;
 		}
 
+		__proto.getID=function(){
+			if (!this._dataO)return 0;
+			return this._dataO.id;
+		}
+
 		__getset(0,__proto,'childNodes',function(){
 			return /*no*/this._childNodes;
 		});
@@ -37582,7 +37623,7 @@ var Laya=window.Laya=(function(window,document){
 	})(ToolBarUI)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,Render,Timer,Browser,View,GraphicAnimation,LocalStorage]);
+	Laya.__init([LoaderManager,EventDispatcher,Timer,Browser,View,GraphicAnimation,LocalStorage,Render]);
 })(window,document,Laya);
 
 

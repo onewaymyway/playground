@@ -4,10 +4,10 @@
 
 	var AutoScrollRecBox=commonlayout.AutoScrollRecBox,Button=laya.ui.Button,CommonInput=commoncomponent.CommonInput;
 	var ContextMenu=laya.debug.uicomps.ContextMenu,ContextMenuItem=laya.debug.uicomps.ContextMenuItem,EditorRenderBase=viewRender.EditorRenderBase;
-	var Event=laya.events.Event,Handler=laya.utils.Handler,Image=laya.ui.Image,Loader=laya.net.Loader,MindMapTreeBase=commonlayout.mindmaptree.MindMapTreeBase;
-	var Point=laya.maths.Point,Radio=laya.ui.Radio,RelationMapItemBase=commonlayout.relationmap.RelationMapItemBase;
-	var RelationMapViewer=commonlayout.relationmap.RelationMapViewer,Stage=laya.display.Stage,Tab=laya.ui.Tab;
-	var Text=laya.display.Text,View=laya.ui.View;
+	var Event=laya.events.Event,EventTools=commontools.EventTools,Graphics=laya.display.Graphics,Handler=laya.utils.Handler;
+	var Image=laya.ui.Image,Loader=laya.net.Loader,MindMapTreeBase=commonlayout.mindmaptree.MindMapTreeBase,Point=laya.maths.Point;
+	var Radio=laya.ui.Radio,RelationMapItemBase=commonlayout.relationmap.RelationMapItemBase,RelationMapViewer=commonlayout.relationmap.RelationMapViewer;
+	var Stage=laya.display.Stage,Tab=laya.ui.Tab,Text=laya.display.Text,View=laya.ui.View;
 	/**
 	*...
 	*@author ww
@@ -216,6 +216,9 @@
 			this.editorBox=null;
 			this.mapViewer=null;
 			this.dataO=null;
+			this._tLine=null;
+			this._lineStart=null;
+			this._lineEnd=null;
 			RelationMapEditor.__super.call(this);
 			this.optionTab.selectedIndex=0;
 			this.saveBtn.on("click",this,this.onSaveBtn);
@@ -229,14 +232,47 @@
 			this.mapViewer.size(1,1);
 			this.editorBox.left=this.editorBox.right=this.editorBox.top=this.editorBox.bottom=1;
 			this.editorBox.on("click",this,this.onMapMouseDown);
+			this.editorBox.on("ItemClicked",this,this.onItemClick);
 		}
 
 		__class(RelationMapEditor,'relationmap.RelationMapEditor',_super);
 		var __proto=RelationMapEditor.prototype;
+		__proto.onItemClick=function(target){
+			if ((target instanceof relationmap.RelationNode )){
+				if (this.isLineMode()){
+					var tNode;
+					tNode=target;
+					if (!this._lineStart||tNode.getID()==this._lineStart.getID()){
+						this._lineStart=tNode;
+					}else
+					if(!this._lineEnd){
+						this._lineEnd=tNode;
+						this.onAddLineComplete();
+					}
+				}
+			}
+		}
+
 		__proto.onMapMouseDown=function(e){
 			if (e.target==this.editorBox){
 				this.handleMouseDownAdd();
 			}
+		}
+
+		__proto.onAddLineComplete=function(){
+			var tData;
+			tData={};
+			tData.type="RelationLine";
+			var tProp;
+			tProp={start:this._lineStart.getID(),end:this._lineEnd.getID()};
+			tProp.startX=this._lineStart.x;
+			tProp.startY=this._lineStart.y;
+			tProp.endX=this._lineEnd.x;
+			tProp.endY=this._lineEnd.y;
+			tData.props=tProp;
+			this.dataO.lines.push(tData);
+			this.resetLineInfo();
+			this.freshUI();
 		}
 
 		__proto.handleMouseDownAdd=function(){
@@ -269,7 +305,10 @@
 			return this.optionTab.selectedIndex==0;
 		}
 
-		__proto.onOpTypeChange=function(){}
+		__proto.onOpTypeChange=function(){
+			this.resetLineInfo();
+		}
+
 		__proto.onSaveBtn=function(){
 			this.event("save");
 		}
@@ -279,7 +318,14 @@
 			this.freshUI();
 		}
 
+		__proto.resetLineInfo=function(){
+			this._tLine=null;
+			this._lineStart=null;
+			this._lineEnd=null;
+		}
+
 		__proto.freshUI=function(){
+			this.resetLineInfo();
 			this.mapViewer.setData(this.dataO);
 		}
 
@@ -314,10 +360,57 @@
 	//class relationmap.RelationLine extends ui.relationmap.RelationLineUI
 	var RelationLine=(function(_super){
 		function RelationLine(){
+			this.propO=null;
 			RelationLine.__super.call(this);
 		}
 
 		__class(RelationLine,'relationmap.RelationLine',_super);
+		var __proto=RelationLine.prototype;
+		__proto.renderByData=function(){
+			commonlayout.relationmap.RelationMapItemBase.prototype.renderByData.call(this);
+			this.propO=this._dataO.props;
+			var startNode;
+			startNode=this.itemDic.getItemByID(this._dataO.start);
+			if (startNode){
+				this.propO.startX=startNode.x;
+				this.propO.startY=startNode.y;
+			};
+			var endNode;
+			endNode=this.itemDic.getItemByID(this._dataO.end);
+			if (endNode){
+				this.propO.endX=endNode.x;
+				this.propO.endY=endNode.y;
+			};
+			var mX=NaN,mY=NaN;
+			mX=(this.propO.startX+this.propO.endX)*0.5;
+			mY=(this.propO.startY+this.propO.endY)*0.5;
+			mX=mX || 0;
+			mY=mY || 0;
+			this.startPoint.visible=false;
+			this.endPoint.visible=false;
+			this.pos(mX,mY);
+		}
+
+		__proto.drawLineToGraphics=function(g){
+			var startNode;
+			startNode=this.itemDic.getItemByID(this.propO.start);
+			var endNode;
+			endNode=this.itemDic.getItemByID(this.propO.end);
+			this.propO.startX=startNode.x;
+			this.propO.startY=startNode.y;
+			this.propO.endX=endNode.x;
+			this.propO.endY=endNode.y;
+			var mX=NaN,mY=NaN;
+			mX=(this.propO.startX+this.propO.endX)*0.5;
+			mY=(this.propO.startY+this.propO.endY)*0.5;
+			mX=mX || 0;
+			mY=mY || 0;
+			this.pos(mX,mY);
+			if (startNode && endNode){
+				g.drawLine(startNode.x,startNode.y,endNode.x,endNode.y,"#ff0000");
+			}
+		}
+
 		return RelationLine;
 	})(RelationLineUI)
 
@@ -331,6 +424,7 @@
 		function RelationNode(){
 			RelationNode.__super.call(this);
 			this.on("mousedown",this,this.onMouseDown);
+			this.on("click",this,this.onMouseClick);
 			this.on("dragend",this,this.onEndDrag);
 		}
 
@@ -339,6 +433,10 @@
 		__proto.renderByData=function(){
 			commonlayout.relationmap.RelationMapItemBase.prototype.renderByData.call(this);
 			this.pos(this._dataO.props.x,this._dataO.props.y);
+		}
+
+		__proto.onMouseClick=function(){
+			EventTools.sendEventOnTree(this,"ItemClicked",this);
 		}
 
 		__proto.onMouseDown=function(){

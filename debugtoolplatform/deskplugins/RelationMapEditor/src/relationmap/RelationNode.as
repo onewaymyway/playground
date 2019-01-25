@@ -1,5 +1,6 @@
 package relationmap 
 {
+	import commontools.EventTools;
 	import laya.events.Event;
 	import ui.relationmap.RelationNodeUI;
 	
@@ -13,6 +14,7 @@ package relationmap
 		public function RelationNode() 
 		{
 			this.on(Event.MOUSE_DOWN, this, onMouseDown);
+			this.on(Event.CLICK, this, onMouseClick);
 			this.on(Event.DRAG_END, this, onEndDrag);
 		}
 		
@@ -20,6 +22,11 @@ package relationmap
 		{
 			super.renderByData();
 			this.pos(_dataO.props.x, _dataO.props.y);
+		}
+		
+		private function onMouseClick():void
+		{
+			EventTools.sendEventOnTree(this, "ItemClicked",this);
 		}
 		
 		private function onMouseDown():void

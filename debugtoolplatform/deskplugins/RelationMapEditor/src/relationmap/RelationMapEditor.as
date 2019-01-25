@@ -32,16 +32,56 @@ package relationmap
 			
 			editorBox.left = editorBox.right = editorBox.top = editorBox.bottom = 1;
 			editorBox.on(Event.CLICK, this, onMapMouseDown);
+			
+			editorBox.on("ItemClicked", this, onItemClick);
 		}
 		
+		
+		private function onItemClick(target:*):void
+		{
+			if (target is RelationNode)
+			{
+				if (isLineMode())
+				{
+					var tNode:RelationNode;
+					tNode = target;
+					if (!_lineStart||tNode.getID()==_lineStart.getID())
+					{
+						_lineStart = tNode;
+					}else
+					if(!_lineEnd)
+					{
+						_lineEnd = tNode;
+						onAddLineComplete();
+					}
+				}
+			}
+		}
 		private function onMapMouseDown(e:Event):void
 		{
 			if (e.target == editorBox)
 			{
 				handleMouseDownAdd();
 			}
+			
 		}
 		
+		private function onAddLineComplete():void
+		{
+			var tData:Object;
+			tData = { };
+			tData.type = "RelationLine";
+			var tProp:Object;
+			tProp = { start:_lineStart.getID(), end:_lineEnd.getID() };
+			tProp.startX = _lineStart.x;
+			tProp.startY = _lineStart.y;
+			tProp.endX = _lineEnd.x;
+			tProp.endY = _lineEnd.y;
+			tData.props = tProp;
+			this.dataO.lines.push(tData);
+			resetLineInfo();
+			freshUI();
+		}
 		private function handleMouseDownAdd():void
 		{
 			if (isOperateMode()) return;
@@ -83,7 +123,7 @@ package relationmap
 		
 		private function onOpTypeChange():void
 		{
-			
+			resetLineInfo();
 		}
 		
 		private function onSaveBtn():void
@@ -98,8 +138,18 @@ package relationmap
 			freshUI();
 		}
 		
+		private var _tLine:RelationLine;
+		private var _lineStart:RelationNode;
+		private var _lineEnd:RelationNode;
+		private function resetLineInfo():void
+		{
+			_tLine = null;
+			_lineStart = null;
+			_lineEnd = null;
+		}
 		public function freshUI():void
 		{
+			resetLineInfo();
 			mapViewer.setData(dataO);
 		}
 	}
