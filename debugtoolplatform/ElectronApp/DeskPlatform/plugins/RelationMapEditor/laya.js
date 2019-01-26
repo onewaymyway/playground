@@ -35833,9 +35833,13 @@ var Laya=window.Laya=(function(window,document){
 		__proto.onTextInputChange=function(input,key){
 			if (this._dataO.props[key]==input.text)return;
 			this._dataO.props[key]=input.text;
+			if (input.isAutoSize){
+				this.updateMySize();
+			}
 			EventTools.sendEventOnTree(this,"DataChanged");
 		}
 
+		__proto.updateMySize=function(){}
 		__proto.setLayoutPos=function(x,y){
 			this.pos(x,y);
 		}
@@ -36952,6 +36956,7 @@ var Laya=window.Laya=(function(window,document){
 	//class commoncomponent.CommonInput extends laya.ui.TextInput
 	var CommonInput=(function(_super){
 		function CommonInput(text){
+			this.isAutoSize=false;
 			(text===void 0)&& (text="");
 			CommonInput.__super.call(this,text);
 			this.editable=false;
@@ -36969,7 +36974,21 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.onBlur=function(){
 			this.editable=false;
+			if (this.isAutoSize){
+				this.text=this.text;
+			}
 		}
+
+		__getset(0,__proto,'text',_super.prototype._$get_text,function(value){
+			if (!this.isAutoSize){
+				_super.prototype._$set_text.call(this,value);
+				return;
+			}
+			this.width=9999;
+			_super.prototype._$set_text.call(this,value);
+			this.textField.typeset();
+			this.width=this.textField.textWidth+5;
+		});
 
 		return CommonInput;
 	})(TextInput)
@@ -37627,5 +37646,5 @@ var Laya=window.Laya=(function(window,document){
 
 
 /*
-1 file:///D:/codes/playground.git/trunk/libs/commonui/src/commonlayout/relationmap/RelationMapItemBase.as (55):warning:_childNodes This variable is not defined.
+1 file:///D:/codes/playground.git/trunk/libs/commonui/src/commonlayout/relationmap/RelationMapItemBase.as (64):warning:_childNodes This variable is not defined.
 */
