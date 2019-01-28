@@ -37,6 +37,7 @@ package commoncomponent
 //			_input.overflow=Text.HIDDEN;
 			_button["_text"].visible=false;
 			addChild(_input);
+			_input.color = "#ffffff";
 			_input.on(Event.BLUR, this, onInputEvents, [Event.BLUR]);
 			this.on(Event.CHANGE, this, onInputEvents, [Event.BLUR]);
 		}
@@ -62,7 +63,8 @@ package commoncomponent
 		
 		public function set color(value:String):void
 		{
-			_input.color = color;
+			_input.color = value;
+			//this.labelColors = "#ffffff,#ffffff,#ffffff,#ffffff,#ffffff";
 		}
 		
 		override public function set selectedIndex(value:int):void {
