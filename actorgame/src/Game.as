@@ -1,16 +1,14 @@
 package  
 {
-	import carotutils.CarotDataManager;
 	import laya.display.Stage;
 	import laya.net.Loader;
 	import laya.utils.Handler;
 	import scenetools.SceneSwitcher;
-	import simulator.DrowningMachine;
 	import view.actorgame.GameMain;
 	import view.actorgame.QGameDataManager;
 	import view.actorgame.QGameState;
-	import view.PlayMainView;
-	import view.tarot.TarotMain;
+
+
 	/**
 	 * ...
 	 * @author ww
