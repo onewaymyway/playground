@@ -255,10 +255,30 @@ package answerflow
 			{
 				itemList.visible = true;
 				itemList.array = dataO.items;
+				initItemLabels(dataO.items);
+				
 			}
 			actionTipTxt.text = "操作(" + dataO.actions.length+")";
 			if(actionEditor.visible)
 			actionEditor.freshLayout();
+		}
+		
+		private function initItemLabels(items:Array):void
+		{
+			var i:int, len:int;
+			len = items.length;
+			var tList:Array;
+			tList = [];
+			var dataO:Object;
+			for (i = 0; i < len; i++)
+			{
+				dataO = items[i];
+				tList.push(dataO.props.label);
+			}
+			
+			var itemLabels:String;
+			itemLabels=tList.join(",");
+			ItemData.itemLabels = itemLabels;
 		}
 	}
 

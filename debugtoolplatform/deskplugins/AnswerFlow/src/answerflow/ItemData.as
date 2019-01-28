@@ -9,7 +9,7 @@ package answerflow
 	 */
 	public class ItemData extends ItemDataUI 
 	{
-		
+		public static var itemLabels:String;
 		public function ItemData() 
 		{
 			setUpTextInput(item, "item");
@@ -20,8 +20,13 @@ package answerflow
 		override protected function renderByData():void 
 		{
 			super.renderByData();
+			
 			item.text = _dataO.props["item"] || "";
 			count.text = _dataO.props["count"] || "";
+			if (itemLabels)
+			{
+				item.labels = itemLabels;
+			}
 		}
 	}
 
