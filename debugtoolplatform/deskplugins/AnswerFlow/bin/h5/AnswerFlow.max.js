@@ -5,8 +5,9 @@
 	var AutoSizeTextInput=commoncomponent.AutoSizeTextInput,Button=laya.ui.Button,CommonInput=commoncomponent.CommonInput;
 	var ContextMenu=laya.debug.uicomps.ContextMenu,ContextMenuItem=laya.debug.uicomps.ContextMenuItem,Dialog=laya.ui.Dialog;
 	var EditorRenderBase=viewRender.EditorRenderBase,Event=laya.events.Event,EventTools=commontools.EventTools;
-	var Handler=laya.utils.Handler,JsonTool=laya.debug.tools.JsonTool,Label=laya.ui.Label,List=laya.ui.List,Loader=laya.net.Loader;
-	var MessageManager=commontools.MessageManager,MindMapTreeBase=commonlayout.mindmaptree.MindMapTreeBase,MindMapViewer=commonlayout.mindmaptree.MindMapViewer;
+	var Handler=laya.utils.Handler,InputSelect=commoncomponent.InputSelect,JsonTool=laya.debug.tools.JsonTool;
+	var Label=laya.ui.Label,List=laya.ui.List,Loader=laya.net.Loader,MessageManager=commontools.MessageManager;
+	var MindMapTreeBase=commonlayout.mindmaptree.MindMapTreeBase,MindMapViewer=commonlayout.mindmaptree.MindMapViewer;
 	var ObjectTools=laya.debug.tools.ObjectTools,Stage=laya.display.Stage,Text=laya.display.Text,TextArea=laya.ui.TextArea;
 	var TextInput=laya.ui.TextInput,View=laya.ui.View;
 	/**
@@ -331,23 +332,6 @@
 	})(MindMapTreeBase)
 
 
-	//class ui.answerflow.DataOperateUI extends commonlayout.mindmaptree.MindMapTreeBase
-	var DataOperateUI=(function(_super){
-		function DataOperateUI(){DataOperateUI.__super.call(this);;
-		};
-
-		__class(DataOperateUI,'ui.answerflow.DataOperateUI',_super);
-		var __proto=DataOperateUI.prototype;
-		__proto.createChildren=function(){
-			laya.ui.Component.prototype.createChildren.call(this);
-			this.createView(DataOperateUI.uiView);
-		}
-
-		DataOperateUI.uiView={"type":"MindMapTreeBase","props":{"width":240,"height":30},"child":[{"type":"TextInput","props":{"y":4,"x":10,"width":95,"text":"TextInput","skin":"comp/input_22.png","promptColor":"#f31713","height":22,"color":"#e80d09"}},{"type":"ComboBox","props":{"y":5,"x":114,"width":53,"skin":"comp/combobox.png","sizeGrid":"0,31,0,0","selectedIndex":0,"labels":"+,-","height":22}},{"type":"TextInput","props":{"y":5,"x":174,"width":60,"text":"TextInput","skin":"comp/input_22.png","height":22,"color":"#ec130f"}}]};
-		return DataOperateUI;
-	})(MindMapTreeBase)
-
-
 	/**
 	*...
 	*@author ...
@@ -470,10 +454,26 @@
 				}else{
 				this.itemList.visible=true;
 				this.itemList.array=this.dataO.items;
+				this.initItemLabels(this.dataO.items);
 			}
 			this.actionTipTxt.text="操作("+this.dataO.actions.length+")";
 			if(this.actionEditor.visible)
 				this.actionEditor.freshLayout();
+		}
+
+		__proto.initItemLabels=function(items){
+			var i=0,len=0;
+			len=items.length;
+			var tList;
+			tList=[];
+			var dataO;
+			for (i=0;i < len;i++){
+				dataO=items[i];
+				tList.push(dataO.props.label);
+			};
+			var itemLabels;
+			itemLabels=tList.join(",");
+			ItemData.itemLabels=itemLabels;
 		}
 
 		AnswerFlowEditor.createActionData=function(){
@@ -570,6 +570,23 @@
 	})(AnswerFlowEditorUI)
 
 
+	//class ui.answerflow.DataOperateUI extends commonlayout.mindmaptree.MindMapTreeBase
+	var DataOperateUI=(function(_super){
+		function DataOperateUI(){DataOperateUI.__super.call(this);;
+		};
+
+		__class(DataOperateUI,'ui.answerflow.DataOperateUI',_super);
+		var __proto=DataOperateUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(DataOperateUI.uiView);
+		}
+
+		DataOperateUI.uiView={"type":"MindMapTreeBase","props":{"width":240,"height":30},"child":[{"type":"TextInput","props":{"y":4,"x":10,"width":95,"text":"TextInput","skin":"comp/input_22.png","promptColor":"#f31713","height":22,"color":"#e80d09"}},{"type":"ComboBox","props":{"y":5,"x":114,"width":53,"skin":"comp/combobox.png","sizeGrid":"0,31,0,0","selectedIndex":0,"labels":"+,-","height":22}},{"type":"TextInput","props":{"y":5,"x":174,"width":60,"text":"TextInput","skin":"comp/input_22.png","height":22,"color":"#ec130f"}}]};
+		return DataOperateUI;
+	})(MindMapTreeBase)
+
+
 	//class ui.answerflow.ItemDataUI extends commonlayout.mindmaptree.MindMapTreeBase
 	var ItemDataUI=(function(_super){
 		function ItemDataUI(){
@@ -582,11 +599,12 @@
 		__class(ItemDataUI,'ui.answerflow.ItemDataUI',_super);
 		var __proto=ItemDataUI.prototype;
 		__proto.createChildren=function(){
+			View.regComponent("commoncomponent.InputSelect",InputSelect);
 			laya.ui.Component.prototype.createChildren.call(this);
 			this.createView(ItemDataUI.uiView);
 		}
 
-		ItemDataUI.uiView={"type":"MindMapTreeBase","props":{"width":200,"height":30},"child":[{"type":"TextInput","props":{"y":4,"x":5,"width":95,"var":"item","text":"物品","skin":"comp/input_22.png","promptColor":"#f31713","height":22,"color":"#e80d09"}},{"type":"TextInput","props":{"y":4,"x":108,"width":60,"var":"count","text":"数量","skin":"comp/input_22.png","height":22,"color":"#ec130f"}},{"type":"Button","props":{"y":3,"x":173,"width":26,"var":"removeBtn","skin":"comp/button.png","label":"-","height":24}}]};
+		ItemDataUI.uiView={"type":"MindMapTreeBase","props":{"width":200,"height":30},"child":[{"type":"TextInput","props":{"y":4,"x":5,"width":95,"var":"item","text":"物品","skin":"comp/input_22.png","runtime":"commoncomponent.InputSelect","promptColor":"#f31713","height":22,"color":"#e80d09"}},{"type":"TextInput","props":{"y":4,"x":108,"width":60,"var":"count","text":"数量","skin":"comp/input_22.png","height":22,"color":"#ec130f"}},{"type":"Button","props":{"y":3,"x":173,"width":26,"var":"removeBtn","skin":"comp/button.png","label":"-","height":24}}]};
 		return ItemDataUI;
 	})(MindMapTreeBase)
 
@@ -791,8 +809,12 @@
 			commonlayout.mindmaptree.MindMapTreeBase.prototype.renderByData.call(this);
 			this.item.text=this._dataO.props["item"] || "";
 			this.count.text=this._dataO.props["count"] || "";
+			if (ItemData.itemLabels){
+				this.item.labels=ItemData.itemLabels;
+			}
 		}
 
+		ItemData.itemLabels=null
 		return ItemData;
 	})(ItemDataUI)
 
