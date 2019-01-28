@@ -38,6 +38,7 @@ package commoncomponent
 			_button["_text"].visible=false;
 			addChild(_input);
 			_input.color = "#ffffff";
+			this.visibleNum = 15;
 			_input.on(Event.BLUR, this, onInputEvents, [Event.BLUR]);
 			this.on(Event.CHANGE, this, onInputEvents, [Event.BLUR]);
 		}
