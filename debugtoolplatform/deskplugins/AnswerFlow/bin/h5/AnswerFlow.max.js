@@ -332,6 +332,23 @@
 	})(MindMapTreeBase)
 
 
+	//class ui.answerflow.DataOperateUI extends commonlayout.mindmaptree.MindMapTreeBase
+	var DataOperateUI=(function(_super){
+		function DataOperateUI(){DataOperateUI.__super.call(this);;
+		};
+
+		__class(DataOperateUI,'ui.answerflow.DataOperateUI',_super);
+		var __proto=DataOperateUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(DataOperateUI.uiView);
+		}
+
+		DataOperateUI.uiView={"type":"MindMapTreeBase","props":{"width":240,"height":30},"child":[{"type":"TextInput","props":{"y":4,"x":10,"width":95,"text":"TextInput","skin":"comp/input_22.png","promptColor":"#f31713","height":22,"color":"#e80d09"}},{"type":"ComboBox","props":{"y":5,"x":114,"width":53,"skin":"comp/combobox.png","sizeGrid":"0,31,0,0","selectedIndex":0,"labels":"+,-","height":22}},{"type":"TextInput","props":{"y":5,"x":174,"width":60,"text":"TextInput","skin":"comp/input_22.png","height":22,"color":"#ec130f"}}]};
+		return DataOperateUI;
+	})(MindMapTreeBase)
+
+
 	/**
 	*...
 	*@author ...
@@ -568,23 +585,6 @@
 		AnswerFlowEditor.QGame="qgame";
 		return AnswerFlowEditor;
 	})(AnswerFlowEditorUI)
-
-
-	//class ui.answerflow.DataOperateUI extends commonlayout.mindmaptree.MindMapTreeBase
-	var DataOperateUI=(function(_super){
-		function DataOperateUI(){DataOperateUI.__super.call(this);;
-		};
-
-		__class(DataOperateUI,'ui.answerflow.DataOperateUI',_super);
-		var __proto=DataOperateUI.prototype;
-		__proto.createChildren=function(){
-			laya.ui.Component.prototype.createChildren.call(this);
-			this.createView(DataOperateUI.uiView);
-		}
-
-		DataOperateUI.uiView={"type":"MindMapTreeBase","props":{"width":240,"height":30},"child":[{"type":"TextInput","props":{"y":4,"x":10,"width":95,"text":"TextInput","skin":"comp/input_22.png","promptColor":"#f31713","height":22,"color":"#e80d09"}},{"type":"ComboBox","props":{"y":5,"x":114,"width":53,"skin":"comp/combobox.png","sizeGrid":"0,31,0,0","selectedIndex":0,"labels":"+,-","height":22}},{"type":"TextInput","props":{"y":5,"x":174,"width":60,"text":"TextInput","skin":"comp/input_22.png","height":22,"color":"#ec130f"}}]};
-		return DataOperateUI;
-	})(MindMapTreeBase)
 
 
 	//class ui.answerflow.ItemDataUI extends commonlayout.mindmaptree.MindMapTreeBase
