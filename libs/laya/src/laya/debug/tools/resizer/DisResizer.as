@@ -24,6 +24,11 @@ package laya.debug.tools.resizer
 		 * 水平方向的拖动条
 		 */
 		public static const Horizon:int = 0;
+		
+		/**
+		 * 拖动条
+		 */
+		public static const Drag:int = 3;
 		public function DisResizer() 
 		{
 			
@@ -32,14 +37,22 @@ package laya.debug.tools.resizer
 		private static var _down:AutoFillRec;
 		private static var _left:AutoFillRec;
 		private static var _right:AutoFillRec;
+		private static var _dragBar:AutoFillRec;
 		
 		private static var _barList:Array;
 		private static var _tar:Sprite;
 		public static const barWidth:int = 2;
-		public static var useGetBounds:Boolean=false;
+		public static var useGetBounds:Boolean = false;
+		public static var hasDragBar:Boolean=true;
 		public static function init():void
 		{
 			if (_up) return;
+			
+			
+			_dragBar=new AutoFillRec("T");
+			_dragBar.height = 10;
+			_dragBar.width = 10;
+			_dragBar.type = Drag;
 			
 			_up=new AutoFillRec("T");
 			_up.height = barWidth;
@@ -57,7 +70,7 @@ package laya.debug.tools.resizer
 			_right.width = barWidth;
 			_right.type =Vertical;
 			
-			_barList = [_up, _down, _left, _right];
+			_barList = [_up, _down, _left, _right,_dragBar];
 			addEvent();
 		}
 		private static function stageDown(e:Event):void
@@ -94,8 +107,15 @@ package laya.debug.tools.resizer
 			clearDragEvents();
 			tBar = e.target as AutoFillRec;
 			if (!tBar) return;
+			
+			if (tBar.type == Drag)
+			{
+				_tar.startDrag();
+				return;
+			}
 			var area:Rectangle;
 			area = new Rectangle();
+			
 			if (tBar.type == Horizon)
 			{
 				area.x = tBar.x;
@@ -123,6 +143,10 @@ package laya.debug.tools.resizer
 			trace("draging");
 			if (!tBar) return;
 			if (!_tar) return;
+			if (tBar.type == Drag)
+			{
+				return;
+			}
 			switch(tBar)
 			{
 				case _left:
@@ -167,6 +191,12 @@ package laya.debug.tools.resizer
 			trace("dragEnd");
 			clearDragEvents();
 			updates();
+			if (tBar.type == Drag)
+			return;
+			if (_tar)
+			{
+				_tar.event("disresize");
+			}
 		}
 		private static function clearDragEvents():void
 		{
@@ -176,6 +206,7 @@ package laya.debug.tools.resizer
 		}
 		public static function setUp(dis:Sprite, force:Boolean = false ):void
 		{
+			_dragBar.visible = hasDragBar;
 			if (force && dis == _tar) 
 			{
 //				updates();
@@ -221,7 +252,10 @@ package laya.debug.tools.resizer
 			
 			_right.x=bounds.x+bounds.width-barWidth;
 			_right.y=bounds.y;
-			_right.height=bounds.height;
+			_right.height = bounds.height;
+			
+			_dragBar.x = bounds.x + bounds.width * 0.5-_dragBar.width*0.5;
+			_dragBar.y = 0;
 		}
 		
 	}
