@@ -728,6 +728,104 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class objecteditor.ObjectDataTpl
+	var ObjectDataTpl=(function(){
+		function ObjectDataTpl(){}
+		__class(ObjectDataTpl,'objecteditor.ObjectDataTpl');
+		ObjectDataTpl.createUData=function(type){
+			var rst;
+			rst={
+				"type":type,
+				"props":{},
+				"childs":[]
+			};
+			return rst;
+		}
+
+		ObjectDataTpl.createKeyData=function(){
+			var rst;
+			rst=ObjectDataTpl.createUData("KeyItem")
+			return rst;
+		}
+
+		ObjectDataTpl.createArrayData=function(){
+			var rst;
+			rst=ObjectDataTpl.createUData("ArrayItem")
+			return rst;
+		}
+
+		ObjectDataTpl.createObjectData=function(){
+			var rst;
+			rst=ObjectDataTpl.createUData("ObjectItem")
+			return rst;
+		}
+
+		ObjectDataTpl.createValueData=function(){
+			var rst;
+			rst=ObjectDataTpl.createUData("ValueItem")
+			return rst;
+		}
+
+		return ObjectDataTpl;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class objecteditor.ObjectTreeTool
+	var ObjectTreeTool=(function(){
+		function ObjectTreeTool(){
+			this._menu=null;
+		}
+
+		__class(ObjectTreeTool,'objecteditor.ObjectTreeTool');
+		ObjectTreeTool.init=function(){
+			this._menu=ContextMenu.createMenuByArray(["Array","Object","Value"]);
+			this._menu.on("select",this,ObjectTreeTool.onEmunSelect);
+		}
+
+		ObjectTreeTool.onEmunSelect=function(e){
+			var data=(e.target).data;
+			if ((typeof data=='string')){
+				var key;
+				key=data;
+				console.log("menuDown:",key);
+				switch (key){
+					case "Array":
+						if (ObjectTreeTool._tItem && ObjectTreeTool._tItem.addChildData){
+							ObjectTreeTool._tItem.addChildData(ObjectDataTpl.createArrayData());
+						}
+						break ;
+					case "Object":
+						if (ObjectTreeTool._tItem && ObjectTreeTool._tItem.addChildData){
+							ObjectTreeTool._tItem.addChildData(ObjectDataTpl.createObjectData());
+						}
+						break ;
+					case "Value":
+						if (ObjectTreeTool._tItem && ObjectTreeTool._tItem.addChildData){
+							ObjectTreeTool._tItem.addChildData(ObjectDataTpl.createValueData());
+						}
+						break ;
+					}
+			}
+		}
+
+		ObjectTreeTool.showAddValueMenu=function(item){
+			ObjectTreeTool._tItem=item;
+			this._menu.show();
+		}
+
+		ObjectTreeTool._tItem=null
+		return ObjectTreeTool;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class TestCEditor
 	var TestCEditor=(function(){
 		function TestCEditor(){
@@ -745,11 +843,12 @@ var Laya=window.Laya=(function(window,document){
 		__class(TestCEditor,'TestCEditor');
 		var __proto=TestCEditor.prototype;
 		__proto.test=function(){
-			var editor;
-			editor=new DataList();
-			editor.pos(200,200);
-			editor.setData(DataTpl.createDataListData());
-			Laya.stage.addChild(editor);
+			ObjectTreeTool.init();
+			var objEditor;
+			objEditor=new ObjectEditor();
+			objEditor.size(400,400);
+			objEditor.setData(ObjectEditor.createTplData().data);
+			Laya.stage.addChild(objEditor);
 		}
 
 		return TestCEditor;
@@ -27209,103 +27308,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
-	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
-	*
-	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
-	*package
-	*{
-		*import laya.ui.HSlider;
-		*import laya.ui.VSlider;
-		*import laya.utils.Handler;
-		*public class VSlider_Example
-		*{
-			*private var vSlider:VSlider;
-			*public function VSlider_Example()
-			*{
-				*Laya.init(640,800);//设置游戏画布宽高。
-				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
-				*}
-			*private function onLoadComplete():void
-			*{
-				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-				*vSlider.min=0;//设置 vSlider 最低位置值。
-				*vSlider.max=10;//设置 vSlider 最高位置值。
-				*vSlider.value=2;//设置 vSlider 当前位置值。
-				*vSlider.tick=1;//设置 vSlider 刻度值。
-				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
-				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-				*}
-			*private function onChange(value:Number):void
-			*{
-				*trace("滑块的位置： value="+value);
-				*}
-			*}
-		*}
-	*@example
-	*Laya.init(640,800);//设置游戏画布宽高
-	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
-	*var vSlider;
-	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
-	*function onLoadComplete(){
-		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-		*vSlider.min=0;//设置 vSlider 最低位置值。
-		*vSlider.max=10;//设置 vSlider 最高位置值。
-		*vSlider.value=2;//设置 vSlider 当前位置值。
-		*vSlider.tick=1;//设置 vSlider 刻度值。
-		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
-		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
-		*}
-	*function onChange(value){
-		*console.log("滑块的位置： value="+value);
-		*}
-	*@example
-	*import HSlider=laya.ui.HSlider;
-	*import VSlider=laya.ui.VSlider;
-	*import Handler=laya.utils.Handler;
-	*class VSlider_Example {
-		*private vSlider:VSlider;
-		*constructor(){
-			*Laya.init(640,800);//设置游戏画布宽高。
-			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
-			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
-			*}
-		*private onLoadComplete():void {
-			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
-			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
-			*this.vSlider.min=0;//设置 vSlider 最低位置值。
-			*this.vSlider.max=10;//设置 vSlider 最高位置值。
-			*this.vSlider.value=2;//设置 vSlider 当前位置值。
-			*this.vSlider.tick=1;//设置 vSlider 刻度值。
-			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
-			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
-			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
-			*}
-		*private onChange(value:number):void {
-			*console.log("滑块的位置： value="+value);
-			*}
-		*}
-	*@see laya.ui.Slider
-	*/
-	//class laya.ui.VSlider extends laya.ui.Slider
-	var VSlider=(function(_super){
-		function VSlider(){VSlider.__super.call(this);;
-		};
-
-		__class(VSlider,'laya.ui.VSlider',_super);
-		return VSlider;
-	})(Slider)
-
-
-	/**
 	*<code>TextInput</code> 类用于创建显示对象以显示和输入文本。
 	*
 	*@example <caption>以下示例代码，创建了一个 <code>TextInput</code> 实例。</caption>
@@ -27626,6 +27628,103 @@ var Laya=window.Laya=(function(window,document){
 
 		return TextInput;
 	})(Label)
+
+
+	/**
+	*使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
+	*<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
+	*
+	*@example <caption>以下示例代码，创建了一个 <code>VSlider</code> 实例。</caption>
+	*package
+	*{
+		*import laya.ui.HSlider;
+		*import laya.ui.VSlider;
+		*import laya.utils.Handler;
+		*public class VSlider_Example
+		*{
+			*private var vSlider:VSlider;
+			*public function VSlider_Example()
+			*{
+				*Laya.init(640,800);//设置游戏画布宽高。
+				*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+				*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,onLoadComplete));//加载资源。
+				*}
+			*private function onLoadComplete():void
+			*{
+				*vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+				*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+				*vSlider.min=0;//设置 vSlider 最低位置值。
+				*vSlider.max=10;//设置 vSlider 最高位置值。
+				*vSlider.value=2;//设置 vSlider 当前位置值。
+				*vSlider.tick=1;//设置 vSlider 刻度值。
+				*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+				*vSlider.changeHandler=new Handler(this,onChange);//设置 vSlider 位置变化处理器。
+				*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+				*}
+			*private function onChange(value:Number):void
+			*{
+				*trace("滑块的位置： value="+value);
+				*}
+			*}
+		*}
+	*@example
+	*Laya.init(640,800);//设置游戏画布宽高
+	*Laya.stage.bgColor="#efefef";//设置画布的背景颜色
+	*var vSlider;
+	*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],laya.utils.Handler.create(this,onLoadComplete));//加载资源。
+	*function onLoadComplete(){
+		*vSlider=new laya.ui.VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+		*vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+		*vSlider.min=0;//设置 vSlider 最低位置值。
+		*vSlider.max=10;//设置 vSlider 最高位置值。
+		*vSlider.value=2;//设置 vSlider 当前位置值。
+		*vSlider.tick=1;//设置 vSlider 刻度值。
+		*vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+		*vSlider.changeHandler=new laya.utils.Handler(this,onChange);//设置 vSlider 位置变化处理器。
+		*Laya.stage.addChild(vSlider);//把 vSlider 添加到显示列表。
+		*}
+	*function onChange(value){
+		*console.log("滑块的位置： value="+value);
+		*}
+	*@example
+	*import HSlider=laya.ui.HSlider;
+	*import VSlider=laya.ui.VSlider;
+	*import Handler=laya.utils.Handler;
+	*class VSlider_Example {
+		*private vSlider:VSlider;
+		*constructor(){
+			*Laya.init(640,800);//设置游戏画布宽高。
+			*Laya.stage.bgColor="#efefef";//设置画布的背景颜色。
+			*Laya.loader.load(["resource/ui/vslider.png","resource/ui/vslider$bar.png"],Handler.create(this,this.onLoadComplete));//加载资源。
+			*}
+		*private onLoadComplete():void {
+			*this.vSlider=new VSlider();//创建一个 VSlider 类的实例对象 vSlider 。
+			*this.vSlider.skin="resource/ui/vslider.png";//设置 vSlider 的皮肤。
+			*this.vSlider.min=0;//设置 vSlider 最低位置值。
+			*this.vSlider.max=10;//设置 vSlider 最高位置值。
+			*this.vSlider.value=2;//设置 vSlider 当前位置值。
+			*this.vSlider.tick=1;//设置 vSlider 刻度值。
+			*this.vSlider.x=100;//设置 vSlider 对象的属性 x 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.y=100;//设置 vSlider 对象的属性 y 的值，用于控制 vSlider 对象的显示位置。
+			*this.vSlider.changeHandler=new Handler(this,this.onChange);//设置 vSlider 位置变化处理器。
+			*Laya.stage.addChild(this.vSlider);//把 vSlider 添加到显示列表。
+			*}
+		*private onChange(value:number):void {
+			*console.log("滑块的位置： value="+value);
+			*}
+		*}
+	*@see laya.ui.Slider
+	*/
+	//class laya.ui.VSlider extends laya.ui.Slider
+	var VSlider=(function(_super){
+		function VSlider(){VSlider.__super.call(this);;
+		};
+
+		__class(VSlider,'laya.ui.VSlider',_super);
+		return VSlider;
+	})(Slider)
 
 
 	/**
@@ -28175,6 +28274,11 @@ var Laya=window.Laya=(function(window,document){
 			return this._dataO;
 		}
 
+		__proto.addChildData=function(dataO){
+			this._dataO.childs.push(ObjectTools.copyObjFast(dataO));
+			EventTools.sendEventOnTree(this,"DataChanged");
+		}
+
 		__getset(0,__proto,'childNodes',function(){
 			return this._childNodes;
 		});
@@ -28525,6 +28629,25 @@ var Laya=window.Laya=(function(window,document){
 
 		DataListUI.uiView={"type":"View","props":{"width":542,"height":149},"child":[{"type":"List","props":{"var":"itemList","vScrollBarSkin":"comp/vscroll.png","top":35,"spaceY":5,"spaceX":5,"right":0,"left":0,"bottom":2},"child":[{"type":"DataItem","props":{"name":"render","runtime":"ui.dataeditor.DataItemUI"}}]},{"type":"Button","props":{"width":28,"var":"addBtn","top":1,"skin":"comp/button.png","right":2,"label":"+","height":24}},{"type":"Label","props":{"y":5,"x":7,"width":53,"var":"titleTxt","text":"标题","styleSkin":"comp/label.png","height":15,"color":"#ef3431"}}]};
 		return DataListUI;
+	})(View)
+
+
+	//class ui.objecteditor.ObjectEditorUI extends laya.ui.View
+	var ObjectEditorUI=(function(_super){
+		function ObjectEditorUI(){
+			this.content=null;
+			ObjectEditorUI.__super.call(this);
+		}
+
+		__class(ObjectEditorUI,'ui.objecteditor.ObjectEditorUI',_super);
+		var __proto=ObjectEditorUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(ObjectEditorUI.uiView);
+		}
+
+		ObjectEditorUI.uiView={"type":"View","props":{"width":720,"height":1280},"child":[{"type":"Image","props":{"top":0,"text":"TextInput","skin":"comp/input_22.png","sizeGrid":"8,11,8,8","right":0,"left":0,"bottom":0}},{"type":"Image","props":{"var":"content","top":100,"text":"TextInput","skin":"comp/input_22_selected.png","sizeGrid":"8,9,6,8","right":5,"left":5,"bottom":5}}]};
+		return ObjectEditorUI;
 	})(View)
 
 
@@ -29048,6 +29171,30 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class commoncomponent.AutoSizeTextInput extends laya.ui.TextInput
+	var AutoSizeTextInput=(function(_super){
+		function AutoSizeTextInput(text){
+			(text===void 0)&& (text="");
+			AutoSizeTextInput.__super.call(this,text);
+		}
+
+		__class(AutoSizeTextInput,'commoncomponent.AutoSizeTextInput',_super);
+		var __proto=AutoSizeTextInput.prototype;
+		__getset(0,__proto,'text',_super.prototype._$get_text,function(value){
+			this.width=9999;
+			_super.prototype._$set_text.call(this,value);
+			this.textField.typeset();
+			this.width=this.textField.textWidth+5;
+		});
+
+		return AutoSizeTextInput;
+	})(TextInput)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class commoncomponent.CommonInput extends laya.ui.TextInput
 	var CommonInput=(function(_super){
 		function CommonInput(text){
@@ -29089,6 +29236,64 @@ var Laya=window.Laya=(function(window,document){
 	})(TextInput)
 
 
+	//class ui.objecteditor.ArrayItemUI extends commonlayout.mindmaptree.MindMapTreeBase
+	var ArrayItemUI=(function(_super){
+		function ArrayItemUI(){
+			this.addBtn=null;
+			ArrayItemUI.__super.call(this);
+		}
+
+		__class(ArrayItemUI,'ui.objecteditor.ArrayItemUI',_super);
+		var __proto=ArrayItemUI.prototype;
+		__proto.createChildren=function(){
+			View.regComponent("commoncomponent.AutoSizeTextInput",AutoSizeTextInput);
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(ArrayItemUI.uiView);
+		}
+
+		ArrayItemUI.uiView={"type":"MindMapTreeBase","props":{"width":68,"height":24},"child":[{"type":"TextInput","props":{"y":1,"x":2,"width":37,"text":"Array","skin":"comp/input_22.png","runtime":"commoncomponent.AutoSizeTextInput","height":21,"color":"#e72320"}},{"type":"Button","props":{"y":0,"x":42,"width":26,"var":"addBtn","skin":"comp/button.png","label":"+","height":24}}]};
+		return ArrayItemUI;
+	})(MindMapTreeBase)
+
+
+	//class ui.objecteditor.KeyItemUI extends commonlayout.mindmaptree.MindMapTreeBase
+	var KeyItemUI=(function(_super){
+		function KeyItemUI(){
+			this.addBtn=null;
+			KeyItemUI.__super.call(this);
+		}
+
+		__class(KeyItemUI,'ui.objecteditor.KeyItemUI',_super);
+		var __proto=KeyItemUI.prototype;
+		__proto.createChildren=function(){
+			View.regComponent("commoncomponent.AutoSizeTextInput",AutoSizeTextInput);
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(KeyItemUI.uiView);
+		}
+
+		KeyItemUI.uiView={"type":"MindMapTreeBase","props":{"width":87,"height":24},"child":[{"type":"TextInput","props":{"y":1,"x":3,"width":45,"text":"key","skin":"comp/input_22.png","runtime":"commoncomponent.AutoSizeTextInput","height":21,"color":"#e72320"}},{"type":"Button","props":{"y":0,"x":61,"width":26,"var":"addBtn","skin":"comp/button.png","label":"+","height":24}}]};
+		return KeyItemUI;
+	})(MindMapTreeBase)
+
+
+	//class ui.objecteditor.KeyValueItemUI extends commonlayout.mindmaptree.MindMapTreeBase
+	var KeyValueItemUI=(function(_super){
+		function KeyValueItemUI(){KeyValueItemUI.__super.call(this);;
+		};
+
+		__class(KeyValueItemUI,'ui.objecteditor.KeyValueItemUI',_super);
+		var __proto=KeyValueItemUI.prototype;
+		__proto.createChildren=function(){
+			View.regComponent("commoncomponent.AutoSizeTextInput",AutoSizeTextInput);
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(KeyValueItemUI.uiView);
+		}
+
+		KeyValueItemUI.uiView={"type":"MindMapTreeBase","props":{"width":143,"height":23},"child":[{"type":"TextInput","props":{"y":-1,"x":0,"width":45,"text":"key","skin":"comp/input_22.png","runtime":"commoncomponent.AutoSizeTextInput","height":21,"color":"#e72320"}},{"type":"TextInput","props":{"y":0,"x":59,"width":45,"text":"value","skin":"comp/input_22.png","runtime":"commoncomponent.AutoSizeTextInput","height":21,"color":"#e72320"}},{"type":"Button","props":{"y":-1,"x":117,"width":26,"skin":"comp/button.png","label":"-","height":24}}]};
+		return KeyValueItemUI;
+	})(MindMapTreeBase)
+
+
 	//class ui.answerflow.SimpleJsonEditorUI extends laya.ui.Dialog
 	var SimpleJsonEditorUI=(function(_super){
 		function SimpleJsonEditorUI(){
@@ -29108,6 +29313,43 @@ var Laya=window.Laya=(function(window,document){
 		SimpleJsonEditorUI.uiView={"type":"Dialog","props":{"width":371,"height":287},"child":[{"type":"Image","props":{"y":0,"x":0,"top":0,"text":"TextInput","skin":"comp/textinput.png","sizeGrid":"5,5,5,7","right":0,"left":0,"bottom":0}},{"type":"TextArea","props":{"y":10,"x":8,"width":356,"var":"editTxt","text":"TextArea","skin":"comp/textarea.png","sizeGrid":"6,18,8,27","height":240,"color":"#f4eeee"}},{"type":"Button","props":{"y":259,"x":296,"var":"saveBtn","skin":"comp/button.png","label":"save"}},{"type":"Button","props":{"y":257,"x":8,"var":"cancelBtn","skin":"comp/button.png","label":"cancel"}}]};
 		return SimpleJsonEditorUI;
 	})(Dialog)
+
+
+	//class ui.objecteditor.ObjectItemUI extends commonlayout.mindmaptree.MindMapTreeBase
+	var ObjectItemUI=(function(_super){
+		function ObjectItemUI(){
+			this.addBtn=null;
+			ObjectItemUI.__super.call(this);
+		}
+
+		__class(ObjectItemUI,'ui.objecteditor.ObjectItemUI',_super);
+		var __proto=ObjectItemUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(ObjectItemUI.uiView);
+		}
+
+		ObjectItemUI.uiView={"type":"MindMapTreeBase","props":{"width":75,"height":24},"child":[{"type":"TextInput","props":{"y":1,"x":0,"width":45,"text":"Object","skin":"comp/input_22.png","height":21,"editable":false,"color":"#e72320"}},{"type":"Button","props":{"y":0,"x":49,"width":26,"var":"addBtn","skin":"comp/button.png","label":"+","height":24}}]};
+		return ObjectItemUI;
+	})(MindMapTreeBase)
+
+
+	//class ui.objecteditor.ValueItemUI extends commonlayout.mindmaptree.MindMapTreeBase
+	var ValueItemUI=(function(_super){
+		function ValueItemUI(){ValueItemUI.__super.call(this);;
+		};
+
+		__class(ValueItemUI,'ui.objecteditor.ValueItemUI',_super);
+		var __proto=ValueItemUI.prototype;
+		__proto.createChildren=function(){
+			View.regComponent("commoncomponent.AutoSizeTextInput",AutoSizeTextInput);
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(ValueItemUI.uiView);
+		}
+
+		ValueItemUI.uiView={"type":"MindMapTreeBase","props":{"width":89,"height":22},"child":[{"type":"TextInput","props":{"y":1,"x":1,"width":88,"text":"Value","skin":"comp/input_22.png","runtime":"commoncomponent.AutoSizeTextInput","height":21,"color":"#e72320"}}]};
+		return ValueItemUI;
+	})(MindMapTreeBase)
 
 
 	/**
@@ -29240,6 +29482,61 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class objecteditor.ObjectEditor extends ui.objecteditor.ObjectEditorUI
+	var ObjectEditor=(function(_super){
+		function ObjectEditor(){
+			this.viewer=null;
+			this._dataO=null;
+			ObjectEditor.__super.call(this);
+			this.viewer=new MindMapViewer();
+			var clzList;
+			clzList=[ArrayItem,KeyItem,KeyValueItem,ObjectItem,ValueItem];
+			this.viewer.regItemClassList(clzList);
+			this.content.addChild(this.viewer);
+			this.viewer.centerY=0;
+			this.viewer.x=100;
+			this.on("DataChanged",this,this.freshUI);
+		}
+
+		__class(ObjectEditor,'objecteditor.ObjectEditor',_super);
+		var __proto=ObjectEditor.prototype;
+		__proto.freshUI=function(){
+			this.viewer.setData(this._dataO);
+		}
+
+		__proto.freshLayout=function(){
+			this.viewer.freshLayout();
+		}
+
+		__proto.setData=function(dataO){
+			this._dataO=dataO;
+			this.freshUI();
+		}
+
+		ObjectEditor.createTplData=function(){
+			var rst;
+			rst={};
+			rst.type="Object";
+			rst.label="Object";
+			var actionData;
+			actionData={
+				"type":"ObjectItem",
+				"props":{"des":"描述信息","label":"问题"},
+				"childs":
+				[]
+			};
+			rst.data=actionData;
+			return rst;
+		}
+
+		return ObjectEditor;
+	})(ObjectEditorUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class answerflow.SimpleJsonEditor extends ui.answerflow.SimpleJsonEditorUI
 	var SimpleJsonEditor=(function(_super){
 		function SimpleJsonEditor(){
@@ -29298,7 +29595,118 @@ var Laya=window.Laya=(function(window,document){
 	})(SimpleJsonEditorUI)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,View,Render,Timer,Browser,GraphicAnimation,LocalStorage]);
+	/**
+	*...
+	*@author ww
+	*/
+	//class objecteditor.ArrayItem extends ui.objecteditor.ArrayItemUI
+	var ArrayItem=(function(_super){
+		function ArrayItem(){
+			ArrayItem.__super.call(this);
+			this.addBtn.on("click",this,this.onAction,["add"]);
+		}
+
+		__class(ArrayItem,'objecteditor.ArrayItem',_super);
+		var __proto=ArrayItem.prototype;
+		__proto.onAction=function(action){
+			switch(action){
+				case "add":
+					ObjectTreeTool.showAddValueMenu(this);
+					break ;
+				}
+		}
+
+		return ArrayItem;
+	})(ArrayItemUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class objecteditor.KeyItem extends ui.objecteditor.KeyItemUI
+	var KeyItem=(function(_super){
+		function KeyItem(){
+			KeyItem.__super.call(this);
+			this.addBtn.on("click",this,this.onAction,["add"]);
+		}
+
+		__class(KeyItem,'objecteditor.KeyItem',_super);
+		var __proto=KeyItem.prototype;
+		__proto.onAction=function(action){
+			switch(action){
+				case "add":
+					ObjectTreeTool.showAddValueMenu(this);
+					break ;
+				}
+		}
+
+		__proto.addChildData=function(dataO){
+			this._dataO.childs.length=0;
+			commonlayout.mindmaptree.MindMapTreeBase.prototype.addChildData.call(this,dataO);
+		}
+
+		return KeyItem;
+	})(KeyItemUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class objecteditor.KeyValueItem extends ui.objecteditor.KeyValueItemUI
+	var KeyValueItem=(function(_super){
+		function KeyValueItem(){
+			KeyValueItem.__super.call(this);
+		}
+
+		__class(KeyValueItem,'objecteditor.KeyValueItem',_super);
+		return KeyValueItem;
+	})(KeyValueItemUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class objecteditor.ObjectItem extends ui.objecteditor.ObjectItemUI
+	var ObjectItem=(function(_super){
+		function ObjectItem(){
+			ObjectItem.__super.call(this);
+			this.addBtn.on("click",this,this.onAction,["add"]);
+		}
+
+		__class(ObjectItem,'objecteditor.ObjectItem',_super);
+		var __proto=ObjectItem.prototype;
+		__proto.onAction=function(action){
+			switch(action){
+				case "add":
+					this._dataO.childs.push(ObjectDataTpl.createKeyData());
+					EventTools.sendEventOnTree(this,"DataChanged");
+					break ;
+				}
+		}
+
+		return ObjectItem;
+	})(ObjectItemUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class objecteditor.ValueItem extends ui.objecteditor.ValueItemUI
+	var ValueItem=(function(_super){
+		function ValueItem(){
+			ValueItem.__super.call(this);
+		}
+
+		__class(ValueItem,'objecteditor.ValueItem',_super);
+		return ValueItem;
+	})(ValueItemUI)
+
+
+	Laya.__init([EventDispatcher,LoaderManager,View,Render,Timer,Browser,GraphicAnimation,LocalStorage]);
 	new TestCEditor();
 
 })(window,document,Laya);

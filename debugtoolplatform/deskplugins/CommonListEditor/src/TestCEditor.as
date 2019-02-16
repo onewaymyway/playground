@@ -8,6 +8,8 @@ package
 	import laya.display.Stage;
 	import laya.net.Loader;
 	import laya.utils.Handler;
+	import objecteditor.ObjectEditor;
+	import objecteditor.ObjectTreeTool;
 	/**
 	 * ...
 	 * @author ww
@@ -22,8 +24,12 @@ package
 			//Laya.stage.bgColor = "#ffffff";
 			DisResizer.init();
 			ContextMenu.init();
+			
+			
 			ContextMenuItem.labelColors = "#ffffff,#ffffff,#ffffff,#ffffff";
 			ContextMenuItem.btnSkin = "comp/button.png";
+			
+			
 			var resList:Array;
 			resList = [ { "url":"res/atlas/comp.json", "type":Loader.ATLAS } ];
 			//resList.push( { "url":"res/atlas/view.json", "type":Loader.ATLAS } );
@@ -34,12 +40,18 @@ package
 		private function test():void
 		{
 			
+			ObjectTreeTool.init();
+			//var editor:DataList;
+			//editor = new DataList();
+			//editor.pos(200, 200);
+			//editor.setData(DataTpl.createDataListData());
+			//Laya.stage.addChild(editor);
 			
-			var editor:DataList;
-			editor = new DataList();
-			editor.pos(200, 200);
-			editor.setData(DataTpl.createDataListData());
-			Laya.stage.addChild(editor);
+			var objEditor:ObjectEditor;
+			objEditor = new ObjectEditor();
+			objEditor.size(400, 400);
+			objEditor.setData(ObjectEditor.createTplData().data);
+			Laya.stage.addChild(objEditor);
 		}
 		
 	}
