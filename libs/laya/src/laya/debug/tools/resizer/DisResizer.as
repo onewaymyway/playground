@@ -70,7 +70,7 @@ package laya.debug.tools.resizer
 			_right.width = barWidth;
 			_right.type =Vertical;
 			
-			_barList = [_up, _down, _left, _right,_dragBar];
+			_barList = [_up, _down, _left, _right];
 			addEvent();
 		}
 		private static function stageDown(e:Event):void
@@ -85,10 +85,23 @@ package laya.debug.tools.resizer
 		}
 		public static function clear():void
 		{
+			if (_tar)
+			{
+				_tar.off(Event.MOUSE_DOWN, this, onTarMouseDown);
+			}
 			_tar = null;
 			Laya.stage.off(Event.MOUSE_UP, null, stageDown);
 			DisControlTool.removeItems(_barList);
 			clearDragEvents();
+		}
+		
+		private static function onTarMouseDown(e:Event):void
+		{
+			if (_barList.indexOf(e.target) >= 0) return;
+			if (_tar)
+			{
+				_tar.startDrag();
+			}
 		}
 		private static function addEvent():void
 		{
@@ -221,6 +234,7 @@ package laya.debug.tools.resizer
 				return;
 			}
 			_tar = dis;
+			_tar.on(Event.MOUSE_DOWN, this, onTarMouseDown);
 			updates();
 			
 			DisControlTool.addItems(_barList, dis);
