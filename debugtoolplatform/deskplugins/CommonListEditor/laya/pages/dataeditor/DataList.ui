@@ -15,7 +15,7 @@
         {
             "x":15,
             "type":"List",
-            "props":{"y":37,"var":"itemList","vScrollBarSkin":"comp/vscroll.png","spaceY":5,"spaceX":5,"right":0,"left":0,"height":108},
+            "props":{"var":"itemList","vScrollBarSkin":"comp/vscroll.png","top":35,"spaceY":5,"spaceX":5,"right":0,"left":0,"bottom":2},
             "nodeParent":1,
             "label":"List(itemList)",
             "isOpen":true,

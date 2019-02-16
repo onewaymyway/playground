@@ -30,7 +30,7 @@ package dataeditor
 		
 		private function onMouseDown():void
 		{
-			DisResizer.setUp(this);
+			DisResizer.setUp(this,true);
 		}
 		
 		public function switchState():void
@@ -48,6 +48,7 @@ package dataeditor
 				this.height = titleTxt.height + 5;
 			}else
 			{
+				itemsControl.addToParent(this);
 				this.width = dataO.width;
 				this.height = dataO.height;
 				

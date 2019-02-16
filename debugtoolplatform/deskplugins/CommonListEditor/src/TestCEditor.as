@@ -2,6 +2,7 @@ package
 {
 	import dataeditor.DataList;
 	import dataeditor.DataTpl;
+	import laya.debug.tools.resizer.DisResizer;
 	import laya.debug.uicomps.ContextMenu;
 	import laya.debug.uicomps.ContextMenuItem;
 	import laya.display.Stage;
@@ -19,6 +20,7 @@ package
 			Laya.init(1000, 900);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			//Laya.stage.bgColor = "#ffffff";
+			DisResizer.init();
 			ContextMenu.init();
 			ContextMenuItem.labelColors = "#ffffff,#ffffff,#ffffff,#ffffff";
 			ContextMenuItem.btnSkin = "comp/button.png";

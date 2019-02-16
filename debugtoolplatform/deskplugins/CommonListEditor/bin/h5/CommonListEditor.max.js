@@ -733,6 +733,7 @@ var Laya=window.Laya=(function(window,document){
 		function TestCEditor(){
 			Laya.init(1000,900);
 			Laya.stage.scaleMode="full";
+			DisResizer.init();
 			ContextMenu.init();
 			ContextMenuItem.labelColors="#ffffff,#ffffff,#ffffff,#ffffff";
 			ContextMenuItem.btnSkin="comp/button.png";
@@ -2620,6 +2621,10 @@ var Laya=window.Laya=(function(window,document){
 		__class(DisResizer,'laya.debug.tools.resizer.DisResizer');
 		DisResizer.init=function(){
 			if (DisResizer._up)return;
+			DisResizer._dragBar=new AutoFillRec("T");
+			DisResizer._dragBar.height=10;
+			DisResizer._dragBar.width=10;
+			DisResizer._dragBar.type=3;
 			DisResizer._up=new AutoFillRec("T");
 			DisResizer._up.height=2;
 			DisResizer._up.type=0;
@@ -2646,10 +2651,20 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		DisResizer.clear=function(){
+			if (DisResizer._tar){
+				DisResizer._tar.off("mousedown",this,DisResizer.onTarMouseDown);
+			}
 			DisResizer._tar=null;
 			Laya.stage.off("mouseup",null,DisResizer.stageDown);
 			DisControlTool.removeItems(DisResizer._barList);
 			DisResizer.clearDragEvents();
+		}
+
+		DisResizer.onTarMouseDown=function(e){
+			if (DisResizer._barList.indexOf(e.target)>=0)return;
+			if (DisResizer._tar){
+				DisResizer._tar.startDrag();
+			}
 		}
 
 		DisResizer.addEvent=function(){
@@ -2666,6 +2681,10 @@ var Laya=window.Laya=(function(window,document){
 			DisResizer.clearDragEvents();
 			DisResizer.tBar=e.target;
 			if (!DisResizer.tBar)return;
+			if (DisResizer.tBar.type==3){
+				DisResizer._tar.startDrag();
+				return;
+			};
 			var area;
 			area=new Rectangle();
 			if (DisResizer.tBar.type==0){
@@ -2692,6 +2711,9 @@ var Laya=window.Laya=(function(window,document){
 			console.log("draging");
 			if (!DisResizer.tBar)return;
 			if (!DisResizer._tar)return;
+			if (DisResizer.tBar.type==3){
+				return;
+			}
 			switch(DisResizer.tBar){
 				case DisResizer._left:
 					DisResizer._tar.x+=DisResizer.tBar.getDx();
@@ -2727,6 +2749,8 @@ var Laya=window.Laya=(function(window,document){
 			console.log("dragEnd");
 			DisResizer.clearDragEvents();
 			DisResizer.updates();
+			if (DisResizer.tBar.type==3)
+				return;
 			if (DisResizer._tar){
 				DisResizer._tar.event("disresize");
 			}
@@ -2740,6 +2764,7 @@ var Laya=window.Laya=(function(window,document){
 
 		DisResizer.setUp=function(dis,force){
 			(force===void 0)&& (force=false);
+			DisResizer._dragBar.visible=DisResizer.hasDragBar;
 			if (force && dis==DisResizer._tar){
 				return;
 			};
@@ -2751,6 +2776,7 @@ var Laya=window.Laya=(function(window,document){
 					return;
 			}
 			DisResizer._tar=dis;
+			DisResizer._tar.on("mousedown",this,DisResizer.onTarMouseDown);
 			DisResizer.updates();
 			DisControlTool.addItems(DisResizer._barList,dis);
 			Laya.stage.off("mouseup",null,DisResizer.stageDown);
@@ -2775,19 +2801,24 @@ var Laya=window.Laya=(function(window,document){
 			DisResizer._right.x=bounds.x+bounds.width-2;
 			DisResizer._right.y=bounds.y;
 			DisResizer._right.height=bounds.height;
+			DisResizer._dragBar.x=bounds.x+bounds.width *0.5-DisResizer._dragBar.width*0.5;
+			DisResizer._dragBar.y=0;
 		}
 
 		DisResizer.Side=2;
 		DisResizer.Vertical=1;
 		DisResizer.Horizon=0;
+		DisResizer.Drag=3;
 		DisResizer._up=null
 		DisResizer._down=null
 		DisResizer._left=null
 		DisResizer._right=null
+		DisResizer._dragBar=null
 		DisResizer._barList=null
 		DisResizer._tar=null
 		DisResizer.barWidth=2;
 		DisResizer.useGetBounds=false;
+		DisResizer.hasDragBar=true;
 		DisResizer.tBar=null
 		return DisResizer;
 	})()
@@ -28492,7 +28523,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(DataListUI.uiView);
 		}
 
-		DataListUI.uiView={"type":"View","props":{"width":542,"height":149},"child":[{"type":"List","props":{"y":37,"var":"itemList","vScrollBarSkin":"comp/vscroll.png","spaceY":5,"spaceX":5,"right":0,"left":0,"height":108},"child":[{"type":"DataItem","props":{"name":"render","runtime":"ui.dataeditor.DataItemUI"}}]},{"type":"Button","props":{"width":28,"var":"addBtn","top":1,"skin":"comp/button.png","right":2,"label":"+","height":24}},{"type":"Label","props":{"y":5,"x":7,"width":53,"var":"titleTxt","text":"标题","styleSkin":"comp/label.png","height":15,"color":"#ef3431"}}]};
+		DataListUI.uiView={"type":"View","props":{"width":542,"height":149},"child":[{"type":"List","props":{"var":"itemList","vScrollBarSkin":"comp/vscroll.png","top":35,"spaceY":5,"spaceX":5,"right":0,"left":0,"bottom":2},"child":[{"type":"DataItem","props":{"name":"render","runtime":"ui.dataeditor.DataItemUI"}}]},{"type":"Button","props":{"width":28,"var":"addBtn","top":1,"skin":"comp/button.png","right":2,"label":"+","height":24}},{"type":"Label","props":{"y":5,"x":7,"width":53,"var":"titleTxt","text":"标题","styleSkin":"comp/label.png","height":15,"color":"#ef3431"}}]};
 		return DataListUI;
 	})(View)
 
@@ -29146,7 +29177,7 @@ var Laya=window.Laya=(function(window,document){
 		__class(DataList,'dataeditor.DataList',_super);
 		var __proto=DataList.prototype;
 		__proto.onMouseDown=function(){
-			DisResizer.setUp(this);
+			DisResizer.setUp(this,true);
 		}
 
 		__proto.switchState=function(){
@@ -29160,6 +29191,7 @@ var Laya=window.Laya=(function(window,document){
 				this.width=this.titleTxt.width+5;
 				this.height=this.titleTxt.height+5;
 				}else{
+				this.itemsControl.addToParent(this);
 				this.width=this.dataO.width;
 				this.height=this.dataO.height;
 			}
