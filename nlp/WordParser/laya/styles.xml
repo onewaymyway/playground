@@ -1,0 +1,4 @@
+<res>
+   <item name="cards" type="" compress="0" pack="2" quality="80" props="" picType="0" scale="0"/>
+   <item name="comp/button.png" type="Button" compress="0" pack="0" quality="80" props="labelColors=#fffff" picType="0" scale="0"/>
+</res>
