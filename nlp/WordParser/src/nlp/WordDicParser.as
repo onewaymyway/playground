@@ -30,6 +30,8 @@ package nlp
 			WordUtils.printLines(lines.slice(0, 500));
 			debugger;
 			
+			var pinyin:PingYinDic;
+			pinyin = new PingYinDic();
 			wordList = [];
 			var tWord:WordParser;
 			
@@ -39,6 +41,7 @@ package nlp
 			for (i = 0; i < len; i++)
 			{
 				tLine = lines[i];
+				pinyin.addIfOK(tLine);
 				if (tLine.charAt(0) == "*")
 				{
 					tWord = new WordParser();
@@ -52,7 +55,8 @@ package nlp
 					}
 				}
 			}
-			trace("word count:",wordList.length);
+			trace("word count:", wordList.length,wordList);
+			trace(pinyin);
 			debugger;
 		}
 		

@@ -29,7 +29,7 @@ package
 		
 		private function initGameView():void
 		{
-			WordUtils.showChars(0, 1000);
+			//WordUtils.showChars(0, 1000);
 			WordDicParser.I.loadDic("data/中文字典1.txt");
 			var tUI:Main;
 			tUI = new Main();

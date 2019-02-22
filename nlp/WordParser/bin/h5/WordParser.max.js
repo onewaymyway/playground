@@ -711,12 +711,252 @@ var Laya=window.Laya=(function(window,document){
 		__class(Game,'Game');
 		var __proto=Game.prototype;
 		__proto.initGameView=function(){
+			WordDicParser.I.loadDic("data/中文字典1.txt");
 			var tUI;
 			tUI=new Main();
 			Laya.stage.addChild(tUI);
 		}
 
 		return Game;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.PingYinDic
+	var PingYinDic=(function(){
+		function PingYinDic(){
+			this.pinYinList=null;
+			this.pinYinList=[];
+		}
+
+		__class(PingYinDic,'nlp.PingYinDic');
+		var __proto=PingYinDic.prototype;
+		__proto.addIfOK=function(line){
+			if (PingYinDic.isPinYin(line)){
+				this.pinYinList.push(line);
+			}
+		}
+
+		PingYinDic.checkIsHasSpecialStr=function(str){
+			var pattern=new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
+			if (pattern.test(str)){
+				return true;
+			}
+			return false;
+		}
+
+		PingYinDic.hasChina=function(obj){
+			var reg=/[\u4E00-\u9FA5\uF900-\uFA2D]/;
+			return reg.test(obj);
+		}
+
+		PingYinDic.isPinYin=function(line){
+			if (line.length < 1)
+				return false;
+			if (PingYinDic.checkIsHasSpecialStr(line))
+				return false;
+			if (PingYinDic.hasChina(line))
+				return false;
+			var char0;
+			char0=line.charAt(0);
+			var charCode0=0;
+			charCode0=line.charCodeAt(0);
+			return true;
+		}
+
+		return PingYinDic;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordDicParser
+	var WordDicParser=(function(){
+		function WordDicParser(){
+			this.wordList=null;
+			this.wordList=[];
+		}
+
+		__class(WordDicParser,'nlp.WordDicParser');
+		var __proto=WordDicParser.prototype;
+		__proto.loadDic=function(filePath){
+			Laya.loader.load(filePath,Handler.create(this,this.onFileLoaded),null,"text");
+		}
+
+		__proto.onFileLoaded=function(txt){
+			var lines;
+			lines=txt.split("\n");
+			WordUtils.printLines(lines.slice(0,500));
+			debugger;
+			var pinyin;
+			pinyin=new PingYinDic();
+			this.wordList=[];
+			var tWord;
+			var i=0,len=0;
+			len=lines.length;
+			var tLine;
+			for (i=0;i < len;i++){
+				tLine=lines[i];
+				pinyin.addIfOK(tLine);
+				if (tLine.charAt(0)=="*"){
+					tWord=new WordParser();
+					tWord.addHead(tLine);
+					this.wordList.push(tWord);
+					}else{
+					if (tWord){
+						tWord.addLine(tLine);
+					}
+				}
+			}
+			console.log("word count:",this.wordList.length,this.wordList);
+			console.log(pinyin);
+			debugger;
+		}
+
+		__static(WordDicParser,
+		['I',function(){return this.I=new WordDicParser();}
+		]);
+		return WordDicParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordOne
+	var WordOne=(function(){
+		function WordOne(){
+			this.word=null;
+			this.pinyin=null;
+			this.type=null;
+			this.detail=null;
+			this.lines=null;
+			this.lines=[];
+		}
+
+		__class(WordOne,'nlp.WordOne');
+		var __proto=WordOne.prototype;
+		__proto.addLine=function(line){
+			this.lines.push(line);
+		}
+
+		__proto.parseEnd=function(removeLast){
+			if (removeLast)this.lines.pop();
+			this.parseDetail();
+		}
+
+		__proto.parseDetail=function(){}
+		return WordOne;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordParser
+	var WordParser=(function(){
+		function WordParser(){
+			this.word=null;
+			this.lineCount=0;
+			this.part=null;
+			this.tWord=null;
+			this.wordList=null;
+			this.lines=null;
+			this.preLine=null;
+			this.lines=[];
+			this.wordList=[];
+		}
+
+		__class(WordParser,'nlp.WordParser');
+		var __proto=WordParser.prototype;
+		__proto.addLine=function(line){
+			this.lines.push(line);
+			var tLine;
+			tLine=line;
+			if (line.charAt(0)=="【"){
+				if (this.tWord){
+					this.tWord.type=StringTool.getBetween(line,"【","】");
+				}
+			}else
+			if (line.indexOf("详细解释：")>=0){
+				tLine=line.replace("详细解释：","");
+				this.tWord=null;
+			}else
+			if (line.indexOf("部首：")>=0){
+				this.part=line.replace("部首：","").replace("；","");
+			}else
+			if (line.indexOf("笔画数：")>=0){
+				this.lineCount=parseInt(line.replace("笔画数：",""));
+			}else
+			if (line.indexOf("基本解释：")>=0){
+				tLine=this.word;
+			}else
+			if (PingYinDic.isPinYin(line)){
+				if (this.tWord){
+					this.tWord.parseEnd(true);
+				}
+				this.tWord=this.createWord();
+				this.tWord.word=this.preLine;
+				this.tWord.pinyin=line;
+				}else{
+				if (this.tWord){
+					this.tWord.addLine(line);
+				}
+			}
+			this.preLine=tLine;
+		}
+
+		__proto.addHead=function(line){
+			var tArr;
+			tArr=line.split(" ");
+			var tt;
+			tt=tArr[0];
+			this.word=tt.charAt(1);
+		}
+
+		__proto.createWord=function(){
+			var rst;
+			rst=new WordOne();
+			rst.word=this.word;
+			this.wordList.push(rst);
+			return rst;
+		}
+
+		return WordParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordUtils
+	var WordUtils=(function(){
+		function WordUtils(){}
+		__class(WordUtils,'nlp.WordUtils');
+		WordUtils.printLines=function(lines){
+			var i=0,len=0;
+			len=lines.length;
+			for (i=0;i < len;i++){
+				console.log(lines[i]);
+			}
+		}
+
+		WordUtils.showChars=function(start,end){
+			var i=0;
+			for (i=start;i <=end;i++){
+				console.log("char:",i,":(",String.fromCharCode(i),")");
+			}
+		}
+
+		return WordUtils;
 	})()
 
 
@@ -1504,6 +1744,547 @@ var Laya=window.Laya=(function(window,document){
 
 		Graphics._cache=[];
 		return Graphics;
+	})()
+
+
+	/**
+	*一些字符串操作函数
+	*@author ww
+	*
+	*/
+	//class laya.debug.tools.StringTool
+	var StringTool=(function(){
+		function StringTool(){}
+		__class(StringTool,'laya.debug.tools.StringTool');
+		StringTool.toUpCase=function(str){
+			return str.toUpperCase();
+		}
+
+		StringTool.toLowCase=function(str){
+			return str.toLowerCase();
+		}
+
+		StringTool.toUpHead=function(str){
+			var rst;
+			if(str.length<=1)return str.toUpperCase();
+			rst=str.charAt(0).toUpperCase()+str.substr(1);
+			return rst;
+		}
+
+		StringTool.toLowHead=function(str){
+			var rst;
+			if(str.length<=1)return str.toLowerCase();
+			rst=str.charAt(0).toLowerCase()+str.substr(1);
+			return rst;
+		}
+
+		StringTool.packageToFolderPath=function(packageName){
+			var rst;
+			rst=packageName.replace(".","/");
+			return rst;
+		}
+
+		StringTool.insert=function(str,iStr,index){
+			return str.substring(0,index)+iStr+str.substr(index);
+		}
+
+		StringTool.insertAfter=function(str,iStr,tarStr,isLast){
+			(isLast===void 0)&& (isLast=false);
+			var i=0;
+			if(isLast){
+				i=str.lastIndexOf(tarStr);
+				}else{
+				i=str.indexOf(tarStr);
+			}
+			if(i>=0){
+				return StringTool.insert(str,iStr,i+tarStr.length);
+			}
+			return str;
+		}
+
+		StringTool.insertBefore=function(str,iStr,tarStr,isLast){
+			(isLast===void 0)&& (isLast=false);
+			var i=0;
+			if(isLast){
+				i=str.lastIndexOf(tarStr);
+				}else{
+				i=str.indexOf(tarStr);
+			}
+			if(i>=0){
+				return StringTool.insert(str,iStr,i);
+			}
+			return str;
+		}
+
+		StringTool.insertParamToFun=function(funStr,params){
+			var oldParam;
+			oldParam=StringTool.getParamArr(funStr);
+			var inserStr;
+			inserStr=params.join(",");
+			if(oldParam.length>0){
+				inserStr=","+inserStr;
+			}
+			return StringTool.insertBefore(funStr,inserStr,")",true);
+		}
+
+		StringTool.trim=function(str,vList){
+			if(!vList){
+				vList=[" ","\r","\n","\t",String.fromCharCode(65279)];
+			};
+			var rst;
+			var i=0;
+			var len=0;
+			rst=str;
+			len=vList.length;
+			for(i=0;i<len;i++){
+				rst=StringTool.getReplace(rst,vList[i],"");
+			}
+			return rst;
+		}
+
+		StringTool.isEmpty=function(str){
+			if(str.length<1)return true;
+			return StringTool.emptyStrDic.hasOwnProperty(str);
+		}
+
+		StringTool.trimLeft=function(str){
+			var i=0;
+			i=0;
+			var len=0;
+			len=str.length;
+			while(StringTool.isEmpty(str.charAt(i))&&i<len){
+				i++;
+			}
+			if(i<len){
+				return str.substr(i);
+			}
+			return "";
+		}
+
+		StringTool.trimRight=function(str){
+			var i=0;
+			i=str.length-1;
+			while(StringTool.isEmpty(str.charAt(i))&&i>=0){
+				i--;
+			};
+			var rst;
+			rst=str.substring(0,i)
+			if(i>=0){
+				return str.substring(0,i+1);
+			}
+			return "";
+		}
+
+		StringTool.trimSide=function(str){
+			var rst;
+			rst=StringTool.trimLeft(str);
+			rst=StringTool.trimRight(rst);
+			return rst;
+		}
+
+		StringTool.isOkFileName=function(fileName){
+			if(laya.debug.tools.StringTool.trimSide(fileName)=="")return false;
+			var i=0,len=0;
+			len=fileName.length;
+			for(i=0;i<len;i++){
+				if(StringTool.specialChars[fileName.charAt(i)])return false;
+			}
+			return true;
+		}
+
+		StringTool.trimButEmpty=function(str){
+			return StringTool.trim(str,["\r","\n","\t"]);
+		}
+
+		StringTool.removeEmptyStr=function(strArr){
+			var i=0;
+			i=strArr.length-1;
+			var str;
+			for(i=i;i>=0;i--){
+				str=strArr[i];
+				str=laya.debug.tools.StringTool.trimSide(str);
+				if(StringTool.isEmpty(str)){
+					strArr.splice(i,1);
+					}else{
+					strArr[i]=str;
+				}
+			}
+			return strArr;
+		}
+
+		StringTool.ifNoAddToTail=function(str,sign){
+			if(str.indexOf(sign)>=0){
+				return str;
+			}
+			return str+sign;
+		}
+
+		StringTool.trimEmptyLine=function(str){
+			var i=0;
+			var len=0;
+			var tLines;
+			var tLine;
+			tLines=str.split("\n");
+			for(i=tLines.length-1;i>=0;i--){
+				tLine=tLines[i];
+				if(StringTool.isEmptyLine(tLine)){
+					tLines.splice(i,1);
+				}
+			}
+			return tLines.join("\n");
+		}
+
+		StringTool.isEmptyLine=function(str){
+			str=laya.debug.tools.StringTool.trim(str);
+			if(str=="")return true;
+			return false;
+		}
+
+		StringTool.removeCommentLine=function(lines){
+			var rst;
+			rst=[];
+			var i=0;
+			var tLine;
+			var adptLine;
+			i=0;
+			var len=0;
+			var index=0;
+			len=lines.length;
+			while(i<len){
+				adptLine=tLine=lines[i];
+				index=tLine.indexOf("/**");
+				if(index>=0){
+					adptLine=tLine.substring(0,index-1);
+					StringTool.addIfNotEmpty(rst,adptLine);
+					while(i<len){
+						tLine=lines[i];
+						index=tLine.indexOf("*/");
+						if(index>=0){
+							adptLine=tLine.substring(index+2);
+							StringTool.addIfNotEmpty(rst,adptLine);
+							break ;
+						}
+						i++;
+					}
+					}else if(tLine.indexOf("//")>=0){
+					if(laya.debug.tools.StringTool.trim(tLine).indexOf("//")==0){
+						}else{
+						StringTool.addIfNotEmpty(rst,adptLine);
+					}
+					}else{
+					StringTool.addIfNotEmpty(rst,adptLine);
+				}
+				i++;
+			}
+			return rst;
+		}
+
+		StringTool.addIfNotEmpty=function(arr,str){
+			if(!str)return;
+			var tStr;
+			tStr=StringTool.trim(str);
+			if(tStr!=""){
+				arr.push(str);
+			}
+		}
+
+		StringTool.trimExt=function(str,vars){
+			var rst;
+			rst=StringTool.trim(str);
+			var i=0;
+			var len=0;
+			len=vars.length;
+			for(i=0;i<len;i++){
+				rst=StringTool.getReplace(rst,vars[i],"");
+			}
+			return rst;
+		}
+
+		StringTool.getBetween=function(str,left,right,ifMax){
+			(ifMax===void 0)&& (ifMax=false);
+			if(!str)return "";
+			if(!left)return "";
+			if(!right)return "";
+			var lId=0;
+			var rId=0;
+			lId=str.indexOf(left);
+			if(lId<0)return"";
+			if(ifMax){
+				rId=str.lastIndexOf(right);
+				if(rId<lId)return "";
+				}else{
+				rId=str.indexOf(right,lId+1);
+			}
+			if(rId<0)return "";
+			return str.substring(lId+left.length,rId);
+		}
+
+		StringTool.getSplitLine=function(line,split){
+			(split===void 0)&& (split=" ");
+			return line.split(split);
+		}
+
+		StringTool.getLeft=function(str,sign){
+			var i=0;
+			i=str.indexOf(sign);
+			return str.substr(0,i);
+		}
+
+		StringTool.getRight=function(str,sign){
+			var i=0;
+			i=str.indexOf(sign);
+			return str.substr(i+1);
+		}
+
+		StringTool.delelteItem=function(arr){
+			while (arr.length>0){
+				if(arr[0]==""){
+					arr.shift();
+					}else{
+					break ;
+				}
+			}
+		}
+
+		StringTool.getWords=function(line){
+			var rst=StringTool.getSplitLine(line);
+			StringTool.delelteItem(rst);
+			return rst;
+		}
+
+		StringTool.getLinesI=function(startLine,endLine,lines){
+			var i=0;
+			var rst=[];
+			for(i=startLine;i<=endLine;i++){
+				rst.push(lines[i]);
+			}
+			return rst;
+		}
+
+		StringTool.structfy=function(str,inWidth,removeEmpty){
+			(inWidth===void 0)&& (inWidth=4);
+			(removeEmpty===void 0)&& (removeEmpty=true);
+			if(removeEmpty){
+				str=laya.debug.tools.StringTool.trimEmptyLine(str);
+			};
+			var lines;
+			var tIn=0;
+			tIn=0;
+			var tInStr;
+			tInStr=StringTool.getEmptyStr(0);
+			lines=str.split("\n");
+			var i=0;
+			var len=0;
+			var tLineStr;
+			len=lines.length;
+			for(i=0;i<len;i++){
+				tLineStr=lines[i];
+				tLineStr=laya.debug.tools.StringTool.trimLeft(tLineStr);
+				tLineStr=laya.debug.tools.StringTool.trimRight(tLineStr);
+				tIn+=StringTool.getPariCount(tLineStr);
+				if(tLineStr.indexOf("}")>=0){
+					tInStr=StringTool.getEmptyStr(tIn*inWidth);
+				}
+				tLineStr=tInStr+tLineStr;
+				lines[i]=tLineStr;
+				tInStr=StringTool.getEmptyStr(tIn*inWidth);
+			}
+			return lines.join("\n");
+		}
+
+		StringTool.getEmptyStr=function(width){
+			if(!StringTool.emptyDic.hasOwnProperty(width)){
+				var i=0;
+				var len=0;
+				len=width;
+				var rst;
+				rst="";
+				for(i=0;i<len;i++){
+					rst+=" ";
+				}
+				StringTool.emptyDic[width]=rst;
+			}
+			return StringTool.emptyDic[width];
+		}
+
+		StringTool.getPariCount=function(str,inChar,outChar){
+			(inChar===void 0)&& (inChar="{");
+			(outChar===void 0)&& (outChar="}");
+			var varDic;
+			varDic={};
+			varDic[inChar]=1;
+			varDic[outChar]=-1;
+			var i=0;
+			var len=0;
+			var tChar;
+			len=str.length;
+			var rst=0;
+			rst=0;
+			for(i=0;i<len;i++){
+				tChar=str.charAt(i);
+				if(varDic.hasOwnProperty(tChar)){
+					rst+=varDic[tChar];
+				}
+			}
+			return rst;
+		}
+
+		StringTool.readInt=function(str,startI){
+			(startI===void 0)&& (startI=0);
+			var rst=NaN;
+			rst=0;
+			var tNum=0;
+			var tC;
+			var i=0;
+			var isBegin=false;
+			isBegin=false;
+			var len=0;
+			len=str.length;
+			for(i=startI;i<len;i++){
+				tC=str.charAt(i);
+				if(Number(tC)>0||tC=="0"){
+					rst=10*rst+Number(tC);
+					if(rst>0)isBegin=true;
+					}else{
+					if(isBegin)return rst;
+				}
+			}
+			return rst;
+		}
+
+		StringTool.getReplace=function(str,oStr,nStr){
+			if(!str)return "";
+			var rst;
+			rst=str.replace(new RegExp(oStr,"g"),nStr);
+			return rst;
+		}
+
+		StringTool.getWordCount=function(str,findWord){
+			var rg=new RegExp(findWord,"g")
+			return str.match(rg).length;
+		}
+
+		StringTool.getResolvePath=function(path,basePath){
+			if(StringTool.isAbsPath(path)){
+				return path;
+			};
+			var tSign;
+			tSign="\\";
+			if(basePath.indexOf("/")>=0){
+				tSign="/";
+			}
+			if(basePath.charAt(basePath.length-1)==tSign){
+				basePath=basePath.substr(0,basePath.length-1);
+			};
+			var parentSign;
+			parentSign=".."+tSign;
+			var tISign;
+			tISign="."+tSign;
+			var pCount=0;
+			pCount=StringTool.getWordCount(path,parentSign);
+			path=laya.debug.tools.StringTool.getReplace(path,parentSign,"");
+			path=laya.debug.tools.StringTool.getReplace(path,tISign,"");
+			var i=0;
+			var len=0;
+			len=pCount;
+			var iPos=0;
+			for(i=0;i<len;i++){
+				basePath=StringTool.removeLastSign(path,tSign);
+			}
+			return basePath+tSign+path;
+		}
+
+		StringTool.isAbsPath=function(path){
+			if(path.indexOf(":")>=0)return true;
+			return false;
+		}
+
+		StringTool.removeLastSign=function(str,sign){
+			var iPos=0;
+			iPos=str.lastIndexOf(sign);
+			str=str.substring(0,iPos);
+			return str;
+		}
+
+		StringTool.getParamArr=function(str){
+			var paramStr;
+			paramStr=laya.debug.tools.StringTool.getBetween(str,"(",")",true);
+			if(StringTool.trim(paramStr).length<1)return [];
+			return paramStr.split(",");
+		}
+
+		StringTool.copyStr=function(str){
+			return str.substring();
+		}
+
+		StringTool.ArrayToString=function(arr){
+			var rst;
+			rst="[{items}]".replace(new RegExp("\\{items\\}","g"),StringTool.getArrayItems(arr));
+			return rst;
+		}
+
+		StringTool.getArrayItems=function(arr){
+			var rst;
+			if(arr.length<1)return "";
+			rst=StringTool.parseItem(arr[0]);
+			var i=0;
+			var len=0;
+			len=arr.length;
+			for(i=1;i<len;i++){
+				rst+=","+StringTool.parseItem(arr[i]);
+			}
+			return rst;
+		}
+
+		StringTool.parseItem=function(item){
+			var rst;
+			rst="\""+item+"\"";
+			return "";
+		}
+
+		StringTool.initAlphaSign=function(){
+			if (StringTool.alphaSigns)return;
+			StringTool.alphaSigns={};
+			StringTool.addSign("a","z",StringTool.alphaSigns);
+			StringTool.addSign("A","Z",StringTool.alphaSigns);
+			StringTool.addSign("0","9",StringTool.alphaSigns);
+		}
+
+		StringTool.addSign=function(ss,e,tar){
+			var i=0;
+			var len=0;
+			var s=0;
+			s=ss.charCodeAt(0);
+			len=e.charCodeAt(0);
+			for(i=s;i<=len;i++){
+				tar[String.fromCharCode(i)]=true;
+				console.log("add :"+String.fromCharCode(i));
+			}
+		}
+
+		StringTool.isPureAlphaNum=function(str){
+			StringTool.initAlphaSign();
+			if (!str)return true;
+			var i=0,len=0;
+			len=str.length;
+			for (i=0;i < len;i++){
+				if (!StringTool.alphaSigns[str.charAt(i)])return false;
+			}
+			return true;
+		}
+
+		StringTool.emptyDic={};
+		StringTool.alphaSigns=null;
+		__static(StringTool,
+		['emptyStrDic',function(){return this.emptyStrDic={
+				" ":true,
+				"\r":true,
+				"\n":true,
+				"\t":true
+		};},'specialChars',function(){return this.specialChars={"*":true,"&":true,"%":true,"#":true,"?":true};}
+
+		]);
+		return StringTool;
 	})()
 
 
@@ -25375,60 +26156,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*<code>VBox</code> 是一个垂直布局容器类。
-	*/
-	//class laya.ui.VBox extends laya.ui.LayoutBox
-	var VBox=(function(_super){
-		function VBox(){VBox.__super.call(this);;
-		};
-
-		__class(VBox,'laya.ui.VBox',_super);
-		var __proto=VBox.prototype;
-		/**@inheritDoc */
-		__proto.changeItems=function(){
-			this._itemChanged=false;
-			var items=[];
-			var maxWidth=0;
-			for (var i=0,n=this.numChildren;i < n;i++){
-				var item=this.getChildAt(i);
-				if (item&&item.layoutEnabled){
-					items.push(item);
-					maxWidth=this._width?this._width:Math.max(maxWidth,item.width *item.scaleX);
-				}
-			}
-			this.sortItem(items);
-			var top=0;
-			for (i=0,n=items.length;i < n;i++){
-				item=items[i];
-				item.y=top;
-				top+=item.height *item.scaleY+this._space;
-				if (this._align=="left"){
-					item.x=0;
-					}else if (this._align=="center"){
-					item.x=(maxWidth-item.width *item.scaleX)*0.5;
-					}else if (this._align=="right"){
-					item.x=maxWidth-item.width *item.scaleX;
-				}
-			}
-			this.changeSize();
-		}
-
-		__getset(0,__proto,'width',_super.prototype._$get_width,function(value){
-			if (this._width !=value){
-				_super.prototype._$set_width.call(this,value);
-				this.callLater(this.changeItems);
-			}
-		});
-
-		VBox.NONE="none";
-		VBox.LEFT="left";
-		VBox.CENTER="center";
-		VBox.RIGHT="right";
-		return VBox;
-	})(LayoutBox)
-
-
-	/**
 	*<code>TextArea</code> 类用于创建显示对象以显示和输入文本。
 	*@example <caption>以下示例代码，创建了一个 <code>TextArea</code> 实例。</caption>
 	*package
@@ -25651,6 +26378,60 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*<code>VBox</code> 是一个垂直布局容器类。
+	*/
+	//class laya.ui.VBox extends laya.ui.LayoutBox
+	var VBox=(function(_super){
+		function VBox(){VBox.__super.call(this);;
+		};
+
+		__class(VBox,'laya.ui.VBox',_super);
+		var __proto=VBox.prototype;
+		/**@inheritDoc */
+		__proto.changeItems=function(){
+			this._itemChanged=false;
+			var items=[];
+			var maxWidth=0;
+			for (var i=0,n=this.numChildren;i < n;i++){
+				var item=this.getChildAt(i);
+				if (item&&item.layoutEnabled){
+					items.push(item);
+					maxWidth=this._width?this._width:Math.max(maxWidth,item.width *item.scaleX);
+				}
+			}
+			this.sortItem(items);
+			var top=0;
+			for (i=0,n=items.length;i < n;i++){
+				item=items[i];
+				item.y=top;
+				top+=item.height *item.scaleY+this._space;
+				if (this._align=="left"){
+					item.x=0;
+					}else if (this._align=="center"){
+					item.x=(maxWidth-item.width *item.scaleX)*0.5;
+					}else if (this._align=="right"){
+					item.x=maxWidth-item.width *item.scaleX;
+				}
+			}
+			this.changeSize();
+		}
+
+		__getset(0,__proto,'width',_super.prototype._$get_width,function(value){
+			if (this._width !=value){
+				_super.prototype._$set_width.call(this,value);
+				this.callLater(this.changeItems);
+			}
+		});
+
+		VBox.NONE="none";
+		VBox.LEFT="left";
+		VBox.CENTER="center";
+		VBox.RIGHT="right";
+		return VBox;
+	})(LayoutBox)
+
+
+	/**
 	*<code>RadioGroup</code> 控件定义一组 <code>Radio</code> 控件，这些控件相互排斥；
 	*因此，用户每次只能选择一个 <code>Radio</code> 控件。
 	*
@@ -25846,7 +26627,7 @@ var Laya=window.Laya=(function(window,document){
 	})(MainUI)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,Render,Browser,View,Timer,GraphicAnimation,LocalStorage]);
+	Laya.__init([EventDispatcher,LoaderManager,Render,Browser,View,Timer,GraphicAnimation,LocalStorage]);
 	new Game();
 
 })(window,document,Laya);
