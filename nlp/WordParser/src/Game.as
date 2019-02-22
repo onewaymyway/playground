@@ -3,6 +3,7 @@ package
 	import laya.net.Loader;
 	import laya.utils.Handler;
 	import nlp.WordDicParser;
+	import nlp.WordUtils;
 	import ui.wordparser.MainUI;
 	import view.Main;
 	/**
@@ -28,7 +29,7 @@ package
 		
 		private function initGameView():void
 		{
-			
+			WordUtils.showChars(0, 1000);
 			WordDicParser.I.loadDic("data/中文字典1.txt");
 			var tUI:Main;
 			tUI = new Main();
