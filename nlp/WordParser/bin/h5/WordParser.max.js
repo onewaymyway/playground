@@ -729,6 +729,8 @@ var Laya=window.Laya=(function(window,document){
 	var PingYinDic=(function(){
 		function PingYinDic(){
 			this.pinYinList=null;
+			this.charDic=null;
+			this.headDic=null;
 			this.pinYinList=[];
 		}
 
@@ -737,6 +739,31 @@ var Laya=window.Laya=(function(window,document){
 		__proto.addIfOK=function(line){
 			if (PingYinDic.isPinYin(line)){
 				this.pinYinList.push(line);
+			}
+		}
+
+		__proto.makeCharDic=function(){
+			this.charDic={};
+			this.headDic={};
+			var i=0,len=0;
+			len=this.pinYinList.length;
+			for (i=0;i < len;i++){
+				this.addWordToDic(this.pinYinList[i]);
+			}
+		}
+
+		__proto.addWordToDic=function(word){
+			var charList;
+			charList=word.split("");
+			if (!charList.length)return;
+			var i=0,len=0;
+			len=charList.length;
+			var tChar;
+			tChar=charList[0];
+			this.headDic[tChar]=tChar;
+			for (i=0;i < len;i++){
+				tChar=charList[i];
+				this.charDic[tChar]=tChar;
 			}
 		}
 
@@ -756,6 +783,7 @@ var Laya=window.Laya=(function(window,document){
 		PingYinDic.isPinYin=function(line){
 			if (line.length < 1)
 				return false;
+			if (line.charAt(0)=="∶")return false;
 			if (PingYinDic.checkIsHasSpecialStr(line))
 				return false;
 			if (PingYinDic.hasChina(line))
@@ -765,6 +793,19 @@ var Laya=window.Laya=(function(window,document){
 			var charCode0=0;
 			charCode0=line.charCodeAt(0);
 			return true;
+		}
+
+		PingYinDic.inits=function(){
+			PingYinDic.DebugDic=WordUtils.arrToDic(PingYinDic.DebugChars);
+		}
+
+		PingYinDic.DebugDic=null
+		__static(PingYinDic,
+		['DebugChars',function(){return this.DebugChars=["’"];}
+		]);
+		PingYinDic.__init$=function(){
+			;;
+			PingYinDic.inits();
 		}
 
 		return PingYinDic;
@@ -779,7 +820,9 @@ var Laya=window.Laya=(function(window,document){
 	var WordDicParser=(function(){
 		function WordDicParser(){
 			this.wordList=null;
+			this.vocList=null;
 			this.wordList=[];
+			this.vocList=[];
 		}
 
 		__class(WordDicParser,'nlp.WordDicParser');
@@ -792,7 +835,6 @@ var Laya=window.Laya=(function(window,document){
 			var lines;
 			lines=txt.split("\n");
 			WordUtils.printLines(lines.slice(0,500));
-			debugger;
 			var pinyin;
 			pinyin=new PingYinDic();
 			this.wordList=[];
@@ -814,8 +856,31 @@ var Laya=window.Laya=(function(window,document){
 				}
 			}
 			console.log("word count:",this.wordList.length,this.wordList);
+			pinyin.makeCharDic();
 			console.log(pinyin);
-			debugger;
+			this.addToWordList(this.wordList);
+			console.log("vocList:",this.vocList);
+		}
+
+		__proto.addToWordList=function(wList){
+			var i=0,len=0;
+			len=wList.length;
+			var tWord;
+			for (i=0;i < len;i++){
+				tWord=wList[i];
+				this.addWordToVocList(tWord);
+			}
+		}
+
+		__proto.addWordToVocList=function(word){
+			var tList;
+			tList=word.wordList;
+			if (!tList)return;
+			var i=0,len=0;
+			len=tList.length;
+			for (i=0;i < len;i++){
+				this.vocList.push(tList[i]);
+			}
 		}
 
 		__static(WordDicParser,
@@ -832,8 +897,10 @@ var Laya=window.Laya=(function(window,document){
 	//class nlp.WordOne
 	var WordOne=(function(){
 		function WordOne(){
+			this.oWord=null;
 			this.word=null;
 			this.pinyin=null;
+			this.twPY=null;
 			this.type=null;
 			this.detail=null;
 			this.lines=null;
@@ -864,22 +931,49 @@ var Laya=window.Laya=(function(window,document){
 	var WordParser=(function(){
 		function WordParser(){
 			this.word=null;
+			this.alasDic=null;
 			this.lineCount=0;
 			this.part=null;
 			this.tWord=null;
 			this.wordList=null;
 			this.lines=null;
 			this.preLine=null;
+			this.preIsPinYin=false;
 			this.lines=[];
 			this.wordList=[];
+			this.alasDic={};
 		}
 
 		__class(WordParser,'nlp.WordParser');
 		var __proto=WordParser.prototype;
+		__proto.addToAlasDic=function(word){
+			word=word.replace("（","").replace("）","");
+			this.alasDic[word]=word;
+		}
+
 		__proto.addLine=function(line){
 			this.lines.push(line);
 			var tLine;
 			tLine=line;
+			var isPinYin=false;
+			isPinYin=false;
+			if (line.length=1&&this.alasDic[line]){
+				tLine=this.preLine;
+			}else
+			if (line.charAt(0)=="（"){
+				this.addToAlasDic(line);
+				tLine=this.preLine;
+			}else
+			if (line.charAt(0)=="〖"){
+				if (this.tWord){
+					this.tWord.addLine(line);
+				}
+			}else
+			if (line.charAt(0)=="∶"){
+				if (this.tWord){
+					this.tWord.addLine(line);
+				}
+			}else
 			if (line.charAt(0)=="【"){
 				if (this.tWord){
 					this.tWord.type=StringTool.getBetween(line,"【","】");
@@ -899,18 +993,27 @@ var Laya=window.Laya=(function(window,document){
 				tLine=this.word;
 			}else
 			if (PingYinDic.isPinYin(line)){
-				if (this.tWord){
-					this.tWord.parseEnd(true);
+				if (this.preIsPinYin){
+					console.log("preIsPinYin:(",this.preLine,") (",line+")");
+					if (this.tWord){
+						this.tWord.twPY=line;
+					}
+					}else{
+					if (this.tWord){
+						this.tWord.parseEnd(true);
+					}
+					this.tWord=this.createWord();
+					this.tWord.word=this.preLine;
+					this.tWord.pinyin=line;
+					isPinYin=true;
 				}
-				this.tWord=this.createWord();
-				this.tWord.word=this.preLine;
-				this.tWord.pinyin=line;
 				}else{
 				if (this.tWord){
 					this.tWord.addLine(line);
 				}
 			}
 			this.preLine=tLine;
+			this.preIsPinYin=isPinYin;
 		}
 
 		__proto.addHead=function(line){
@@ -925,6 +1028,7 @@ var Laya=window.Laya=(function(window,document){
 			var rst;
 			rst=new WordOne();
 			rst.word=this.word;
+			rst.oWord=this;
 			this.wordList.push(rst);
 			return rst;
 		}
@@ -954,6 +1058,17 @@ var Laya=window.Laya=(function(window,document){
 			for (i=start;i <=end;i++){
 				console.log("char:",i,":(",String.fromCharCode(i),")");
 			}
+		}
+
+		WordUtils.arrToDic=function(arr){
+			var rst;
+			rst={};
+			var i=0,len=0;
+			len=arr.length;
+			for (i=0;i < len;i++){
+				rst[arr[i]]=arr[i];
+			}
+			return rst;
 		}
 
 		return WordUtils;
@@ -26627,7 +26742,7 @@ var Laya=window.Laya=(function(window,document){
 	})(MainUI)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,Render,Browser,View,Timer,GraphicAnimation,LocalStorage]);
+	Laya.__init([EventDispatcher,LoaderManager,PingYinDic,Render,Browser,View,Timer,GraphicAnimation,LocalStorage]);
 	new Game();
 
 })(window,document,Laya);

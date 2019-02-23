@@ -31,6 +31,19 @@ package nlp
 			}
 		}
 		
+		public static function arrToDic(arr:Array):Object
+		{
+			var rst:Object;
+			rst = { };
+			var i:int, len:int;
+			len = arr.length;
+			for (i = 0; i < len; i++)
+			{
+				rst[arr[i]] = arr[i];
+			}
+			return rst;
+		}
+		
 	}
 
 }

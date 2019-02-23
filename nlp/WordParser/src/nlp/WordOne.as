@@ -6,8 +6,10 @@ package nlp
 	 */
 	public class WordOne 
 	{
+		public var oWord:WordParser;
 		public var word:String;
 		public var pinyin:String;
+		public var twPY:String;
 		public var type:String;
 		public var detail:String;
 		public var lines:Array;

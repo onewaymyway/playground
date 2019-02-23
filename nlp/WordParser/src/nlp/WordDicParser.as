@@ -12,6 +12,7 @@ package nlp
 		public function WordDicParser() 
 		{
 			wordList = [];
+			vocList = [];
 		}
 		
 		public static var I:WordDicParser = new WordDicParser();
@@ -22,13 +23,13 @@ package nlp
 		}
 		
 		public var wordList:Array;
+		public var vocList:Array;
 		private function onFileLoaded(txt:String):void
 		{
 			var lines:Array;
 			lines = txt.split("\n");
 			
 			WordUtils.printLines(lines.slice(0, 500));
-			debugger;
 			
 			var pinyin:PingYinDic;
 			pinyin = new PingYinDic();
@@ -55,9 +56,37 @@ package nlp
 					}
 				}
 			}
-			trace("word count:", wordList.length,wordList);
+			trace("word count:", wordList.length, wordList);
+			pinyin.makeCharDic();
 			trace(pinyin);
-			debugger;
+			addToWordList(wordList);
+			trace("vocList:",vocList);
+		}
+		
+		private function addToWordList(wList:Array):void
+		{
+			var i:int, len:int;
+			len = wList.length;
+			var tWord:WordParser;
+			for (i = 0; i < len; i++)
+			{
+				tWord = wList[i];
+				addWordToVocList(tWord);
+			}
+		}
+		
+		private function addWordToVocList(word:WordParser):void
+		{
+			var tList:Array;
+			tList = word.wordList;
+			if (!tList) return;
+			var i:int, len:int;
+			len = tList.length;
+			
+			for (i = 0; i < len; i++)
+			{
+				vocList.push(tList[i]);
+			}
 		}
 		
 	}

@@ -8,6 +8,7 @@ package nlp
 	public class WordParser 
 	{
 		public var word:String;
+		public var alasDic:Object;
 		public var lineCount:int;
 		public var part:String;
 		private var tWord:WordOne;
@@ -16,16 +17,49 @@ package nlp
 		{
 			lines = [];
 			wordList = [];
+			alasDic = { };
 		}
 		
 		public var lines:Array;
 		private var preLine:String;
+		private var preIsPinYin:Boolean = false;
+		public function addToAlasDic(word:String):void
+		{
+			word = word.replace("（", "").replace("）", "");
+			alasDic[word] = word;
+		}
 		public function addLine(line:String):void
 		{
 			lines.push(line);
 			var tLine:String;
 			tLine = line;
+			var isPinYin:Boolean;
+			isPinYin = false;
 			
+			if (line.length=1&&alasDic[line])
+			{
+				
+				tLine = preLine;
+			}else
+			if (line.charAt(0)=="（")
+			{
+				addToAlasDic(line);
+				tLine = preLine;
+			}else
+			if (line.charAt(0)=="〖")
+			{
+				if (tWord)
+				{
+					tWord.addLine(line);
+				}
+			}else
+			if (line.charAt(0)=="∶")
+			{
+				if (tWord)
+				{
+					tWord.addLine(line);
+				}
+			}else
 			if (line.charAt(0)=="【")
 			{
 				if (tWord)
@@ -55,13 +89,26 @@ package nlp
 			}else
 			if (PingYinDic.isPinYin(line))
 			{
-				if (tWord)
+				if (preIsPinYin)
 				{
-					tWord.parseEnd(true);
+					trace("preIsPinYin:(", preLine, ") (", line + ")");
+					if (tWord)
+					{
+						tWord.twPY = line;
+					}
+				}else
+				{
+					if (tWord)
+					{
+						tWord.parseEnd(true);
+					}
+					tWord = createWord();
+					tWord.word = preLine;
+					tWord.pinyin = line;
+					isPinYin = true;
 				}
-				tWord = createWord();
-				tWord.word = preLine;
-				tWord.pinyin = line;
+				
+				
 			}else
 			{
 				if (tWord)
@@ -70,6 +117,7 @@ package nlp
 				}
 			}
 			preLine = tLine;
+			preIsPinYin = isPinYin;
 		}
 		
 		public function addHead(line:String):void
@@ -87,6 +135,7 @@ package nlp
 			var rst:WordOne;
 			rst = new WordOne();
 			rst.word = word;
+			rst.oWord = this;
 			wordList.push(rst);
 			return rst;
 		}

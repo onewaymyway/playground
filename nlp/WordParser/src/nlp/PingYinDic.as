@@ -34,6 +34,7 @@ package nlp {
 		public static function isPinYin(line:String):Boolean {
 			if (line.length < 1)
 				return false;
+			if (line.charAt(0) =="∶") return false;
 			if (checkIsHasSpecialStr(line))
 				return false;
 			if (hasChina(line))
@@ -48,6 +49,47 @@ package nlp {
 		public function addIfOK(line:String):void {
 			if (isPinYin(line)) {
 				pinYinList.push(line);
+			}
+		}
+		
+		public var charDic:Object;
+		public var headDic:Object;
+		public function makeCharDic():void
+		{
+			charDic = { };
+			headDic = { };
+			var i:int, len:int;
+			len = pinYinList.length;
+			for (i = 0; i < len; i++)
+			{
+				addWordToDic(pinYinList[i]);
+			}
+		}
+		public static const DebugChars:Array = ["’"];
+		public static const DebugDic:Object;
+		public static function inits():void
+		{
+			DebugDic = WordUtils.arrToDic(DebugChars);
+		}
+		inits();
+		public function addWordToDic(word:String):void
+		{
+			var charList:Array;
+			charList = word.split("");
+			if (!charList.length) return;
+			var i:int, len:int;
+			len = charList.length;
+			var tChar:String;
+			tChar = charList[0];
+			headDic[tChar] = tChar;
+			for (i = 0; i < len; i++)
+			{
+				tChar = charList[i];
+				charDic[tChar] = tChar;
+				//if (DebugDic.hasOwnProperty(tChar))
+				//{
+					//trace("debugChar:",word);
+				//}
 			}
 		}
 	
