@@ -1,5 +1,6 @@
 package nlp.cutwords 
 {
+	import nlp.dictools.TypeDicParser;
 	import nlp.trie.Trie;
 	import nlp.trie.TrieNode;
 	/**
@@ -9,6 +10,7 @@ package nlp.cutwords
 	public class WordCutter 
 	{
 		public var trie:Trie;
+		public var typeDic:TypeDicParser;
 		public function WordCutter() 
 		{
 			
@@ -32,6 +34,16 @@ package nlp.cutwords
 			return rst;
 		}
 		
+		public function adptPiece(piece:WordPiece):void
+		{
+			piece.update();
+			if (typeDic)
+			{
+				piece.typeO = typeDic.getWordType(piece.word);
+			}
+			
+			return piece;
+		}
 		public function findMaxWord(str:String, pos:int = 0):WordPiece
 		{
 			var tchar:String;
@@ -47,7 +59,8 @@ package nlp.cutwords
 			{
 				tPiece.word = tchar;
 				tPiece.type = "new";
-				return tPiece.update();
+				
+				return adptPiece(tPiece);
 			} 
 			
 			//tPiece
@@ -76,7 +89,8 @@ package nlp.cutwords
 					tPiece.wordRef = tTrieNode.word;
 				}
 			}
-			return tPiece.update();
+			
+			return adptPiece(tPiece);
 		}
 		
 		

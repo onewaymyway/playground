@@ -3,6 +3,7 @@ package
 	import laya.events.Event;
 	import laya.net.Loader;
 	import laya.utils.Handler;
+	import nlp.dictools.TypeDicParser;
 	import nlp.WordDicParser;
 	import nlp.WordUtils;
 	import ui.wordparser.MainUI;
@@ -40,6 +41,12 @@ package
 		
 		private function onDicLoaded():void
 		{
+			
+			var typeDic:TypeDicParser;
+			typeDic = new TypeDicParser();
+			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
+			trace(typeDic);
+			WordDicParser.I.cutter.typeDic = typeDic;
 			Laya.stage.on(Event.CLICK, this, testCut);
 		}
 		

@@ -91,7 +91,7 @@ package nlp
 			{
 				if (preIsPinYin)
 				{
-					trace("preIsPinYin:(", preLine, ") (", line + ")");
+					//trace("preIsPinYin:(", preLine, ") (", line + ")");
 					if (tWord)
 					{
 						tWord.twPY = line;

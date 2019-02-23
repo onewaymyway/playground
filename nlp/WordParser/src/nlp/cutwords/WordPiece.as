@@ -12,6 +12,7 @@ package nlp.cutwords
 		public var end:int;
 		public var wordRef:WordOne;
 		public var type:String;
+		public var typeO:Object;
 		public function WordPiece() 
 		{
 			
