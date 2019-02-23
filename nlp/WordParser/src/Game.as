@@ -20,7 +20,8 @@ package
 			var loadList:Array;
 			loadList = [];
 			loadList.push( { url:"res/atlas/comp.json", type:Loader.ATLAS } );
-			loadList.push({url:"data/cardconfig.json",type:Loader.JSON });
+			loadList.push( { url:"data/CoreSynonym.txt", type:Loader.TEXT } );
+			loadList.push({url:"data/CoreNatureDictionary.txt",type:Loader.TEXT });
 			Laya.loader.load( loadList, new Handler(this, initGameView));
 			
 		}

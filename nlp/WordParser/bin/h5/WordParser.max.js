@@ -704,7 +704,8 @@ var Laya=window.Laya=(function(window,document){
 			var loadList;
 			loadList=[];
 			loadList.push({url:"res/atlas/comp.json",type:"atlas" });
-			loadList.push({url:"data/cardconfig.json",type:"json" });
+			loadList.push({url:"data/CoreSynonym.txt",type:"text" });
+			loadList.push({url:"data/CoreNatureDictionary.txt",type:"text" });
 			Laya.loader.load(loadList,new Handler(this,this.initGameView));
 		}
 
