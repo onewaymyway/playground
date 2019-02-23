@@ -711,13 +711,130 @@ var Laya=window.Laya=(function(window,document){
 		__class(Game,'Game');
 		var __proto=Game.prototype;
 		__proto.initGameView=function(){
-			WordDicParser.I.loadDic("data/中文字典1.txt");
+			WordDicParser.I.loadDic("data/中文字典1.txt",Handler.create(this,this.onDicLoaded));
 			var tUI;
 			tUI=new Main();
 			Laya.stage.addChild(tUI);
 		}
 
+		__proto.onDicLoaded=function(){
+			Laya.stage.on("click",this,this.testCut);
+		}
+
+		__proto.testCut=function(){
+			var testStrList;
+			testStrList=[];
+			testStrList.push("你是笨蛋吗");
+			testStrList.push("该剧改编自芦原妃名子的同名漫画，讲述了高中时代曾是同班同学的主人公和女主角，因以前的同学去世为契机而再相见，他们一边搜寻以前的同学曾秘密交往过的男性，一边面对自己的回忆的模样。");
+			var testStr;
+			var words;
+			var i=0,len=0;
+			len=testStrList.length;
+			for (i=0;i < len;i++){
+				testStr=testStrList[i];
+				words=WordDicParser.I.cut(testStr);
+				console.log("words:",words);
+			}
+		}
+
 		return Game;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.cutwords.WordCutter
+	var WordCutter=(function(){
+		function WordCutter(){
+			this.trie=null;
+		}
+
+		__class(WordCutter,'nlp.cutwords.WordCutter');
+		var __proto=WordCutter.prototype;
+		__proto.cut=function(str){
+			var tPos=0;
+			tPos=0;
+			var rst;
+			rst=[];
+			var tPiece;
+			while (tPos < str.length){
+				tPiece=this.findMaxWord(str,tPos);
+				if (!tPiece)break ;
+				rst.push(tPiece);
+				tPos=tPiece.end;
+			}
+			return rst;
+		}
+
+		__proto.findMaxWord=function(str,pos){
+			(pos===void 0)&& (pos=0);
+			var tchar;
+			tchar=str.charAt(pos);
+			var tTrieNode;
+			tTrieNode=this.trie.findByChar(tchar);
+			var tPiece;
+			tPiece=new WordPiece();
+			tPiece.start=pos;
+			tPiece.end=pos+1;
+			if (!tTrieNode){
+				tPiece.word=tchar;
+				tPiece.type="new";
+				return tPiece.update();
+			}
+			if (tTrieNode.isWord()){
+				tPiece.end=pos+1;
+				tPiece.wordRef=tTrieNode.word;
+			};
+			var end=0;
+			end=pos;
+			var next;
+			while (tTrieNode){
+				end++;
+				if (end >=str.length){
+					break ;
+				}
+				tchar=str.charAt(end);
+				next=tTrieNode.findByChar(tchar);
+				if (!next)break ;
+				tTrieNode=next;
+				if (tTrieNode.isWord()){
+					tPiece.end=end+1;
+					tPiece.wordRef=tTrieNode.word;
+				}
+			}
+			return tPiece.update();
+		}
+
+		return WordCutter;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.cutwords.WordPiece
+	var WordPiece=(function(){
+		function WordPiece(){
+			this.word=null;
+			this.start=0;
+			this.end=0;
+			this.wordRef=null;
+			this.type=null;
+		}
+
+		__class(WordPiece,'nlp.cutwords.WordPiece');
+		var __proto=WordPiece.prototype;
+		__proto.update=function(){
+			if (this.wordRef){
+				this.word=this.wordRef.word;
+			}
+			return this;
+		}
+
+		return WordPiece;
 	})()
 
 
@@ -816,25 +933,178 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class nlp.trie.Trie
+	var Trie=(function(){
+		function Trie(){
+			this.root=null;
+		}
+
+		__class(Trie,'nlp.trie.Trie');
+		var __proto=Trie.prototype;
+		__proto.addWord=function(word){
+			this.root.addWord(0,word);
+		}
+
+		__proto.buildByWordList=function(wordList){
+			this.root=new TrieNode();
+			var twList;
+			twList=TrieWord.createTrieWordList(wordList);
+			var i=0,len=0;
+			len=twList.length;
+			var tWord;
+			for (i=0;i < len;i++){
+				tWord=twList[i];
+				this.addWord(tWord);
+			}
+		}
+
+		__proto.findByChar=function(char){
+			return this.root.findByChar(char);
+		}
+
+		return Trie;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.trie.TrieNode
+	var TrieNode=(function(){
+		function TrieNode(){
+			this.childDic=null;
+			this.char="";
+			this.word=null;
+			this.childDic={};
+		}
+
+		__class(TrieNode,'nlp.trie.TrieNode');
+		var __proto=TrieNode.prototype;
+		__proto.findByChar=function(char){
+			return this.childDic[char];
+		}
+
+		__proto.isWord=function(){
+			return this.word?true:false;
+		}
+
+		__proto.getChildByChar=function(char){
+			if (!this.childDic[char]){
+				this.childDic[char]=TrieNode.createByChar(char);
+			}
+			return this.childDic[char];
+		}
+
+		__proto.addWord=function(pos,word){
+			if (pos==word.word.length){
+				this.word=word;
+				return;
+			};
+			var tchar;
+			tchar=word.word.charAt(pos);
+			var tChild;
+			tChild=this.getChildByChar(tchar);
+			tChild.addWord(pos+1,word);
+		}
+
+		TrieNode.createByChar=function(char){
+			var rst;
+			rst=new TrieNode();
+			rst.char=char;
+			return rst;
+		}
+
+		return TrieNode;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.trie.TrieWord
+	var TrieWord=(function(){
+		function TrieWord(){
+			this.words=null;
+			this.word=null;
+			this.words=[];
+		}
+
+		__class(TrieWord,'nlp.trie.TrieWord');
+		var __proto=TrieWord.prototype;
+		__proto.addWord=function(word){
+			this.words.push(word);
+		}
+
+		TrieWord.createByWord=function(word){
+			var rst;
+			rst=new TrieWord();
+			rst.word=word;
+			return rst;
+		}
+
+		TrieWord.createTrieWordList=function(wordList){
+			var wordDic;
+			wordDic={};
+			var i=0,len=0;
+			len=wordList.length;
+			var tWord;
+			var tTrieWord;
+			for (i=0;i < len;i++){
+				tWord=wordList[i];
+				if (!wordDic[tWord.word]){
+					wordDic[tWord.word]=TrieWord.createByWord(tWord.word);
+				}
+				tTrieWord=wordDic[tWord.word];
+				tTrieWord.addWord(tWord);
+			};
+			var twList;
+			twList=[];
+			var key;
+			for (key in wordDic){
+				tTrieWord=wordDic[key];
+				twList.push(tTrieWord);
+			}
+			twList.sort(TrieWord.sortWordByLen);
+			return twList;
+		}
+
+		TrieWord.sortWordByLen=function(word0,word1){
+			return word0.word.length-word1.word.length;
+		}
+
+		return TrieWord;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class nlp.WordDicParser
 	var WordDicParser=(function(){
 		function WordDicParser(){
+			this.complete=null;
 			this.wordList=null;
 			this.vocList=null;
+			this.trie=null;
+			this.cutter=null;
 			this.wordList=[];
 			this.vocList=[];
+			this.trie=new Trie();
 		}
 
 		__class(WordDicParser,'nlp.WordDicParser');
 		var __proto=WordDicParser.prototype;
-		__proto.loadDic=function(filePath){
+		__proto.loadDic=function(filePath,complete){
+			this.complete=complete;
 			Laya.loader.load(filePath,Handler.create(this,this.onFileLoaded),null,"text");
 		}
 
 		__proto.onFileLoaded=function(txt){
 			var lines;
 			lines=txt.split("\n");
-			WordUtils.printLines(lines.slice(0,500));
 			var pinyin;
 			pinyin=new PingYinDic();
 			this.wordList=[];
@@ -844,6 +1114,7 @@ var Laya=window.Laya=(function(window,document){
 			var tLine;
 			for (i=0;i < len;i++){
 				tLine=lines[i];
+				tLine=tLine.replace("\r","");
 				pinyin.addIfOK(tLine);
 				if (tLine.charAt(0)=="*"){
 					tWord=new WordParser();
@@ -860,6 +1131,17 @@ var Laya=window.Laya=(function(window,document){
 			console.log(pinyin);
 			this.addToWordList(this.wordList);
 			console.log("vocList:",this.vocList);
+			this.trie.buildByWordList(this.vocList);
+			console.log("trie:",this.trie);
+			this.cutter=new WordCutter();
+			this.cutter.trie=this.trie;
+			if (this.complete){
+				this.complete.run();
+			}
+		}
+
+		__proto.cut=function(str){
+			return this.cutter.cut(str);
 		}
 
 		__proto.addToWordList=function(wList){
@@ -23677,99 +23959,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*<code>LayoutBox</code> 是一个布局容器类。
-	*/
-	//class laya.ui.LayoutBox extends laya.ui.Box
-	var LayoutBox=(function(_super){
-		function LayoutBox(){
-			this._space=0;
-			this._align="none";
-			this._itemChanged=false;
-			LayoutBox.__super.call(this);
-		}
-
-		__class(LayoutBox,'laya.ui.LayoutBox',_super);
-		var __proto=LayoutBox.prototype;
-		/**@inheritDoc */
-		__proto.addChild=function(child){
-			child.on("resize",this,this.onResize);
-			this._setItemChanged();
-			return laya.display.Node.prototype.addChild.call(this,child);
-		}
-
-		__proto.onResize=function(e){
-			this._setItemChanged();
-		}
-
-		/**@inheritDoc */
-		__proto.addChildAt=function(child,index){
-			child.on("resize",this,this.onResize);
-			this._setItemChanged();
-			return laya.display.Node.prototype.addChildAt.call(this,child,index);
-		}
-
-		/**@inheritDoc */
-		__proto.removeChild=function(child){
-			child.off("resize",this,this.onResize);
-			this._setItemChanged();
-			return laya.display.Node.prototype.removeChild.call(this,child);
-		}
-
-		/**@inheritDoc */
-		__proto.removeChildAt=function(index){
-			this.getChildAt(index).off("resize",this,this.onResize);
-			this._setItemChanged();
-			return laya.display.Node.prototype.removeChildAt.call(this,index);
-		}
-
-		/**刷新。*/
-		__proto.refresh=function(){
-			this._setItemChanged();
-		}
-
-		/**
-		*改变子对象的布局。
-		*/
-		__proto.changeItems=function(){
-			this._itemChanged=false;
-		}
-
-		/**
-		*排序项目列表。可通过重写改变默认排序规则。
-		*@param items 项目列表。
-		*/
-		__proto.sortItem=function(items){
-			if (items)items.sort(function(a,b){return a.y-b.y;});
-		}
-
-		__proto._setItemChanged=function(){
-			if (!this._itemChanged){
-				this._itemChanged=true;
-				this.callLater(this.changeItems);
-			}
-		}
-
-		/**子对象的间隔。*/
-		__getset(0,__proto,'space',function(){
-			return this._space;
-			},function(value){
-			this._space=value;
-			this._setItemChanged();
-		});
-
-		/**子对象对齐方式。*/
-		__getset(0,__proto,'align',function(){
-			return this._align;
-			},function(value){
-			this._align=value;
-			this._setItemChanged();
-		});
-
-		return LayoutBox;
-	})(Box)
-
-
-	/**
 	*<code>TextInput</code> 类用于创建显示对象以显示和输入文本。
 	*
 	*@example <caption>以下示例代码，创建了一个 <code>TextInput</code> 实例。</caption>
@@ -24090,6 +24279,99 @@ var Laya=window.Laya=(function(window,document){
 
 		return TextInput;
 	})(Label)
+
+
+	/**
+	*<code>LayoutBox</code> 是一个布局容器类。
+	*/
+	//class laya.ui.LayoutBox extends laya.ui.Box
+	var LayoutBox=(function(_super){
+		function LayoutBox(){
+			this._space=0;
+			this._align="none";
+			this._itemChanged=false;
+			LayoutBox.__super.call(this);
+		}
+
+		__class(LayoutBox,'laya.ui.LayoutBox',_super);
+		var __proto=LayoutBox.prototype;
+		/**@inheritDoc */
+		__proto.addChild=function(child){
+			child.on("resize",this,this.onResize);
+			this._setItemChanged();
+			return laya.display.Node.prototype.addChild.call(this,child);
+		}
+
+		__proto.onResize=function(e){
+			this._setItemChanged();
+		}
+
+		/**@inheritDoc */
+		__proto.addChildAt=function(child,index){
+			child.on("resize",this,this.onResize);
+			this._setItemChanged();
+			return laya.display.Node.prototype.addChildAt.call(this,child,index);
+		}
+
+		/**@inheritDoc */
+		__proto.removeChild=function(child){
+			child.off("resize",this,this.onResize);
+			this._setItemChanged();
+			return laya.display.Node.prototype.removeChild.call(this,child);
+		}
+
+		/**@inheritDoc */
+		__proto.removeChildAt=function(index){
+			this.getChildAt(index).off("resize",this,this.onResize);
+			this._setItemChanged();
+			return laya.display.Node.prototype.removeChildAt.call(this,index);
+		}
+
+		/**刷新。*/
+		__proto.refresh=function(){
+			this._setItemChanged();
+		}
+
+		/**
+		*改变子对象的布局。
+		*/
+		__proto.changeItems=function(){
+			this._itemChanged=false;
+		}
+
+		/**
+		*排序项目列表。可通过重写改变默认排序规则。
+		*@param items 项目列表。
+		*/
+		__proto.sortItem=function(items){
+			if (items)items.sort(function(a,b){return a.y-b.y;});
+		}
+
+		__proto._setItemChanged=function(){
+			if (!this._itemChanged){
+				this._itemChanged=true;
+				this.callLater(this.changeItems);
+			}
+		}
+
+		/**子对象的间隔。*/
+		__getset(0,__proto,'space',function(){
+			return this._space;
+			},function(value){
+			this._space=value;
+			this._setItemChanged();
+		});
+
+		/**子对象对齐方式。*/
+		__getset(0,__proto,'align',function(){
+			return this._align;
+			},function(value){
+			this._align=value;
+			this._setItemChanged();
+		});
+
+		return LayoutBox;
+	})(Box)
 
 
 	/**

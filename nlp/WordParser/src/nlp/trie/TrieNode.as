@@ -8,14 +8,50 @@ package nlp.trie
 	public class TrieNode 
 	{
 		public var childDic:Object;
+		public var char:String = "";
+		public var word:TrieWord;
 		public function TrieNode() 
 		{
 			childDic = { };
 		}
 		
-		public function addWord(word:WordOne):void
+		public function findByChar(char:String):TrieNode
 		{
-			
+			return childDic[char];
+		}
+		
+		public function isWord():Boolean
+		{
+			return word?true:false;
+		}
+		public function getChildByChar(char:String):TrieNode
+		{
+			if (!childDic[char])
+			{
+				childDic[char] = createByChar(char);
+			}
+			return childDic[char];
+		}
+		public function addWord(pos:int,word:TrieWord):void
+		{
+			if (pos == word.word.length)
+			{
+				this.word = word;
+				return;
+			}
+			var tchar:String;
+			tchar = word.word.charAt(pos);
+			var tChild:TrieNode;
+			tChild = getChildByChar(tchar);
+			tChild.addWord(pos + 1, word);
+		}
+		
+		public static function createByChar(char:String):TrieNode
+		{
+			var rst:TrieNode;
+			rst = new TrieNode();
+			rst.char = char;
+			return rst;
 		}
 		
 	}

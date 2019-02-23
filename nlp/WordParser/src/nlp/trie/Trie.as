@@ -13,13 +13,15 @@ package nlp.trie
 			
 		}
 		
+		public var root:TrieNode;
 		public function addWord(word:TrieWord):void
 		{
-			
+			root.addWord(0, word);
 		}
 		
 		public function buildByWordList(wordList:Array):void
 		{
+			root = new TrieNode();
 			var twList:Array;
 			twList = TrieWord.createTrieWordList(wordList);
 			var i:int, len:int;
@@ -30,6 +32,11 @@ package nlp.trie
 				tWord = twList[i];
 				addWord(tWord);
 			}
+		}
+		
+		public function findByChar(char:String):TrieNode
+		{
+			return root.findByChar(char);
 		}
 	}
 
