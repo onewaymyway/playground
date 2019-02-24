@@ -8,6 +8,7 @@ package
 	import nlp.WordUtils;
 	import ui.wordparser.MainUI;
 	import view.Main;
+	import view.WordListViewer;
 	/**
 	 * ...
 	 * @author ww
@@ -29,14 +30,15 @@ package
 
 		
 		
+		public var wordView:WordListViewer;
 		
 		private function initGameView():void
 		{
 			//WordUtils.showChars(0, 1000);
 			WordDicParser.I.loadDic("data/中文字典1.txt",Handler.create(this,onDicLoaded));
-			var tUI:Main;
-			tUI = new Main();
-			Laya.stage.addChild(tUI);
+			wordView = new WordListViewer();
+			wordView.pos(20, 20);
+			Laya.stage.addChild(wordView);
 		}
 		
 		private function onDicLoaded():void
@@ -48,6 +50,8 @@ package
 			trace(typeDic);
 			WordDicParser.I.cutter.typeDic = typeDic;
 			Laya.stage.on(Event.CLICK, this, testCut);
+			
+			Laya.stage.graphics.fillText("ready", 10, 10, null, "#ff0000");
 		}
 		
 		private function testCut():void
@@ -68,6 +72,8 @@ package
 				words = WordDicParser.I.cut(testStr);
 				trace("words:",words);
 			}
+			
+			wordView.setWordList(words);
 			
 		}
 		

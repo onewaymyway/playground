@@ -401,6 +401,63 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*...
+	*@author ww
+	*/
+	//class Game
+	var Game=(function(){
+		function Game(){
+			this.wordView=null;
+			Laya.init(1000,900);
+			var loadList;
+			loadList=[];
+			loadList.push({url:"res/atlas/comp.json",type:"atlas" });
+			loadList.push({url:"data/CoreSynonym.txt",type:"text" });
+			loadList.push({url:"data/CoreNatureDictionary.txt",type:"text" });
+			Laya.loader.load(loadList,new Handler(this,this.initGameView));
+		}
+
+		__class(Game,'Game');
+		var __proto=Game.prototype;
+		__proto.initGameView=function(){
+			WordDicParser.I.loadDic("data/中文字典1.txt",Handler.create(this,this.onDicLoaded));
+			this.wordView=new WordListViewer();
+			this.wordView.pos(20,20);
+			Laya.stage.addChild(this.wordView);
+		}
+
+		__proto.onDicLoaded=function(){
+			var typeDic;
+			typeDic=new TypeDicParser();
+			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
+			console.log(typeDic);
+			WordDicParser.I.cutter.typeDic=typeDic;
+			Laya.stage.on("click",this,this.testCut);
+			Laya.stage.graphics.fillText("ready",10,10,null,"#ff0000");
+		}
+
+		__proto.testCut=function(){
+			var testStrList;
+			testStrList=[];
+			testStrList.push("你是笨蛋吗");
+			testStrList.push("该剧改编自芦原妃名子的同名漫画，讲述了高中时代曾是同班同学的主人公和女主角，因以前的同学去世为契机而再相见，他们一边搜寻以前的同学曾秘密交往过的男性，一边面对自己的回忆的模样。");
+			var testStr;
+			var words;
+			var i=0,len=0;
+			len=testStrList.length;
+			for (i=0;i < len;i++){
+				testStr=testStrList[i];
+				words=WordDicParser.I.cut(testStr);
+				console.log("words:",words);
+			}
+			this.wordView.setWordList(words);
+		}
+
+		return Game;
+	})()
+
+
+	/**
 	*<code>EventDispatcher</code> 类是可调度事件的所有类的基类。
 	*/
 	//class laya.events.EventDispatcher
@@ -697,53 +754,368 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class Game
-	var Game=(function(){
-		function Game(){
-			Laya.init(1000,900);
-			var loadList;
-			loadList=[];
-			loadList.push({url:"res/atlas/comp.json",type:"atlas" });
-			loadList.push({url:"data/CoreSynonym.txt",type:"text" });
-			loadList.push({url:"data/CoreNatureDictionary.txt",type:"text" });
-			Laya.loader.load(loadList,new Handler(this,this.initGameView));
+	//class nlp.PingYinDic
+	var PingYinDic=(function(){
+		function PingYinDic(){
+			this.pinYinList=null;
+			this.charDic=null;
+			this.headDic=null;
+			this.pinYinList=[];
 		}
 
-		__class(Game,'Game');
-		var __proto=Game.prototype;
-		__proto.initGameView=function(){
-			WordDicParser.I.loadDic("data/中文字典1.txt",Handler.create(this,this.onDicLoaded));
-			var tUI;
-			tUI=new Main();
-			Laya.stage.addChild(tUI);
-		}
-
-		__proto.onDicLoaded=function(){
-			var typeDic;
-			typeDic=new TypeDicParser();
-			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
-			console.log(typeDic);
-			WordDicParser.I.cutter.typeDic=typeDic;
-			Laya.stage.on("click",this,this.testCut);
-		}
-
-		__proto.testCut=function(){
-			var testStrList;
-			testStrList=[];
-			testStrList.push("你是笨蛋吗");
-			testStrList.push("该剧改编自芦原妃名子的同名漫画，讲述了高中时代曾是同班同学的主人公和女主角，因以前的同学去世为契机而再相见，他们一边搜寻以前的同学曾秘密交往过的男性，一边面对自己的回忆的模样。");
-			var testStr;
-			var words;
-			var i=0,len=0;
-			len=testStrList.length;
-			for (i=0;i < len;i++){
-				testStr=testStrList[i];
-				words=WordDicParser.I.cut(testStr);
-				console.log("words:",words);
+		__class(PingYinDic,'nlp.PingYinDic');
+		var __proto=PingYinDic.prototype;
+		__proto.addIfOK=function(line){
+			if (PingYinDic.isPinYin(line)){
+				this.pinYinList.push(line);
 			}
 		}
 
-		return Game;
+		__proto.makeCharDic=function(){
+			this.charDic={};
+			this.headDic={};
+			var i=0,len=0;
+			len=this.pinYinList.length;
+			for (i=0;i < len;i++){
+				this.addWordToDic(this.pinYinList[i]);
+			}
+		}
+
+		__proto.addWordToDic=function(word){
+			var charList;
+			charList=word.split("");
+			if (!charList.length)return;
+			var i=0,len=0;
+			len=charList.length;
+			var tChar;
+			tChar=charList[0];
+			this.headDic[tChar]=tChar;
+			for (i=0;i < len;i++){
+				tChar=charList[i];
+				this.charDic[tChar]=tChar;
+			}
+		}
+
+		PingYinDic.checkIsHasSpecialStr=function(str){
+			var pattern=new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
+			if (pattern.test(str)){
+				return true;
+			}
+			return false;
+		}
+
+		PingYinDic.hasChina=function(obj){
+			var reg=/[\u4E00-\u9FA5\uF900-\uFA2D]/;
+			return reg.test(obj);
+		}
+
+		PingYinDic.isPinYin=function(line){
+			if (line.length < 1)
+				return false;
+			if (line.charAt(0)=="∶")return false;
+			if (PingYinDic.checkIsHasSpecialStr(line))
+				return false;
+			if (PingYinDic.hasChina(line))
+				return false;
+			var char0;
+			char0=line.charAt(0);
+			var charCode0=0;
+			charCode0=line.charCodeAt(0);
+			return true;
+		}
+
+		PingYinDic.inits=function(){
+			PingYinDic.DebugDic=WordUtils.arrToDic(PingYinDic.DebugChars);
+		}
+
+		PingYinDic.DebugDic=null
+		__static(PingYinDic,
+		['DebugChars',function(){return this.DebugChars=["’"];}
+		]);
+		PingYinDic.__init$=function(){
+			;;
+			PingYinDic.inits();
+		}
+
+		return PingYinDic;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordDicParser
+	var WordDicParser=(function(){
+		function WordDicParser(){
+			this.complete=null;
+			this.wordList=null;
+			this.vocList=null;
+			this.trie=null;
+			this.cutter=null;
+			this.wordList=[];
+			this.vocList=[];
+			this.trie=new Trie();
+		}
+
+		__class(WordDicParser,'nlp.WordDicParser');
+		var __proto=WordDicParser.prototype;
+		__proto.loadDic=function(filePath,complete){
+			this.complete=complete;
+			Laya.loader.load(filePath,Handler.create(this,this.onFileLoaded),null,"text");
+		}
+
+		__proto.onFileLoaded=function(txt){
+			var lines;
+			lines=txt.split("\n");
+			var pinyin;
+			pinyin=new PingYinDic();
+			this.wordList=[];
+			var tWord;
+			var i=0,len=0;
+			len=lines.length;
+			var tLine;
+			for (i=0;i < len;i++){
+				tLine=lines[i];
+				tLine=tLine.replace("\r","");
+				pinyin.addIfOK(tLine);
+				if (tLine.charAt(0)=="*"){
+					tWord=new WordParser();
+					tWord.addHead(tLine);
+					this.wordList.push(tWord);
+					}else{
+					if (tWord){
+						tWord.addLine(tLine);
+					}
+				}
+			}
+			console.log("word count:",this.wordList.length,this.wordList);
+			pinyin.makeCharDic();
+			console.log(pinyin);
+			this.addToWordList(this.wordList);
+			console.log("vocList:",this.vocList);
+			this.trie.buildByWordList(this.vocList);
+			console.log("trie:",this.trie);
+			this.cutter=new WordCutter();
+			this.cutter.trie=this.trie;
+			if (this.complete){
+				this.complete.run();
+			}
+		}
+
+		__proto.cut=function(str){
+			return this.cutter.cut(str);
+		}
+
+		__proto.addToWordList=function(wList){
+			var i=0,len=0;
+			len=wList.length;
+			var tWord;
+			for (i=0;i < len;i++){
+				tWord=wList[i];
+				this.addWordToVocList(tWord);
+			}
+		}
+
+		__proto.addWordToVocList=function(word){
+			var tList;
+			tList=word.wordList;
+			if (!tList)return;
+			var i=0,len=0;
+			len=tList.length;
+			for (i=0;i < len;i++){
+				this.vocList.push(tList[i]);
+			}
+		}
+
+		__static(WordDicParser,
+		['I',function(){return this.I=new WordDicParser();}
+		]);
+		return WordDicParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordOne
+	var WordOne=(function(){
+		function WordOne(){
+			this.oWord=null;
+			this.word=null;
+			this.pinyin=null;
+			this.twPY=null;
+			this.type=null;
+			this.detail=null;
+			this.lines=null;
+			this.lines=[];
+		}
+
+		__class(WordOne,'nlp.WordOne');
+		var __proto=WordOne.prototype;
+		__proto.addLine=function(line){
+			this.lines.push(line);
+		}
+
+		__proto.parseEnd=function(removeLast){
+			if (removeLast)this.lines.pop();
+			this.parseDetail();
+		}
+
+		__proto.parseDetail=function(){}
+		return WordOne;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordParser
+	var WordParser=(function(){
+		function WordParser(){
+			this.word=null;
+			this.alasDic=null;
+			this.lineCount=0;
+			this.part=null;
+			this.tWord=null;
+			this.wordList=null;
+			this.lines=null;
+			this.preLine=null;
+			this.preIsPinYin=false;
+			this.lines=[];
+			this.wordList=[];
+			this.alasDic={};
+		}
+
+		__class(WordParser,'nlp.WordParser');
+		var __proto=WordParser.prototype;
+		__proto.addToAlasDic=function(word){
+			word=word.replace("（","").replace("）","");
+			this.alasDic[word]=word;
+		}
+
+		__proto.addLine=function(line){
+			this.lines.push(line);
+			var tLine;
+			tLine=line;
+			var isPinYin=false;
+			isPinYin=false;
+			if (line.length=1&&this.alasDic[line]){
+				tLine=this.preLine;
+			}else
+			if (line.charAt(0)=="（"){
+				this.addToAlasDic(line);
+				tLine=this.preLine;
+			}else
+			if (line.charAt(0)=="〖"){
+				if (this.tWord){
+					this.tWord.addLine(line);
+				}
+			}else
+			if (line.charAt(0)=="∶"){
+				if (this.tWord){
+					this.tWord.addLine(line);
+				}
+			}else
+			if (line.charAt(0)=="【"){
+				if (this.tWord){
+					this.tWord.type=StringTool.getBetween(line,"【","】");
+				}
+			}else
+			if (line.indexOf("详细解释：")>=0){
+				tLine=line.replace("详细解释：","");
+				this.tWord=null;
+			}else
+			if (line.indexOf("部首：")>=0){
+				this.part=line.replace("部首：","").replace("；","");
+			}else
+			if (line.indexOf("笔画数：")>=0){
+				this.lineCount=parseInt(line.replace("笔画数：",""));
+			}else
+			if (line.indexOf("基本解释：")>=0){
+				tLine=this.word;
+			}else
+			if (PingYinDic.isPinYin(line)){
+				if (this.preIsPinYin){
+					if (this.tWord){
+						this.tWord.twPY=line;
+					}
+					}else{
+					if (this.tWord){
+						this.tWord.parseEnd(true);
+					}
+					this.tWord=this.createWord();
+					this.tWord.word=this.preLine;
+					this.tWord.pinyin=line;
+					isPinYin=true;
+				}
+				}else{
+				if (this.tWord){
+					this.tWord.addLine(line);
+				}
+			}
+			this.preLine=tLine;
+			this.preIsPinYin=isPinYin;
+		}
+
+		__proto.addHead=function(line){
+			var tArr;
+			tArr=line.split(" ");
+			var tt;
+			tt=tArr[0];
+			this.word=tt.charAt(1);
+		}
+
+		__proto.createWord=function(){
+			var rst;
+			rst=new WordOne();
+			rst.word=this.word;
+			rst.oWord=this;
+			this.wordList.push(rst);
+			return rst;
+		}
+
+		return WordParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordUtils
+	var WordUtils=(function(){
+		function WordUtils(){}
+		__class(WordUtils,'nlp.WordUtils');
+		WordUtils.printLines=function(lines){
+			var i=0,len=0;
+			len=lines.length;
+			for (i=0;i < len;i++){
+				console.log(lines[i]);
+			}
+		}
+
+		WordUtils.showChars=function(start,end){
+			var i=0;
+			for (i=start;i <=end;i++){
+				console.log("char:",i,":(",String.fromCharCode(i),")");
+			}
+		}
+
+		WordUtils.arrToDic=function(arr){
+			var rst;
+			rst={};
+			var i=0,len=0;
+			len=arr.length;
+			for (i=0;i < len;i++){
+				rst[arr[i]]=arr[i];
+			}
+			return rst;
+		}
+
+		return WordUtils;
 	})()
 
 
@@ -1084,97 +1456,6 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class nlp.PingYinDic
-	var PingYinDic=(function(){
-		function PingYinDic(){
-			this.pinYinList=null;
-			this.charDic=null;
-			this.headDic=null;
-			this.pinYinList=[];
-		}
-
-		__class(PingYinDic,'nlp.PingYinDic');
-		var __proto=PingYinDic.prototype;
-		__proto.addIfOK=function(line){
-			if (PingYinDic.isPinYin(line)){
-				this.pinYinList.push(line);
-			}
-		}
-
-		__proto.makeCharDic=function(){
-			this.charDic={};
-			this.headDic={};
-			var i=0,len=0;
-			len=this.pinYinList.length;
-			for (i=0;i < len;i++){
-				this.addWordToDic(this.pinYinList[i]);
-			}
-		}
-
-		__proto.addWordToDic=function(word){
-			var charList;
-			charList=word.split("");
-			if (!charList.length)return;
-			var i=0,len=0;
-			len=charList.length;
-			var tChar;
-			tChar=charList[0];
-			this.headDic[tChar]=tChar;
-			for (i=0;i < len;i++){
-				tChar=charList[i];
-				this.charDic[tChar]=tChar;
-			}
-		}
-
-		PingYinDic.checkIsHasSpecialStr=function(str){
-			var pattern=new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
-			if (pattern.test(str)){
-				return true;
-			}
-			return false;
-		}
-
-		PingYinDic.hasChina=function(obj){
-			var reg=/[\u4E00-\u9FA5\uF900-\uFA2D]/;
-			return reg.test(obj);
-		}
-
-		PingYinDic.isPinYin=function(line){
-			if (line.length < 1)
-				return false;
-			if (line.charAt(0)=="∶")return false;
-			if (PingYinDic.checkIsHasSpecialStr(line))
-				return false;
-			if (PingYinDic.hasChina(line))
-				return false;
-			var char0;
-			char0=line.charAt(0);
-			var charCode0=0;
-			charCode0=line.charCodeAt(0);
-			return true;
-		}
-
-		PingYinDic.inits=function(){
-			PingYinDic.DebugDic=WordUtils.arrToDic(PingYinDic.DebugChars);
-		}
-
-		PingYinDic.DebugDic=null
-		__static(PingYinDic,
-		['DebugChars',function(){return this.DebugChars=["’"];}
-		]);
-		PingYinDic.__init$=function(){
-			;;
-			PingYinDic.inits();
-		}
-
-		return PingYinDic;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
 	//class nlp.trie.Trie
 	var Trie=(function(){
 		function Trie(){
@@ -1321,284 +1602,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.WordDicParser
-	var WordDicParser=(function(){
-		function WordDicParser(){
-			this.complete=null;
-			this.wordList=null;
-			this.vocList=null;
-			this.trie=null;
-			this.cutter=null;
-			this.wordList=[];
-			this.vocList=[];
-			this.trie=new Trie();
-		}
-
-		__class(WordDicParser,'nlp.WordDicParser');
-		var __proto=WordDicParser.prototype;
-		__proto.loadDic=function(filePath,complete){
-			this.complete=complete;
-			Laya.loader.load(filePath,Handler.create(this,this.onFileLoaded),null,"text");
-		}
-
-		__proto.onFileLoaded=function(txt){
-			var lines;
-			lines=txt.split("\n");
-			var pinyin;
-			pinyin=new PingYinDic();
-			this.wordList=[];
-			var tWord;
-			var i=0,len=0;
-			len=lines.length;
-			var tLine;
-			for (i=0;i < len;i++){
-				tLine=lines[i];
-				tLine=tLine.replace("\r","");
-				pinyin.addIfOK(tLine);
-				if (tLine.charAt(0)=="*"){
-					tWord=new WordParser();
-					tWord.addHead(tLine);
-					this.wordList.push(tWord);
-					}else{
-					if (tWord){
-						tWord.addLine(tLine);
-					}
-				}
-			}
-			console.log("word count:",this.wordList.length,this.wordList);
-			pinyin.makeCharDic();
-			console.log(pinyin);
-			this.addToWordList(this.wordList);
-			console.log("vocList:",this.vocList);
-			this.trie.buildByWordList(this.vocList);
-			console.log("trie:",this.trie);
-			this.cutter=new WordCutter();
-			this.cutter.trie=this.trie;
-			if (this.complete){
-				this.complete.run();
-			}
-		}
-
-		__proto.cut=function(str){
-			return this.cutter.cut(str);
-		}
-
-		__proto.addToWordList=function(wList){
-			var i=0,len=0;
-			len=wList.length;
-			var tWord;
-			for (i=0;i < len;i++){
-				tWord=wList[i];
-				this.addWordToVocList(tWord);
-			}
-		}
-
-		__proto.addWordToVocList=function(word){
-			var tList;
-			tList=word.wordList;
-			if (!tList)return;
-			var i=0,len=0;
-			len=tList.length;
-			for (i=0;i < len;i++){
-				this.vocList.push(tList[i]);
-			}
-		}
-
-		__static(WordDicParser,
-		['I',function(){return this.I=new WordDicParser();}
-		]);
-		return WordDicParser;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.WordOne
-	var WordOne=(function(){
-		function WordOne(){
-			this.oWord=null;
-			this.word=null;
-			this.pinyin=null;
-			this.twPY=null;
-			this.type=null;
-			this.detail=null;
-			this.lines=null;
-			this.lines=[];
-		}
-
-		__class(WordOne,'nlp.WordOne');
-		var __proto=WordOne.prototype;
-		__proto.addLine=function(line){
-			this.lines.push(line);
-		}
-
-		__proto.parseEnd=function(removeLast){
-			if (removeLast)this.lines.pop();
-			this.parseDetail();
-		}
-
-		__proto.parseDetail=function(){}
-		return WordOne;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.WordParser
-	var WordParser=(function(){
-		function WordParser(){
-			this.word=null;
-			this.alasDic=null;
-			this.lineCount=0;
-			this.part=null;
-			this.tWord=null;
-			this.wordList=null;
-			this.lines=null;
-			this.preLine=null;
-			this.preIsPinYin=false;
-			this.lines=[];
-			this.wordList=[];
-			this.alasDic={};
-		}
-
-		__class(WordParser,'nlp.WordParser');
-		var __proto=WordParser.prototype;
-		__proto.addToAlasDic=function(word){
-			word=word.replace("（","").replace("）","");
-			this.alasDic[word]=word;
-		}
-
-		__proto.addLine=function(line){
-			this.lines.push(line);
-			var tLine;
-			tLine=line;
-			var isPinYin=false;
-			isPinYin=false;
-			if (line.length=1&&this.alasDic[line]){
-				tLine=this.preLine;
-			}else
-			if (line.charAt(0)=="（"){
-				this.addToAlasDic(line);
-				tLine=this.preLine;
-			}else
-			if (line.charAt(0)=="〖"){
-				if (this.tWord){
-					this.tWord.addLine(line);
-				}
-			}else
-			if (line.charAt(0)=="∶"){
-				if (this.tWord){
-					this.tWord.addLine(line);
-				}
-			}else
-			if (line.charAt(0)=="【"){
-				if (this.tWord){
-					this.tWord.type=StringTool.getBetween(line,"【","】");
-				}
-			}else
-			if (line.indexOf("详细解释：")>=0){
-				tLine=line.replace("详细解释：","");
-				this.tWord=null;
-			}else
-			if (line.indexOf("部首：")>=0){
-				this.part=line.replace("部首：","").replace("；","");
-			}else
-			if (line.indexOf("笔画数：")>=0){
-				this.lineCount=parseInt(line.replace("笔画数：",""));
-			}else
-			if (line.indexOf("基本解释：")>=0){
-				tLine=this.word;
-			}else
-			if (PingYinDic.isPinYin(line)){
-				if (this.preIsPinYin){
-					if (this.tWord){
-						this.tWord.twPY=line;
-					}
-					}else{
-					if (this.tWord){
-						this.tWord.parseEnd(true);
-					}
-					this.tWord=this.createWord();
-					this.tWord.word=this.preLine;
-					this.tWord.pinyin=line;
-					isPinYin=true;
-				}
-				}else{
-				if (this.tWord){
-					this.tWord.addLine(line);
-				}
-			}
-			this.preLine=tLine;
-			this.preIsPinYin=isPinYin;
-		}
-
-		__proto.addHead=function(line){
-			var tArr;
-			tArr=line.split(" ");
-			var tt;
-			tt=tArr[0];
-			this.word=tt.charAt(1);
-		}
-
-		__proto.createWord=function(){
-			var rst;
-			rst=new WordOne();
-			rst.word=this.word;
-			rst.oWord=this;
-			this.wordList.push(rst);
-			return rst;
-		}
-
-		return WordParser;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.WordUtils
-	var WordUtils=(function(){
-		function WordUtils(){}
-		__class(WordUtils,'nlp.WordUtils');
-		WordUtils.printLines=function(lines){
-			var i=0,len=0;
-			len=lines.length;
-			for (i=0;i < len;i++){
-				console.log(lines[i]);
-			}
-		}
-
-		WordUtils.showChars=function(start,end){
-			var i=0;
-			for (i=start;i <=end;i++){
-				console.log("char:",i,":(",String.fromCharCode(i),")");
-			}
-		}
-
-		WordUtils.arrToDic=function(arr){
-			var rst;
-			rst={};
-			var i=0,len=0;
-			len=arr.length;
-			for (i=0;i < len;i++){
-				rst[arr[i]]=arr[i];
-			}
-			return rst;
-		}
-
-		return WordUtils;
-	})()
-
-
-	/**
 	*Config 用于配置一些全局参数。如需更改，请在初始化引擎之前设置。
 	*/
 	//class Config
@@ -1615,6 +1618,21 @@ var Laya=window.Laya=(function(window,document){
 		Config.isStencil=true;
 		Config.preserveDrawingBuffer=false;
 		return Config;
+	})()
+
+
+	/**全局配置*/
+	//class UIConfig
+	var UIConfig=(function(){
+		function UIConfig(){};
+		__class(UIConfig,'UIConfig');
+		UIConfig.touchScrollEnable=true;
+		UIConfig.mouseWheelEnable=true;
+		UIConfig.showButtons=true;
+		UIConfig.popupBgColor="#000000";
+		UIConfig.popupBgAlpha=0.5;
+		UIConfig.closeDialogOnSide=true;
+		return UIConfig;
 	})()
 
 
@@ -3099,6 +3117,311 @@ var Laya=window.Laya=(function(window,document){
 
 	/**
 	*@private
+	*Graphic bounds数据类
+	*/
+	//class laya.display.GraphicsBounds
+	var GraphicsBounds=(function(){
+		function GraphicsBounds(){
+			//this._temp=null;
+			//this._bounds=null;
+			//this._rstBoundPoints=null;
+			this._cacheBoundsType=false;
+			//this._graphics=null;
+		}
+
+		__class(GraphicsBounds,'laya.display.GraphicsBounds');
+		var __proto=GraphicsBounds.prototype;
+		/**
+		*销毁
+		*/
+		__proto.destroy=function(){
+			this._graphics=null;
+			this._temp=null;
+			this._rstBoundPoints=null;
+			this._bounds=null;
+		}
+
+		/**
+		*重置数据
+		*/
+		__proto.reset=function(){
+			this._temp && (this._temp.length=0);
+		}
+
+		/**
+		*获取位置及宽高信息矩阵(比较耗CPU，频繁使用会造成卡顿，尽量少用)。
+		*@param realSize （可选）使用图片的真实大小，默认为false
+		*@return 位置与宽高组成的 一个 Rectangle 对象。
+		*/
+		__proto.getBounds=function(realSize){
+			(realSize===void 0)&& (realSize=false);
+			if (!this._bounds || !this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType){
+				this._bounds=Rectangle._getWrapRec(this.getBoundPoints(realSize),this._bounds)
+			}
+			this._cacheBoundsType=realSize;
+			return this._bounds;
+		}
+
+		/**
+		*@private
+		*@param realSize （可选）使用图片的真实大小，默认为false
+		*获取端点列表。
+		*/
+		__proto.getBoundPoints=function(realSize){
+			(realSize===void 0)&& (realSize=false);
+			if (!this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType)
+				this._temp=this._getCmdPoints(realSize);
+			this._cacheBoundsType=realSize;
+			return this._rstBoundPoints=Utils.copyArray(this._rstBoundPoints,this._temp);
+		}
+
+		__proto._getCmdPoints=function(realSize){
+			(realSize===void 0)&& (realSize=false);
+			var context=Render._context;
+			var cmds=this._graphics.cmds;
+			var rst;
+			rst=this._temp || (this._temp=[]);
+			rst.length=0;
+			if (!cmds && this._graphics._one !=null){
+				GraphicsBounds._tempCmds.length=0;
+				GraphicsBounds._tempCmds.push(this._graphics._one);
+				cmds=GraphicsBounds._tempCmds;
+			}
+			if (!cmds)
+				return rst;
+			var matrixs;
+			matrixs=GraphicsBounds._tempMatrixArrays;
+			matrixs.length=0;
+			var tMatrix=GraphicsBounds._initMatrix;
+			tMatrix.identity();
+			var tempMatrix=GraphicsBounds._tempMatrix;
+			var cmd;
+			var tex;
+			for (var i=0,n=cmds.length;i < n;i++){
+				cmd=cmds[i];
+				switch (cmd.callee){
+					case context._save:
+					case 7:
+						matrixs.push(tMatrix);
+						tMatrix=tMatrix.clone();
+						break ;
+					case context._restore:
+					case 8:
+						tMatrix=matrixs.pop();
+						break ;
+					case context._scale:
+					case 5:
+						tempMatrix.identity();
+						tempMatrix.translate(-cmd[2],-cmd[3]);
+						tempMatrix.scale(cmd[0],cmd[1]);
+						tempMatrix.translate(cmd[2],cmd[3]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case context._rotate:
+					case 3:
+						tempMatrix.identity();
+						tempMatrix.translate(-cmd[1],-cmd[2]);
+						tempMatrix.rotate(cmd[0]);
+						tempMatrix.translate(cmd[1],cmd[2]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case context._translate:
+					case 6:
+						tempMatrix.identity();
+						tempMatrix.translate(cmd[0],cmd[1]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case context._transform:
+					case 4:
+						tempMatrix.identity();
+						tempMatrix.translate(-cmd[1],-cmd[2]);
+						tempMatrix.concat(cmd[0]);
+						tempMatrix.translate(cmd[1],cmd[2]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case 16:
+					case 24:
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
+						break ;
+					case 17:
+						tMatrix.copyTo(tempMatrix);
+						tempMatrix.concat(cmd[4]);
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tempMatrix);
+						break ;
+					case context._drawTexture:
+						tex=cmd[0];
+						if (realSize){
+							if (cmd[3] && cmd[4]){
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
+								}else {
+								tex=cmd[0];
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
+							}
+							}else {
+							var wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
+							var hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
+							var oWidth=wRate *tex.sourceWidth;
+							var oHeight=hRate *tex.sourceHeight;
+							var offX=tex.offsetX > 0 ? tex.offsetX :0;
+							var offY=tex.offsetY > 0 ? tex.offsetY :0;
+							offX *=wRate;
+							offY *=hRate;
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),tMatrix);
+						}
+						break ;
+					case context._fillTexture:
+						if (cmd[3] && cmd[4]){
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
+							}else {
+							tex=cmd[0];
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
+						}
+						break ;
+					case context._drawTextureWithTransform:;
+						var drawMatrix;
+						if (cmd[5]){
+							tMatrix.copyTo(tempMatrix);
+							tempMatrix.concat(cmd[5]);
+							drawMatrix=tempMatrix;
+							}else {
+							drawMatrix=tMatrix;
+						}
+						if (realSize){
+							if (cmd[3] && cmd[4]){
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),drawMatrix);
+								}else {
+								tex=cmd[0];
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),drawMatrix);
+							}
+							}else {
+							tex=cmd[0];
+							wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
+							hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
+							oWidth=wRate *tex.sourceWidth;
+							oHeight=hRate *tex.sourceHeight;
+							offX=tex.offsetX > 0 ? tex.offsetX :0;
+							offY=tex.offsetY > 0 ? tex.offsetY :0;
+							offX *=wRate;
+							offY *=hRate;
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),drawMatrix);
+						}
+						break ;
+					case context._drawRect:
+					case 13:
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
+						break ;
+					case context._drawCircle:
+					case context._fillCircle:
+					case 14:
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0]-cmd[2],cmd[1]-cmd[2],cmd[2]+cmd[2],cmd[2]+cmd[2]),tMatrix);
+						break ;
+					case context._drawLine:
+					case 20:
+						GraphicsBounds._tempPoints.length=0;
+						var lineWidth=NaN;
+						lineWidth=cmd[5] *0.5;
+						if (cmd[0]==cmd[2]){
+							GraphicsBounds._tempPoints.push(cmd[0]+lineWidth,cmd[1],cmd[2]+lineWidth,cmd[3],cmd[0]-lineWidth,cmd[1],cmd[2]-lineWidth,cmd[3]);
+							}else if (cmd[1]==cmd[3]){
+							GraphicsBounds._tempPoints.push(cmd[0],cmd[1]+lineWidth,cmd[2],cmd[3]+lineWidth,cmd[0],cmd[1]-lineWidth,cmd[2],cmd[3]-lineWidth);
+							}else {
+							GraphicsBounds._tempPoints.push(cmd[0],cmd[1],cmd[2],cmd[3]);
+						}
+						GraphicsBounds._addPointArrToRst(rst,GraphicsBounds._tempPoints,tMatrix);
+						break ;
+					case context._drawCurves:
+					case 22:
+						GraphicsBounds._addPointArrToRst(rst,Bezier.I.getBezierPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
+						break ;
+					case context._drawPoly:
+					case context._drawLines:
+					case 18:
+						GraphicsBounds._addPointArrToRst(rst,cmd[2],tMatrix,cmd[0],cmd[1]);
+						break ;
+					case context._drawPath:
+					case 19:
+						GraphicsBounds._addPointArrToRst(rst,this._getPathPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
+						break ;
+					case context._drawPie:
+					case 15:
+						GraphicsBounds._addPointArrToRst(rst,this._getPiePoints(cmd[0],cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
+						break ;
+					}
+			}
+			if (rst.length > 200){
+				rst=Utils.copyArray(rst,Rectangle._getWrapRec(rst)._getBoundPoints());
+			}else if (rst.length > 8)
+			rst=GrahamScan.scanPList(rst);
+			return rst;
+		}
+
+		__proto._switchMatrix=function(tMatix,tempMatrix){
+			tempMatrix.concat(tMatix);
+			tempMatrix.copyTo(tMatix);
+		}
+
+		__proto._getPiePoints=function(x,y,radius,startAngle,endAngle){
+			var rst=GraphicsBounds._tempPoints;
+			GraphicsBounds._tempPoints.length=0;
+			rst.push(x,y);
+			var dP=Math.PI / 10;
+			var i=NaN;
+			for (i=startAngle;i < endAngle;i+=dP){
+				rst.push(x+radius *Math.cos(i),y+radius *Math.sin(i));
+			}
+			if (endAngle !=i){
+				rst.push(x+radius *Math.cos(endAngle),y+radius *Math.sin(endAngle));
+			}
+			return rst;
+		}
+
+		__proto._getPathPoints=function(paths){
+			var i=0,len=0;
+			var rst=GraphicsBounds._tempPoints;
+			rst.length=0;
+			len=paths.length;
+			var tCMD;
+			for (i=0;i < len;i++){
+				tCMD=paths[i];
+				if (tCMD.length > 1){
+					rst.push(tCMD[1],tCMD[2]);
+					if (tCMD.length > 3){
+						rst.push(tCMD[3],tCMD[4]);
+					}
+				}
+			}
+			return rst;
+		}
+
+		GraphicsBounds._addPointArrToRst=function(rst,points,matrix,dx,dy){
+			(dx===void 0)&& (dx=0);
+			(dy===void 0)&& (dy=0);
+			var i=0,len=0;
+			len=points.length;
+			for (i=0;i < len;i+=2){
+				GraphicsBounds._addPointToRst(rst,points[i]+dx,points[i+1]+dy,matrix);
+			}
+		}
+
+		GraphicsBounds._addPointToRst=function(rst,x,y,matrix){
+			var _tempPoint=Point.TEMP;
+			_tempPoint.setTo(x ? x :0,y ? y :0);
+			matrix.transformPoint(_tempPoint);
+			rst.push(_tempPoint.x,_tempPoint.y);
+		}
+
+		GraphicsBounds._tempPoints=[];
+		GraphicsBounds._tempMatrixArrays=[];
+		GraphicsBounds._tempCmds=[];
+		__static(GraphicsBounds,
+		['_tempMatrix',function(){return this._tempMatrix=new Matrix();},'_initMatrix',function(){return this._initMatrix=new Matrix();}
+		]);
+		return GraphicsBounds;
+	})()
+
+
+	/**
+	*@private
 	*<code>Style</code> 类是元素样式定义类。
 	*/
 	//class laya.display.css.Style
@@ -3461,311 +3784,6 @@ var Laya=window.Laya=(function(window,document){
 
 		__class(TransformInfo,'laya.display.css.TransformInfo');
 		return TransformInfo;
-	})()
-
-
-	/**
-	*@private
-	*Graphic bounds数据类
-	*/
-	//class laya.display.GraphicsBounds
-	var GraphicsBounds=(function(){
-		function GraphicsBounds(){
-			//this._temp=null;
-			//this._bounds=null;
-			//this._rstBoundPoints=null;
-			this._cacheBoundsType=false;
-			//this._graphics=null;
-		}
-
-		__class(GraphicsBounds,'laya.display.GraphicsBounds');
-		var __proto=GraphicsBounds.prototype;
-		/**
-		*销毁
-		*/
-		__proto.destroy=function(){
-			this._graphics=null;
-			this._temp=null;
-			this._rstBoundPoints=null;
-			this._bounds=null;
-		}
-
-		/**
-		*重置数据
-		*/
-		__proto.reset=function(){
-			this._temp && (this._temp.length=0);
-		}
-
-		/**
-		*获取位置及宽高信息矩阵(比较耗CPU，频繁使用会造成卡顿，尽量少用)。
-		*@param realSize （可选）使用图片的真实大小，默认为false
-		*@return 位置与宽高组成的 一个 Rectangle 对象。
-		*/
-		__proto.getBounds=function(realSize){
-			(realSize===void 0)&& (realSize=false);
-			if (!this._bounds || !this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType){
-				this._bounds=Rectangle._getWrapRec(this.getBoundPoints(realSize),this._bounds)
-			}
-			this._cacheBoundsType=realSize;
-			return this._bounds;
-		}
-
-		/**
-		*@private
-		*@param realSize （可选）使用图片的真实大小，默认为false
-		*获取端点列表。
-		*/
-		__proto.getBoundPoints=function(realSize){
-			(realSize===void 0)&& (realSize=false);
-			if (!this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType)
-				this._temp=this._getCmdPoints(realSize);
-			this._cacheBoundsType=realSize;
-			return this._rstBoundPoints=Utils.copyArray(this._rstBoundPoints,this._temp);
-		}
-
-		__proto._getCmdPoints=function(realSize){
-			(realSize===void 0)&& (realSize=false);
-			var context=Render._context;
-			var cmds=this._graphics.cmds;
-			var rst;
-			rst=this._temp || (this._temp=[]);
-			rst.length=0;
-			if (!cmds && this._graphics._one !=null){
-				GraphicsBounds._tempCmds.length=0;
-				GraphicsBounds._tempCmds.push(this._graphics._one);
-				cmds=GraphicsBounds._tempCmds;
-			}
-			if (!cmds)
-				return rst;
-			var matrixs;
-			matrixs=GraphicsBounds._tempMatrixArrays;
-			matrixs.length=0;
-			var tMatrix=GraphicsBounds._initMatrix;
-			tMatrix.identity();
-			var tempMatrix=GraphicsBounds._tempMatrix;
-			var cmd;
-			var tex;
-			for (var i=0,n=cmds.length;i < n;i++){
-				cmd=cmds[i];
-				switch (cmd.callee){
-					case context._save:
-					case 7:
-						matrixs.push(tMatrix);
-						tMatrix=tMatrix.clone();
-						break ;
-					case context._restore:
-					case 8:
-						tMatrix=matrixs.pop();
-						break ;
-					case context._scale:
-					case 5:
-						tempMatrix.identity();
-						tempMatrix.translate(-cmd[2],-cmd[3]);
-						tempMatrix.scale(cmd[0],cmd[1]);
-						tempMatrix.translate(cmd[2],cmd[3]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case context._rotate:
-					case 3:
-						tempMatrix.identity();
-						tempMatrix.translate(-cmd[1],-cmd[2]);
-						tempMatrix.rotate(cmd[0]);
-						tempMatrix.translate(cmd[1],cmd[2]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case context._translate:
-					case 6:
-						tempMatrix.identity();
-						tempMatrix.translate(cmd[0],cmd[1]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case context._transform:
-					case 4:
-						tempMatrix.identity();
-						tempMatrix.translate(-cmd[1],-cmd[2]);
-						tempMatrix.concat(cmd[0]);
-						tempMatrix.translate(cmd[1],cmd[2]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case 16:
-					case 24:
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
-						break ;
-					case 17:
-						tMatrix.copyTo(tempMatrix);
-						tempMatrix.concat(cmd[4]);
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tempMatrix);
-						break ;
-					case context._drawTexture:
-						tex=cmd[0];
-						if (realSize){
-							if (cmd[3] && cmd[4]){
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
-								}else {
-								tex=cmd[0];
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
-							}
-							}else {
-							var wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
-							var hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
-							var oWidth=wRate *tex.sourceWidth;
-							var oHeight=hRate *tex.sourceHeight;
-							var offX=tex.offsetX > 0 ? tex.offsetX :0;
-							var offY=tex.offsetY > 0 ? tex.offsetY :0;
-							offX *=wRate;
-							offY *=hRate;
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),tMatrix);
-						}
-						break ;
-					case context._fillTexture:
-						if (cmd[3] && cmd[4]){
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
-							}else {
-							tex=cmd[0];
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
-						}
-						break ;
-					case context._drawTextureWithTransform:;
-						var drawMatrix;
-						if (cmd[5]){
-							tMatrix.copyTo(tempMatrix);
-							tempMatrix.concat(cmd[5]);
-							drawMatrix=tempMatrix;
-							}else {
-							drawMatrix=tMatrix;
-						}
-						if (realSize){
-							if (cmd[3] && cmd[4]){
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),drawMatrix);
-								}else {
-								tex=cmd[0];
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),drawMatrix);
-							}
-							}else {
-							tex=cmd[0];
-							wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
-							hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
-							oWidth=wRate *tex.sourceWidth;
-							oHeight=hRate *tex.sourceHeight;
-							offX=tex.offsetX > 0 ? tex.offsetX :0;
-							offY=tex.offsetY > 0 ? tex.offsetY :0;
-							offX *=wRate;
-							offY *=hRate;
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),drawMatrix);
-						}
-						break ;
-					case context._drawRect:
-					case 13:
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
-						break ;
-					case context._drawCircle:
-					case context._fillCircle:
-					case 14:
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0]-cmd[2],cmd[1]-cmd[2],cmd[2]+cmd[2],cmd[2]+cmd[2]),tMatrix);
-						break ;
-					case context._drawLine:
-					case 20:
-						GraphicsBounds._tempPoints.length=0;
-						var lineWidth=NaN;
-						lineWidth=cmd[5] *0.5;
-						if (cmd[0]==cmd[2]){
-							GraphicsBounds._tempPoints.push(cmd[0]+lineWidth,cmd[1],cmd[2]+lineWidth,cmd[3],cmd[0]-lineWidth,cmd[1],cmd[2]-lineWidth,cmd[3]);
-							}else if (cmd[1]==cmd[3]){
-							GraphicsBounds._tempPoints.push(cmd[0],cmd[1]+lineWidth,cmd[2],cmd[3]+lineWidth,cmd[0],cmd[1]-lineWidth,cmd[2],cmd[3]-lineWidth);
-							}else {
-							GraphicsBounds._tempPoints.push(cmd[0],cmd[1],cmd[2],cmd[3]);
-						}
-						GraphicsBounds._addPointArrToRst(rst,GraphicsBounds._tempPoints,tMatrix);
-						break ;
-					case context._drawCurves:
-					case 22:
-						GraphicsBounds._addPointArrToRst(rst,Bezier.I.getBezierPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
-						break ;
-					case context._drawPoly:
-					case context._drawLines:
-					case 18:
-						GraphicsBounds._addPointArrToRst(rst,cmd[2],tMatrix,cmd[0],cmd[1]);
-						break ;
-					case context._drawPath:
-					case 19:
-						GraphicsBounds._addPointArrToRst(rst,this._getPathPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
-						break ;
-					case context._drawPie:
-					case 15:
-						GraphicsBounds._addPointArrToRst(rst,this._getPiePoints(cmd[0],cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
-						break ;
-					}
-			}
-			if (rst.length > 200){
-				rst=Utils.copyArray(rst,Rectangle._getWrapRec(rst)._getBoundPoints());
-			}else if (rst.length > 8)
-			rst=GrahamScan.scanPList(rst);
-			return rst;
-		}
-
-		__proto._switchMatrix=function(tMatix,tempMatrix){
-			tempMatrix.concat(tMatix);
-			tempMatrix.copyTo(tMatix);
-		}
-
-		__proto._getPiePoints=function(x,y,radius,startAngle,endAngle){
-			var rst=GraphicsBounds._tempPoints;
-			GraphicsBounds._tempPoints.length=0;
-			rst.push(x,y);
-			var dP=Math.PI / 10;
-			var i=NaN;
-			for (i=startAngle;i < endAngle;i+=dP){
-				rst.push(x+radius *Math.cos(i),y+radius *Math.sin(i));
-			}
-			if (endAngle !=i){
-				rst.push(x+radius *Math.cos(endAngle),y+radius *Math.sin(endAngle));
-			}
-			return rst;
-		}
-
-		__proto._getPathPoints=function(paths){
-			var i=0,len=0;
-			var rst=GraphicsBounds._tempPoints;
-			rst.length=0;
-			len=paths.length;
-			var tCMD;
-			for (i=0;i < len;i++){
-				tCMD=paths[i];
-				if (tCMD.length > 1){
-					rst.push(tCMD[1],tCMD[2]);
-					if (tCMD.length > 3){
-						rst.push(tCMD[3],tCMD[4]);
-					}
-				}
-			}
-			return rst;
-		}
-
-		GraphicsBounds._addPointArrToRst=function(rst,points,matrix,dx,dy){
-			(dx===void 0)&& (dx=0);
-			(dy===void 0)&& (dy=0);
-			var i=0,len=0;
-			len=points.length;
-			for (i=0;i < len;i+=2){
-				GraphicsBounds._addPointToRst(rst,points[i]+dx,points[i+1]+dy,matrix);
-			}
-		}
-
-		GraphicsBounds._addPointToRst=function(rst,x,y,matrix){
-			var _tempPoint=Point.TEMP;
-			_tempPoint.setTo(x ? x :0,y ? y :0);
-			matrix.transformPoint(_tempPoint);
-			rst.push(_tempPoint.x,_tempPoint.y);
-		}
-
-		GraphicsBounds._tempPoints=[];
-		GraphicsBounds._tempMatrixArrays=[];
-		GraphicsBounds._tempCmds=[];
-		__static(GraphicsBounds,
-		['_tempMatrix',function(){return this._tempMatrix=new Matrix();},'_initMatrix',function(){return this._initMatrix=new Matrix();}
-		]);
-		return GraphicsBounds;
 	})()
 
 
@@ -8934,6 +8952,109 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*@private
+	*<code>HTMLChar</code> 是一个 HTML 字符类。
+	*/
+	//class laya.utils.HTMLChar
+	var HTMLChar=(function(){
+		function HTMLChar(char,w,h,style){
+			//this._sprite=null;
+			//this._x=NaN;
+			//this._y=NaN;
+			//this._w=NaN;
+			//this._h=NaN;
+			//this.isWord=false;
+			//this.char=null;
+			//this.charNum=NaN;
+			//this.style=null;
+			this.char=char;
+			this.charNum=char.charCodeAt(0);
+			this._x=this._y=0;
+			this.width=w;
+			this.height=h;
+			this.style=style;
+			this.isWord=!HTMLChar._isWordRegExp.test(char);
+		}
+
+		__class(HTMLChar,'laya.utils.HTMLChar');
+		var __proto=HTMLChar.prototype;
+		Laya.imps(__proto,{"laya.display.ILayout":true})
+		/**
+		*设置与此对象绑定的显示对象 <code>Sprite</code> 。
+		*@param sprite 显示对象 <code>Sprite</code> 。
+		*/
+		__proto.setSprite=function(sprite){
+			this._sprite=sprite;
+		}
+
+		/**
+		*获取与此对象绑定的显示对象 <code>Sprite</code>。
+		*@return
+		*/
+		__proto.getSprite=function(){
+			return this._sprite;
+		}
+
+		/**@private */
+		__proto._isChar=function(){
+			return true;
+		}
+
+		/**@private */
+		__proto._getCSSStyle=function(){
+			return this.style;
+		}
+
+		/**
+		*宽度。
+		*/
+		__getset(0,__proto,'width',function(){
+			return this._w;
+			},function(value){
+			this._w=value;
+		});
+
+		/**
+		*此对象存储的 X 轴坐标值。
+		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 x 的值。
+		*/
+		__getset(0,__proto,'x',function(){
+			return this._x;
+			},function(value){
+			if (this._sprite){
+				this._sprite.x=value;
+			}
+			this._x=value;
+		});
+
+		/**
+		*此对象存储的 Y 轴坐标值。
+		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 y 的值。
+		*/
+		__getset(0,__proto,'y',function(){
+			return this._y;
+			},function(value){
+			if (this._sprite){
+				this._sprite.y=value;
+			}
+			this._y=value;
+		});
+
+		/**
+		*高度。
+		*/
+		__getset(0,__proto,'height',function(){
+			return this._h;
+			},function(value){
+			this._h=value;
+		});
+
+		HTMLChar._isWordRegExp=new RegExp("[\\w\.]","");
+		return HTMLChar;
+	})()
+
+
+	/**
 	*鼠标点击区域，可以设置绘制一系列矢量图作为点击区域和非点击区域（目前只支持圆形，矩形，多边形）
 	*/
 	//class laya.utils.HitArea
@@ -9078,109 +9199,6 @@ var Laya=window.Laya=(function(window,document){
 		['_rec',function(){return this._rec=new Rectangle();},'_ptPoint',function(){return this._ptPoint=new Point();}
 		]);
 		return HitArea;
-	})()
-
-
-	/**
-	*@private
-	*<code>HTMLChar</code> 是一个 HTML 字符类。
-	*/
-	//class laya.utils.HTMLChar
-	var HTMLChar=(function(){
-		function HTMLChar(char,w,h,style){
-			//this._sprite=null;
-			//this._x=NaN;
-			//this._y=NaN;
-			//this._w=NaN;
-			//this._h=NaN;
-			//this.isWord=false;
-			//this.char=null;
-			//this.charNum=NaN;
-			//this.style=null;
-			this.char=char;
-			this.charNum=char.charCodeAt(0);
-			this._x=this._y=0;
-			this.width=w;
-			this.height=h;
-			this.style=style;
-			this.isWord=!HTMLChar._isWordRegExp.test(char);
-		}
-
-		__class(HTMLChar,'laya.utils.HTMLChar');
-		var __proto=HTMLChar.prototype;
-		Laya.imps(__proto,{"laya.display.ILayout":true})
-		/**
-		*设置与此对象绑定的显示对象 <code>Sprite</code> 。
-		*@param sprite 显示对象 <code>Sprite</code> 。
-		*/
-		__proto.setSprite=function(sprite){
-			this._sprite=sprite;
-		}
-
-		/**
-		*获取与此对象绑定的显示对象 <code>Sprite</code>。
-		*@return
-		*/
-		__proto.getSprite=function(){
-			return this._sprite;
-		}
-
-		/**@private */
-		__proto._isChar=function(){
-			return true;
-		}
-
-		/**@private */
-		__proto._getCSSStyle=function(){
-			return this.style;
-		}
-
-		/**
-		*宽度。
-		*/
-		__getset(0,__proto,'width',function(){
-			return this._w;
-			},function(value){
-			this._w=value;
-		});
-
-		/**
-		*此对象存储的 X 轴坐标值。
-		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 x 的值。
-		*/
-		__getset(0,__proto,'x',function(){
-			return this._x;
-			},function(value){
-			if (this._sprite){
-				this._sprite.x=value;
-			}
-			this._x=value;
-		});
-
-		/**
-		*此对象存储的 Y 轴坐标值。
-		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 y 的值。
-		*/
-		__getset(0,__proto,'y',function(){
-			return this._y;
-			},function(value){
-			if (this._sprite){
-				this._sprite.y=value;
-			}
-			this._y=value;
-		});
-
-		/**
-		*高度。
-		*/
-		__getset(0,__proto,'height',function(){
-			return this._h;
-			},function(value){
-			this._h=value;
-		});
-
-		HTMLChar._isWordRegExp=new RegExp("[\\w\.]","");
-		return HTMLChar;
 	})()
 
 
@@ -10372,18 +10390,43 @@ var Laya=window.Laya=(function(window,document){
 	})()
 
 
-	/**全局配置*/
-	//class UIConfig
-	var UIConfig=(function(){
-		function UIConfig(){};
-		__class(UIConfig,'UIConfig');
-		UIConfig.touchScrollEnable=true;
-		UIConfig.mouseWheelEnable=true;
-		UIConfig.showButtons=true;
-		UIConfig.popupBgColor="#000000";
-		UIConfig.popupBgAlpha=0.5;
-		UIConfig.closeDialogOnSide=true;
-		return UIConfig;
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonlayout.WordLayout
+	var WordLayout=(function(){
+		function WordLayout(){
+			this.spaceX=2;
+			this.spaceY=2;
+			this.border=2;
+		}
+
+		__class(WordLayout,'commonlayout.WordLayout');
+		var __proto=WordLayout.prototype;
+		__proto.layout=function(items,width,height){
+			var i=0,len=0;
+			len=items.length;
+			var tX=NaN,tY=NaN;
+			width=width-this.border;
+			height=height-this.border;
+			tX=this.border;
+			tY=this.border;
+			var tItem;
+			var tHeight=NaN;
+			for (i=0;i < len;i++){
+				tItem=items[i];
+				tItem.x=tX;
+				tItem.y=tY;
+				tX+=tItem.width+this.spaceX;
+				if (tX > width){
+					tX=this.spaceX;
+					tY+=tItem.height+this.spaceY;
+				}
+			}
+		}
+
+		return WordLayout;
 	})()
 
 
@@ -11517,6 +11560,119 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*<code>Sound</code> 类是用来播放控制声音的类。
+	*/
+	//class laya.media.Sound extends laya.events.EventDispatcher
+	var Sound=(function(_super){
+		function Sound(){Sound.__super.call(this);;
+		};
+
+		__class(Sound,'laya.media.Sound',_super);
+		var __proto=Sound.prototype;
+		/**
+		*加载声音。
+		*@param url 地址。
+		*
+		*/
+		__proto.load=function(url){}
+		/**
+		*播放声音。
+		*@param startTime 开始时间,单位秒
+		*@param loops 循环次数,0表示一直循环
+		*@return 声道 SoundChannel 对象。
+		*
+		*/
+		__proto.play=function(startTime,loops){
+			(startTime===void 0)&& (startTime=0);
+			(loops===void 0)&& (loops=0);
+			return null;
+		}
+
+		/**
+		*释放声音资源。
+		*
+		*/
+		__proto.dispose=function(){}
+		/**
+		*获取总时间。
+		*/
+		__getset(0,__proto,'duration',function(){
+			return 0;
+		});
+
+		return Sound;
+	})(EventDispatcher)
+
+
+	/**
+	*<p> <code>SoundChannel</code> 用来控制程序中的声音。每个声音均分配给一个声道，而且应用程序可以具有混合在一起的多个声道。</p>
+	*<p> <code>SoundChannel</code> 类包含控制声音的播放、暂停、停止、音量的方法，以及获取声音的播放状态、总时间、当前播放时间、总循环次数、播放地址等信息的方法。</p>
+	*/
+	//class laya.media.SoundChannel extends laya.events.EventDispatcher
+	var SoundChannel=(function(_super){
+		function SoundChannel(){
+			this.url=null;
+			this.loops=0;
+			this.startTime=NaN;
+			this.isStopped=false;
+			this.completeHandler=null;
+			SoundChannel.__super.call(this);
+		}
+
+		__class(SoundChannel,'laya.media.SoundChannel',_super);
+		var __proto=SoundChannel.prototype;
+		/**
+		*播放。
+		*/
+		__proto.play=function(){}
+		/**
+		*停止。
+		*/
+		__proto.stop=function(){}
+		/**
+		*暂停。
+		*/
+		__proto.pause=function(){}
+		/**
+		*继续播放。
+		*/
+		__proto.resume=function(){}
+		/**
+		*private
+		*/
+		__proto.__runComplete=function(handler){
+			if (handler){
+				handler.run();
+			}
+		}
+
+		/**
+		*音量范围从 0（静音）至 1（最大音量）。
+		*/
+		__getset(0,__proto,'volume',function(){
+			return 1;
+			},function(v){
+		});
+
+		/**
+		*获取当前播放时间。
+		*/
+		__getset(0,__proto,'position',function(){
+			return 0;
+		});
+
+		/**
+		*获取总时间。
+		*/
+		__getset(0,__proto,'duration',function(){
+			return 0;
+		});
+
+		return SoundChannel;
+	})(EventDispatcher)
+
+
+	/**
 	*@private
 	*使用Audio标签播放声音
 	*/
@@ -11675,119 +11831,6 @@ var Laya=window.Laya=(function(window,document){
 		AudioSound._audioCache={};
 		AudioSound._musicAudio=null
 		return AudioSound;
-	})(EventDispatcher)
-
-
-	/**
-	*<p> <code>SoundChannel</code> 用来控制程序中的声音。每个声音均分配给一个声道，而且应用程序可以具有混合在一起的多个声道。</p>
-	*<p> <code>SoundChannel</code> 类包含控制声音的播放、暂停、停止、音量的方法，以及获取声音的播放状态、总时间、当前播放时间、总循环次数、播放地址等信息的方法。</p>
-	*/
-	//class laya.media.SoundChannel extends laya.events.EventDispatcher
-	var SoundChannel=(function(_super){
-		function SoundChannel(){
-			this.url=null;
-			this.loops=0;
-			this.startTime=NaN;
-			this.isStopped=false;
-			this.completeHandler=null;
-			SoundChannel.__super.call(this);
-		}
-
-		__class(SoundChannel,'laya.media.SoundChannel',_super);
-		var __proto=SoundChannel.prototype;
-		/**
-		*播放。
-		*/
-		__proto.play=function(){}
-		/**
-		*停止。
-		*/
-		__proto.stop=function(){}
-		/**
-		*暂停。
-		*/
-		__proto.pause=function(){}
-		/**
-		*继续播放。
-		*/
-		__proto.resume=function(){}
-		/**
-		*private
-		*/
-		__proto.__runComplete=function(handler){
-			if (handler){
-				handler.run();
-			}
-		}
-
-		/**
-		*音量范围从 0（静音）至 1（最大音量）。
-		*/
-		__getset(0,__proto,'volume',function(){
-			return 1;
-			},function(v){
-		});
-
-		/**
-		*获取当前播放时间。
-		*/
-		__getset(0,__proto,'position',function(){
-			return 0;
-		});
-
-		/**
-		*获取总时间。
-		*/
-		__getset(0,__proto,'duration',function(){
-			return 0;
-		});
-
-		return SoundChannel;
-	})(EventDispatcher)
-
-
-	/**
-	*<code>Sound</code> 类是用来播放控制声音的类。
-	*/
-	//class laya.media.Sound extends laya.events.EventDispatcher
-	var Sound=(function(_super){
-		function Sound(){Sound.__super.call(this);;
-		};
-
-		__class(Sound,'laya.media.Sound',_super);
-		var __proto=Sound.prototype;
-		/**
-		*加载声音。
-		*@param url 地址。
-		*
-		*/
-		__proto.load=function(url){}
-		/**
-		*播放声音。
-		*@param startTime 开始时间,单位秒
-		*@param loops 循环次数,0表示一直循环
-		*@return 声道 SoundChannel 对象。
-		*
-		*/
-		__proto.play=function(startTime,loops){
-			(startTime===void 0)&& (startTime=0);
-			(loops===void 0)&& (loops=0);
-			return null;
-		}
-
-		/**
-		*释放声音资源。
-		*
-		*/
-		__proto.dispose=function(){}
-		/**
-		*获取总时间。
-		*/
-		__getset(0,__proto,'duration',function(){
-			return 0;
-		});
-
-		return Sound;
 	})(EventDispatcher)
 
 
@@ -25490,6 +25533,30 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*...
+	*@author ...
+	*/
+	//class commoncomponent.AutoSizeLabel extends laya.ui.Label
+	var AutoSizeLabel=(function(_super){
+		function AutoSizeLabel(text){
+			(text===void 0)&& (text="");
+			AutoSizeLabel.__super.call(this,text);
+		}
+
+		__class(AutoSizeLabel,'commoncomponent.AutoSizeLabel',_super);
+		var __proto=AutoSizeLabel.prototype;
+		__getset(0,__proto,'text',_super.prototype._$get_text,function(value){
+			this.width=9999;
+			_super.prototype._$set_text.call(this,value);
+			this.textField.typeset();
+			this.width=this.textField.textWidth+5;
+		});
+
+		return AutoSizeLabel;
+	})(Label)
+
+
+	/**
 	*<code>CheckBox</code> 组件显示一个小方框，该方框内可以有选中标记。
 	*<code>CheckBox</code> 组件还可以显示可选的文本标签，默认该标签位于 CheckBox 右侧。
 	*<p><code>CheckBox</code> 使用 <code>dataSource</code>赋值时的的默认属性是：<code>selected</code>。</p>
@@ -26734,6 +26801,45 @@ var Laya=window.Laya=(function(window,document){
 	})(View)
 
 
+	//class ui.wordparser.WordListViewerUI extends laya.ui.View
+	var WordListViewerUI=(function(_super){
+		function WordListViewerUI(){
+			this.container=null;
+			WordListViewerUI.__super.call(this);
+		}
+
+		__class(WordListViewerUI,'ui.wordparser.WordListViewerUI',_super);
+		var __proto=WordListViewerUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(WordListViewerUI.uiView);
+		}
+
+		WordListViewerUI.uiView={"type":"View","props":{"width":600,"height":400},"child":[{"type":"Box","props":{"var":"container","top":5,"right":5,"left":5,"bottom":5}}]};
+		return WordListViewerUI;
+	})(View)
+
+
+	//class ui.wordparser.WordViewerUI extends laya.ui.View
+	var WordViewerUI=(function(_super){
+		function WordViewerUI(){
+			this.txt=null;
+			WordViewerUI.__super.call(this);
+		}
+
+		__class(WordViewerUI,'ui.wordparser.WordViewerUI',_super);
+		var __proto=WordViewerUI.prototype;
+		__proto.createChildren=function(){
+			View.regComponent("commoncomponent.AutoSizeLabel",AutoSizeLabel);
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(WordViewerUI.uiView);
+		}
+
+		WordViewerUI.uiView={"type":"View","props":{"width":85,"height":29},"child":[{"type":"Label","props":{"y":0,"x":0,"width":85,"var":"txt","text":"文字","runtime":"commoncomponent.AutoSizeLabel","height":29,"fontSize":20,"color":"#f4e4e4"}}]};
+		return WordViewerUI;
+	})(View)
+
+
 	/**
 	*<code>HBox</code> 是一个水平布局容器类。
 	*/
@@ -27265,7 +27371,85 @@ var Laya=window.Laya=(function(window,document){
 	})(MainUI)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,PingYinDic,Render,Browser,View,Timer,GraphicAnimation,LocalStorage]);
+	/**
+	*...
+	*@author ww
+	*/
+	//class view.WordViewer extends ui.wordparser.WordViewerUI
+	var WordViewer=(function(_super){
+		function WordViewer(){
+			this.dataO=null;
+			WordViewer.__super.call(this);
+		}
+
+		__class(WordViewer,'view.WordViewer',_super);
+		var __proto=WordViewer.prototype;
+		__proto.setData=function(dataO){
+			this.dataO=dataO;
+			this.txt.text=dataO.word;
+			this.width=this.txt.width;
+		}
+
+		return WordViewer;
+	})(WordViewerUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class view.WordListViewer extends ui.wordparser.WordListViewerUI
+	var WordListViewer=(function(_super){
+		function WordListViewer(){
+			this.layouter=null;
+			this.wList=null;
+			this.wordItemList=null;
+			WordListViewer.__super.call(this);
+			this.layouter=new WordLayout();
+			this.container.on("resize",this,this.freshUI);
+		}
+
+		__class(WordListViewer,'view.WordListViewer',_super);
+		var __proto=WordListViewer.prototype;
+		__proto.clearPre=function(){
+			if (!this.wordItemList)return;
+			var i=0,len=0;
+			len=this.wordItemList.length;
+			var tItem;
+			for (i=0;i < len;i++){
+				tItem=this.wordItemList[i];
+				tItem.removeSelf();
+				Pool.recover("WordViewer",tItem);
+			}
+			this.wordItemList.length=0;
+		}
+
+		__proto.setWordList=function(wList){
+			this.wList=wList;
+			this.clearPre();
+			this.wordItemList=[];
+			var i=0,len=0;
+			var tWord;
+			len=wList.length;
+			for (i=0;i < len;i++){
+				tWord=Pool.getItemByClass("WordViewer",WordViewer);
+				tWord.setData(wList[i]);
+				this.wordItemList.push(tWord);
+				this.container.addChild(tWord);
+			}
+			this.freshUI();
+		}
+
+		__proto.freshUI=function(){
+			if (!this.wordItemList)return;
+			this.layouter.layout(this.wordItemList,this.container.width,this.container.height);
+		}
+
+		return WordListViewer;
+	})(WordListViewerUI)
+
+
+	Laya.__init([LoaderManager,EventDispatcher,LocalStorage,PingYinDic,Browser,Render,Timer,View,GraphicAnimation]);
 	new Game();
 
 })(window,document,Laya);

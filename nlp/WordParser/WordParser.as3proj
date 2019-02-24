@@ -17,6 +17,7 @@
   <classpaths>
     <class path="src" />
     <class path="..\..\libs\laya\src" />
+    <class path="..\..\libs\commonui\src" />
   </classpaths>
   <!-- Build options -->
   <build>
