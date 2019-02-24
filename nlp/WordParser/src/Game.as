@@ -1,8 +1,10 @@
 package  
 {
 	import laya.events.Event;
+	import laya.events.Keyboard;
 	import laya.net.Loader;
 	import laya.utils.Handler;
+	import nlp.bookutils.BookParser;
 	import nlp.dictools.TypeDicParser;
 	import nlp.WordDicParser;
 	import nlp.WordUtils;
@@ -23,7 +25,8 @@ package
 			loadList = [];
 			loadList.push( { url:"res/atlas/comp.json", type:Loader.ATLAS } );
 			loadList.push( { url:"data/CoreSynonym.txt", type:Loader.TEXT } );
-			loadList.push({url:"data/CoreNatureDictionary.txt",type:Loader.TEXT });
+			loadList.push({url:"data/CoreNatureDictionary.txt", type:Loader.TEXT });
+			loadList.push({url:"books/qqst.txt",type:Loader.TEXT });
 			Laya.loader.load( loadList, new Handler(this, initGameView));
 			
 		}
@@ -49,11 +52,12 @@ package
 			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
 			trace(typeDic);
 			WordDicParser.I.cutter.typeDic = typeDic;
-			Laya.stage.on(Event.CLICK, this, testCut);
+			//Laya.stage.on(Event.CLICK, this, testCut);
+			testCut();
 			
 			Laya.stage.graphics.fillText("ready", 10, 10, null, "#ff0000");
 		}
-		
+		private var book:BookParser;
 		private function testCut():void
 		{
 			var testStrList:Array;
@@ -75,6 +79,28 @@ package
 			
 			wordView.setWordList(words);
 			
+			book = BookParser.createByTxt(Loader.getRes("books/qqst.txt"));
+			Laya.stage.on(Event.KEY_DOWN, this, onKeyDown);
+			showTxt("键盘上下控制段落切换显示");
+		}
+		public function showTxt(str:String):void
+		{
+			str = str || "no words";
+			var words:Array;
+			words = WordDicParser.I.cut(str);
+			wordView.setWordList(words);
+		}
+		private function onKeyDown(e:Event):void
+		{
+			switch(e.keyCode)
+			{
+				case Keyboard.UP:
+					showTxt(book.pre());
+					break;
+				case Keyboard.DOWN:
+					showTxt(book.next());
+					break;
+			}
 		}
 		
 	}
