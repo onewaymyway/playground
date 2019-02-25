@@ -137,6 +137,10 @@ package nlp.cutwords
 			{
 				tPiece.end = pos+1;
 				tPiece.wordRef = tTrieNode.word;
+			}else
+			{
+				tPiece.word = tchar;
+				tPiece.type = "new";
 			}
 			var end:int;
 			end = pos;

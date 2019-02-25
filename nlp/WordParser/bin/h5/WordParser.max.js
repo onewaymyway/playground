@@ -941,6 +941,9 @@ var Laya=window.Laya=(function(window,document){
 			if (tTrieNode.isWord()){
 				tPiece.end=pos+1;
 				tPiece.wordRef=tTrieNode.word;
+				}else{
+				tPiece.word=tchar;
+				tPiece.type="new";
 			};
 			var end=0;
 			end=pos;
@@ -1391,7 +1394,6 @@ var Laya=window.Laya=(function(window,document){
 			if (this.getWord(wordOne.word)){
 				return;
 			}
-			console.log("addWord:",wordOne.word,wordOne);
 			this.addWord(wordOne);
 		}
 
@@ -1417,9 +1419,9 @@ var Laya=window.Laya=(function(window,document){
 				tPos++;
 				if (tPos >=word.length)break ;
 				tchar=word.charAt(tPos);
-				tWord=this.findByChar(tchar);
+				tWord=tWord.findByChar(tchar);
 			}
-			if (tWord && tWord.isWord()&& tWord.word==word){
+			if (tWord && tWord.isWord()&& tWord.word.word==word){
 				return tWord;
 			}
 			return null;

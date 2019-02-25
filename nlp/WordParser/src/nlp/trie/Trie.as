@@ -23,9 +23,14 @@ package nlp.trie
 		
 		public function addWordIfNotExist(wordOne:TrieWord):void
 		{
+			//if (wordOne.word=="亮度")
+			//{
+				//debugger;
+			//}
 			if (getWord(wordOne.word))
 			{
 				
+				//trace("skip exist:",wordOne.word);
 				return;
 			} 
 			//trace("addWord:",wordOne.word,wordOne);
@@ -56,10 +61,10 @@ package nlp.trie
 				tPos++;
 				if (tPos >= word.length) break;
 				tchar = word.charAt(tPos);
-				tWord = findByChar(tchar);
+				tWord = tWord.findByChar(tchar);
 				
 			}
-			if (tWord && tWord.isWord() && tWord.word == word)
+			if (tWord && tWord.isWord() && tWord.word.word == word)
 			{
 				return tWord;
 			}
