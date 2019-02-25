@@ -1,5 +1,6 @@
 package nlp 
 {
+	import nlp.cutwords.WordPiece;
 	/**
 	 * ...
 	 * @author ww
@@ -41,6 +42,108 @@ package nlp
 			{
 				rst[arr[i]] = arr[i];
 			}
+			return rst;
+		}
+		
+		public static function isWordListSame(wordList1:Array, wordList2:Array):Boolean
+		{
+			if (!wordList1.length == wordList2.length) return false;
+			var i:int, len:int;
+			len = wordList1.length;
+			var word1:WordPiece, word2:WordPiece;
+			for (i = 0; i < len; i++)
+			{
+				word1 = wordList1[i];
+				word2 = wordList2[i];
+				if (word1.start != word2.start)
+				{
+					trace("Dif:",i,word1.word,word2.word);
+					return false;
+				}
+				
+				if (word1.end != word2.end)
+				{
+					trace("Dif:",i,word1.word,word2.word);
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		public static function getMaxScore(dic:Object):Number
+		{
+			var score:Number;
+			score = 0;
+			var key:String;
+			var tScore:Number;
+			for (key in dic)
+			{
+				tScore = dic[key];
+				if (tScore>score)
+				{
+					score = tScore;
+				}
+			}
+			return score;
+		}
+		public static function scoreWordList(wordList:Array):Number
+		{
+			var i:int, len:int;
+			len = wordList.length;
+			var score:Number;
+			score = 0;
+			var tWord:WordPiece;
+			for (i = 0; i < len; i++)
+			{
+				tWord = wordList[i];
+				if (tWord.typeO)
+				{
+					score += getMaxScore(tWord.typeO);
+				}
+			}
+			return score/len;
+		}
+		
+		public static function splitWordBySpecial(str:String):Array
+		{
+			var rst:Array;
+			rst = [];
+			var i:int, len:int;
+			len = str.length;
+			var tStart:Number;
+			var tEnd:Number;
+			tStart = 0;
+			tEnd = tStart;
+			var tChar:String;
+			var lastChar:int;
+			lastChar = -1;
+			
+			while (tEnd < len)
+			{
+				
+				//if (tEnd >= len)
+				//{
+					//break;
+				//}
+				tChar = str.charAt(tEnd);
+				if (PingYinDic.checkIsHasSpecialStr(tChar))
+				{
+					rst.push(str.substring(tStart, tEnd), tChar);
+					lastChar = tEnd;
+					tStart = tEnd + 1;
+					tEnd = tStart;
+				}else
+				{
+					tEnd++;
+				}
+				
+			}
+			
+			if (tStart > lastChar&&tStart<len)
+			{
+				rst.push(str.substring(tStart));
+			}
+			
 			return rst;
 		}
 		

@@ -46,6 +46,20 @@ package nlp.trie
 			tChild.addWord(pos + 1, word);
 		}
 		
+		public function addWordR(pos:int,word:TrieWord):void
+		{
+			if (pos == word.word.length)
+			{
+				this.word = word;
+				return;
+			}
+			var tchar:String;
+			tchar = word.word.charAt(word.word.length-1-pos);
+			var tChild:TrieNode;
+			tChild = getChildByChar(tchar);
+			tChild.addWordR(pos + 1, word);
+		}
+		
 		public static function createByChar(char:String):TrieNode
 		{
 			var rst:TrieNode;

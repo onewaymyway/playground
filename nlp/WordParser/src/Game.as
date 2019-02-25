@@ -52,6 +52,7 @@ package
 			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
 			trace(typeDic);
 			WordDicParser.I.cutter.typeDic = typeDic;
+			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
 			//Laya.stage.on(Event.CLICK, this, testCut);
 			testCut();
 			
@@ -62,8 +63,9 @@ package
 		{
 			var testStrList:Array;
 			testStrList = [];
-			testStrList.push("你是笨蛋吗");
-			testStrList.push("该剧改编自芦原妃名子的同名漫画，讲述了高中时代曾是同班同学的主人公和女主角，因以前的同学去世为契机而再相见，他们一边搜寻以前的同学曾秘密交往过的男性，一边面对自己的回忆的模样。");
+			//testStrList.push("你是笨蛋吗");
+			//testStrList.push("该剧改编自芦原妃名子的同名漫画，讲述了高中时代曾是同班同学的主人公和女主角，因以前的同学去世为契机而再相见，他们一边搜寻以前的同学曾秘密交往过的男性，一边面对自己的回忆的模样。");
+			testStrList.push("每个人的一生，都离不开金钱、离不开商业，但是，很多人从来没有试图好好地、认真地去走近它，了解它。它是一个我们每天都碰到的、陌生的朋友。");
 			var testStr:String;
 			
 			var words:Array;
@@ -73,6 +75,7 @@ package
 			for (i = 0; i < len; i++)
 			{
 				testStr = testStrList[i];
+				debugger;
 				words = WordDicParser.I.cut(testStr);
 				trace("words:",words);
 			}

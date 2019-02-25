@@ -1,5 +1,6 @@
 package nlp.dictools 
 {
+	import nlp.WordOne;
 	/**
 	 * ...
 	 * @author ww
@@ -19,9 +20,11 @@ package nlp.dictools
 			return typeO.type;
 		}
 		public var wordDic:Object;
+		public var wordList:Array;
 		public static const Tab:String = "	";
 		public function initByTxt(txt:String):void
 		{
+			wordList = [];
 			var lines:Array;
 			lines = txt.split("\n");
 			var i:int, len:int;
@@ -34,8 +37,10 @@ package nlp.dictools
 				tLine = tLine.replace("\r", "");
 				tWordO = parseLine(tLine);
 				wordDic[tWordO.word] = tWordO;
+				wordList.push(createWordOneByTypeO(tWordO));
 				//if (i > 100) break;
 			}
+			
 		}
 		
 		public function parseLine(line:String):Object
@@ -49,12 +54,22 @@ package nlp.dictools
 			rst.type = {};
 			var i:int, len:int;
 			len = arr.length;
+			var score:Number;
 			for (i = 1; i < len; i += 2)
 			{
-				rst.type[arr[i]] = arr[i + 1];
-				rst.type[TypeDefine.getCHType(arr[i])] = arr[i + 1];
+				score = parseInt(arr[i + 1]);
+				rst.type[arr[i]] = score;
+				rst.type[TypeDefine.getCHType(arr[i])] = score;
 			}
 			
+			return rst;
+		}
+		
+		public function createWordOneByTypeO(typeO:Object):WordOne
+		{
+			var rst:WordOne;
+			rst = new WordOne();
+			rst.word = typeO.word;
 			return rst;
 		}
 	}
