@@ -37,8 +37,11 @@ package commonlayout
 				tX += tItem.width + spaceX;
 				if (tX > width)
 				{
-					tX = spaceX;
 					tY += tItem.height + spaceY;
+					tItem.x = spaceX;
+					tItem.y = tY;
+					tX = tItem.width + spaceX;
+					
 				}
 				
 			}

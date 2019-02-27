@@ -2,6 +2,7 @@ package commonlayout.mindmaptree
 {
 	import commontools.EventTools;
 	import laya.debug.tools.ClassTool;
+	import laya.debug.tools.ObjectTools;
 	import laya.events.Event;
 	import laya.ui.TextInput;
 	import laya.ui.View;
@@ -80,6 +81,13 @@ package commonlayout.mindmaptree
 		public function getData():Object
 		{
 			return _dataO;
+		}
+		
+		public function addChildData(dataO:Object):void
+		{
+			_dataO.childs.push(ObjectTools.copyObjFast(dataO));
+			//Notice.notify(AnswerFlowEvents.DataChanged);
+			EventTools.sendEventOnTree(this, "DataChanged");
 		}
 	}
 
