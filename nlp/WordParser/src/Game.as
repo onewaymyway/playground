@@ -12,6 +12,7 @@ package
 	import ui.wordparser.MainUI;
 	import view.Main;
 	import view.WordListViewer;
+	import view.WordTreeViewer;
 	/**
 	 * ...
 	 * @author ww
@@ -40,14 +41,36 @@ package
 		private function initGameView():void
 		{
 			//WordUtils.showChars(0, 1000);
+			
+			//startWordParserTest();
+			
+			testWordTree();
+		}
+		
+		private function startWordParserTest():void
+		{
 			WordDicParser.I.loadDic("data/中文字典1.txt",Handler.create(this,onDicLoaded));
-			wordView = new WordListViewer();
-			wordView.pos(20, 20);
-			Laya.stage.addChild(wordView);
 		}
 		
 		private function onDicLoaded():void
 		{
+			
+			testWordParser();
+			//Laya.stage.on(Event.CLICK, this, testCut);
+			
+			
+			
+			
+			
+			Laya.stage.graphics.fillText("ready", 10, 10, null, "#ff0000");
+		}
+		
+		private function testWordParser():void
+		{
+			
+			wordView = new WordListViewer();
+			wordView.pos(20, 20);
+			Laya.stage.addChild(wordView);
 			
 			var typeDic:TypeDicParser;
 			typeDic = new TypeDicParser();
@@ -55,14 +78,22 @@ package
 			trace(typeDic);
 			WordDicParser.I.cutter.typeDic = typeDic;
 			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
-			//Laya.stage.on(Event.CLICK, this, testCut);
-			
-			var conllParser:ConllFileParser;
+			testCut();
+		}
+		
+		private var conllParser:ConllFileParser;
+		private function testWordTree():void
+		{
 			conllParser = new ConllFileParser();
 			conllParser.parseTxt(Loader.getRes("data/text.train.conll"));
-			testCut();
 			
-			Laya.stage.graphics.fillText("ready", 10, 10, null, "#ff0000");
+			var wordTreeView:WordTreeViewer;
+			wordTreeView = new WordTreeViewer();
+			wordTreeView.pos(20, 10);
+			wordTreeView.width = Laya.stage.width - 40;
+			Laya.stage.addChild(wordTreeView);
+			
+			wordTreeView.setTree(conllParser.treeList[0]);
 		}
 		private var book:BookParser;
 		private function testCut():void

@@ -38,6 +38,8 @@ package nlp.conll
 		 * 当前词语与中心词的依存关系
 		 */
 		public var deprel:String;
+		
+		public var word:String;
 		public function ConllWord() 
 		{
 			
@@ -57,6 +59,9 @@ package nlp.conll
 			{
 				rst[KeyList[i]] = values[i];
 			}
+			rst.id = parseInt(rst.id) - 1;
+			rst.head = parseInt(rst.head) - 1;
+			rst.word = rst.form;
 			return rst;
 		}
 	}

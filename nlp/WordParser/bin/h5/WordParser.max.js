@@ -701,6 +701,7 @@ var Laya=window.Laya=(function(window,document){
 	var Game=(function(){
 		function Game(){
 			this.wordView=null;
+			this.conllParser=null;
 			this.book=null;
 			Laya.init(1000,900);
 			var loadList;
@@ -716,24 +717,40 @@ var Laya=window.Laya=(function(window,document){
 		__class(Game,'Game');
 		var __proto=Game.prototype;
 		__proto.initGameView=function(){
+			this.testWordTree();
+		}
+
+		__proto.startWordParserTest=function(){
 			WordDicParser.I.loadDic("data/中文字典1.txt",Handler.create(this,this.onDicLoaded));
-			this.wordView=new WordListViewer();
-			this.wordView.pos(20,20);
-			Laya.stage.addChild(this.wordView);
 		}
 
 		__proto.onDicLoaded=function(){
+			this.testWordParser();
+			Laya.stage.graphics.fillText("ready",10,10,null,"#ff0000");
+		}
+
+		__proto.testWordParser=function(){
+			this.wordView=new WordListViewer();
+			this.wordView.pos(20,20);
+			Laya.stage.addChild(this.wordView);
 			var typeDic;
 			typeDic=new TypeDicParser();
 			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
 			console.log(typeDic);
 			WordDicParser.I.cutter.typeDic=typeDic;
 			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
-			var conllParser;
-			conllParser=new ConllFileParser();
-			conllParser.parseTxt(Loader.getRes("data/text.train.conll"));
 			this.testCut();
-			Laya.stage.graphics.fillText("ready",10,10,null,"#ff0000");
+		}
+
+		__proto.testWordTree=function(){
+			this.conllParser=new ConllFileParser();
+			this.conllParser.parseTxt(Loader.getRes("data/text.train.conll"));
+			var wordTreeView;
+			wordTreeView=new WordTreeViewer();
+			wordTreeView.pos(20,10);
+			wordTreeView.width=Laya.stage.width-40;
+			Laya.stage.addChild(wordTreeView);
+			wordTreeView.setTree(this.conllParser.treeList[0]);
 		}
 
 		__proto.testCut=function(){
@@ -887,10 +904,39 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class nlp.conll.ConllRelation
+	var ConllRelation=(function(){
+		function ConllRelation(){
+			this.start=0;
+			this.end=0;
+			this.type=null;
+			this.len=0;
+		}
+
+		__class(ConllRelation,'nlp.conll.ConllRelation');
+		ConllRelation.buildByWord=function(word){
+			var rst;
+			rst=new ConllRelation();
+			rst.start=word.id;
+			rst.end=word.head;
+			rst.type=word.deprel;
+			rst.len=Math.abs(rst.start-rst.end);
+			return rst;
+		}
+
+		return ConllRelation;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class nlp.conll.ConllTree
 	var ConllTree=(function(){
 		function ConllTree(){
 			this.wordList=null;
+			this.relations=null;
 			this.wordList=[];
 		}
 
@@ -898,6 +944,16 @@ var Laya=window.Laya=(function(window,document){
 		var __proto=ConllTree.prototype;
 		__proto.addLine=function(line){
 			this.wordList.push(ConllWord.parseFromLine(line));
+		}
+
+		__proto.buildRelation=function(){
+			this.relations=[];
+			var i=0,len=0;
+			len=this.wordList.length;
+			for (i=0;i < len;i++){
+				this.relations.push(ConllRelation.buildByWord(this.wordList[i]));
+			}
+			this.relations.sort(MathUtil.sortByKey("len",false,true));
 		}
 
 		return ConllTree;
@@ -919,6 +975,7 @@ var Laya=window.Laya=(function(window,document){
 			this.feats=null;
 			this.head=null;
 			this.deprel=null;
+			this.word=null;
 		}
 
 		__class(ConllWord,'nlp.conll.ConllWord');
@@ -932,6 +989,9 @@ var Laya=window.Laya=(function(window,document){
 			for (i=0;i < len;i++){
 				rst[ConllWord.KeyList[i]]=values[i];
 			}
+			rst.id=parseInt(rst.id)-1;
+			rst.head=parseInt(rst.head)-1;
+			rst.word=rst.form;
 			return rst;
 		}
 
@@ -10975,8 +11035,10 @@ var Laya=window.Laya=(function(window,document){
 				tItem.y=tY;
 				tX+=tItem.width+this.spaceX;
 				if (tX > width){
-					tX=this.spaceX;
 					tY+=tItem.height+this.spaceY;
+					tItem.x=this.spaceX;
+					tItem.y=tY;
+					tX=tItem.width+this.spaceX;
 				}
 			}
 		}
@@ -27356,6 +27418,26 @@ var Laya=window.Laya=(function(window,document){
 	})(View)
 
 
+	//class ui.wordparser.WordForTreeUI extends laya.ui.View
+	var WordForTreeUI=(function(_super){
+		function WordForTreeUI(){
+			this.txt=null;
+			WordForTreeUI.__super.call(this);
+		}
+
+		__class(WordForTreeUI,'ui.wordparser.WordForTreeUI',_super);
+		var __proto=WordForTreeUI.prototype;
+		__proto.createChildren=function(){
+			View.regComponent("commoncomponent.AutoSizeLabel",AutoSizeLabel);
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(WordForTreeUI.uiView);
+		}
+
+		WordForTreeUI.uiView={"type":"View","props":{"width":85,"height":29},"child":[{"type":"Label","props":{"y":0,"x":0,"width":85,"var":"txt","text":"文字","runtime":"commoncomponent.AutoSizeLabel","height":29,"fontSize":20,"color":"#f4e4e4"}}]};
+		return WordForTreeUI;
+	})(View)
+
+
 	//class ui.wordparser.WordListViewerUI extends laya.ui.View
 	var WordListViewerUI=(function(_super){
 		function WordListViewerUI(){
@@ -27372,6 +27454,25 @@ var Laya=window.Laya=(function(window,document){
 
 		WordListViewerUI.uiView={"type":"View","props":{"width":600,"height":400},"child":[{"type":"Box","props":{"var":"container","top":5,"right":5,"left":5,"bottom":5}}]};
 		return WordListViewerUI;
+	})(View)
+
+
+	//class ui.wordparser.WordTreeViewerUI extends laya.ui.View
+	var WordTreeViewerUI=(function(_super){
+		function WordTreeViewerUI(){
+			this.container=null;
+			WordTreeViewerUI.__super.call(this);
+		}
+
+		__class(WordTreeViewerUI,'ui.wordparser.WordTreeViewerUI',_super);
+		var __proto=WordTreeViewerUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(WordTreeViewerUI.uiView);
+		}
+
+		WordTreeViewerUI.uiView={"type":"View","props":{"width":600,"height":400},"child":[{"type":"Box","props":{"var":"container","top":5,"right":5,"left":5,"bottom":5}}]};
+		return WordTreeViewerUI;
 	})(View)
 
 
@@ -27930,6 +28031,29 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class view.WordForTree extends ui.wordparser.WordForTreeUI
+	var WordForTree=(function(_super){
+		function WordForTree(){
+			this.dataO=null;
+			WordForTree.__super.call(this);
+		}
+
+		__class(WordForTree,'view.WordForTree',_super);
+		var __proto=WordForTree.prototype;
+		__proto.setData=function(dataO){
+			this.dataO=dataO;
+			this.txt.text=dataO.word;
+			this.width=this.txt.width;
+		}
+
+		return WordForTree;
+	})(WordForTreeUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class view.WordListViewer extends ui.wordparser.WordListViewerUI
 	var WordListViewer=(function(_super){
 		function WordListViewer(){
@@ -27979,6 +28103,104 @@ var Laya=window.Laya=(function(window,document){
 
 		return WordListViewer;
 	})(WordListViewerUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class view.WordTreeViewer extends ui.wordparser.WordTreeViewerUI
+	var WordTreeViewer=(function(_super){
+		function WordTreeViewer(){
+			this.layouter=null;
+			this.relationLayer=null;
+			this.wList=null;
+			this.wordItemList=null;
+			this.tree=null;
+			WordTreeViewer.__super.call(this);
+			this.layouter=new WordLayout();
+			this.relationLayer=new Sprite();
+			this.container.on("resize",this,this.freshUI);
+		}
+
+		__class(WordTreeViewer,'view.WordTreeViewer',_super);
+		var __proto=WordTreeViewer.prototype;
+		__proto.clearPre=function(){
+			if (!this.wordItemList)return;
+			var i=0,len=0;
+			len=this.wordItemList.length;
+			var tItem;
+			for (i=0;i < len;i++){
+				tItem=this.wordItemList[i];
+				tItem.removeSelf();
+				Pool.recover("WordForTree",tItem);
+			}
+			this.wordItemList.length=0;
+		}
+
+		__proto.setTree=function(tree){
+			this.tree=tree;
+			tree.buildRelation();
+			this.setWordList(tree.wordList);
+		}
+
+		__proto.setWordList=function(wList){
+			this.wList=wList;
+			this.clearPre();
+			this.wordItemList=[];
+			var i=0,len=0;
+			var tWord;
+			len=wList.length;
+			for (i=0;i < len;i++){
+				tWord=Pool.getItemByClass("WordForTree",WordForTree);
+				tWord.setData(wList[i]);
+				this.wordItemList.push(tWord);
+				this.container.addChild(tWord);
+			}
+			this.freshUI();
+		}
+
+		__proto.freshUI=function(){
+			this.relationLayer.graphics.clear();
+			this.container.addChild(this.relationLayer);
+			if (!this.wordItemList)return;
+			this.layouter.layout(this.wordItemList,this.container.width,this.container.height);
+			this.drawRelations();
+		}
+
+		__proto.drawRelations=function(){
+			var relations;
+			relations=this.tree.relations;
+			var i=0,len=0;
+			len=relations.length;
+			for (i=0;i < len;i++){
+				this.drawRelation(relations[i],i*20);
+			}
+		}
+
+		__proto.drawRelation=function(relation,pos){
+			var start;
+			var end;
+			start=this.wordItemList[relation.start];
+			end=this.wordItemList[relation.end];
+			if (!start || !end)return;
+			var startX=NaN;
+			startX=start.x+0.5 *start.width;
+			var endX=NaN;
+			endX=end.x+0.5 *end.width;
+			var tY=NaN;
+			tY=start.y+start.height+pos+20;
+			var eY=NaN;
+			eY=start.y+start.height+5;
+			this.relationLayer.graphics.drawLine(startX,tY,startX,eY,"#ff0000");
+			this.relationLayer.graphics.drawLine(endX,tY,endX,eY,"#ff0000");
+			this.relationLayer.graphics.drawLine(startX,tY,endX,tY,"#ff0000");
+			this.relationLayer.graphics.fillText(relation.type,(startX+endX)*0.5,tY,null,"#ff0000","center");
+			this.relationLayer.graphics.drawCircle(endX,tY,2,"#00ff00");
+		}
+
+		return WordTreeViewer;
+	})(WordTreeViewerUI)
 
 
 	/**
