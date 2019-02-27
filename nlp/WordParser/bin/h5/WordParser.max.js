@@ -702,6 +702,7 @@ var Laya=window.Laya=(function(window,document){
 		function Game(){
 			this.wordView=null;
 			this.conllParser=null;
+			this.wordTreeView=null;
 			this.book=null;
 			Laya.init(1000,900);
 			var loadList;
@@ -745,12 +746,23 @@ var Laya=window.Laya=(function(window,document){
 		__proto.testWordTree=function(){
 			this.conllParser=new ConllFileParser();
 			this.conllParser.parseTxt(Loader.getRes("data/text.train.conll"));
-			var wordTreeView;
-			wordTreeView=new WordTreeViewer();
-			wordTreeView.pos(20,10);
-			wordTreeView.width=Laya.stage.width-40;
-			Laya.stage.addChild(wordTreeView);
-			wordTreeView.setTree(this.conllParser.treeList[0]);
+			this.wordTreeView=new WordTreeViewer();
+			this.wordTreeView.pos(20,10);
+			this.wordTreeView.width=Laya.stage.width-40;
+			Laya.stage.addChild(this.wordTreeView);
+			this.wordTreeView.setTree(this.conllParser.getCurLine());
+			Laya.stage.on("keydown",this,this.onWordTreeKeyDown);
+		}
+
+		__proto.onWordTreeKeyDown=function(e){
+			switch(e.keyCode){
+				case 38:
+					this.wordTreeView.setTree(this.conllParser.pre());
+					break ;
+				case 40:
+					this.wordTreeView.setTree(this.conllParser.next());
+					break ;
+				}
 		}
 
 		__proto.testCut=function(){
@@ -792,6 +804,85 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		return Game;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.TopoSort
+	var TopoSort=(function(){
+		function TopoSort(){
+			this.startKey=null;
+			this.endKey=null;
+			this.relationList=null;
+			this.nodeDic=null;
+		}
+
+		__class(TopoSort,'nlp.algorithm.TopoSort');
+		var __proto=TopoSort.prototype;
+		__proto.findOKNode=function(startPos){
+			var i=0,len=0;
+			len=this.relationList.length;
+			var tRelation;
+			for (i=startPos;i < len;i++){
+				tRelation=this.relationList[i];
+				if (this.nodeDic[tRelation[this.startKey]]==0){
+					return i;
+				}
+			}
+			return-1;
+		}
+
+		__proto.switchPos=function(i,j){
+			var tp;
+			tp=this.relationList[i];
+			this.relationList[i]=this.relationList[j];
+			this.relationList[j]=tp;
+		}
+
+		__proto.removeRefer=function(tRelation){
+			this.nodeDic[tRelation[this.endKey]]=this.nodeDic[tRelation[this.endKey]]-1;
+		}
+
+		__proto.sort=function(relationList){
+			this.nodeDic={};
+			this.relationList=relationList;
+			var i=0,len=0;
+			var tRelation;
+			len=relationList.length;
+			for (i=0;i < len;i++){
+				tRelation=relationList[i];
+				if (!this.nodeDic[tRelation[this.startKey]]){
+					this.nodeDic[tRelation[this.startKey]]=0;
+				}
+				if (!this.nodeDic[tRelation[this.endKey]]){
+					this.nodeDic[tRelation[this.endKey]]=0;
+				}
+				this.nodeDic[tRelation[this.endKey]]=this.nodeDic[tRelation[this.endKey]]+1;
+			};
+			var okPos=0;
+			for (i=0;i < len;i++){
+				okPos=this.findOKNode(i);
+				if (okPos >=0){
+					this.removeRefer(relationList[okPos]);
+					this.switchPos(i,okPos);
+				}
+			}
+		}
+
+		TopoSort.sort=function(relationList,startKey,endKey){
+			(startKey===void 0)&& (startKey="start");
+			(endKey===void 0)&& (endKey="end");
+			var tp;
+			tp=new TopoSort();
+			tp.startKey=startKey;
+			tp.endKey=endKey;
+			tp.sort(relationList);
+		}
+
+		return TopoSort;
 	})()
 
 
@@ -857,6 +948,7 @@ var Laya=window.Laya=(function(window,document){
 	//class nlp.conll.ConllFileParser
 	var ConllFileParser=(function(){
 		function ConllFileParser(){
+			this.index=0;
 			this.treeList=null;
 			this.treeList=[];
 		}
@@ -894,6 +986,31 @@ var Laya=window.Laya=(function(window,document){
 				}
 			}
 			console.log("conllfileParser:",this);
+		}
+
+		__proto.reset=function(){
+			this.index=0;
+		}
+
+		__proto.getCurLine=function(){
+			return this.treeList[this.index];
+		}
+
+		__proto.pre=function(){
+			this.index--;
+			this.normalIndex();
+			return this.getCurLine();
+		}
+
+		__proto.next=function(){
+			this.index++;
+			this.normalIndex();
+			return this.getCurLine();
+		}
+
+		__proto.normalIndex=function(){
+			if (this.index < 0)this.index=0;
+			if (this.index >=this.treeList.length)this.index=this.treeList.length-1;
 		}
 
 		return ConllFileParser;
@@ -953,7 +1070,22 @@ var Laya=window.Laya=(function(window,document){
 			for (i=0;i < len;i++){
 				this.relations.push(ConllRelation.buildByWord(this.wordList[i]));
 			}
-			this.relations.sort(MathUtil.sortByKey("len",false,true));
+			TopoSort.sort(this.relations,"start","end");
+			return;
+			var j=0;
+			var tWord;
+			var cpWord;
+			var tmpWord;
+			for (i=0;i < len;i++){
+				tWord=this.relations[i];
+				for (j=i+1;j < len;j++){
+					cpWord=this.relations[j];
+					if (tWord.end==cpWord.start){
+						this.relations[j]=tWord;
+						tWord=cpWord;
+					}
+				}
+			}
 		}
 
 		return ConllTree;

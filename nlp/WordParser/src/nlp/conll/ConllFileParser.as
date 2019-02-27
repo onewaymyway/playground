@@ -8,7 +8,7 @@ package nlp.conll
 	 */
 	public class ConllFileParser 
 	{
-		
+		public var index:int;
 		public function ConllFileParser() 
 		{
 			treeList = [];
@@ -56,6 +56,37 @@ package nlp.conll
 				}
 			}
 			trace("conllfileParser:",this);
+		}
+		
+		
+		public function reset():void
+		{
+			index = 0;
+		}
+		
+		public function getCurLine():String
+		{
+			return treeList[index];
+		}
+		
+		public function pre():String
+		{
+			index--;
+			normalIndex();
+			return getCurLine();
+		}
+		
+		public function next():String
+		{
+			index++;
+			normalIndex();
+			return getCurLine();
+		}
+		
+		private function normalIndex():void
+		{
+			if (index < 0) index = 0;
+			if (index >= treeList.length) index = treeList.length - 1;
 		}
 	}
 

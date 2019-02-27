@@ -82,19 +82,36 @@ package
 		}
 		
 		private var conllParser:ConllFileParser;
+		private var wordTreeView:WordTreeViewer;
 		private function testWordTree():void
 		{
 			conllParser = new ConllFileParser();
 			conllParser.parseTxt(Loader.getRes("data/text.train.conll"));
 			
-			var wordTreeView:WordTreeViewer;
+			
 			wordTreeView = new WordTreeViewer();
 			wordTreeView.pos(20, 10);
 			wordTreeView.width = Laya.stage.width - 40;
 			Laya.stage.addChild(wordTreeView);
 			
-			wordTreeView.setTree(conllParser.treeList[0]);
+			wordTreeView.setTree(conllParser.getCurLine());
+			
+			Laya.stage.on(Event.KEY_DOWN, this, onWordTreeKeyDown);
 		}
+		
+		private function onWordTreeKeyDown(e:Event):void
+		{
+			switch(e.keyCode)
+			{
+				case Keyboard.UP:
+					wordTreeView.setTree(conllParser.pre());
+					break;
+				case Keyboard.DOWN:
+					wordTreeView.setTree(conllParser.next());
+					break;
+			}
+		}
+		
 		private var book:BookParser;
 		private function testCut():void
 		{
