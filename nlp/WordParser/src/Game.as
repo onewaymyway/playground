@@ -5,6 +5,7 @@ package
 	import laya.net.Loader;
 	import laya.utils.Handler;
 	import nlp.bookutils.BookParser;
+	import nlp.conll.ConllFileParser;
 	import nlp.dictools.TypeDicParser;
 	import nlp.WordDicParser;
 	import nlp.WordUtils;
@@ -26,7 +27,8 @@ package
 			loadList.push( { url:"res/atlas/comp.json", type:Loader.ATLAS } );
 			loadList.push( { url:"data/CoreSynonym.txt", type:Loader.TEXT } );
 			loadList.push({url:"data/CoreNatureDictionary.txt", type:Loader.TEXT });
-			loadList.push({url:"books/qqst.txt",type:Loader.TEXT });
+			loadList.push( { url:"books/qqst.txt", type:Loader.TEXT } );
+			loadList.push({url:"data/text.train.conll",type:Loader.TEXT });
 			Laya.loader.load( loadList, new Handler(this, initGameView));
 			
 		}
@@ -54,6 +56,10 @@ package
 			WordDicParser.I.cutter.typeDic = typeDic;
 			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
 			//Laya.stage.on(Event.CLICK, this, testCut);
+			
+			var conllParser:ConllFileParser;
+			conllParser = new ConllFileParser();
+			conllParser.parseTxt(Loader.getRes("data/text.train.conll"));
 			testCut();
 			
 			Laya.stage.graphics.fillText("ready", 10, 10, null, "#ff0000");

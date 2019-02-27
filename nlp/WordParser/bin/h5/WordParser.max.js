@@ -709,6 +709,7 @@ var Laya=window.Laya=(function(window,document){
 			loadList.push({url:"data/CoreSynonym.txt",type:"text" });
 			loadList.push({url:"data/CoreNatureDictionary.txt",type:"text" });
 			loadList.push({url:"books/qqst.txt",type:"text" });
+			loadList.push({url:"data/text.train.conll",type:"text" });
 			Laya.loader.load(loadList,new Handler(this,this.initGameView));
 		}
 
@@ -728,6 +729,9 @@ var Laya=window.Laya=(function(window,document){
 			console.log(typeDic);
 			WordDicParser.I.cutter.typeDic=typeDic;
 			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
+			var conllParser;
+			conllParser=new ConllFileParser();
+			conllParser.parseTxt(Loader.getRes("data/text.train.conll"));
 			this.testCut();
 			Laya.stage.graphics.fillText("ready",10,10,null,"#ff0000");
 		}
@@ -826,6 +830,115 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		return BookParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllFileParser
+	var ConllFileParser=(function(){
+		function ConllFileParser(){
+			this.treeList=null;
+			this.treeList=[];
+		}
+
+		__class(ConllFileParser,'nlp.conll.ConllFileParser');
+		var __proto=ConllFileParser.prototype;
+		__proto.loadFile=function(file,complete){
+			Laya.loader.load(file,Handler.create(this,this.onFileLoaded,[complete]),null,"text");
+		}
+
+		__proto.onFileLoaded=function(complete,txt){
+			this.parseTxt(txt);
+			if (complete){
+				complete.run();
+			}
+		}
+
+		__proto.parseTxt=function(txt){
+			var lines;
+			lines=txt.split("\n");
+			var i=0,len=0;
+			len=lines.length;
+			var tLine;
+			var tTree;
+			for (i=0;i < len;i++){
+				tLine=lines[i];
+				if (tLine==""){
+					tTree=null;
+					}else{
+					if (!tTree){
+						tTree=new ConllTree();
+						this.treeList.push(tTree);
+					}
+					tTree.addLine(tLine);
+				}
+			}
+			console.log("conllfileParser:",this);
+		}
+
+		return ConllFileParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllTree
+	var ConllTree=(function(){
+		function ConllTree(){
+			this.wordList=null;
+			this.wordList=[];
+		}
+
+		__class(ConllTree,'nlp.conll.ConllTree');
+		var __proto=ConllTree.prototype;
+		__proto.addLine=function(line){
+			this.wordList.push(ConllWord.parseFromLine(line));
+		}
+
+		return ConllTree;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllWord
+	var ConllWord=(function(){
+		function ConllWord(){
+			this.id=0;
+			this.form=null;
+			this.lemma=null;
+			this.cpostag=null;
+			this.postag=null;
+			this.feats=null;
+			this.head=null;
+			this.deprel=null;
+		}
+
+		__class(ConllWord,'nlp.conll.ConllWord');
+		ConllWord.parseFromLine=function(line){
+			var values;
+			values=line.split("\t");
+			var rst;
+			rst=new ConllWord();
+			var i=0,len=0;
+			len=ConllWord.KeyList.length;
+			for (i=0;i < len;i++){
+				rst[ConllWord.KeyList[i]]=values[i];
+			}
+			return rst;
+		}
+
+		__static(ConllWord,
+		['KeyList',function(){return this.KeyList=["id","form","lemma","cpostag","postag","feats","head","deprel"];}
+		]);
+		return ConllWord;
 	})()
 
 
@@ -27891,7 +28004,7 @@ var Laya=window.Laya=(function(window,document){
 	})(WordViewerUI)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,PingYinDic,Render,Browser,View,Timer,GraphicAnimation,LocalStorage]);
+	Laya.__init([LoaderManager,EventDispatcher,PingYinDic,Render,Browser,View,Timer,GraphicAnimation,LocalStorage]);
 	new Game();
 
 })(window,document,Laya);
