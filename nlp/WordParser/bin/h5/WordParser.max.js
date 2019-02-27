@@ -818,6 +818,7 @@ var Laya=window.Laya=(function(window,document){
 			this.endKey=null;
 			this.relationList=null;
 			this.nodeDic=null;
+			this.otherSort=null;
 		}
 
 		__class(TopoSort,'nlp.algorithm.TopoSort');
@@ -826,13 +827,19 @@ var Laya=window.Laya=(function(window,document){
 			var i=0,len=0;
 			len=this.relationList.length;
 			var tRelation;
+			var tSelect;
+			var tI=0;
+			tI=-1;
 			for (i=startPos;i < len;i++){
 				tRelation=this.relationList[i];
 				if (this.nodeDic[tRelation[this.startKey]]==0){
-					return i;
+					if (!this.otherSort)return i;
+					if (tI<0||this.otherSort(tRelation,this.relationList[tI])){
+						tI=i;
+					}
 				}
 			}
-			return-1;
+			return tI;
 		}
 
 		__proto.switchPos=function(i,j){
@@ -872,13 +879,14 @@ var Laya=window.Laya=(function(window,document){
 			}
 		}
 
-		TopoSort.sort=function(relationList,startKey,endKey){
+		TopoSort.sort=function(relationList,startKey,endKey,otherSort){
 			(startKey===void 0)&& (startKey="start");
 			(endKey===void 0)&& (endKey="end");
 			var tp;
 			tp=new TopoSort();
 			tp.startKey=startKey;
 			tp.endKey=endKey;
+			tp.otherSort=otherSort;
 			tp.sort(relationList);
 		}
 
@@ -1070,7 +1078,7 @@ var Laya=window.Laya=(function(window,document){
 			for (i=0;i < len;i++){
 				this.relations.push(ConllRelation.buildByWord(this.wordList[i]));
 			}
-			TopoSort.sort(this.relations,"start","end");
+			TopoSort.sort(this.relations,"start","end",ConllTree.otherSort);
 			return;
 			var j=0;
 			var tWord;
@@ -1086,6 +1094,10 @@ var Laya=window.Laya=(function(window,document){
 					}
 				}
 			}
+		}
+
+		ConllTree.otherSort=function(item0,item1){
+			return item0.len < item1.len;
 		}
 
 		return ConllTree;
@@ -28249,6 +28261,7 @@ var Laya=window.Laya=(function(window,document){
 			this.wList=null;
 			this.wordItemList=null;
 			this.tree=null;
+			this.tYDic=null;
 			WordTreeViewer.__super.call(this);
 			this.layouter=new WordLayout();
 			this.relationLayer=new Sprite();
@@ -28301,21 +28314,35 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.drawRelations=function(){
+			this.tYDic={};
 			var relations;
 			relations=this.tree.relations;
 			var i=0,len=0;
 			len=relations.length;
 			for (i=0;i < len;i++){
-				this.drawRelation(relations[i],i*20);
+				this.drawRelation(relations[i]);
 			}
 		}
 
-		__proto.drawRelation=function(relation,pos){
+		__proto.getYPos=function(id){
+			if (!this.tYDic[id]){
+				this.tYDic[id]=20;
+			}
+			return this.tYDic[id];
+		}
+
+		__proto.setYPos=function(id,value){
+			this.tYDic[id]=value;
+		}
+
+		__proto.drawRelation=function(relation){
 			var start;
 			var end;
 			start=this.wordItemList[relation.start];
 			end=this.wordItemList[relation.end];
 			if (!start || !end)return;
+			var pos=0;
+			pos=Math.max(this.getYPos(relation.start),this.getYPos(relation.end));
 			var startX=NaN;
 			startX=start.x+0.5 *start.width;
 			var endX=NaN;
@@ -28324,6 +28351,8 @@ var Laya=window.Laya=(function(window,document){
 			tY=start.y+start.height+pos+20;
 			var eY=NaN;
 			eY=start.y+start.height+5;
+			this.setYPos(relation.start,pos+20);
+			this.setYPos(relation.end,pos+20);
 			this.relationLayer.graphics.drawLine(startX,tY,startX,eY,"#ff0000");
 			this.relationLayer.graphics.drawLine(endX,tY,endX,eY,"#ff0000");
 			this.relationLayer.graphics.drawLine(startX,tY,endX,tY,"#ff0000");

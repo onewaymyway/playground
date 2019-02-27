@@ -10,6 +10,7 @@ package nlp.algorithm
 		public var endKey:String;
 		public var relationList:Array;
 		public var nodeDic:Object;
+		public var otherSort:Function;
 		public function TopoSort() 
 		{
 			
@@ -20,15 +21,23 @@ package nlp.algorithm
 			var i:int, len:int;
 			len = relationList.length;
 			var tRelation:Object;
+			var tSelect:Object;
+			var tI:int;
+			tI = -1;
 			for (i = startPos; i < len; i++)
 			{
 				tRelation = relationList[i];
 				if (nodeDic[tRelation[startKey]] == 0)
 				{
-					return i;
+					if (!otherSort) return i;
+					if (tI<0||otherSort(tRelation,relationList[tI]))
+					{
+						tI = i;
+					}
+					
 				}
 			}
-			return -1;
+			return tI;
 		}
 		
 		public function switchPos(i:int, j:int):void
@@ -75,12 +84,13 @@ package nlp.algorithm
 				
 			}
 		}
-		public static function sort(relationList:Array,startKey:String="start",endKey:String="end"):void
+		public static function sort(relationList:Array,startKey:String="start",endKey:String="end",otherSort:Function=null):void
 		{
 			var tp:TopoSort;
 			tp = new TopoSort();
 			tp.startKey = startKey;
 			tp.endKey = endKey;
+			tp.otherSort = otherSort;
 			tp.sort(relationList);
 		}
 	}

@@ -20,6 +20,10 @@ package nlp.conll
 			wordList.push(ConllWord.parseFromLine(line));
 		}
 		
+		private static function otherSort(item0:Object, item1:Object):Boolean
+		{
+			return item0.len < item1.len;
+		}
 		public function buildRelation():void
 		{
 			relations = [];
@@ -31,7 +35,7 @@ package nlp.conll
 			}
 			//relations.sort(MathUtil.sortByKey("len", false, true));
 			
-			TopoSort.sort(relations, "start", "end");
+			TopoSort.sort(relations, "start", "end",otherSort);
 			return;
 			var j:int;
 			var tWord:ConllRelation;

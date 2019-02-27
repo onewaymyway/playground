@@ -75,26 +75,43 @@ package view
 			layouter.layout(wordItemList, container.width, container.height);
 			drawRelations();
 		}
-		
+		private var tYDic:Object;
 		private function drawRelations():void
 		{
+			tYDic = { };
 			var relations:Array;
 			relations = tree.relations;
 			var i:int, len:int;
 			len = relations.length;
 			for (i = 0; i < len; i++)
 			{
-				drawRelation(relations[i],i*20);
+				drawRelation(relations[i]);
 			}
 		}
 		
-		private function drawRelation(relation:ConllRelation,pos:int):void
+		private function getYPos(id:int):Number
+		{
+			if (!tYDic[id])
+			{
+				tYDic[id] = 20;
+			}
+			return tYDic[id];
+		}
+		
+		private function setYPos(id:int, value:int):void
+		{
+			tYDic[id]=value;
+		}
+		private function drawRelation(relation:ConllRelation):void
 		{
 			var start:WordForTree;
 			var end:WordForTree;
 			start = wordItemList[relation.start];
 			end = wordItemList[relation.end];
 			if (!start || !end) return;
+			
+			var pos:int;
+			pos = Math.max(getYPos(relation.start),getYPos(relation.end));
 			var startX:Number;
 			startX = start.x + 0.5 * start.width;
 			var endX:Number;
@@ -102,7 +119,10 @@ package view
 			var tY:Number;
 			tY = start.y + start.height + pos + 20;
 			var eY:Number;
-			eY = start.y + start.height+5;
+			eY = start.y + start.height + 5;
+			
+			setYPos(relation.start, pos + 20);
+			setYPos(relation.end, pos + 20);
 			
 			relationLayer.graphics.drawLine(startX, tY, startX, eY, "#ff0000");
 			relationLayer.graphics.drawLine(endX, tY, endX, eY, "#ff0000");
