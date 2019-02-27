@@ -3,8 +3,10 @@ package
 	import laya.events.Event;
 	import laya.events.Keyboard;
 	import laya.net.Loader;
+	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import nlp.bookutils.BookParser;
+	import nlp.conll.ConllDesParser;
 	import nlp.conll.ConllFileParser;
 	import nlp.dictools.TypeDicParser;
 	import nlp.WordDicParser;
@@ -22,14 +24,15 @@ package
 		
 		public function Game() 
 		{
-			Laya.init(1000, 900);
+			Laya.init(Browser.width, 900);
 			var loadList:Array;
 			loadList = [];
 			loadList.push( { url:"res/atlas/comp.json", type:Loader.ATLAS } );
 			loadList.push( { url:"data/CoreSynonym.txt", type:Loader.TEXT } );
 			loadList.push({url:"data/CoreNatureDictionary.txt", type:Loader.TEXT });
 			loadList.push( { url:"books/qqst.txt", type:Loader.TEXT } );
-			loadList.push({url:"data/text.train.conll",type:Loader.TEXT });
+			loadList.push({url:"data/text.train.conll", type:Loader.TEXT });
+			loadList.push({url:"data/conlldes.txt",type:Loader.TEXT });
 			Laya.loader.load( loadList, new Handler(this, initGameView));
 			
 		}
@@ -85,15 +88,23 @@ package
 		private var wordTreeView:WordTreeViewer;
 		private function testWordTree():void
 		{
+			var conllDes:ConllDesParser;
+			conllDes = new ConllDesParser();
+			conllDes.parseTxt(Loader.getRes("data/conlldes.txt"));
+			
+			ConllDesParser.I = conllDes;
+			
 			conllParser = new ConllFileParser();
 			conllParser.parseTxt(Loader.getRes("data/text.train.conll"));
+			
+			
 			
 			
 			wordTreeView = new WordTreeViewer();
 			wordTreeView.pos(20, 10);
 			wordTreeView.width = Laya.stage.width - 40;
 			Laya.stage.addChild(wordTreeView);
-			
+			//return;
 			wordTreeView.setTree(conllParser.getCurLine());
 			
 			Laya.stage.on(Event.KEY_DOWN, this, onWordTreeKeyDown);

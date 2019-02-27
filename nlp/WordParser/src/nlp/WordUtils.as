@@ -147,6 +147,18 @@ package nlp
 			return rst;
 		}
 		
+		public static function arr2keyObj(arr:Array, KeyList:Array):Object
+		{
+			var rst:Object;
+			rst = new Object();
+			var i:int, len:int;
+			len = KeyList.length;
+			for (i = 0; i < len; i++)
+			{
+				rst[KeyList[i]] = arr[i];
+			}
+			return rst;
+		}
 	}
 
 }

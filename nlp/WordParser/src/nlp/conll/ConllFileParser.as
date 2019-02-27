@@ -9,8 +9,10 @@ package nlp.conll
 	public class ConllFileParser 
 	{
 		public var index:int;
-		public function ConllFileParser() 
+		public var conllDes:ConllDesParser;
+		public function ConllFileParser(conllDes:ConllDesParser=null) 
 		{
+			this.conllDes = conllDes;
 			treeList = [];
 		}
 		
@@ -41,7 +43,7 @@ package nlp.conll
 			for (i = 0; i < len; i++)
 			{
 				tLine = lines[i];
-				if (tLine == "")
+				if (tLine.indexOf("\t")<0)
 				{
 					tTree = null;
 				}else

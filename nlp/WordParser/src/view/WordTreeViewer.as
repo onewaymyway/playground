@@ -4,6 +4,7 @@ package view
 	import laya.display.Sprite;
 	import laya.events.Event;
 	import laya.utils.Pool;
+	import nlp.conll.ConllDesParser;
 	import nlp.conll.ConllRelation;
 	import nlp.conll.ConllTree;
 	import ui.wordparser.WordTreeViewerUI;
@@ -128,7 +129,7 @@ package view
 			relationLayer.graphics.drawLine(endX, tY, endX, eY, "#ff0000");
 			relationLayer.graphics.drawLine(startX, tY, endX, tY, "#ff0000");
 			
-			relationLayer.graphics.fillText(relation.type, (startX + endX) * 0.5, tY, null, "#ff0000", "center");
+			relationLayer.graphics.fillText(ConllDesParser.getCNType(relation.type), (startX + endX) * 0.5, tY, null, "#ff0000", "center");
 			
 			relationLayer.graphics.drawCircle(endX, tY, 2, "#00ff00");
 		}

@@ -26,6 +26,7 @@ package nlp.conll
 		}
 		public function buildRelation():void
 		{
+			//debugger;
 			relations = [];
 			var i:int, len:int;
 			len = wordList.length;
