@@ -40,6 +40,8 @@ package nlp.conll
 		public var deprel:String;
 		
 		public var word:String;
+		
+		public var refers:Array;
 		public function ConllWord() 
 		{
 			
@@ -62,7 +64,36 @@ package nlp.conll
 			rst.id = parseInt(rst.id) - 1;
 			rst.head = parseInt(rst.head) - 1;
 			rst.word = rst.form;
+			rst.refers = [];
 			return rst;
+		}
+		
+		public function sortRefers(i:int):void
+		{
+			function mSort(v0:int, v1:int):int
+			{
+				if (v0 == i||v1==i)
+				{
+					return v0 - v1;
+				}
+				
+				if (v0 > i && v1 > i)
+				{
+					return v1 - v0;
+				}
+				
+				if (v0 < i && v1 < i)
+				{
+					return v1 - v0;
+				}
+				
+				return v0 - v1;
+			}
+			//this.refers.sort();
+			//this.refers.reverse();
+			this.refers.sort(mSort);
+			//this.refers.reverse();
+			
 		}
 	}
 

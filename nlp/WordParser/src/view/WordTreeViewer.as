@@ -88,6 +88,11 @@ package view
 			{
 				drawRelation(relations[i]);
 			}
+			//len = wordItemList.length;
+			//for (i = 0; i < len; i++)
+			//{
+				//trace("refers:"+i,wordItemList[i].dataO.refers);
+			//}
 		}
 		
 		private function getYPos(id:int):Number
@@ -115,8 +120,10 @@ package view
 			pos = Math.max(getYPos(relation.start),getYPos(relation.end));
 			var startX:Number;
 			startX = start.x + 0.5 * start.width;
+			startX = start.getPos(relation.end);
 			var endX:Number;
 			endX = end.x + 0.5 * end.width;
+			endX = end.getPos(relation.start);
 			var tY:Number;
 			tY = start.y + start.height + pos + 20;
 			var eY:Number;
