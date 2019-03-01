@@ -57,7 +57,8 @@ package nlp.conll
 					tTree.addLine(tLine);
 				}
 			}
-			trace("conllfileParser:",this);
+			trace("conllfileParser:", this);
+			trace("contypeDic:",ConllWordDic.I);
 		}
 		
 		

@@ -19,8 +19,12 @@ package nlp.conll
 		{
 			var tWord:ConllWord;
 			tWord = ConllWord.parseFromLine(line);
-			if(!wordList[tWord.id])
-			wordList.push(tWord);
+			if (!wordList[tWord.id])
+			{
+				wordList.push(tWord);
+				ConllWordDic.I.addWord(tWord);
+			}
+			
 		}
 		
 		private static function otherSort(item0:Object, item1:Object):Boolean

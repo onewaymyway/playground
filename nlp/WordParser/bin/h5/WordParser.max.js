@@ -1047,6 +1047,7 @@ var Laya=window.Laya=(function(window,document){
 				}
 			}
 			console.log("conllfileParser:",this);
+			console.log("contypeDic:",ConllWordDic.I);
 		}
 
 		__proto.reset=function(){
@@ -1121,7 +1122,12 @@ var Laya=window.Laya=(function(window,document){
 		__class(ConllTree,'nlp.conll.ConllTree');
 		var __proto=ConllTree.prototype;
 		__proto.addLine=function(line){
-			this.wordList.push(ConllWord.parseFromLine(line));
+			var tWord;
+			tWord=ConllWord.parseFromLine(line);
+			if (!this.wordList[tWord.id]){
+				this.wordList.push(tWord);
+				ConllWordDic.I.addWord(tWord);
+			}
 		}
 
 		__proto.dealRelation=function(relation){
@@ -1235,6 +1241,49 @@ var Laya=window.Laya=(function(window,document){
 		['KeyList',function(){return this.KeyList=["id","form","lemma","cpostag","postag","feats","head","deprel"];}
 		]);
 		return ConllWord;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllWordDic
+	var ConllWordDic=(function(){
+		function ConllWordDic(){
+			this.wordDic={};
+			this.wordList=[];
+			this.typeDic={};
+		}
+
+		__class(ConllWordDic,'nlp.conll.ConllWordDic');
+		var __proto=ConllWordDic.prototype;
+		__proto.getWordCacheKey=function(word){
+			return word.word+"@"+word.postag;
+		}
+
+		__proto.addToTypeDic=function(word){
+			var tType;
+			tType=word.postag;
+			if (!this.typeDic[tType])this.typeDic[tType]=[];
+			var typeList;
+			typeList=this.typeDic[tType];
+			typeList.push(word);
+		}
+
+		__proto.addWord=function(word){
+			var key;
+			key=this.getWordCacheKey(word);
+			if (this.wordDic[key])return;
+			this.wordDic[key]=word;
+			this.wordList.push(word);
+			this.addToTypeDic(word);
+		}
+
+		__static(ConllWordDic,
+		['I',function(){return this.I=new ConllWordDic();}
+		]);
+		return ConllWordDic;
 	})()
 
 
