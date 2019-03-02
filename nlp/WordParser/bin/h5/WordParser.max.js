@@ -1126,6 +1126,7 @@ var Laya=window.Laya=(function(window,document){
 			tWord=ConllWord.parseFromLine(line);
 			if (!this.wordList[tWord.id]){
 				this.wordList.push(tWord);
+				tWord.tree=this;
 				ConllWordDic.I.addWord(tWord);
 			}
 		}
@@ -1199,6 +1200,7 @@ var Laya=window.Laya=(function(window,document){
 			this.head=null;
 			this.deprel=null;
 			this.word=null;
+			this.tree=null;
 			this.refers=null;
 		}
 

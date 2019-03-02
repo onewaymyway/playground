@@ -41,6 +41,7 @@ package nlp.conll
 		
 		public var word:String;
 		
+		public var tree:ConllTree;
 		public var refers:Array;
 		public function ConllWord() 
 		{

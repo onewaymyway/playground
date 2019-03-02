@@ -22,6 +22,7 @@ package nlp.conll
 			if (!wordList[tWord.id])
 			{
 				wordList.push(tWord);
+				tWord.tree = this;
 				ConllWordDic.I.addWord(tWord);
 			}
 			
