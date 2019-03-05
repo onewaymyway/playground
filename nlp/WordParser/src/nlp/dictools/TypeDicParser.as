@@ -17,7 +17,7 @@ package nlp.dictools
 			var typeO:Object;
 			typeO = wordDic[word];
 			if (!typeO) return null;
-			return typeO.type;
+			return typeO;
 		}
 		public var wordDic:Object;
 		public var wordList:Array;
@@ -52,14 +52,20 @@ package nlp.dictools
 			rst = { };
 			rst.word = arr[0];
 			rst.type = {};
+			rst.types = [];
+			rst.typecns = [];
 			var i:int, len:int;
 			len = arr.length;
 			var score:Number;
+			var ttype:String;
 			for (i = 1; i < len; i += 2)
 			{
 				score = parseInt(arr[i + 1]);
-				rst.type[arr[i]] = score;
-				rst.type[TypeDefine.getCHType(arr[i])] = score;
+				ttype = arr[i];
+				rst.type[ttype] = score;
+				rst.type[TypeDefine.getCHType(ttype)] = score;
+				rst.types.push(ttype);
+				rst.typecns.push(TypeDefine.getCHType(ttype));
 			}
 			
 			return rst;
