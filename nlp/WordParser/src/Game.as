@@ -8,6 +8,7 @@ package
 	import nlp.bookutils.BookParser;
 	import nlp.conll.ConllDesParser;
 	import nlp.conll.ConllFileParser;
+	import nlp.conll.ConllTreeAnalyse;
 	import nlp.dictools.TypeDicParser;
 	import nlp.WordDicParser;
 	import nlp.WordUtils;
@@ -45,9 +46,9 @@ package
 		{
 			//WordUtils.showChars(0, 1000);
 			
-			startWordParserTest();
+			//startWordParserTest();
 			
-			//testWordTree();
+			testWordTree();
 		}
 		
 		private function startWordParserTest():void
@@ -88,6 +89,12 @@ package
 		private var wordTreeView:WordTreeViewer;
 		private function testWordTree():void
 		{
+			
+			var typeDic:TypeDicParser;
+			typeDic = new TypeDicParser();
+			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
+			trace(typeDic);
+			
 			var conllDes:ConllDesParser;
 			conllDes = new ConllDesParser();
 			conllDes.parseTxt(Loader.getRes("data/conlldes.txt"));
@@ -98,6 +105,10 @@ package
 			conllParser.parseTxt(Loader.getRes("data/text.train.conll"));
 			
 			
+			ConllTreeAnalyse.typeDic = typeDic;
+			var analyse:ConllTreeAnalyse;
+			analyse = new ConllTreeAnalyse();
+			analyse.analyse(conllParser.treeList);
 			
 			
 			wordTreeView = new WordTreeViewer();

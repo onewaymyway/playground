@@ -19,6 +19,15 @@ package nlp.dictools
 			if (!typeO) return null;
 			return typeO;
 		}
+		
+		public function getWordTypeStr(word:String):String
+		{
+			var typeO:Object;
+			typeO = getWordType(word);
+			if (!typeO) return "unknow";
+			return typeO.types[0];
+			return typeO.types.join(";");
+		}
 		public var wordDic:Object;
 		public var wordList:Array;
 		public static const Tab:String = "	";

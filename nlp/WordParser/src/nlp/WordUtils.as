@@ -45,6 +45,18 @@ package nlp
 			return rst;
 		}
 		
+		public static function getDicKeys(dic:Object):Array
+		{
+			var rst:Array;
+			rst = [];
+			var key:String;
+			
+			for (key in dic)
+			{
+				rst.push(key);
+			}
+			return rst;
+		}
 		public static function isWordListSame(wordList1:Array, wordList2:Array):Boolean
 		{
 			if (!wordList1.length == wordList2.length) return false;
@@ -104,6 +116,15 @@ package nlp
 			return score/len;
 		}
 		
+		public static function removeSameNB(arr:Array):Array
+		{
+			var i:int;
+			i = arr.length - 1;
+			for (i = arr.length - 1; i >= 0; i--)
+			{
+				if (arr[i + 1] == arr[i]) arr.splice(i, 1);
+			}
+		}
 		public static function splitWordBySpecial(str:String):Array
 		{
 			var rst:Array;
