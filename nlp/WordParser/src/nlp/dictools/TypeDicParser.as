@@ -28,6 +28,15 @@ package nlp.dictools
 			return typeO.types[0];
 			return typeO.types.join(";");
 		}
+		
+		public function getWordTypeCNStr(word:String):String
+		{
+			var typeO:Object;
+			typeO = getWordType(word);
+			if (!typeO) return "unknow";
+			return typeO.typecns[0];
+			return typeO.typecns.join(";");
+		}
 		public var wordDic:Object;
 		public var wordList:Array;
 		public static const Tab:String = "	";

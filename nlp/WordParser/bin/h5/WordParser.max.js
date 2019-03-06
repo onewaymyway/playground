@@ -1129,6 +1129,10 @@ var Laya=window.Laya=(function(window,document){
 
 		__class(ConllTree,'nlp.conll.ConllTree');
 		var __proto=ConllTree.prototype;
+		__proto.getWordByIndex=function(index){
+			return this.wordList[index];
+		}
+
 		__proto.addLine=function(line){
 			var tWord;
 			tWord=ConllWord.parseFromLine(line);
@@ -1201,6 +1205,8 @@ var Laya=window.Laya=(function(window,document){
 		function ConllTreeAnalyse(){
 			this.keyDic={};
 			this.keys=null;
+			this.dependDic={};
+			this.depends=null;
 		}
 
 		__class(ConllTreeAnalyse,'nlp.conll.ConllTreeAnalyse');
@@ -1212,11 +1218,53 @@ var Laya=window.Laya=(function(window,document){
 			var tree;
 			for (i=0;i < len;i++){
 				tree=treeList[i];
+				tree.buildRelation();
+				this.analyseRelation(tree);
 				this.analyseWordLists(ConllTreeAnalyse.splitWordListByPu(tree.wordList));
 			}
 			this.keys=WordUtils.getDicKeys(this.keyDic);
 			this.keys.sort();
 			console.log("keys:",this.keys);
+			this.depends=WordUtils.dic2Arr(this.dependDic);
+			this.depends.sort(MathUtil.sortByKey("value"));
+			console.log("depends",this.depends);
+		}
+
+		__proto.getWordTypeEx=function(word){
+			if (!word)return "null";
+			return word.postag;
+		}
+
+		//return typeDic.getWordTypeCNStr(word.word);
+		__proto.getRelationKey=function(relation,tree){
+			var startWord;
+			var endWord;
+			startWord=tree.getWordByIndex(relation.start);
+			endWord=tree.getWordByIndex(relation.end);
+			return this.getWordTypeEx(startWord)+":"+this.getWordTypeEx(endWord)+":"+(relation.end>relation.start);
+			if (startWord && endWord){
+				return ConllTreeAnalyse.typeDic.getWordTypeStr(startWord.word)+":"+ConllTreeAnalyse.typeDic.getWordTypeStr(endWord.word);
+			}
+			return "unknow";
+		}
+
+		__proto.getWordRelationScore=function(start,end,pos){}
+		__proto.analyseRelation=function(tree){
+			var relations;
+			relations=tree.relations;
+			var i=0,len=0;
+			len=relations.length;
+			var tRelation;
+			var tkey;
+			for (i=0;i < len;i++){
+				tRelation=relations[i];
+				tkey=this.getRelationKey(tRelation,tree);
+				if (!this.dependDic[tkey]){
+					this.dependDic[tkey]=1;
+					}else{
+					this.dependDic[tkey]=this.dependDic[tkey]+1;
+				}
+			}
 		}
 
 		__proto.analyseWordLists=function(lists){
@@ -1793,6 +1841,14 @@ var Laya=window.Laya=(function(window,document){
 			if (!typeO)return "unknow";
 			return typeO.types[0];
 			return typeO.types.join(";");
+		}
+
+		__proto.getWordTypeCNStr=function(word){
+			var typeO;
+			typeO=this.getWordType(word);
+			if (!typeO)return "unknow";
+			return typeO.typecns[0];
+			return typeO.typecns.join(";");
 		}
 
 		__proto.initByTxt=function(txt){
@@ -2425,6 +2481,16 @@ var Laya=window.Laya=(function(window,document){
 			var key;
 			for (key in dic){
 				rst.push(key);
+			}
+			return rst;
+		}
+
+		WordUtils.dic2Arr=function(dic){
+			var rst;
+			rst=[];
+			var key;
+			for (key in dic){
+				rst.push({key:key,value:dic[key]});
 			}
 			return rst;
 		}
@@ -28699,5 +28765,5 @@ var Laya=window.Laya=(function(window,document){
 
 
 /*
-1 file:///D:/codes/playground.git/trunk/nlp/WordParser/src/nlp/conll/ConllTreeAnalyse.as (99):warning:tree This variable is not defined.
+1 file:///D:/codes/playground.git/trunk/nlp/WordParser/src/nlp/conll/ConllTreeAnalyse.as (157):warning:tree This variable is not defined.
 */

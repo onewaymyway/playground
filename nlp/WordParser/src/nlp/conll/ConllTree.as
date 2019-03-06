@@ -15,6 +15,10 @@ package nlp.conll
 			wordList = [];
 		}
 		
+		public function getWordByIndex(index:int):ConllWord
+		{
+			return wordList[index];
+		}
 		public function addLine(line:String):void
 		{
 			var tWord:ConllWord;

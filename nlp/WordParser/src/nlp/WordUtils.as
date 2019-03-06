@@ -57,6 +57,19 @@ package nlp
 			}
 			return rst;
 		}
+		
+		public static function dic2Arr(dic:Object):Array
+		{
+			var rst:Array;
+			rst = [];
+			var key:String;
+			
+			for (key in dic)
+			{
+				rst.push({key:key,value:dic[key]});
+			}
+			return rst;
+		}
 		public static function isWordListSame(wordList1:Array, wordList2:Array):Boolean
 		{
 			if (!wordList1.length == wordList2.length) return false;
