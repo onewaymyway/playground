@@ -102,11 +102,11 @@ package nlp.cutwords
 			{
 				if (tTrieNode.isWord())
 				{
-					map.addEdge(start, pos+1, WordUtils.getWordScore(tTrieNode.word.word), tTrieNode);
+					map.addEdge(start, pos+1, 1/WordUtils.getWordScore(tTrieNode.word.word), tTrieNode);
 				}
 				pos++;
 				tchar = str.charAt(pos);
-				tTrieNode = trie.findByChar(tchar);
+				tTrieNode = tTrieNode.findByChar(tchar);
 			}
 		}
 		

@@ -134,8 +134,8 @@ package nlp
 		{
 			var tTypeO:Object;
 			tTypeO=typeDic.getWordType(word);
-			if (!tTypeO) return 1;
-			return getMaxScore(tTypeO);
+			if (!tTypeO||!tTypeO.type) return 1;
+			return getMaxScore(tTypeO.type);
 		}
 		
 		public static function removeSameNB(arr:Array):Array
