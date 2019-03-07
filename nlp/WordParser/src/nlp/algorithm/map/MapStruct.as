@@ -40,7 +40,14 @@ package nlp.algorithm.map
 		
 		public function findMaxWeightPath(endI:int):Array
 		{
+			return LineDP.dpEx(eList,[0],0,-999).getMaxWeightPath(endI);
 			return LineDP.simpleDP(eList).getMaxWeightPath(endI);
+		}
+		
+		public static function showEdgeList(eList:Array):void
+		{
+			var i:int, len:int;
+			//var 
 		}
 		public function buildMap():void
 		{

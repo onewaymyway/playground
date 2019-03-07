@@ -81,7 +81,7 @@ package nlp.cutwords
 				
 			}
 			var wList:Array;
-			wList = map.findMaxWeightPath(str.length - 1);
+			wList = map.findMaxWeightPath(str.length);
 			trace("wList:",wList);
 		}
 		
@@ -102,7 +102,8 @@ package nlp.cutwords
 			{
 				if (tTrieNode.isWord())
 				{
-					map.addEdge(start, pos+1, 1/WordUtils.getWordScore(tTrieNode.word.word), tTrieNode);
+					//map.addEdge(start, pos + 1, 1 / WordUtils.getWordScore(tTrieNode.word.word), tTrieNode);
+					map.addEdge(start, pos+1, -1, tTrieNode);
 				}
 				pos++;
 				tchar = str.charAt(pos);

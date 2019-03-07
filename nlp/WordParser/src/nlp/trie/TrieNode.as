@@ -10,6 +10,7 @@ package nlp.trie
 		public var childDic:Object;
 		public var char:String = "";
 		public var word:TrieWord;
+		public var wordStr:String;
 		public function TrieNode() 
 		{
 			childDic = { };
@@ -37,6 +38,7 @@ package nlp.trie
 			if (pos == word.word.length)
 			{
 				this.word = word;
+				this.wordStr = word.word;
 				return;
 			}
 			var tchar:String;
@@ -51,6 +53,7 @@ package nlp.trie
 			if (pos == word.word.length)
 			{
 				this.word = word;
+				this.wordStr = word.word;
 				return;
 			}
 			var tchar:String;

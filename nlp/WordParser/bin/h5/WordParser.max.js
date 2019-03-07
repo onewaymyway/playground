@@ -743,7 +743,7 @@ var Laya=window.Laya=(function(window,document){
 			WordUtils.typeDic=typeDic;
 			WordDicParser.I.cutter.typeDic=typeDic;
 			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
-			WordDicParser.I.cutter.cutToMap("每个人的一生，都离不开金钱、离不开商业，但是，很多人从来没有试图好好地、认真地去走近它，了解它。");
+			WordDicParser.I.cutter.cutToMap("每个人的一生，都离不开金钱、离不开商业，但是，很多人从来没有试图好好地、认真地去走近它，了解它。它是一个我们每天都碰到的、陌生的朋友。");
 			this.testCut();
 		}
 
@@ -830,9 +830,11 @@ var Laya=window.Laya=(function(window,document){
 	//class nlp.algorithm.LineDP
 	var LineDP=(function(){
 		function LineDP(){
+			this.defaultValue=0;
 			this.relations=null;
 			this.tarDic=null;
 			this.preDic=null;
+			this.walkAble=null;
 		}
 
 		__class(LineDP,'nlp.algorithm.LineDP');
@@ -857,6 +859,47 @@ var Laya=window.Laya=(function(window,document){
 			}
 		}
 
+		__proto.dpWithStart=function(startList,startValue,defaultValue){
+			(startValue===void 0)&& (startValue=0);
+			(defaultValue===void 0)&& (defaultValue=0);
+			this.relations=TopoSort.sort(this.relations,"start","end",null);
+			var i=0,len=0;
+			this.tarDic={};
+			this.preDic={};
+			this.walkAble={};
+			this.defaultValue=defaultValue;
+			var hasStart=false;
+			hasStart=false;
+			if (startList && startList.length){
+				hasStart=true;
+				len=startList.length;
+				for (i=0;i < len;i++){
+					this.walkAble[startList[i]]=true;
+					this.setWeight(startList[i],startValue);
+				}
+			}
+			len=this.relations.length;
+			var tRelation;
+			var tEnd=0;
+			var tValue=NaN;
+			var tStart=0;
+			for (i=0;i < len;i++){
+				tRelation=this.relations[i];
+				tEnd=tRelation.end;
+				tStart=tRelation.start;
+				if (hasStart && !this.walkAble[tStart])continue ;
+				if (hasStart){
+					if (!this.walkAble[tStart])continue ;
+					this.walkAble[tEnd]=true;
+				}
+				tValue=this.getWeight(tRelation.start)+tRelation.weight;
+				if (!this.preDic[tEnd] || this.getWeight(tRelation.end)< tValue){
+					this.preDic[tEnd]=tRelation;
+					this.tarDic[tEnd]=tValue;
+				}
+			}
+		}
+
 		__proto.getMaxWeightPath=function(end){
 			var pathList;
 			pathList=[];
@@ -871,10 +914,14 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.getWeight=function(id){
-			if (!this.tarDic[id]){
-				this.tarDic[id]=0;
+			if (!this.tarDic.hasOwnProperty(id)){
+				this.tarDic[id]=this.defaultValue;
 			}
 			return this.tarDic[id];
+		}
+
+		__proto.setWeight=function(id,value){
+			this.tarDic[id]=value;
 		}
 
 		LineDP.simpleDP=function(relations){
@@ -882,6 +929,16 @@ var Laya=window.Laya=(function(window,document){
 			lDP=new LineDP();
 			lDP.relations=relations;
 			lDP.dp();
+			return lDP;
+		}
+
+		LineDP.dpEx=function(relations,startList,startValue,defaultValue){
+			(startValue===void 0)&& (startValue=0);
+			(defaultValue===void 0)&& (defaultValue=0);
+			var lDP;
+			lDP=new LineDP();
+			lDP.relations=relations;
+			lDP.dpWithStart(startList,startValue,defaultValue);
 			return lDP;
 		}
 
@@ -954,10 +1011,16 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.findMaxWeightPath=function(endI){
+			return LineDP.dpEx(this.eList,[0],0,-999).getMaxWeightPath(endI);
 			return LineDP.simpleDP(this.eList).getMaxWeightPath(endI);
 		}
 
+		//var
 		__proto.buildMap=function(){}
+		MapStruct.showEdgeList=function(eList){
+			var i=0,len=0;
+		}
+
 		return MapStruct;
 	})()
 
@@ -1688,7 +1751,7 @@ var Laya=window.Laya=(function(window,document){
 				this.findWordToMap(str,i,map);
 			};
 			var wList;
-			wList=map.findMaxWeightPath(str.length-1);
+			wList=map.findMaxWeightPath(str.length);
 			console.log("wList:",wList);
 		}
 
@@ -1705,11 +1768,11 @@ var Laya=window.Laya=(function(window,document){
 			}
 			while (tTrieNode){
 				if (tTrieNode.isWord()){
-					map.addEdge(start,pos+1,WordUtils.getWordScore(tTrieNode.word.word),tTrieNode);
+					map.addEdge(start,pos+1,-1,tTrieNode);
 				}
 				pos++;
 				tchar=str.charAt(pos);
-				tTrieNode=this.trie.findByChar(tchar);
+				tTrieNode=tTrieNode.findByChar(tchar);
 			}
 		}
 
@@ -2314,6 +2377,7 @@ var Laya=window.Laya=(function(window,document){
 			this.childDic=null;
 			this.char="";
 			this.word=null;
+			this.wordStr=null;
 			this.childDic={};
 		}
 
@@ -2337,6 +2401,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.addWord=function(pos,word){
 			if (pos==word.word.length){
 				this.word=word;
+				this.wordStr=word.word;
 				return;
 			};
 			var tchar;
@@ -2349,6 +2414,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.addWordR=function(pos,word){
 			if (pos==word.word.length){
 				this.word=word;
+				this.wordStr=word.word;
 				return;
 			};
 			var tchar;
@@ -2774,8 +2840,8 @@ var Laya=window.Laya=(function(window,document){
 		WordUtils.getWordScore=function(word){
 			var tTypeO;
 			tTypeO=WordUtils.typeDic.getWordType(word);
-			if (!tTypeO)return 1;
-			return WordUtils.getMaxScore(tTypeO);
+			if (!tTypeO||!tTypeO.type)return 1;
+			return WordUtils.getMaxScore(tTypeO.type);
 		}
 
 		WordUtils.removeSameNB=function(arr){
