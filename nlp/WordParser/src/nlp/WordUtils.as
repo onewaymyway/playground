@@ -1,13 +1,14 @@
 package nlp 
 {
 	import nlp.cutwords.WordPiece;
+	import nlp.dictools.TypeDicParser;
 	/**
 	 * ...
 	 * @author ww
 	 */
 	public class WordUtils 
 	{
-		
+		public static var typeDic:TypeDicParser;
 		public function WordUtils() 
 		{
 			
@@ -129,6 +130,14 @@ package nlp
 			return score/len;
 		}
 		
+		public static function getWordScore(word:String):Number
+		{
+			var tTypeO:Object;
+			tTypeO=typeDic.getWordType(word);
+			if (!tTypeO) return 1;
+			return getMaxScore(tTypeO);
+		}
+		
 		public static function removeSameNB(arr:Array):Array
 		{
 			var i:int;
@@ -137,6 +146,7 @@ package nlp
 			{
 				if (arr[i + 1] == arr[i]) arr.splice(i, 1);
 			}
+			return arr;
 		}
 		public static function splitWordBySpecial(str:String):Array
 		{

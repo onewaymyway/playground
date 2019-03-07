@@ -27,7 +27,7 @@ package nlp {
 		
 		public static function hasChina(obj:String):Boolean {
 			
-			var reg = /[\u4E00-\u9FA5\uF900-\uFA2D]/;
+			var reg:* = /[\u4E00-\u9FA5\uF900-\uFA2D]/;
 			return reg.test(obj);
 		}
 		
@@ -66,7 +66,7 @@ package nlp {
 			}
 		}
 		public static const DebugChars:Array = ["’"];
-		public static const DebugDic:Object;
+		public static var DebugDic:Object;
 		public static function inits():void
 		{
 			DebugDic = WordUtils.arrToDic(DebugChars);

@@ -72,24 +72,24 @@ package nlp.conll
 			//relations.sort(MathUtil.sortByKey("len", false, true));
 			
 			TopoSort.sort(relations, "start", "end",otherSort);
-			return;
-			var j:int;
-			var tWord:ConllRelation;
-			var cpWord:ConllRelation;
-			var tmpWord:ConllRelation;
-			for (i = 0; i < len; i++)
-			{
-				tWord = relations[i];
-				for (j = i + 1; j < len; j++)
-				{
-					cpWord = relations[j];
-					if (tWord.end == cpWord.start)
-					{
-						relations[j] = tWord;
-						tWord = cpWord;
-					}
-				}
-			}
+			//return;
+			//var j:int;
+			//var tWord:ConllRelation;
+			//var cpWord:ConllRelation;
+			//var tmpWord:ConllRelation;
+			//for (i = 0; i < len; i++)
+			//{
+				//tWord = relations[i];
+				//for (j = i + 1; j < len; j++)
+				//{
+					//cpWord = relations[j];
+					//if (tWord.end == cpWord.start)
+					//{
+						//relations[j] = tWord;
+						//tWord = cpWord;
+					//}
+				//}
+			//}
 		}
 	}
 

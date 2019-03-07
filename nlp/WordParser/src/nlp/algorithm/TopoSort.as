@@ -29,7 +29,7 @@ package nlp.algorithm
 				tRelation = relationList[i];
 				if (nodeDic[tRelation[startKey]] == 0)
 				{
-					if (!otherSort) return i;
+					if (otherSort==null) return i;
 					if (tI<0||otherSort(tRelation,relationList[tI]))
 					{
 						tI = i;
@@ -83,8 +83,9 @@ package nlp.algorithm
 				} 
 				
 			}
+			return relationList;
 		}
-		public static function sort(relationList:Array,startKey:String="start",endKey:String="end",otherSort:Function=null):void
+		public static function sort(relationList:Array,startKey:String="start",endKey:String="end",otherSort:Function=null):Array
 		{
 			var tp:TopoSort;
 			tp = new TopoSort();
@@ -92,6 +93,7 @@ package nlp.algorithm
 			tp.endKey = endKey;
 			tp.otherSort = otherSort;
 			tp.sort(relationList);
+			return relationList;
 		}
 	}
 

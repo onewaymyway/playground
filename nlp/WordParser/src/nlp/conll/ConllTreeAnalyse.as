@@ -114,19 +114,31 @@ package nlp.conll
 			startWord = tree.getWordByIndex(relation.start);
 			endWord = tree.getWordByIndex(relation.end);
 			
-			return getWordTypeEx(startWord) + ":" +getWordTypeEx(endWord)+":"+(relation.end>relation.start);
-			if (startWord && endWord)
-			{
+			//return getWordTypeEx(startWord) + ":" +getWordTypeEx(endWord) + ":" + (relation.end > relation.start);
+			return getWordRelationKey(startWord, endWord, relation.end - relation.start);
+			//if (startWord && endWord)
+			//{
 				//return startWord.postag + ":" + endWord.postag;
-				
-				return typeDic.getWordTypeStr(startWord.word) + ":" + typeDic.getWordTypeStr(endWord.word);
-			}
+				//
+				//return typeDic.getWordTypeStr(startWord.word) + ":" + typeDic.getWordTypeStr(endWord.word);
+			//}
 			return "unknow";
 		}
 		
-		public function getWordRelationScore(start:String, end:String, pos:int):Number
+		private function getWordRelationKey(startWord:ConllWord, endWord:ConllWord, pos:int):String
 		{
-			
+			return getWordTypeEx(startWord) + ":" +getWordTypeEx(endWord)+":"+(pos>0);
+		}
+		
+		public function getWordRelationScore(start:ConllWord, end:ConllWord, pos:int):Number
+		{
+			var key:String;
+			key = getWordRelationKey(start, end,pos);
+			if (dependDic[key])
+			{
+				return dependDic[key];
+			}
+			return 0;
 		}
 		private function analyseRelation(tree:ConllTree):void
 		{
@@ -158,7 +170,7 @@ package nlp.conll
 			for (i = 0; i < len; i++)
 			{
 				tKey = getWordListKey(lists[i]);
-				keyDic[tKey] = tree;
+				keyDic[tKey] = lists;
 			}
 		}
 	}

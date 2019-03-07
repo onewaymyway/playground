@@ -1,5 +1,6 @@
 package nlp.cutwords 
 {
+	import nlp.algorithm.map.MapStruct;
 	import nlp.dictools.TypeDicParser;
 	import nlp.trie.Trie;
 	import nlp.trie.TrieNode;
@@ -67,6 +68,48 @@ package nlp.cutwords
 			return rst;
 		}
 		
+		public function cutToMap(str:String):void
+		{
+			var i:int, len:int;
+			len = str.length;
+			var map:MapStruct;
+			map = new MapStruct();
+			
+			for (i = 0; i < len; i++)
+			{
+				findWordToMap(str, i, map);
+				
+			}
+			var wList:Array;
+			wList = map.findMaxWeightPath(str.length - 1);
+			trace("wList:",wList);
+		}
+		
+		private function findWordToMap(str:String,pos:int, map:MapStruct):void
+		{
+			var start:int;
+			start = pos;
+			var tChar:String;
+			var tchar:String;
+			tchar = str.charAt(pos);
+			var tTrieNode:TrieNode;
+			tTrieNode = trie.findByChar(tchar);
+			if (!tTrieNode)
+			{
+				map.addEdge(start, pos+1, WordUtils.getWordScore(tchar), tchar);
+			}
+			while (tTrieNode)
+			{
+				if (tTrieNode.isWord())
+				{
+					map.addEdge(start, pos+1, WordUtils.getWordScore(tTrieNode.word.word), tTrieNode);
+				}
+				pos++;
+				tchar = str.charAt(pos);
+				tTrieNode = trie.findByChar(tchar);
+			}
+		}
+		
 		private function cutWork(str:String):Array
 		{
 			var tPos:int;
@@ -103,7 +146,7 @@ package nlp.cutwords
 			return rst;
 		}
 		
-		public function adptPiece(piece:WordPiece):void
+		public function adptPiece(piece:WordPiece):WordPiece
 		{
 			piece.update();
 			if (typeDic)

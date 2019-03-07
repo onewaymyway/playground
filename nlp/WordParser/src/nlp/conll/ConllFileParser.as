@@ -67,19 +67,19 @@ package nlp.conll
 			index = 0;
 		}
 		
-		public function getCurLine():String
+		public function getCurLine():*
 		{
 			return treeList[index];
 		}
 		
-		public function pre():String
+		public function pre():*
 		{
 			index--;
 			normalIndex();
 			return getCurLine();
 		}
 		
-		public function next():String
+		public function next():*
 		{
 			index++;
 			normalIndex();

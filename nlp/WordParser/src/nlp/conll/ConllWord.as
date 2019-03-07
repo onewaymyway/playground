@@ -33,7 +33,7 @@ package nlp.conll
 		/**
 		 * 当前词语的中心词
 		 */
-		public var head:String;
+		public var head:int;
 		/**
 		 * 当前词语与中心词的依存关系
 		 */
@@ -50,7 +50,7 @@ package nlp.conll
 		
 		
 		public static const KeyList:Array = ["id","form","lemma","cpostag","postag","feats","head","deprel"];
-		public static function parseFromLine(line:String):void
+		public static function parseFromLine(line:String):ConllWord
 		{
 			var values:Array;
 			values = line.split("\t");
@@ -62,8 +62,8 @@ package nlp.conll
 			{
 				rst[KeyList[i]] = values[i];
 			}
-			rst.id = parseInt(rst.id) - 1;
-			rst.head = parseInt(rst.head) - 1;
+			rst.id = Sys.mParseInt(rst.id) - 1;
+			rst.head = Sys.mParseInt(rst.head) - 1;
 			rst.word = rst.form;
 			rst.refers = [];
 			return rst;

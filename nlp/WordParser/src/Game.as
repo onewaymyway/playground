@@ -46,9 +46,9 @@ package
 		{
 			//WordUtils.showChars(0, 1000);
 			
-			//startWordParserTest();
+			startWordParserTest();
 			
-			testWordTree();
+			//testWordTree();
 		}
 		
 		private function startWordParserTest():void
@@ -66,7 +66,7 @@ package
 			
 			
 			
-			Laya.stage.graphics.fillText("ready", 10, 10, null, "#ff0000");
+			Laya.stage.graphics.fillText("ready", 10, 10, null, "#ff0000",null);
 		}
 		
 		private function testWordParser():void
@@ -80,8 +80,10 @@ package
 			typeDic = new TypeDicParser();
 			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
 			trace(typeDic);
+			WordUtils.typeDic = typeDic;
 			WordDicParser.I.cutter.typeDic = typeDic;
 			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
+			WordDicParser.I.cutter.cutToMap("每个人的一生，都离不开金钱、离不开商业，但是，很多人从来没有试图好好地、认真地去走近它，了解它。");
 			testCut();
 		}
 		

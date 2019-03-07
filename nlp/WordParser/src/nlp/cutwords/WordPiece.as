@@ -1,5 +1,6 @@
 package nlp.cutwords 
 {
+	import nlp.trie.TrieWord;
 	import nlp.WordOne;
 	/**
 	 * ...
@@ -10,7 +11,7 @@ package nlp.cutwords
 		public var word:String;
 		public var start:int;
 		public var end:int;
-		public var wordRef:WordOne;
+		public var wordRef:TrieWord;
 		public var type:String;
 		public var typeO:Object;
 		public function WordPiece() 

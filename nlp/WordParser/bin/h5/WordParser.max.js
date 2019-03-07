@@ -719,16 +719,17 @@ var Laya=window.Laya=(function(window,document){
 		__class(Game,'Game');
 		var __proto=Game.prototype;
 		__proto.initGameView=function(){
-			this.testWordTree();
+			this.startWordParserTest();
 		}
 
+		//testWordTree();
 		__proto.startWordParserTest=function(){
 			WordDicParser.I.loadDic("data/中文字典1.txt",Handler.create(this,this.onDicLoaded));
 		}
 
 		__proto.onDicLoaded=function(){
 			this.testWordParser();
-			Laya.stage.graphics.fillText("ready",10,10,null,"#ff0000");
+			Laya.stage.graphics.fillText("ready",10,10,null,"#ff0000",null);
 		}
 
 		__proto.testWordParser=function(){
@@ -739,8 +740,10 @@ var Laya=window.Laya=(function(window,document){
 			typeDic=new TypeDicParser();
 			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
 			console.log(typeDic);
+			WordUtils.typeDic=typeDic;
 			WordDicParser.I.cutter.typeDic=typeDic;
 			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
+			WordDicParser.I.cutter.cutToMap("每个人的一生，都离不开金钱、离不开商业，但是，很多人从来没有试图好好地、认真地去走近它，了解它。");
 			this.testCut();
 		}
 
@@ -824,6 +827,200 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class nlp.algorithm.LineDP
+	var LineDP=(function(){
+		function LineDP(){
+			this.relations=null;
+			this.tarDic=null;
+			this.preDic=null;
+		}
+
+		__class(LineDP,'nlp.algorithm.LineDP');
+		var __proto=LineDP.prototype;
+		__proto.dp=function(){
+			this.relations=TopoSort.sort(this.relations,"start","end",null);
+			var i=0,len=0;
+			len=this.relations.length;
+			this.tarDic={};
+			this.preDic={};
+			var tRelation;
+			var tEnd=0;
+			var tValue=NaN;
+			for (i=0;i < len;i++){
+				tRelation=this.relations[i];
+				tEnd=tRelation.end;
+				tValue=this.getWeight(tRelation.start)+tRelation.weight;
+				if (!this.preDic[tEnd] || this.getWeight(tRelation.end)< tValue){
+					this.preDic[tEnd]=tRelation;
+					this.tarDic[tEnd]=tValue;
+				}
+			}
+		}
+
+		__proto.getMaxWeightPath=function(end){
+			var pathList;
+			pathList=[];
+			var tID=0;
+			tID=end;
+			while (this.preDic[tID]){
+				pathList.push(this.preDic[tID]);
+				tID=this.preDic[tID].start;
+			}
+			pathList.reverse();
+			return pathList;
+		}
+
+		__proto.getWeight=function(id){
+			if (!this.tarDic[id]){
+				this.tarDic[id]=0;
+			}
+			return this.tarDic[id];
+		}
+
+		LineDP.simpleDP=function(relations){
+			var lDP;
+			lDP=new LineDP();
+			lDP.relations=relations;
+			lDP.dp();
+			return lDP;
+		}
+
+		return LineDP;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.map.Edge
+	var Edge=(function(){
+		function Edge(){
+			this.data=null;
+			this.start=0;
+			this.end=0;
+			this.weight=0;
+		}
+
+		__class(Edge,'nlp.algorithm.map.Edge');
+		Edge.create=function(start,end,weight,data){
+			var rst;
+			rst=new Edge();
+			rst.start=start;
+			rst.end=end;
+			rst.weight=weight;
+			rst.data=data;
+			return rst;
+		}
+
+		return Edge;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.map.MapStruct
+	var MapStruct=(function(){
+		function MapStruct(){
+			this.vList=null;
+			this.eList=null;
+			this.reset();
+		}
+
+		__class(MapStruct,'nlp.algorithm.map.MapStruct');
+		var __proto=MapStruct.prototype;
+		__proto.reset=function(){
+			this.vList=[];
+			this.eList=[];
+		}
+
+		__proto.getVertex=function(id){
+			if (!this.vList[id])this.vList[id]=Vertex.createByID(id);
+			return this.vList[id];
+		}
+
+		__proto.addEdge=function(start,end,weight,data){
+			var edge;
+			edge=Edge.create(start,end,weight,data);
+			var startV;
+			var endV;
+			startV=this.getVertex(start);
+			endV=this.getVertex(end);
+			startV.addOut(end,weight);
+			endV.addIn(start,weight);
+			this.eList.push(edge);
+		}
+
+		__proto.findMaxWeightPath=function(endI){
+			return LineDP.simpleDP(this.eList).getMaxWeightPath(endI);
+		}
+
+		__proto.buildMap=function(){}
+		return MapStruct;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.map.Vertex
+	var Vertex=(function(){
+		function Vertex(){
+			this.inList=null;
+			this.outList=null;
+			this.inDic=null;
+			this.outDic=null;
+			this.id=0;
+			this.reset();
+		}
+
+		__class(Vertex,'nlp.algorithm.map.Vertex');
+		var __proto=Vertex.prototype;
+		__proto.reset=function(){
+			this.inList=[];
+			this.outList=[];
+			this.inDic={};
+			this.outDic={};
+		}
+
+		__proto.addEdge=function(edge){
+			if (edge.start==this.id){
+				this.addOut(edge.end,edge.weight);
+			}else
+			if (edge.end==this.id){
+				this.addIn(edge.start,edge.weight);
+			}
+		}
+
+		__proto.addIn=function(id,weight){
+			this.inList.push(id);
+			this.inDic[id]=weight;
+		}
+
+		__proto.addOut=function(id,weight){
+			this.outList.push(id);
+			this.outDic[id]=weight;
+		}
+
+		Vertex.createByID=function(id){
+			var rst;
+			rst=new Vertex();
+			rst.reset();
+			rst.id=id;
+			return rst;
+		}
+
+		return Vertex;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class nlp.algorithm.TopoSort
 	var TopoSort=(function(){
 		function TopoSort(){
@@ -846,7 +1043,7 @@ var Laya=window.Laya=(function(window,document){
 			for (i=startPos;i < len;i++){
 				tRelation=this.relationList[i];
 				if (this.nodeDic[tRelation[this.startKey]]==0){
-					if (!this.otherSort)return i;
+					if (this.otherSort==null)return i;
 					if (tI<0||this.otherSort(tRelation,this.relationList[tI])){
 						tI=i;
 					}
@@ -890,6 +1087,7 @@ var Laya=window.Laya=(function(window,document){
 					this.switchPos(i,okPos);
 				}
 			}
+			return relationList;
 		}
 
 		TopoSort.sort=function(relationList,startKey,endKey,otherSort){
@@ -901,6 +1099,7 @@ var Laya=window.Laya=(function(window,document){
 			tp.endKey=endKey;
 			tp.otherSort=otherSort;
 			tp.sort(relationList);
+			return relationList;
 		}
 
 		return TopoSort;
@@ -1171,21 +1370,6 @@ var Laya=window.Laya=(function(window,document){
 				tWord.sortRefers(i);
 			}
 			TopoSort.sort(this.relations,"start","end",ConllTree.otherSort);
-			return;
-			var j=0;
-			var tWord;
-			var cpWord;
-			var tmpWord;
-			for (i=0;i < len;i++){
-				tWord=this.relations[i];
-				for (j=i+1;j < len;j++){
-					cpWord=this.relations[j];
-					if (tWord.end==cpWord.start){
-						this.relations[j]=tWord;
-						tWord=cpWord;
-					}
-				}
-			}
 		}
 
 		ConllTree.otherSort=function(item0,item1){
@@ -1241,14 +1425,23 @@ var Laya=window.Laya=(function(window,document){
 			var endWord;
 			startWord=tree.getWordByIndex(relation.start);
 			endWord=tree.getWordByIndex(relation.end);
-			return this.getWordTypeEx(startWord)+":"+this.getWordTypeEx(endWord)+":"+(relation.end>relation.start);
-			if (startWord && endWord){
-				return ConllTreeAnalyse.typeDic.getWordTypeStr(startWord.word)+":"+ConllTreeAnalyse.typeDic.getWordTypeStr(endWord.word);
-			}
+			return this.getWordRelationKey(startWord,endWord,relation.end-relation.start);
 			return "unknow";
 		}
 
-		__proto.getWordRelationScore=function(start,end,pos){}
+		__proto.getWordRelationKey=function(startWord,endWord,pos){
+			return this.getWordTypeEx(startWord)+":"+this.getWordTypeEx(endWord)+":"+(pos>0);
+		}
+
+		__proto.getWordRelationScore=function(start,end,pos){
+			var key;
+			key=this.getWordRelationKey(start,end,pos);
+			if (this.dependDic[key]){
+				return this.dependDic[key];
+			}
+			return 0;
+		}
+
 		__proto.analyseRelation=function(tree){
 			var relations;
 			relations=tree.relations;
@@ -1273,7 +1466,7 @@ var Laya=window.Laya=(function(window,document){
 			var tKey;
 			for (i=0;i < len;i++){
 				tKey=ConllTreeAnalyse.getWordListKey(lists[i]);
-				this.keyDic[tKey]=/*no*/this.tree;
+				this.keyDic[tKey]=lists;
 			}
 		}
 
@@ -1339,7 +1532,7 @@ var Laya=window.Laya=(function(window,document){
 			this.cpostag=null;
 			this.postag=null;
 			this.feats=null;
-			this.head=null;
+			this.head=0;
 			this.deprel=null;
 			this.word=null;
 			this.tree=null;
@@ -1374,8 +1567,8 @@ var Laya=window.Laya=(function(window,document){
 			for (i=0;i < len;i++){
 				rst[ConllWord.KeyList[i]]=values[i];
 			}
-			rst.id=parseInt(rst.id)-1;
-			rst.head=parseInt(rst.head)-1;
+			rst.id=Sys.mParseInt(rst.id)-1;
+			rst.head=Sys.mParseInt(rst.head)-1;
 			rst.word=rst.form;
 			rst.refers=[];
 			return rst;
@@ -1484,6 +1677,40 @@ var Laya=window.Laya=(function(window,document){
 				}
 			}
 			return rst;
+		}
+
+		__proto.cutToMap=function(str){
+			var i=0,len=0;
+			len=str.length;
+			var map;
+			map=new MapStruct();
+			for (i=0;i < len;i++){
+				this.findWordToMap(str,i,map);
+			};
+			var wList;
+			wList=map.findMaxWeightPath(str.length-1);
+			console.log("wList:",wList);
+		}
+
+		__proto.findWordToMap=function(str,pos,map){
+			var start=0;
+			start=pos;
+			var tChar;
+			var tchar;
+			tchar=str.charAt(pos);
+			var tTrieNode;
+			tTrieNode=this.trie.findByChar(tchar);
+			if (!tTrieNode){
+				map.addEdge(start,pos+1,WordUtils.getWordScore(tchar),tchar);
+			}
+			while (tTrieNode){
+				if (tTrieNode.isWord()){
+					map.addEdge(start,pos+1,WordUtils.getWordScore(tTrieNode.word.word),tTrieNode);
+				}
+				pos++;
+				tchar=str.charAt(pos);
+				tTrieNode=this.trie.findByChar(tchar);
+			}
 		}
 
 		__proto.cutWork=function(str){
@@ -2362,7 +2589,7 @@ var Laya=window.Laya=(function(window,document){
 			tLine=line;
 			var isPinYin=false;
 			isPinYin=false;
-			if (line.length=1&&this.alasDic[line]){
+			if (line.length==1&&this.alasDic[line]){
 				tLine=this.preLine;
 			}else
 			if (line.charAt(0)=="（"){
@@ -2544,12 +2771,20 @@ var Laya=window.Laya=(function(window,document){
 			return score/len;
 		}
 
+		WordUtils.getWordScore=function(word){
+			var tTypeO;
+			tTypeO=WordUtils.typeDic.getWordType(word);
+			if (!tTypeO)return 1;
+			return WordUtils.getMaxScore(tTypeO);
+		}
+
 		WordUtils.removeSameNB=function(arr){
 			var i=0;
 			i=arr.length-1;
 			for (i=arr.length-1;i >=0;i--){
 				if (arr[i+1]==arr[i])arr.splice(i,1);
 			}
+			return arr;
 		}
 
 		WordUtils.splitWordBySpecial=function(str){
@@ -2592,6 +2827,7 @@ var Laya=window.Laya=(function(window,document){
 			return rst;
 		}
 
+		WordUtils.typeDic=null
 		return WordUtils;
 	})()
 
@@ -11534,6 +11770,62 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		return WordLayout;
+	})()
+
+
+	/**
+	*编辑器全局静态入口
+	*@author yung
+	*/
+	//class Sys
+	var Sys=(function(){
+		function Sys(){};
+		__class(Sys,'Sys');
+		Sys.mParseInt=function(v){
+			return parseInt(v);
+		}
+
+		Sys.lang=function(body,__args){
+			var args=[];for(var i=1,sz=arguments.length;i<sz;i++)args.push(arguments[i]);
+			var i=0,len=0;
+			len=args.length;
+			if(Sys.langPack&&Sys.langPack[body]){
+				body=Sys.langPack[body];
+			}
+			for (i=0;i < len;i++){
+				body=body.replace("{"+i+"}",args[i]);
+			}
+			return body;
+		}
+
+		Sys.adptLangPack=function(){
+			if(!Sys.langPack)return;
+			var key;
+			var newKey;
+			for(key in Sys.langPack){
+				if(key.indexOf("\\n")>=0){
+					newKey=StringTool.getReplace(key,"\\\\n","\n");
+					Sys.langPack[newKey]=StringTool.getReplace(Sys.langPack[key],"\\\\n","\n");
+				}
+			}
+		}
+
+		Sys.langArr=function(txtList){
+			if(!Sys.langPack)return txtList;
+			var i=0,len=0;
+			len=txtList.length;
+			var tTxt;
+			for(i=0;i<len;i++){
+				tTxt=txtList[i];
+				if(Sys.langPack[tTxt]){
+					txtList[i]=Sys.langPack[tTxt];
+				}
+			}
+			return txtList;
+		}
+
+		Sys.langPack=null
+		return Sys;
 	})()
 
 
@@ -28758,12 +29050,7 @@ var Laya=window.Laya=(function(window,document){
 	})(WordViewerUI)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,PingYinDic,Render,View,Browser,Timer,GraphicAnimation,LocalStorage]);
+	Laya.__init([EventDispatcher,LoaderManager,PingYinDic,Render,View,Browser,Timer,GraphicAnimation,LocalStorage]);
 	new Game();
 
 })(window,document,Laya);
-
-
-/*
-1 file:///D:/codes/playground.git/trunk/nlp/WordParser/src/nlp/conll/ConllTreeAnalyse.as (157):warning:tree This variable is not defined.
-*/

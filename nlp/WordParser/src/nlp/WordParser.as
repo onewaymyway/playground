@@ -36,7 +36,7 @@ package nlp
 			var isPinYin:Boolean;
 			isPinYin = false;
 			
-			if (line.length=1&&alasDic[line])
+			if (line.length==1&&alasDic[line])
 			{
 				
 				tLine = preLine;
