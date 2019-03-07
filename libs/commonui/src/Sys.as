@@ -9,7 +9,10 @@ package {
 	 */
 	public class Sys {
 		
-		
+		public static function mParseInt(v:*):int
+		{
+			return parseInt(v);
+		}
 		public static var langPack:Object;
 		public static function lang(body:String, ...args):String {
 			var i:int, len:int;
