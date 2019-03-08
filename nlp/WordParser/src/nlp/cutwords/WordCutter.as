@@ -2,6 +2,7 @@ package nlp.cutwords
 {
 	import nlp.algorithm.map.MapStruct;
 	import nlp.dictools.TypeDicParser;
+	import nlp.PingYinDic;
 	import nlp.trie.Trie;
 	import nlp.trie.TrieNode;
 	import nlp.WordUtils;
@@ -13,9 +14,17 @@ package nlp.cutwords
 	{
 		public var trie:Trie;
 		public var typeDic:TypeDicParser;
+		public var charDicCutter:CharDicCutter;
 		public function WordCutter() 
 		{
-			
+			init();
+		}
+		
+		private function init():void
+		{
+			charDicCutter = new CharDicCutter();
+			charDicCutter.addCutDic("NUMBER", PingYinDic.NumCharDic);
+			charDicCutter.addCutDic("ENGLISHWORD", PingYinDic.EnglishCharDic);
 		}
 		
 		public function cut(str:String):Array
@@ -159,12 +168,17 @@ package nlp.cutwords
 		}
 		public function findMaxWord(str:String, pos:int = 0):WordPiece
 		{
+			
+			var tPiece:WordPiece;
+			
+			tPiece = charDicCutter.findMaxWord(str, pos);
+			if (tPiece) return tPiece;
 			var tchar:String;
 			tchar = str.charAt(pos);
 			var tTrieNode:TrieNode;
 			tTrieNode = trie.findByChar(tchar);
 			
-			var tPiece:WordPiece;
+			
 			tPiece = new WordPiece();
 			tPiece.start = pos;
 			tPiece.end = pos + 1;
@@ -216,12 +230,18 @@ package nlp.cutwords
 			{
 				pos = str.length - 1;
 			}
+			
+			var tPiece:WordPiece;
+			
+			tPiece = charDicCutter.findMaxWordR(str, pos);
+			if (tPiece) return tPiece;
+			
 			var tchar:String;
 			tchar = str.charAt(pos);
 			var tTrieNode:TrieNode;
 			tTrieNode = trie.findByCharR(tchar);
 			
-			var tPiece:WordPiece;
+			
 			tPiece = new WordPiece();
 			tPiece.start = pos;
 			tPiece.end = pos + 1;

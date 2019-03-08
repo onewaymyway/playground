@@ -1691,15 +1691,103 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class nlp.cutwords.CharDicCutter
+	var CharDicCutter=(function(){
+		function CharDicCutter(){
+			this.allDic={};
+		}
+
+		__class(CharDicCutter,'nlp.cutwords.CharDicCutter');
+		var __proto=CharDicCutter.prototype;
+		__proto.addCutDic=function(type,charDic){
+			var tConfig;
+			tConfig={};
+			tConfig.type=type;
+			tConfig.charDic=charDic;
+			var key;
+			for (key in charDic){
+				this.allDic[key]=tConfig;
+			}
+		}
+
+		__proto.findMaxWord=function(str,tPos){
+			var tChar;
+			tChar=str.charAt(tPos);
+			var tCutConfig;
+			tCutConfig=this.allDic[tChar];
+			if (!tCutConfig)return null;
+			var tPiece;
+			tPiece=new WordPiece();
+			tPiece.start=tPos;
+			tPiece.end=tPos+1;
+			var charDic;
+			charDic=tCutConfig.charDic;
+			var start=0;
+			start=tPos;
+			var end=0;
+			end=tPos;
+			while (charDic[tChar]){
+				tPiece.end=tPiece.end+1;
+				if (tPiece.end >=str.length)break ;
+				tChar=str.charAt(tPiece.end);
+			}
+			tPiece.word=str.substring(tPiece.start,tPiece.end);
+			tPiece.type=tCutConfig.type;
+			return tPiece;
+		}
+
+		__proto.findMaxWordR=function(str,tPos){
+			var tChar;
+			tChar=str.charAt(tPos);
+			var tCutConfig;
+			tCutConfig=this.allDic[tChar];
+			if (!tCutConfig)return null;
+			var tPiece;
+			tPiece=new WordPiece();
+			tPiece.start=tPos;
+			tPiece.end=tPos+1;
+			var charDic;
+			charDic=tCutConfig.charDic;
+			var start=0;
+			start=tPos;
+			var end=0;
+			end=tPos;
+			while (charDic[tChar]){
+				tPiece.start=start;
+				start--;
+				if (start<0)break ;
+				tChar=str.charAt(start);
+			}
+			tPiece.word=str.substring(tPiece.start,tPiece.end);
+			tPiece.type=tCutConfig.type;
+			return tPiece;
+		}
+
+		return CharDicCutter;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class nlp.cutwords.WordCutter
 	var WordCutter=(function(){
 		function WordCutter(){
 			this.trie=null;
 			this.typeDic=null;
+			this.charDicCutter=null;
+			this.init();
 		}
 
 		__class(WordCutter,'nlp.cutwords.WordCutter');
 		var __proto=WordCutter.prototype;
+		__proto.init=function(){
+			this.charDicCutter=new CharDicCutter();
+			this.charDicCutter.addCutDic("NUMBER",PingYinDic.NumCharDic);
+			this.charDicCutter.addCutDic("ENGLISHWORD",PingYinDic.EnglishCharDic);
+		}
+
 		__proto.cut=function(str){
 			var splitStrs;
 			splitStrs=WordUtils.splitWordBySpecial(str);
@@ -1817,11 +1905,13 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.findMaxWord=function(str,pos){
 			(pos===void 0)&& (pos=0);
+			var tPiece;
+			tPiece=this.charDicCutter.findMaxWord(str,pos);
+			if (tPiece)return tPiece;
 			var tchar;
 			tchar=str.charAt(pos);
 			var tTrieNode;
 			tTrieNode=this.trie.findByChar(tchar);
-			var tPiece;
 			tPiece=new WordPiece();
 			tPiece.start=pos;
 			tPiece.end=pos+1;
@@ -1862,11 +1952,13 @@ var Laya=window.Laya=(function(window,document){
 			if (pos==-2){
 				pos=str.length-1;
 			};
+			var tPiece;
+			tPiece=this.charDicCutter.findMaxWordR(str,pos);
+			if (tPiece)return tPiece;
 			var tchar;
 			tchar=str.charAt(pos);
 			var tTrieNode;
 			tTrieNode=this.trie.findByCharR(tchar);
-			var tPiece;
 			tPiece=new WordPiece();
 			tPiece.start=pos;
 			tPiece.end=pos+1;
@@ -2269,11 +2361,36 @@ var Laya=window.Laya=(function(window,document){
 			return true;
 		}
 
+		PingYinDic.isNumChar=function(char){
+			return PingYinDic.NumCharDic[char];
+		}
+
+		PingYinDic.isEnglishChar=function(char){
+			return PingYinDic.EnglishCharDic[char];
+		}
+
 		PingYinDic.inits=function(){
 			PingYinDic.DebugDic=WordUtils.arrToDic(PingYinDic.DebugChars);
+			var i=0,len=0;
+			var start=0;
+			start="A".charCodeAt(0);
+			len="Z".charCodeAt(0);
+			for (i=start;i <=len;i++){
+				PingYinDic.EnglishCharDic[String.fromCharCode(i)]=true;
+			}
+			start="a".charCodeAt(0);
+			len="z".charCodeAt(0);
+			for (i=start;i <=len;i++){
+				PingYinDic.EnglishCharDic[String.fromCharCode(i)]=true;
+			}
+			for (i=0;i < 10;i++){
+				PingYinDic.NumCharDic[i]=true;
+			}
 		}
 
 		PingYinDic.DebugDic=null
+		PingYinDic.EnglishCharDic={};
+		PingYinDic.NumCharDic={};
 		__static(PingYinDic,
 		['DebugChars',function(){return this.DebugChars=["’"];}
 		]);
@@ -29116,7 +29233,7 @@ var Laya=window.Laya=(function(window,document){
 	})(WordViewerUI)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,PingYinDic,Render,View,Browser,Timer,GraphicAnimation,LocalStorage]);
+	Laya.__init([EventDispatcher,LoaderManager,PingYinDic,Render,View,Timer,GraphicAnimation,Browser,LocalStorage]);
 	new Game();
 
 })(window,document,Laya);

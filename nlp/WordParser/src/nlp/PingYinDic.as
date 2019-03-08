@@ -67,9 +67,40 @@ package nlp {
 		}
 		public static const DebugChars:Array = ["’"];
 		public static var DebugDic:Object;
+		public static var EnglishCharDic:Object = { };
+		public static var NumCharDic:Object = { };
+		
+		public static function isNumChar(char:String):Boolean
+		{
+			return NumCharDic[char];
+		}
+		
+		public static function isEnglishChar(char:String):Boolean
+		{
+			return EnglishCharDic[char];
+		}
+		
 		public static function inits():void
 		{
 			DebugDic = WordUtils.arrToDic(DebugChars);
+			var i:int, len:int;
+			var start:int;
+			start = "A".charCodeAt(0);
+			len = "Z".charCodeAt(0);
+			for (i = start; i <= len; i++)
+			{
+				EnglishCharDic[String.fromCharCode(i)] = true;
+			}
+			start = "a".charCodeAt(0);
+			len = "z".charCodeAt(0);
+			for (i = start; i <= len; i++)
+			{
+				EnglishCharDic[String.fromCharCode(i)] = true;
+			}
+			for (i = 0; i < 10; i++)
+			{
+				NumCharDic[i] = true;
+			}
 		}
 		inits();
 		public function addWordToDic(word:String):void
