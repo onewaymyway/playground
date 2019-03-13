@@ -12,7 +12,10 @@ package nlp.memory
 		{
 			
 		}
-		
+		public function getScore(word:String):Number
+		{
+			return connectDic[word] || 0;
+		}
 		public function addConnect(word:String):void
 		{
 			if (!connectDic[word]) connectDic[word] = 0;
