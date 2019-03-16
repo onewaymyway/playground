@@ -1,5 +1,6 @@
 package view 
 {
+	import nlp.WordUtils;
 	import ui.wordparser.WordForTreeUI;
 	/**
 	 * ...
@@ -20,7 +21,9 @@ package view
 			txt.text = dataO.word;
 			this.width = txt.width;
 			this.graphics.clear();
-			this.graphics.fillText(dataO.cpostag, this.width * 0.5, -10, null, "#ff0000", "center");
+			//this.graphics.fillText(dataO.cpostag, this.width * 0.5, -10, null, "#ff0000", "center");
+			
+			this.graphics.fillText(WordUtils.typeDic.getWordTypeCNStr(dataO.word)+"", this.width * 0.5, -10, null, "#ff0000", "center");
 		}
 		
 		public function getCenterX():Number

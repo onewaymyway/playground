@@ -47,9 +47,9 @@ package
 		{
 			//WordUtils.showChars(0, 1000);
 			
-			startWordParserTest();
+			//startWordParserTest();
 			
-			//testWordTree();
+			testWordTree();
 		}
 		
 		private function startWordParserTest():void
@@ -74,11 +74,7 @@ package
 		{
 			
 			testWordParser();
-			//Laya.stage.on(Event.CLICK, this, testCut);
-			
-			
-			
-			
+			//Laya.stage.on(Event.CLICK, this, testCut);		
 			
 			Laya.stage.graphics.fillText("ready", 10, 10, null, "#ff0000",null);
 		}
@@ -105,7 +101,7 @@ package
 			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
 			typeDic.addType([" ",":","/",".","。","."],["punk"],["标点"]);
 			trace(typeDic);
-			
+			WordUtils.typeDic = typeDic;
 			var conllDes:ConllDesParser;
 			conllDes = new ConllDesParser();
 			conllDes.parseTxt(Loader.getRes("data/conlldes.txt"));
