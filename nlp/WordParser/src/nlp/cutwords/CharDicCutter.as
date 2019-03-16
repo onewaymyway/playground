@@ -6,7 +6,8 @@ package nlp.cutwords
 	 */
 	public class CharDicCutter 
 	{
-		public var allDic:Object={};
+		public var allDic:Object = { };
+		public var typeDic:Object = { };
 		
 		public function CharDicCutter() 
 		{
@@ -24,6 +25,17 @@ package nlp.cutwords
 			{
 				allDic[key] = tConfig;
 			}
+			var typeO:Object;
+			typeO = { };
+			typeO.typecns = [type];
+			typeO.types = [type];
+			typeDic[type] = typeO;
+		}
+		
+		public function adptWordPiece(wordPiece:WordPiece):WordPiece
+		{
+			wordPiece.typeO = typeDic[wordPiece.type];
+			return wordPiece;
 		}
 		
 		
@@ -55,7 +67,7 @@ package nlp.cutwords
 			}
 			tPiece.word = str.substring(tPiece.start, tPiece.end);
 			tPiece.type = tCutConfig.type;
-			return tPiece;
+			return adptWordPiece(tPiece);
 		}
 		
 		public function findMaxWordR(str:String, tPos:int):WordPiece
@@ -87,7 +99,7 @@ package nlp.cutwords
 			}
 			tPiece.word = str.substring(tPiece.start, tPiece.end);
 			tPiece.type = tCutConfig.type;
-			return tPiece;
+			return adptWordPiece(tPiece);
 		}
 		
 		

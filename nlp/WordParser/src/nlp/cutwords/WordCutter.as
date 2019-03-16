@@ -24,7 +24,7 @@ package nlp.cutwords
 		{
 			charDicCutter = new CharDicCutter();
 			charDicCutter.addCutDic("NUMBER", PingYinDic.NumCharDic);
-			charDicCutter.addCutDic("ENGLISHWORD", PingYinDic.EnglishCharDic);
+			charDicCutter.addCutDic("ENG", PingYinDic.EnglishCharDic);
 		}
 		
 		public function cut(str:String):Array
@@ -158,6 +158,7 @@ package nlp.cutwords
 		
 		public function adptPiece(piece:WordPiece):WordPiece
 		{
+			if (piece.word == " ") debugger;
 			piece.update();
 			if (typeDic)
 			{

@@ -96,6 +96,23 @@ package nlp.dictools
 			rst.word = typeO.word;
 			return rst;
 		}
+		
+		public function addType(wordList:Array, types:Array, typecns:Array = null):void
+		{
+			var tWordO:Object;
+			var i:int, len:int;
+			len = wordList.length;
+			for (i = 0; i < len; i++)
+			{
+				tWordO = { };
+				tWordO.word = wordList[i];
+				tWordO.type = { };
+				tWordO.types = types;
+				tWordO.typecns = typecns || types;
+				if(!wordDic[tWordO.word])
+				wordDic[tWordO.word] = tWordO;
+			}
+		}
 	}
 
 }

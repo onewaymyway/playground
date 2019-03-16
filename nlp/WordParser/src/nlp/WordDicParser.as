@@ -32,6 +32,16 @@ package nlp
 		public var cutter:WordCutter;
 		private function onFileLoaded(txt:String):void
 		{
+			
+			initByDicTxt(txt);
+			if (complete)
+			{
+				complete.run();
+			}
+		}
+		
+		public function initByDicTxt(txt:String):void
+		{
 			var lines:Array;
 			lines = txt.split("\n");
 			
@@ -74,11 +84,6 @@ package nlp
 			
 			cutter = new WordCutter();
 			cutter.trie = trie;
-			
-			if (complete)
-			{
-				complete.run();
-			}
 		}
 		
 		public function cut(str:String):Array

@@ -33,7 +33,8 @@ package
 			loadList.push({url:"data/CoreNatureDictionary.txt", type:Loader.TEXT });
 			loadList.push( { url:"books/qqst.txt", type:Loader.TEXT } );
 			loadList.push({url:"data/text.train.conll", type:Loader.TEXT });
-			loadList.push({url:"data/conlldes.txt",type:Loader.TEXT });
+			loadList.push( { url:"data/conlldes.txt", type:Loader.TEXT } );
+			loadList.push({url:"data/中文字典1.txt",type:Loader.TEXT });
 			Laya.loader.load( loadList, new Handler(this, initGameView));
 			
 		}
@@ -53,7 +54,20 @@ package
 		
 		private function startWordParserTest():void
 		{
-			WordDicParser.I.loadDic("data/中文字典1.txt",Handler.create(this,onDicLoaded));
+			WordDicParser.I.initByDicTxt(Loader.getRes("data/中文字典1.txt"));
+			var typeDic:TypeDicParser;
+			typeDic = new TypeDicParser();
+			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
+			typeDic.addType([":", "/", ".", "。"], ["punk"], ["标点"]);
+			typeDic.addType(["\t"], ["TAB"], ["TAB"]);
+			typeDic.addType([" ","　"], ["EMPTY"], ["空格"]);
+			//trace("unkonw:","　".charCodeAt(0));
+			trace(typeDic);
+			WordUtils.typeDic = typeDic;
+			WordDicParser.I.cutter.typeDic = typeDic;
+			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
+			onDicLoaded();
+	
 		}
 		
 		private function onDicLoaded():void
@@ -76,13 +90,7 @@ package
 			wordView.pos(20, 20);
 			Laya.stage.addChild(wordView);
 			
-			var typeDic:TypeDicParser;
-			typeDic = new TypeDicParser();
-			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
-			trace(typeDic);
-			WordUtils.typeDic = typeDic;
-			WordDicParser.I.cutter.typeDic = typeDic;
-			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
+			
 			WordDicParser.I.cutter.cutToMap("每个人的一生，都离不开金钱、离不开商业，但是，很多人从来没有试图好好地、认真地去走近它，了解它。它是一个我们每天都碰到的、陌生的朋友。");
 			testCut();
 		}
@@ -95,6 +103,7 @@ package
 			var typeDic:TypeDicParser;
 			typeDic = new TypeDicParser();
 			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
+			typeDic.addType([" ",":","/",".","。","."],["punk"],["标点"]);
 			trace(typeDic);
 			
 			var conllDes:ConllDesParser;
