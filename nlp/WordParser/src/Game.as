@@ -47,9 +47,9 @@ package
 		{
 			//WordUtils.showChars(0, 1000);
 			
-			//startWordParserTest();
+			startWordParserTest();
 			
-			testWordTree();
+			//testWordTree();
 		}
 		
 		private function startWordParserTest():void

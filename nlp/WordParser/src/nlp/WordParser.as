@@ -18,8 +18,20 @@ package nlp
 			lines = [];
 			wordList = [];
 			alasDic = { };
+			_isParsed = false;
 		}
 		
+		private var _isParsed:Boolean = false;
+		public function wordParseComplete():void
+		{
+			if (_isParsed) return;
+			var i:int, len:int;
+			len = wordList.length;
+			for (i = 0; i < len; i++)
+			{
+				(wordList[i] as WordOne).parseDetail();
+			}
+		}
 		public var lines:Array;
 		private var preLine:String;
 		private var preIsPinYin:Boolean = false;

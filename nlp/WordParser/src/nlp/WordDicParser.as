@@ -62,6 +62,7 @@ package nlp
 				pinyin.addIfOK(tLine);
 				if (tLine.charAt(0) == "*")
 				{
+					if (tWord) tWord.wordParseComplete();
 					tWord = new WordParser();
 					tWord.addHead(tLine);
 					wordList.push(tWord);
@@ -73,6 +74,7 @@ package nlp
 					}
 				}
 			}
+			if (tWord) tWord.wordParseComplete();
 			trace("word count:", wordList.length, wordList);
 			pinyin.makeCharDic();
 			trace(pinyin);
