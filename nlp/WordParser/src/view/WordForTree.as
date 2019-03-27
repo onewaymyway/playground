@@ -37,7 +37,7 @@ package view
 			if (!this.dataO.refers) return tValue;
 			var refres:Array;
 			refres = this.dataO.refers;
-			tValue = tValue-(refres.length* 0.5 - refres.indexOf(i) ) * 4;
+			tValue = tValue-(refres.length* 0.5 - refres.indexOf(i) ) * 2;
 			return tValue;
 		}
 	}
