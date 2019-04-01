@@ -1,29 +1,30 @@
-1,0.00,,0,Project command:D:/codes/EasyDesk/EasyDesk.git/trunk//EasyDesk/EasyDesk.as3proj;iflash=false;chromerun=false;outlaya=false
-Project configuration:D:/codes/EasyDesk/EasyDesk.git/trunk//EasyDesk/EasyDesk.as3proj.
-1,0.00,,0,output file:EasyDesk
-1,0.00,,0,output path:D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/bin/h5/
-1,0.00,,0,Main Class:D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/EasyDesk.as
-1,0.00,D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src,0,Collect
-1,0.00,D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/libs/laya/src,0,Collect
+1,0.00,,0,Project command:D:\codes\playground.git\trunk\debugtoolplatform\DebugToolKit\DebutToolKit.as3proj;iflash=false;chromerun=false;outlaya=false
+Project configuration:D:\codes\playground.git\trunk\debugtoolplatform\DebugToolKit\DebutToolKit.as3proj.
+1,0.00,,0,output file:DebutToolKit
+1,0.00,,0,output path:D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/bin/h5/
+1,0.00,,0,Main Class:D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/DebugPlatform.as
+1,0.00,D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src,0,Collect
+1,0.00,D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/libs/laya/src,0,Collect
+1,0.00,D:/codes/playground.git/trunk/chromedebugprotocal/Libs/debugprotocol/src,0,Collect
 1,2.00,,0,read class message
-7,50.95,D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/electrontools/drags/DragEvent.as,84,SystemSetting.assetsPath This variable is not defined.
-7,51.12,D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/electrontools/menus/ContextMenu.as,85,Sys.lang This variable is not defined.
-7,51.12,D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/electrontools/menus/ContextMenu.as,149,SystemSetting.isCMDVer This variable is not defined.
-7,51.56,D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/nodetools/devices/FileManager.as,225,XMLElement This variable is not defined.
-7,51.56,D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/nodetools/devices/FileManager.as,237,XMLElement This variable is not defined.
-7,51.62,D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
-7,51.62,D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
-7,52.01,D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/nodetools/NodeJSTools.as,36,Sys.mParseFloat This variable is not defined.
-1,89.94,,0,Disable Flash3D D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/EasyDesk.as
-12,89.94,D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/bin/h5/EasyDesk.max.js,1156530,
-11,89.94,D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/bin/h5/EasyDesk.max.html,795,
+7,51.09,D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/drags/DragEvent.as,84,SystemSetting.assetsPath This variable is not defined.
+7,51.25,D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/menus/ContextMenu.as,85,Sys.lang This variable is not defined.
+7,51.25,D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/menus/ContextMenu.as,149,SystemSetting.isCMDVer This variable is not defined.
+7,51.66,D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileManager.as,225,XMLElement This variable is not defined.
+7,51.66,D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileManager.as,237,XMLElement This variable is not defined.
+7,51.71,D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
+7,51.71,D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
+7,52.08,D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/NodeJSTools.as,36,Sys.mParseFloat This variable is not defined.
+1,89.95,,0,Disable Flash3D D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/DebugPlatform.as
+12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/bin/h5/DebutToolKit.max.js,1257229,
+11,89.95,D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/bin/h5/DebutToolKit.max.html,799,
 ******************************************************************************
-Error or warning message:EasyDesk.max.js
-1 file:///D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/nodetools/devices/FileManager.as (225):warning:XMLElement This variable is not defined.
-2 file:///D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
-3 file:///D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
-4 file:///D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
-5 file:///D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/electrontools/menus/ContextMenu.as (85):warning:Sys.lang This variable is not defined.
-6 file:///D:/codes/EasyDesk/EasyDesk.git/trunk/EasyDesk/src/electrontools/menus/ContextMenu.as (149):warning:SystemSetting.isCMDVer This variable is not defined.
+Error or warning message:DebutToolKit.max.js
+1 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileManager.as (225):warning:XMLElement This variable is not defined.
+2 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
+3 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+4 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+5 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/menus/ContextMenu.as (85):warning:Sys.lang This variable is not defined.
+6 file:///D:/codes/playground.git/trunk/debugtoolplatform/DebugToolKit/src/electrontools/menus/ContextMenu.as (149):warning:SystemSetting.isCMDVer This variable is not defined.
 ******************************************************************************
-14,89.94,,0,
+14,89.95,,0,

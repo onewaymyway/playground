@@ -3,6 +3,18 @@ import shutil
 import sys
 import win32api
 
+projectPath=""
+jsFilePath="";
+compileParam=""
+jsFilePathNew=""
+outLaya=False
+myRoot=sys.path[0].replace("\\","/")+"/"
+print(myRoot)
+compileExe=myRoot+"laya.js.exe"
+
+def getAbsPath(rpath):
+    return os.path.normpath(os.path.join(myRoot,  rpath))
+
 def copyFiles(sourceDir,  targetDir): 
     if sourceDir.find(".svn") > 0: 
         return 
@@ -34,26 +46,13 @@ def copyFileToTar(srcFile,tarFile):
 def sOpen(exe,param):
     win32api.ShellExecute(0, 'open', exe,param,'',1)
 
-compileExe="E:/wangwei/codes/laya/laya.js.exe"
-compileParam="E:/wangwei/codes/LayaAir/trank/Editor/LayaAirEditor/LayaAirEditor.as3proj"+";iflash=false;chromerun=false;outlaya=true";
+compileParam=getAbsPath("../DebutToolKit.as3proj")+";iflash=false;chromerun=false;outlaya=false";
 #sOpen(compileExe,compileParam);
 os.system(compileExe+" "+compileParam)
 print("compile complete");
-IDEPath="D:\ideweek/"
-exePath=IDEPath+"LayaAir.exe";
-tarDir=IDEPath+"resources/app/out/vs/layaEditor/h5/layabuilder.max.js"
-srcDir="E:/wangwei/codes/LayaAir/trank/Editor/LayaAirEditor/bin/h5/layaaireditor.max.js"
-
-#shutil.copyfile(srcDir,tarDir)
-
-libFile="E:/wangwei/codes/LayaAir/trank/Editor/LayaAirEditor/bin/h5/laya.js"
-ideFile="E:/wangwei/codes/LayaAir/trank/Editor/LayaAirEditor/bin/h5/layaaireditor.max.js"
-
-tarLibFile=IDEPath+"resources/app/out/vs/layaEditor/h5/laya.js"
-tarIDEFile=IDEPath+"resources/app/out/vs/layaEditor/h5/layabuilder.max.js"
-
-shutil.copyfile(libFile,tarLibFile)
-shutil.copyfile(ideFile,tarIDEFile)
+copyFileToTar(getAbsPath("../bin/h5"),getAbsPath("../../ElectronApp/DeskApp/h5/"))
 print("copy complete")
-sOpen(exePath,"");
+exePath=getAbsPath("../../Electron/EasyDesk.exe")+" "+getAbsPath("../../ElectronApp/DeskApp");
+print("exe:",exePath)
+os.system(exePath);
 print("workDone");
