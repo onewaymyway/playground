@@ -28553,6 +28553,7 @@ var Laya=window.Laya=(function(window,document){
 	var WordViewerUI=(function(_super){
 		function WordViewerUI(){
 			this.txt=null;
+			this.typeTxt=null;
 			WordViewerUI.__super.call(this);
 		}
 
@@ -28564,7 +28565,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(WordViewerUI.uiView);
 		}
 
-		WordViewerUI.uiView={"type":"View","props":{"width":85,"height":29},"child":[{"type":"Label","props":{"y":0,"x":0,"width":85,"var":"txt","text":"文字","runtime":"commoncomponent.AutoSizeLabel","height":29,"fontSize":20,"color":"#f4e4e4"}}]};
+		WordViewerUI.uiView={"type":"View","props":{"width":85,"height":60},"child":[{"type":"Label","props":{"y":30,"x":0,"width":85,"var":"txt","text":"文字","runtime":"commoncomponent.AutoSizeLabel","height":29,"fontSize":20,"color":"#0dcd62"}},{"type":"Label","props":{"y":0,"x":0,"width":85,"var":"typeTxt","text":"文字","runtime":"commoncomponent.AutoSizeLabel","height":29,"fontSize":20,"color":"#eac654"}}]};
 		return WordViewerUI;
 	})(View)
 
@@ -29330,11 +29331,19 @@ var Laya=window.Laya=(function(window,document){
 			return word.typeO.typecns.join(":");
 		}
 
+		__proto.centerItem=function(item){
+			item.x=(this.width-item.width)*0.5;
+		}
+
 		__proto.setData=function(dataO){
 			this.dataO=dataO;
 			this.txt.text=dataO.word;
-			this.txt.text=dataO.word+"("+this.getWordTypeStr(dataO)+")";
-			this.width=this.txt.width;
+			this.typeTxt.text="("+this.getWordTypeStr(dataO)+")";
+			var maxWidth=0;
+			maxWidth=Math.max(this.txt.width,this.typeTxt.width);
+			this.width=maxWidth;
+			this.centerItem(this.txt);
+			this.centerItem(this.typeTxt);
 		}
 
 		return WordViewer;
