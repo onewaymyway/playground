@@ -246,6 +246,8 @@ package scriptuis
 			spList.push(createRoundCornerRec("script_valueitembg", 80 - 10 * 2, 30, 10, "#fffcfa", "#ffffff", 1));
 			
 			spList.push(createComboxSprite("script_combox"));
+			
+			spList.push(UICreateUtils.createHeadIcon("home_headmask",50));
 			len = spList.length;
 			
 			var tY:Number;
