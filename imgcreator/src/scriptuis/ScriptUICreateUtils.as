@@ -145,6 +145,7 @@ package scriptuis
 			
 			return sp;
 		}
+		
 		public static function createNormalSprite(name:String,points:Array,fillColor:String,lineColor:String,lineWidth:int=1):Sprite
 		{
 			var sp:Sprite;
@@ -247,7 +248,9 @@ package scriptuis
 			
 			spList.push(createComboxSprite("script_combox"));
 			
-			spList.push(UICreateUtils.createHeadIcon("home_headmask",50));
+			spList.push(UICreateUtils.createHeadIcon("home_headmask", 50));
+			
+			spList.push( createNormalSprite("triangleblack", createTriangle(16, 8), "#000000", "#000000", 0));
 			len = spList.length;
 			
 			var tY:Number;

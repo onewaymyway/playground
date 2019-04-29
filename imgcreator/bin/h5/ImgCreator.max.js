@@ -630,6 +630,7 @@ var Laya=window.Laya=(function(window,document){
 			spList.push(ScriptUICreateUtils.createRoundCornerRec("script_valueitembg",80-10 *2,30,10,"#fffcfa","#ffffff",1));
 			spList.push(ScriptUICreateUtils.createComboxSprite("script_combox"));
 			spList.push(UICreateUtils.createHeadIcon("home_headmask",50));
+			spList.push(ScriptUICreateUtils.createNormalSprite("triangleblack",ScriptUICreateUtils.createTriangle(16,8),"#000000","#000000",0));
 			len=spList.length;
 			var tY=NaN;
 			tY=0;
@@ -26811,11 +26812,11 @@ var Laya=window.Laya=(function(window,document){
 
 
 /*
-1 file:///D:/codes/playground.git/trunk/imgcreator/src/scriptuis/ScriptUICreateUtils.as (167):warning:tDis This variable is not defined.
-2 file:///D:/codes/playground.git/trunk/imgcreator/src/scriptuis/ScriptUICreateUtils.as (168):warning:tSp This variable is not defined.
-3 file:///D:/codes/playground.git/trunk/imgcreator/src/scriptuis/ScriptUICreateUtils.as (168):warning:tDis This variable is not defined.
-4 file:///D:/codes/playground.git/trunk/imgcreator/src/scriptuis/ScriptUICreateUtils.as (168):warning:tDis This variable is not defined.
-5 file:///D:/codes/playground.git/trunk/imgcreator/src/scriptuis/ScriptUICreateUtils.as (168):warning:tDis This variable is not defined.
-6 file:///D:/codes/playground.git/trunk/imgcreator/src/scriptuis/ScriptUICreateUtils.as (168):warning:tDis This variable is not defined.
-7 file:///D:/codes/playground.git/trunk/imgcreator/src/scriptuis/ScriptUICreateUtils.as (169):warning:tSp This variable is not defined.
+1 file:///D:/codes/playground.git/trunk/imgcreator/src/scriptuis/ScriptUICreateUtils.as (168):warning:tDis This variable is not defined.
+2 file:///D:/codes/playground.git/trunk/imgcreator/src/scriptuis/ScriptUICreateUtils.as (169):warning:tSp This variable is not defined.
+3 file:///D:/codes/playground.git/trunk/imgcreator/src/scriptuis/ScriptUICreateUtils.as (169):warning:tDis This variable is not defined.
+4 file:///D:/codes/playground.git/trunk/imgcreator/src/scriptuis/ScriptUICreateUtils.as (169):warning:tDis This variable is not defined.
+5 file:///D:/codes/playground.git/trunk/imgcreator/src/scriptuis/ScriptUICreateUtils.as (169):warning:tDis This variable is not defined.
+6 file:///D:/codes/playground.git/trunk/imgcreator/src/scriptuis/ScriptUICreateUtils.as (169):warning:tDis This variable is not defined.
+7 file:///D:/codes/playground.git/trunk/imgcreator/src/scriptuis/ScriptUICreateUtils.as (170):warning:tSp This variable is not defined.
 */
