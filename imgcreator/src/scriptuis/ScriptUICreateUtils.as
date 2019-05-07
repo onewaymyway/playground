@@ -251,6 +251,8 @@ package scriptuis
 			spList.push(UICreateUtils.createHeadIcon("home_headmask", 50));
 			
 			spList.push( createNormalSprite("triangleblack", createTriangle(16, 8), "#000000", "#000000", 0));
+			
+			spList.push(createRoundCornerRec("tipbg", 80 - 10 * 2, 30, 10, "#000000", "#000000", 0));
 			len = spList.length;
 			
 			var tY:Number;

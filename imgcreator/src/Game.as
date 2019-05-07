@@ -24,6 +24,7 @@ package
 			Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 			Laya.stage.alignH = Stage.ALIGN_CENTER;
 			Laya.stage.alignV = Stage.ALIGN_MIDDLE;
+			Laya.stage.bgColor = "#aaaaaa";
 			UIConfig.closeDialogOnSide = false;
 			var loadList:Array;
 			loadList = [];
