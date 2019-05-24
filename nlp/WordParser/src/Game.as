@@ -5,6 +5,7 @@ package
 	import laya.net.Loader;
 	import laya.utils.Browser;
 	import laya.utils.Handler;
+	import nlp.NLP;
 	import nlp.bookutils.BookParser;
 	import nlp.conll.ConllDesParser;
 	import nlp.conll.ConllFileParser;
@@ -54,18 +55,8 @@ package
 		
 		private function startWordParserTest():void
 		{
-			WordDicParser.I.initByDicTxt(Loader.getRes("data/中文字典1.txt"));
-			var typeDic:TypeDicParser;
-			typeDic = new TypeDicParser();
-			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
-			typeDic.addType([":", "/", ".", "。"], ["punk"], ["标点"]);
-			typeDic.addType(["\t"], ["TAB"], ["TAB"]);
-			typeDic.addType([" ","　"], ["EMPTY"], ["空格"]);
-			//trace("unkonw:","　".charCodeAt(0));
-			trace(typeDic);
-			WordUtils.typeDic = typeDic;
-			WordDicParser.I.cutter.typeDic = typeDic;
-			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
+			NLP.initWordCutter("data/中文字典1.txt","data/CoreNatureDictionary.txt");
+
 			onDicLoaded();
 	
 		}

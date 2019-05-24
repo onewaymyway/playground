@@ -113,6 +113,13 @@ package nlp.dictools
 				wordDic[tWordO.word] = tWordO;
 			}
 		}
+		
+		public function addDefaultTypes():void
+		{
+			this.addType([":", "/", ".", "。"], ["punk"], ["标点"]);
+			this.addType(["\t"], ["TAB"], ["TAB"]);
+			this.addType([" ","　"], ["EMPTY"], ["空格"]);
+		}
 	}
 
 }

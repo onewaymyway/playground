@@ -725,17 +725,7 @@ var Laya=window.Laya=(function(window,document){
 
 		//testWordTree();
 		__proto.startWordParserTest=function(){
-			WordDicParser.I.initByDicTxt(Loader.getRes("data/中文字典1.txt"));
-			var typeDic;
-			typeDic=new TypeDicParser();
-			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
-			typeDic.addType([":","/",".","。"],["punk"],["标点"]);
-			typeDic.addType(["\t"],["TAB"],["TAB"]);
-			typeDic.addType([" ","　"],["EMPTY"],["空格"]);
-			console.log(typeDic);
-			WordUtils.typeDic=typeDic;
-			WordDicParser.I.cutter.typeDic=typeDic;
-			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
+			NLP.initWordCutter("data/中文字典1.txt","data/CoreNatureDictionary.txt");
 			this.onDicLoaded();
 		}
 
@@ -9831,6 +9821,30 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class nlp.NLP
+	var NLP=(function(){
+		function NLP(){}
+		__class(NLP,'nlp.NLP');
+		NLP.cut=function(str){}
+		NLP.initWordCutter=function(dicFile,typeFile){
+			WordDicParser.I.initByDicTxt(Loader.getRes(dicFile));
+			var typeDic;
+			typeDic=new TypeDicParser();
+			typeDic.initByTxt(Loader.getRes(typeFile));
+			typeDic.addDefaultTypes();
+			WordUtils.typeDic=typeDic;
+			WordDicParser.I.cutter.typeDic=typeDic;
+			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
+		}
+
+		return NLP;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class nlp.WordUtils
 	var WordUtils=(function(){
 		function WordUtils(){}
@@ -11041,6 +11055,12 @@ var Laya=window.Laya=(function(window,document){
 				if(!this.wordDic[tWordO.word])
 					this.wordDic[tWordO.word]=tWordO;
 			}
+		}
+
+		__proto.addDefaultTypes=function(){
+			this.addType([":","/",".","。"],["punk"],["标点"]);
+			this.addType(["\t"],["TAB"],["TAB"]);
+			this.addType([" ","　"],["EMPTY"],["空格"]);
 		}
 
 		TypeDicParser.Tab="	";
