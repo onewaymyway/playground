@@ -831,2299 +831,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.algorithm.LineDP
-	var LineDP=(function(){
-		function LineDP(){
-			this.defaultValue=0;
-			this.relations=null;
-			this.tarDic=null;
-			this.preDic=null;
-			this.walkAble=null;
-		}
-
-		__class(LineDP,'nlp.algorithm.LineDP');
-		var __proto=LineDP.prototype;
-		__proto.dp=function(){
-			this.relations=TopoSort.sort(this.relations,"start","end",null);
-			var i=0,len=0;
-			len=this.relations.length;
-			this.tarDic={};
-			this.preDic={};
-			var tRelation;
-			var tEnd=0;
-			var tValue=NaN;
-			for (i=0;i < len;i++){
-				tRelation=this.relations[i];
-				tEnd=tRelation.end;
-				tValue=this.getWeight(tRelation.start)+tRelation.weight;
-				if (!this.preDic[tEnd] || this.getWeight(tRelation.end)< tValue){
-					this.preDic[tEnd]=tRelation;
-					this.tarDic[tEnd]=tValue;
-				}
-			}
-		}
-
-		__proto.dpWithStart=function(startList,startValue,defaultValue){
-			(startValue===void 0)&& (startValue=0);
-			(defaultValue===void 0)&& (defaultValue=0);
-			this.relations=TopoSort.sort(this.relations,"start","end",null);
-			var i=0,len=0;
-			this.tarDic={};
-			this.preDic={};
-			this.walkAble={};
-			this.defaultValue=defaultValue;
-			var hasStart=false;
-			hasStart=false;
-			if (startList && startList.length){
-				hasStart=true;
-				len=startList.length;
-				for (i=0;i < len;i++){
-					this.walkAble[startList[i]]=true;
-					this.setWeight(startList[i],startValue);
-				}
-			}
-			len=this.relations.length;
-			var tRelation;
-			var tEnd=0;
-			var tValue=NaN;
-			var tStart=0;
-			for (i=0;i < len;i++){
-				tRelation=this.relations[i];
-				tEnd=tRelation.end;
-				tStart=tRelation.start;
-				if (hasStart && !this.walkAble[tStart])continue ;
-				if (hasStart){
-					if (!this.walkAble[tStart])continue ;
-					this.walkAble[tEnd]=true;
-				}
-				tValue=this.getWeight(tRelation.start)+tRelation.weight;
-				if (!this.preDic[tEnd] || this.getWeight(tRelation.end)< tValue){
-					this.preDic[tEnd]=tRelation;
-					this.tarDic[tEnd]=tValue;
-				}
-			}
-		}
-
-		__proto.getMaxWeightPath=function(end){
-			var pathList;
-			pathList=[];
-			var tID=0;
-			tID=end;
-			while (this.preDic[tID]){
-				pathList.push(this.preDic[tID]);
-				tID=this.preDic[tID].start;
-			}
-			pathList.reverse();
-			return pathList;
-		}
-
-		__proto.getWeight=function(id){
-			if (!this.tarDic.hasOwnProperty(id)){
-				this.tarDic[id]=this.defaultValue;
-			}
-			return this.tarDic[id];
-		}
-
-		__proto.setWeight=function(id,value){
-			this.tarDic[id]=value;
-		}
-
-		LineDP.simpleDP=function(relations){
-			var lDP;
-			lDP=new LineDP();
-			lDP.relations=relations;
-			lDP.dp();
-			return lDP;
-		}
-
-		LineDP.dpEx=function(relations,startList,startValue,defaultValue){
-			(startValue===void 0)&& (startValue=0);
-			(defaultValue===void 0)&& (defaultValue=0);
-			var lDP;
-			lDP=new LineDP();
-			lDP.relations=relations;
-			lDP.dpWithStart(startList,startValue,defaultValue);
-			return lDP;
-		}
-
-		return LineDP;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.algorithm.map.Edge
-	var Edge=(function(){
-		function Edge(){
-			this.data=null;
-			this.start=0;
-			this.end=0;
-			this.weight=0;
-		}
-
-		__class(Edge,'nlp.algorithm.map.Edge');
-		Edge.create=function(start,end,weight,data){
-			var rst;
-			rst=new Edge();
-			rst.start=start;
-			rst.end=end;
-			rst.weight=weight;
-			rst.data=data;
-			return rst;
-		}
-
-		return Edge;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.algorithm.map.MapStruct
-	var MapStruct=(function(){
-		function MapStruct(){
-			this.vList=null;
-			this.eList=null;
-			this.reset();
-		}
-
-		__class(MapStruct,'nlp.algorithm.map.MapStruct');
-		var __proto=MapStruct.prototype;
-		__proto.reset=function(){
-			this.vList=[];
-			this.eList=[];
-		}
-
-		__proto.getVertex=function(id){
-			if (!this.vList[id])this.vList[id]=Vertex.createByID(id);
-			return this.vList[id];
-		}
-
-		__proto.addEdge=function(start,end,weight,data){
-			var edge;
-			edge=Edge.create(start,end,weight,data);
-			var startV;
-			var endV;
-			startV=this.getVertex(start);
-			endV=this.getVertex(end);
-			startV.addOut(end,weight);
-			endV.addIn(start,weight);
-			this.eList.push(edge);
-		}
-
-		__proto.findMaxWeightPath=function(endI){
-			return LineDP.dpEx(this.eList,[0],0,-999).getMaxWeightPath(endI);
-			return LineDP.simpleDP(this.eList).getMaxWeightPath(endI);
-		}
-
-		//var
-		__proto.buildMap=function(){}
-		MapStruct.showEdgeList=function(eList){
-			var i=0,len=0;
-		}
-
-		return MapStruct;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.algorithm.map.Vertex
-	var Vertex=(function(){
-		function Vertex(){
-			this.inList=null;
-			this.outList=null;
-			this.inDic=null;
-			this.outDic=null;
-			this.id=0;
-			this.reset();
-		}
-
-		__class(Vertex,'nlp.algorithm.map.Vertex');
-		var __proto=Vertex.prototype;
-		__proto.reset=function(){
-			this.inList=[];
-			this.outList=[];
-			this.inDic={};
-			this.outDic={};
-		}
-
-		__proto.addEdge=function(edge){
-			if (edge.start==this.id){
-				this.addOut(edge.end,edge.weight);
-			}else
-			if (edge.end==this.id){
-				this.addIn(edge.start,edge.weight);
-			}
-		}
-
-		__proto.addIn=function(id,weight){
-			this.inList.push(id);
-			this.inDic[id]=weight;
-		}
-
-		__proto.addOut=function(id,weight){
-			this.outList.push(id);
-			this.outDic[id]=weight;
-		}
-
-		Vertex.createByID=function(id){
-			var rst;
-			rst=new Vertex();
-			rst.reset();
-			rst.id=id;
-			return rst;
-		}
-
-		return Vertex;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.algorithm.TopoSort
-	var TopoSort=(function(){
-		function TopoSort(){
-			this.startKey=null;
-			this.endKey=null;
-			this.relationList=null;
-			this.nodeDic=null;
-			this.otherSort=null;
-		}
-
-		__class(TopoSort,'nlp.algorithm.TopoSort');
-		var __proto=TopoSort.prototype;
-		__proto.findOKNode=function(startPos){
-			var i=0,len=0;
-			len=this.relationList.length;
-			var tRelation;
-			var tSelect;
-			var tI=0;
-			tI=-1;
-			for (i=startPos;i < len;i++){
-				tRelation=this.relationList[i];
-				if (this.nodeDic[tRelation[this.startKey]]==0){
-					if (this.otherSort==null)return i;
-					if (tI<0||this.otherSort(tRelation,this.relationList[tI])){
-						tI=i;
-					}
-				}
-			}
-			return tI;
-		}
-
-		__proto.switchPos=function(i,j){
-			var tp;
-			tp=this.relationList[i];
-			this.relationList[i]=this.relationList[j];
-			this.relationList[j]=tp;
-		}
-
-		__proto.removeRefer=function(tRelation){
-			this.nodeDic[tRelation[this.endKey]]=this.nodeDic[tRelation[this.endKey]]-1;
-		}
-
-		__proto.sort=function(relationList){
-			this.nodeDic={};
-			this.relationList=relationList;
-			var i=0,len=0;
-			var tRelation;
-			len=relationList.length;
-			for (i=0;i < len;i++){
-				tRelation=relationList[i];
-				if (!this.nodeDic[tRelation[this.startKey]]){
-					this.nodeDic[tRelation[this.startKey]]=0;
-				}
-				if (!this.nodeDic[tRelation[this.endKey]]){
-					this.nodeDic[tRelation[this.endKey]]=0;
-				}
-				this.nodeDic[tRelation[this.endKey]]=this.nodeDic[tRelation[this.endKey]]+1;
-			};
-			var okPos=0;
-			for (i=0;i < len;i++){
-				okPos=this.findOKNode(i);
-				if (okPos >=0){
-					this.removeRefer(relationList[okPos]);
-					this.switchPos(i,okPos);
-				}
-			}
-			return relationList;
-		}
-
-		TopoSort.sort=function(relationList,startKey,endKey,otherSort){
-			(startKey===void 0)&& (startKey="start");
-			(endKey===void 0)&& (endKey="end");
-			var tp;
-			tp=new TopoSort();
-			tp.startKey=startKey;
-			tp.endKey=endKey;
-			tp.otherSort=otherSort;
-			tp.sort(relationList);
-			return relationList;
-		}
-
-		return TopoSort;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.bookutils.BookParser
-	var BookParser=(function(){
-		function BookParser(){
-			this.lines=null;
-			this.index=0;
-		}
-
-		__class(BookParser,'nlp.bookutils.BookParser');
-		var __proto=BookParser.prototype;
-		__proto.setTxt=function(txt){
-			txt=txt.replace("\r","");
-			this.lines=txt.split("\n");
-			this.index=0;
-		}
-
-		__proto.reset=function(){
-			this.index=0;
-		}
-
-		__proto.getCurLine=function(){
-			return this.lines[this.index];
-		}
-
-		__proto.pre=function(){
-			this.index--;
-			this.normalIndex();
-			return this.getCurLine();
-		}
-
-		__proto.next=function(){
-			this.index++;
-			this.normalIndex();
-			return this.getCurLine();
-		}
-
-		__proto.normalIndex=function(){
-			if (this.index < 0)this.index=0;
-			if (this.index >=this.lines.length)this.index=this.lines.length-1;
-		}
-
-		BookParser.createByTxt=function(txt){
-			var rst;
-			rst=new BookParser();
-			rst.setTxt(txt);
-			return rst;
-		}
-
-		return BookParser;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.conll.ConllDesParser
-	var ConllDesParser=(function(){
-		function ConllDesParser(){
-			this.desDic=null;
-		}
-
-		__class(ConllDesParser,'nlp.conll.ConllDesParser');
-		var __proto=ConllDesParser.prototype;
-		__proto.parseLine=function(line){
-			var data;
-			data=WordUtils.arr2keyObj(line.split("\t"),ConllDesParser.KeyList);
-			this.desDic[data.type]=data;
-			return data;
-		}
-
-		__proto.parseTxt=function(txt){
-			this.desDic={};
-			var lines;
-			lines=txt.split("\n");
-			var i=0,len=0;
-			len=lines.length;
-			var tLine;
-			for (i=0;i < len;i++){
-				tLine=lines[i];
-				this.parseLine(tLine);
-			}
-			console.log("ConllDesParser:",this);
-		}
-
-		ConllDesParser.getCNType=function(type){
-			if (ConllDesParser.I && ConllDesParser.I.desDic[type])return ConllDesParser.I.desDic[type].desCN;
-			return type;
-		}
-
-		ConllDesParser.I=null
-		__static(ConllDesParser,
-		['KeyList',function(){return this.KeyList=["desCN","type","desEN","detail"];}
-		]);
-		return ConllDesParser;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.conll.ConllFileParser
-	var ConllFileParser=(function(){
-		function ConllFileParser(conllDes){
-			this.index=0;
-			this.conllDes=null;
-			this.treeList=null;
-			this.conllDes=conllDes;
-			this.treeList=[];
-		}
-
-		__class(ConllFileParser,'nlp.conll.ConllFileParser');
-		var __proto=ConllFileParser.prototype;
-		__proto.loadFile=function(file,complete){
-			Laya.loader.load(file,Handler.create(this,this.onFileLoaded,[complete]),null,"text");
-		}
-
-		__proto.onFileLoaded=function(complete,txt){
-			this.parseTxt(txt);
-			if (complete){
-				complete.run();
-			}
-		}
-
-		__proto.parseTxt=function(txt){
-			var lines;
-			lines=txt.split("\n");
-			var i=0,len=0;
-			len=lines.length;
-			var tLine;
-			var tTree;
-			for (i=0;i < len;i++){
-				tLine=lines[i];
-				if (tLine.indexOf("\t")<0){
-					tTree=null;
-					}else{
-					if (!tTree){
-						tTree=new ConllTree();
-						this.treeList.push(tTree);
-					}
-					tTree.addLine(tLine);
-				}
-			}
-			console.log("conllfileParser:",this);
-			console.log("contypeDic:",ConllWordDic.I);
-		}
-
-		__proto.reset=function(){
-			this.index=0;
-		}
-
-		__proto.getCurLine=function(){
-			return this.treeList[this.index];
-		}
-
-		__proto.pre=function(){
-			this.index--;
-			this.normalIndex();
-			return this.getCurLine();
-		}
-
-		__proto.next=function(){
-			this.index++;
-			this.normalIndex();
-			return this.getCurLine();
-		}
-
-		__proto.normalIndex=function(){
-			if (this.index < 0)this.index=0;
-			if (this.index >=this.treeList.length)this.index=this.treeList.length-1;
-		}
-
-		return ConllFileParser;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.conll.ConllRelation
-	var ConllRelation=(function(){
-		function ConllRelation(){
-			this.start=0;
-			this.end=0;
-			this.type=null;
-			this.len=0;
-		}
-
-		__class(ConllRelation,'nlp.conll.ConllRelation');
-		ConllRelation.buildByWord=function(word){
-			var rst;
-			rst=new ConllRelation();
-			rst.start=word.id;
-			rst.end=word.head;
-			rst.type=word.deprel;
-			rst.len=Math.abs(rst.start-rst.end);
-			return rst;
-		}
-
-		return ConllRelation;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.conll.ConllTree
-	var ConllTree=(function(){
-		function ConllTree(){
-			this.wordList=null;
-			this.relations=null;
-			this.wordList=[];
-		}
-
-		__class(ConllTree,'nlp.conll.ConllTree');
-		var __proto=ConllTree.prototype;
-		__proto.getWordByIndex=function(index){
-			return this.wordList[index];
-		}
-
-		__proto.addLine=function(line){
-			var tWord;
-			tWord=ConllWord.parseFromLine(line);
-			if (!this.wordList[tWord.id]){
-				this.wordList.push(tWord);
-				tWord.tree=this;
-				ConllWordDic.I.addWord(tWord);
-			}
-		}
-
-		__proto.dealRelation=function(relation){
-			var enWord;
-			enWord=this.wordList[relation.end];
-			if(enWord)
-				enWord.refers.push(relation.start);
-			var sWord;
-			sWord=this.wordList[relation.start];
-			if(sWord)
-				sWord.refers.push(relation.end);
-		}
-
-		__proto.buildRelation=function(){
-			this.relations=[];
-			var i=0,len=0;
-			len=this.wordList.length;
-			var tRelation;
-			for (i=0;i < len;i++){
-				tRelation=ConllRelation.buildByWord(this.wordList[i]);
-				this.relations.push(tRelation);
-				this.dealRelation(tRelation);
-			}
-			len=this.wordList.length;
-			var tWord;
-			for (i=0;i < len;i++){
-				tWord=this.wordList[i];
-				tWord.sortRefers(i);
-			}
-			TopoSort.sort(this.relations,"start","end",ConllTree.otherSort);
-		}
-
-		ConllTree.otherSort=function(item0,item1){
-			return item0.len < item1.len;
-		}
-
-		return ConllTree;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.conll.ConllTreeAnalyse
-	var ConllTreeAnalyse=(function(){
-		function ConllTreeAnalyse(){
-			this.keyDic={};
-			this.keys=null;
-			this.dependDic={};
-			this.depends=null;
-		}
-
-		__class(ConllTreeAnalyse,'nlp.conll.ConllTreeAnalyse');
-		var __proto=ConllTreeAnalyse.prototype;
-		__proto.analyse=function(treeList){
-			var i=0,len=0;
-			len=treeList.length;
-			var tKey;
-			var tree;
-			for (i=0;i < len;i++){
-				tree=treeList[i];
-				tree.buildRelation();
-				this.analyseRelation(tree);
-				this.analyseWordLists(ConllTreeAnalyse.splitWordListByPu(tree.wordList));
-			}
-			this.keys=WordUtils.getDicKeys(this.keyDic);
-			this.keys.sort();
-			console.log("keys:",this.keys);
-			this.depends=WordUtils.dic2Arr(this.dependDic);
-			this.depends.sort(MathUtil.sortByKey("value"));
-			console.log("depends",this.depends);
-		}
-
-		__proto.getWordTypeEx=function(word){
-			if (!word)return "null";
-			return word.postag;
-		}
-
-		//return typeDic.getWordTypeCNStr(word.word);
-		__proto.getRelationKey=function(relation,tree){
-			var startWord;
-			var endWord;
-			startWord=tree.getWordByIndex(relation.start);
-			endWord=tree.getWordByIndex(relation.end);
-			return this.getWordRelationKey(startWord,endWord,relation.end-relation.start);
-			return "unknow";
-		}
-
-		__proto.getWordRelationKey=function(startWord,endWord,pos){
-			return this.getWordTypeEx(startWord)+":"+this.getWordTypeEx(endWord)+":"+(pos>0);
-		}
-
-		__proto.getWordRelationScore=function(start,end,pos){
-			var key;
-			key=this.getWordRelationKey(start,end,pos);
-			if (this.dependDic[key]){
-				return this.dependDic[key];
-			}
-			return 0;
-		}
-
-		__proto.analyseRelation=function(tree){
-			var relations;
-			relations=tree.relations;
-			var i=0,len=0;
-			len=relations.length;
-			var tRelation;
-			var tkey;
-			for (i=0;i < len;i++){
-				tRelation=relations[i];
-				tkey=this.getRelationKey(tRelation,tree);
-				if (!this.dependDic[tkey]){
-					this.dependDic[tkey]=1;
-					}else{
-					this.dependDic[tkey]=this.dependDic[tkey]+1;
-				}
-			}
-		}
-
-		__proto.analyseWordLists=function(lists){
-			var i=0,len=0;
-			len=lists.length;
-			var tKey;
-			for (i=0;i < len;i++){
-				tKey=ConllTreeAnalyse.getWordListKey(lists[i]);
-				this.keyDic[tKey]=lists;
-			}
-		}
-
-		ConllTreeAnalyse.getTreeKey=function(tree){
-			var wordList;
-			wordList=tree.wordList;
-			return ConllTreeAnalyse.getWordListKey(wordList);
-		}
-
-		ConllTreeAnalyse.getWordListKey=function(wordList){
-			var i=0,len=0;
-			len=wordList.length;
-			var signList;
-			signList=[];
-			var tword;
-			for (i=0;i < len;i++){
-				tword=wordList[i];
-				signList.push(tword.postag);
-			}
-			WordUtils.removeSameNB(signList);
-			return signList.join(",");
-		}
-
-		ConllTreeAnalyse.splitWordListByPu=function(wordList){
-			var rst;
-			rst=[];
-			var tarr;
-			var i=0,len=0;
-			len=wordList.length;
-			var tword;
-			for (i=0;i < len;i++){
-				tword=wordList[i];
-				if (tword.postag=="PU"){
-					if (tarr && tarr.length){
-						tarr=null;
-					}
-					}else{
-					if (!tarr){
-						tarr=[];
-						rst.push(tarr);
-					}
-					tarr.push(tword);
-				}
-			}
-			return rst;
-		}
-
-		ConllTreeAnalyse.typeDic=null
-		return ConllTreeAnalyse;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.conll.ConllWord
-	var ConllWord=(function(){
-		function ConllWord(){
-			this.id=0;
-			this.form=null;
-			this.lemma=null;
-			this.cpostag=null;
-			this.postag=null;
-			this.feats=null;
-			this.head=0;
-			this.deprel=null;
-			this.word=null;
-			this.tree=null;
-			this.refers=null;
-		}
-
-		__class(ConllWord,'nlp.conll.ConllWord');
-		var __proto=ConllWord.prototype;
-		__proto.sortRefers=function(i){
-			function mSort (v0,v1){
-				if (v0==i||v1==i){
-					return v0-v1;
-				}
-				if (v0 > i && v1 > i){
-					return v1-v0;
-				}
-				if (v0 < i && v1 < i){
-					return v1-v0;
-				}
-				return v0-v1;
-			}
-			this.refers.sort(mSort);
-		}
-
-		ConllWord.parseFromLine=function(line){
-			var values;
-			values=line.split("\t");
-			var rst;
-			rst=new ConllWord();
-			var i=0,len=0;
-			len=ConllWord.KeyList.length;
-			for (i=0;i < len;i++){
-				rst[ConllWord.KeyList[i]]=values[i];
-			}
-			rst.id=Sys.mParseInt(rst.id)-1;
-			rst.head=Sys.mParseInt(rst.head)-1;
-			rst.word=rst.form;
-			rst.refers=[];
-			return rst;
-		}
-
-		__static(ConllWord,
-		['KeyList',function(){return this.KeyList=["id","form","lemma","cpostag","postag","feats","head","deprel"];}
-		]);
-		return ConllWord;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.conll.ConllWordDic
-	var ConllWordDic=(function(){
-		function ConllWordDic(){
-			this.wordDic={};
-			this.wordList=[];
-			this.typeDic={};
-		}
-
-		__class(ConllWordDic,'nlp.conll.ConllWordDic');
-		var __proto=ConllWordDic.prototype;
-		__proto.getWordCacheKey=function(word){
-			return word.word+"@"+word.postag;
-		}
-
-		__proto.addToTypeDic=function(word){
-			var tType;
-			tType=word.postag;
-			if (!this.typeDic[tType])this.typeDic[tType]=[];
-			var typeList;
-			typeList=this.typeDic[tType];
-			typeList.push(word);
-		}
-
-		__proto.addWord=function(word){
-			var key;
-			key=this.getWordCacheKey(word);
-			if (this.wordDic[key])return;
-			this.wordDic[key]=word;
-			this.wordList.push(word);
-			this.addToTypeDic(word);
-		}
-
-		__static(ConllWordDic,
-		['I',function(){return this.I=new ConllWordDic();}
-		]);
-		return ConllWordDic;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.cutwords.CharDicCutter
-	var CharDicCutter=(function(){
-		function CharDicCutter(){
-			this.allDic={};
-			this.typeDic={};
-		}
-
-		__class(CharDicCutter,'nlp.cutwords.CharDicCutter');
-		var __proto=CharDicCutter.prototype;
-		__proto.addCutDic=function(type,charDic){
-			var tConfig;
-			tConfig={};
-			tConfig.type=type;
-			tConfig.charDic=charDic;
-			var key;
-			for (key in charDic){
-				this.allDic[key]=tConfig;
-			};
-			var typeO;
-			typeO={};
-			typeO.typecns=[type];
-			typeO.types=[type];
-			this.typeDic[type]=typeO;
-		}
-
-		__proto.adptWordPiece=function(wordPiece){
-			wordPiece.typeO=this.typeDic[wordPiece.type];
-			return wordPiece;
-		}
-
-		__proto.findMaxWord=function(str,tPos){
-			var tChar;
-			tChar=str.charAt(tPos);
-			var tCutConfig;
-			tCutConfig=this.allDic[tChar];
-			if (!tCutConfig)return null;
-			var tPiece;
-			tPiece=new WordPiece();
-			tPiece.start=tPos;
-			tPiece.end=tPos+1;
-			var charDic;
-			charDic=tCutConfig.charDic;
-			var start=0;
-			start=tPos;
-			var end=0;
-			end=tPos;
-			while (charDic[tChar]){
-				tPiece.end=tPiece.end+1;
-				if (tPiece.end >=str.length)break ;
-				tChar=str.charAt(tPiece.end);
-			}
-			tPiece.word=str.substring(tPiece.start,tPiece.end);
-			tPiece.type=tCutConfig.type;
-			return this.adptWordPiece(tPiece);
-		}
-
-		__proto.findMaxWordR=function(str,tPos){
-			var tChar;
-			tChar=str.charAt(tPos);
-			var tCutConfig;
-			tCutConfig=this.allDic[tChar];
-			if (!tCutConfig)return null;
-			var tPiece;
-			tPiece=new WordPiece();
-			tPiece.start=tPos;
-			tPiece.end=tPos+1;
-			var charDic;
-			charDic=tCutConfig.charDic;
-			var start=0;
-			start=tPos;
-			var end=0;
-			end=tPos;
-			while (charDic[tChar]){
-				tPiece.start=start;
-				start--;
-				if (start<0)break ;
-				tChar=str.charAt(start);
-			}
-			tPiece.word=str.substring(tPiece.start,tPiece.end);
-			tPiece.type=tCutConfig.type;
-			return this.adptWordPiece(tPiece);
-		}
-
-		return CharDicCutter;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.cutwords.WordCutter
-	var WordCutter=(function(){
-		function WordCutter(){
-			this.trie=null;
-			this.typeDic=null;
-			this.charDicCutter=null;
-			this.init();
-		}
-
-		__class(WordCutter,'nlp.cutwords.WordCutter');
-		var __proto=WordCutter.prototype;
-		__proto.init=function(){
-			this.charDicCutter=new CharDicCutter();
-			this.charDicCutter.addCutDic("NUMBER",PingYinDic.NumCharDic);
-			this.charDicCutter.addCutDic("ENG",PingYinDic.EnglishCharDic);
-		}
-
-		__proto.cut=function(str){
-			var splitStrs;
-			splitStrs=WordUtils.splitWordBySpecial(str);
-			console.log("cutStr:",str);
-			console.log("split:",splitStrs);
-			var i=0,len=0;
-			var rst;
-			var tempRst;
-			rst=[];
-			len=splitStrs.length;
-			for (i=0;i < len;i++){
-				tempRst=this.cutSmallPiece(splitStrs[i]);
-				rst=rst.concat(tempRst);
-			}
-			return rst;
-		}
-
-		__proto.cutSmallPiece=function(str){
-			console.log("cutSmall:",str);
-			var rst;
-			rst=this.cutWork(str);
-			var score=NaN;
-			score=WordUtils.scoreWordList(rst);
-			console.log("cut:"+score,rst);
-			var rst1;
-			rst1=this.cutWorkR(str);
-			var score1=NaN;
-			score1=WordUtils.scoreWordList(rst1);
-			console.log("cut:"+score1,rst1);
-			var isSame=false;
-			isSame=WordUtils.isWordListSame(rst,rst1);
-			console.log("isSame:",isSame);
-			if (!isSame){
-				if (score > score1){
-					return rst;
-					}else{
-					return rst1;
-				}
-			}
-			return rst;
-		}
-
-		__proto.cutToMap=function(str){
-			var i=0,len=0;
-			len=str.length;
-			var map;
-			map=new MapStruct();
-			for (i=0;i < len;i++){
-				this.findWordToMap(str,i,map);
-			};
-			var wList;
-			wList=map.findMaxWeightPath(str.length);
-			console.log("wList:",wList);
-		}
-
-		__proto.findWordToMap=function(str,pos,map){
-			var start=0;
-			start=pos;
-			var tChar;
-			var tchar;
-			tchar=str.charAt(pos);
-			var tTrieNode;
-			tTrieNode=this.trie.findByChar(tchar);
-			if (!tTrieNode){
-				map.addEdge(start,pos+1,WordUtils.getWordScore(tchar),tchar);
-			}
-			while (tTrieNode){
-				if (tTrieNode.isWord()){
-					map.addEdge(start,pos+1,-1,tTrieNode);
-				}
-				pos++;
-				tchar=str.charAt(pos);
-				tTrieNode=tTrieNode.findByChar(tchar);
-			}
-		}
-
-		__proto.cutWork=function(str){
-			var tPos=0;
-			tPos=0;
-			var rst;
-			rst=[];
-			var tPiece;
-			while (tPos < str.length){
-				tPiece=this.findMaxWord(str,tPos);
-				if (!tPiece)break ;
-				rst.push(tPiece);
-				tPos=tPiece.end;
-			}
-			return rst;
-		}
-
-		__proto.cutWorkR=function(str){
-			var tPos=0;
-			tPos=str.length-1;
-			var rst;
-			rst=[];
-			var tPiece;
-			while (tPos >=0){
-				tPiece=this.findMaxWordR(str,tPos);
-				if (!tPiece)break ;
-				rst.push(tPiece);
-				tPos=tPiece.start-1;
-			}
-			rst.reverse();
-			return rst;
-		}
-
-		__proto.adptPiece=function(piece){
-			if (piece.word==" ")debugger;
-			piece.update();
-			if (this.typeDic){
-				piece.typeO=this.typeDic.getWordType(piece.word);
-			}
-			return piece;
-		}
-
-		__proto.findMaxWord=function(str,pos){
-			(pos===void 0)&& (pos=0);
-			var tPiece;
-			tPiece=this.charDicCutter.findMaxWord(str,pos);
-			if (tPiece)return tPiece;
-			var tchar;
-			tchar=str.charAt(pos);
-			var tTrieNode;
-			tTrieNode=this.trie.findByChar(tchar);
-			tPiece=new WordPiece();
-			tPiece.start=pos;
-			tPiece.end=pos+1;
-			if (!tTrieNode){
-				tPiece.word=tchar;
-				tPiece.type="new";
-				return this.adptPiece(tPiece);
-			}
-			if (tTrieNode.isWord()){
-				tPiece.end=pos+1;
-				tPiece.wordRef=tTrieNode.word;
-				}else{
-				tPiece.word=tchar;
-				tPiece.type="new";
-			};
-			var end=0;
-			end=pos;
-			var next;
-			while (tTrieNode){
-				end++;
-				if (end >=str.length){
-					break ;
-				}
-				tchar=str.charAt(end);
-				next=tTrieNode.findByChar(tchar);
-				if (!next)break ;
-				tTrieNode=next;
-				if (tTrieNode.isWord()){
-					tPiece.end=end+1;
-					tPiece.wordRef=tTrieNode.word;
-				}
-			}
-			return this.adptPiece(tPiece);
-		}
-
-		__proto.findMaxWordR=function(str,pos){
-			(pos===void 0)&& (pos=-2);
-			if (pos==-2){
-				pos=str.length-1;
-			};
-			var tPiece;
-			tPiece=this.charDicCutter.findMaxWordR(str,pos);
-			if (tPiece)return tPiece;
-			var tchar;
-			tchar=str.charAt(pos);
-			var tTrieNode;
-			tTrieNode=this.trie.findByCharR(tchar);
-			tPiece=new WordPiece();
-			tPiece.start=pos;
-			tPiece.end=pos+1;
-			if (!tTrieNode){
-				tPiece.word=tchar;
-				tPiece.type="new";
-				return this.adptPiece(tPiece);
-			}
-			if (tTrieNode.isWord()){
-				tPiece.end=pos+1;
-				tPiece.wordRef=tTrieNode.word;
-			}
-			if (!tTrieNode.isWord()){
-				tPiece.word=tchar;
-				tPiece.type="new";
-			};
-			var start=0;
-			start=pos;
-			var next;
-			while (tTrieNode){
-				start--;
-				if (start < 0){
-					break ;
-				}
-				tchar=str.charAt(start);
-				next=tTrieNode.findByChar(tchar);
-				if (!next)break ;
-				tTrieNode=next;
-				if (tTrieNode.isWord()){
-					tPiece.start=start;
-					tPiece.wordRef=tTrieNode.word;
-				}
-			}
-			return this.adptPiece(tPiece);
-		}
-
-		return WordCutter;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.cutwords.WordPiece
-	var WordPiece=(function(){
-		function WordPiece(){
-			this.word=null;
-			this.start=0;
-			this.end=0;
-			this.wordRef=null;
-			this.type=null;
-			this.typeO=null;
-		}
-
-		__class(WordPiece,'nlp.cutwords.WordPiece');
-		var __proto=WordPiece.prototype;
-		__proto.update=function(){
-			if (this.wordRef){
-				this.word=this.wordRef.word;
-			}
-			return this;
-		}
-
-		return WordPiece;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.dictools.TypeDefine
-	var TypeDefine=(function(){
-		function TypeDefine(){}
-		__class(TypeDefine,'nlp.dictools.TypeDefine');
-		TypeDefine.getCHType=function(type){
-			return TypeDefine.TypeDesDic[type] || "未知";
-		}
-
-		__static(TypeDefine,
-		['TypeDesDic',function(){return this.TypeDesDic={
-				"a":"形容词",
-				"ad":"副形词",
-				"ag":"形容词性语素",
-				"al":"形容词性惯用语",
-				"an":"名形词",
-				"b":"区别词",
-				"begin":"仅用于始##始",
-				"bg":"区别语素",
-				"bl":"区别词性惯用语",
-				"c":"连词",
-				"cc":"并列连词",
-				"d":"副词",
-				"dg":"辄,俱,复之类的副词",
-				"dl":"连语",
-				"e":"叹词",
-				"end":"仅用于终##终",
-				"f":"方位词",
-				"g":"学术词汇",
-				"gb":"生物相关词汇",
-				"gbc":"生物类别",
-				"gc":"化学相关词汇",
-				"gg":"地理地质相关词汇",
-				"gi":"计算机相关词汇",
-				"gm":"数学相关词汇",
-				"gp":"物理相关词汇",
-				"h":"前缀",
-				"i":"成语",
-				"j":"简称略语",
-				"k":"后缀",
-				"l":"习用语",
-				"m":"数词",
-				"mg":"数语素",
-				"Mg":"甲乙丙丁之类的数词",
-				"mq":"数量词",
-				"n":"名词",
-				"nb":"生物名",
-				"nba":"动物名",
-				"nbc":"动物纲目",
-				"nbp":"植物名",
-				"nf":"食品，比如“薯片”",
-				"ng":"名词性语素",
-				"nh":"医药疾病等健康相关名词",
-				"nhd":"疾病",
-				"nhm":"药品",
-				"ni":"机构相关（不是独立机构名）",
-				"nic":"下属机构",
-				"nis":"机构后缀",
-				"nit":"教育相关机构",
-				"nl":"名词性惯用语",
-				"nm":"物品名",
-				"nmc":"化学品名",
-				"nn":"工作相关名词",
-				"nnd":"职业",
-				"nnt":"职务职称",
-				"nr":"人名",
-				"nr1":"复姓",
-				"nr2":"蒙古姓名",
-				"nrf":"音译人名",
-				"nrj":"日语人名",
-				"ns":"地名",
-				"nsf":"音译地名",
-				"nt":"机构团体名",
-				"ntc":"公司名",
-				"ntcb":"银行",
-				"ntcf":"工厂",
-				"ntch":"酒店宾馆",
-				"nth":"医院",
-				"nto":"政府机构",
-				"nts":"中小学",
-				"ntu":"大学",
-				"nx":"字母专名",
-				"nz":"其他专名",
-				"o":"拟声词",
-				"p":"介词",
-				"pba":"介词'把'",
-				"pbei":"介词'被'",
-				"q":"量词",
-				"qg":"量词语素",
-				"qt":"时量词",
-				"qv":"动量词",
-				"r":"代词",
-				"rg":"代词性语素",
-				"Rg":"古汉语代词性语素",
-				"rr":"人称代词",
-				"ry":"疑问代词",
-				"rys":"处所疑问代词",
-				"ryt":"时间疑问代词",
-				"ryv":"谓词性疑问代词",
-				"rz":"指示代词",
-				"rzs":"处所指示代词",
-				"rzt":"时间指示代词",
-				"rzv":"谓词性指示代词",
-				"s":"处所词",
-				"t":"时间词",
-				"tg":"时间词性语素",
-				"u":"助词",
-				"ud":"助词",
-				"ude1":"的 底",
-				"ude2":"地",
-				"ude3":"得",
-				"udeng":"等 等等 云云",
-				"udh":"的话",
-				"ug":"过",
-				"uguo":"过",
-				"uj":"助词",
-				"ul":"连词",
-				"ule":"了 喽",
-				"ulian":"连 （“连小学生都会”）",
-				"uls":"来讲 来说 而言 说来",
-				"usuo":"所",
-				"uv":"连词",
-				"uyy":"一样 一般 似的 般",
-				"uz":"着",
-				"uzhe":"着",
-				"uzhi":"之",
-				"v":"动词",
-				"vd":"副动词",
-				"vf":"趋向动词",
-				"vg":"动词性语素",
-				"vi":"不及物动词（内动词",
-				"vl":"动词性惯用语",
-				"vn":"名动词",
-				"vshi":"动词“是”",
-				"vx":"形式动词",
-				"vyou":"动词“有”",
-				"w":"标点符号",
-				"wb":"百分号千分号，全角：％ ‰   半角：%",
-				"wd":"逗号，全角：， 半角：,",
-				"wf":"分号，全角：； 半角： ;",
-				"wh":"单位符号，全角：￥ ＄ ￡  °  ℃  半角：$",
-				"wj":"句号，全角：。",
-				"wky":"右括号，全角：） 〕  ］ ｝ 》  】 〗 〉 半角： ) ] { >",
-				"wkz":"左括号，全角：（ 〔  ［  ｛  《 【  〖 〈   半角：( [ { <",
-				"wm":"冒号，全角：： 半角： :",
-				"wn":"顿号，全角：、",
-				"wp":"破折号，全角：——   －－   ——－   半角：—  —-	",
-				"ws":"省略号，全角：……  …",
-				"wt":"叹号，全角：！",
-				"ww":"问号，全角：？",
-				"wyy":"右引号，全角：” ’ 』",
-				"wyz":"左引号，全角：“ ‘ 『",
-				"x":"字符串",
-				"xu":"网址URL",
-				"xx":"非语素字",
-				"y":"语气词(delete yg)",
-				"yg":"语气语素",
-				"z":"状态词",
-				"zg":"状态词"
-		};}
-
-		]);
-		return TypeDefine;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.dictools.TypeDicParser
-	var TypeDicParser=(function(){
-		function TypeDicParser(){
-			this.wordDic=null;
-			this.wordList=null;
-			this.wordDic={};
-		}
-
-		__class(TypeDicParser,'nlp.dictools.TypeDicParser');
-		var __proto=TypeDicParser.prototype;
-		__proto.getWordType=function(word){
-			var typeO;
-			typeO=this.wordDic[word];
-			if (!typeO)return null;
-			return typeO;
-		}
-
-		__proto.getWordTypeStr=function(word){
-			var typeO;
-			typeO=this.getWordType(word);
-			if (!typeO)return "unknow";
-			return typeO.types[0];
-			return typeO.types.join(";");
-		}
-
-		__proto.getWordTypeCNStr=function(word){
-			var typeO;
-			typeO=this.getWordType(word);
-			if (!typeO)return "unknow";
-			return typeO.typecns[0];
-			return typeO.typecns.join(";");
-		}
-
-		__proto.initByTxt=function(txt){
-			this.wordList=[];
-			var lines;
-			lines=txt.split("\n");
-			var i=0,len=0;
-			len=lines.length;
-			var tLine;
-			var tWordO;
-			for (i=0;i < len;i++){
-				tLine=lines[i];
-				tLine=tLine.replace("\r","");
-				tWordO=this.parseLine(tLine);
-				this.wordDic[tWordO.word]=tWordO;
-				this.wordList.push(this.createWordOneByTypeO(tWordO));
-			}
-		}
-
-		//if (i > 100)break;
-		__proto.parseLine=function(line){
-			var arr;
-			arr=line.split("	");
-			var rst;
-			rst={};
-			rst.word=arr[0];
-			rst.type={};
-			rst.types=[];
-			rst.typecns=[];
-			var i=0,len=0;
-			len=arr.length;
-			var score=NaN;
-			var ttype;
-			for (i=1;i < len;i+=2){
-				score=parseInt(arr[i+1]);
-				ttype=arr[i];
-				rst.type[ttype]=score;
-				rst.type[TypeDefine.getCHType(ttype)]=score;
-				rst.types.push(ttype);
-				rst.typecns.push(TypeDefine.getCHType(ttype));
-			}
-			return rst;
-		}
-
-		__proto.createWordOneByTypeO=function(typeO){
-			var rst;
-			rst=new WordOne();
-			rst.word=typeO.word;
-			return rst;
-		}
-
-		__proto.addType=function(wordList,types,typecns){
-			var tWordO;
-			var i=0,len=0;
-			len=wordList.length;
-			for (i=0;i < len;i++){
-				tWordO={};
-				tWordO.word=wordList[i];
-				tWordO.type={};
-				tWordO.types=types;
-				tWordO.typecns=typecns || types;
-				if(!this.wordDic[tWordO.word])
-					this.wordDic[tWordO.word]=tWordO;
-			}
-		}
-
-		TypeDicParser.Tab="	";
-		return TypeDicParser;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.PingYinDic
-	var PingYinDic=(function(){
-		function PingYinDic(){
-			this.pinYinList=null;
-			this.charDic=null;
-			this.headDic=null;
-			this.pinYinList=[];
-		}
-
-		__class(PingYinDic,'nlp.PingYinDic');
-		var __proto=PingYinDic.prototype;
-		__proto.addIfOK=function(line){
-			if (PingYinDic.isPinYin(line)){
-				this.pinYinList.push(line);
-			}
-		}
-
-		__proto.makeCharDic=function(){
-			this.charDic={};
-			this.headDic={};
-			var i=0,len=0;
-			len=this.pinYinList.length;
-			for (i=0;i < len;i++){
-				this.addWordToDic(this.pinYinList[i]);
-			}
-		}
-
-		__proto.addWordToDic=function(word){
-			var charList;
-			charList=word.split("");
-			if (!charList.length)return;
-			var i=0,len=0;
-			len=charList.length;
-			var tChar;
-			tChar=charList[0];
-			this.headDic[tChar]=tChar;
-			for (i=0;i < len;i++){
-				tChar=charList[i];
-				this.charDic[tChar]=tChar;
-			}
-		}
-
-		PingYinDic.checkIsHasSpecialStr=function(str){
-			var pattern=new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
-			if (pattern.test(str)){
-				return true;
-			}
-			return false;
-		}
-
-		PingYinDic.hasChina=function(obj){
-			var reg=/[\u4E00-\u9FA5\uF900-\uFA2D]/;
-			return reg.test(obj);
-		}
-
-		PingYinDic.isPinYin=function(line){
-			if (line.length < 1)
-				return false;
-			if (line.charAt(0)=="∶")return false;
-			if (PingYinDic.checkIsHasSpecialStr(line))
-				return false;
-			if (PingYinDic.hasChina(line))
-				return false;
-			var char0;
-			char0=line.charAt(0);
-			var charCode0=0;
-			charCode0=line.charCodeAt(0);
-			return true;
-		}
-
-		PingYinDic.isNumChar=function(char){
-			return PingYinDic.NumCharDic[char];
-		}
-
-		PingYinDic.isEnglishChar=function(char){
-			return PingYinDic.EnglishCharDic[char];
-		}
-
-		PingYinDic.inits=function(){
-			PingYinDic.DebugDic=WordUtils.arrToDic(PingYinDic.DebugChars);
-			var i=0,len=0;
-			var start=0;
-			start="A".charCodeAt(0);
-			len="Z".charCodeAt(0);
-			for (i=start;i <=len;i++){
-				PingYinDic.EnglishCharDic[String.fromCharCode(i)]=true;
-			}
-			start="a".charCodeAt(0);
-			len="z".charCodeAt(0);
-			for (i=start;i <=len;i++){
-				PingYinDic.EnglishCharDic[String.fromCharCode(i)]=true;
-			}
-			for (i=0;i < 10;i++){
-				PingYinDic.NumCharDic[i]=true;
-			}
-		}
-
-		PingYinDic.DebugDic=null
-		PingYinDic.EnglishCharDic={};
-		PingYinDic.NumCharDic={};
-		__static(PingYinDic,
-		['DebugChars',function(){return this.DebugChars=["’"];}
-		]);
-		PingYinDic.__init$=function(){
-			;;
-			PingYinDic.inits();
-		}
-
-		return PingYinDic;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.trie.Trie
-	var Trie=(function(){
-		function Trie(){
-			this.root=null;
-			this.rootR=null;
-		}
-
-		__class(Trie,'nlp.trie.Trie');
-		var __proto=Trie.prototype;
-		__proto.addWord=function(word){
-			this.root.addWord(0,word);
-			this.rootR.addWordR(0,word);
-		}
-
-		__proto.addWordIfNotExist=function(wordOne){
-			if (this.getWord(wordOne.word)){
-				return;
-			}
-			this.addWord(wordOne);
-		}
-
-		__proto.addWordOneList=function(wordList){
-			var trieWordList;
-			trieWordList=TrieWord.createTrieWordList(wordList);
-			var i=0,len=0;
-			len=trieWordList.length;
-			for (i=0;i < len;i++){
-				this.addWordIfNotExist(trieWordList[i]);
-			}
-		}
-
-		__proto.getWord=function(word){
-			if (!word)return null;
-			var tWord;
-			var tchar;
-			var tPos=0;
-			tPos=0;
-			tchar=word.charAt(tPos);
-			tWord=this.findByChar(tchar);
-			while (tWord){
-				tPos++;
-				if (tPos >=word.length)break ;
-				tchar=word.charAt(tPos);
-				tWord=tWord.findByChar(tchar);
-			}
-			if (tWord && tWord.isWord()&& tWord.word.word==word){
-				return tWord;
-			}
-			return null;
-		}
-
-		__proto.buildByWordList=function(wordList){
-			this.root=new TrieNode();
-			this.rootR=new TrieNode();
-			var twList;
-			twList=TrieWord.createTrieWordList(wordList);
-			var i=0,len=0;
-			len=twList.length;
-			var tWord;
-			for (i=0;i < len;i++){
-				tWord=twList[i];
-				this.addWord(tWord);
-			}
-		}
-
-		__proto.findByChar=function(char){
-			return this.root.findByChar(char);
-		}
-
-		__proto.findByCharR=function(char){
-			return this.rootR.findByChar(char);
-		}
-
-		return Trie;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.trie.TrieNode
-	var TrieNode=(function(){
-		function TrieNode(){
-			this.childDic=null;
-			this.char="";
-			this.word=null;
-			this.wordStr=null;
-			this.childDic={};
-		}
-
-		__class(TrieNode,'nlp.trie.TrieNode');
-		var __proto=TrieNode.prototype;
-		__proto.findByChar=function(char){
-			return this.childDic[char];
-		}
-
-		__proto.isWord=function(){
-			return this.word?true:false;
-		}
-
-		__proto.getChildByChar=function(char){
-			if (!this.childDic[char]){
-				this.childDic[char]=TrieNode.createByChar(char);
-			}
-			return this.childDic[char];
-		}
-
-		__proto.addWord=function(pos,word){
-			if (pos==word.word.length){
-				this.word=word;
-				this.wordStr=word.word;
-				return;
-			};
-			var tchar;
-			tchar=word.word.charAt(pos);
-			var tChild;
-			tChild=this.getChildByChar(tchar);
-			tChild.addWord(pos+1,word);
-		}
-
-		__proto.addWordR=function(pos,word){
-			if (pos==word.word.length){
-				this.word=word;
-				this.wordStr=word.word;
-				return;
-			};
-			var tchar;
-			tchar=word.word.charAt(word.word.length-1-pos);
-			var tChild;
-			tChild=this.getChildByChar(tchar);
-			tChild.addWordR(pos+1,word);
-		}
-
-		TrieNode.createByChar=function(char){
-			var rst;
-			rst=new TrieNode();
-			rst.char=char;
-			return rst;
-		}
-
-		return TrieNode;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.trie.TrieWord
-	var TrieWord=(function(){
-		function TrieWord(){
-			this.words=null;
-			this.word=null;
-			this.words=[];
-		}
-
-		__class(TrieWord,'nlp.trie.TrieWord');
-		var __proto=TrieWord.prototype;
-		__proto.addWord=function(word){
-			this.words.push(word);
-		}
-
-		TrieWord.createByWord=function(word){
-			var rst;
-			rst=new TrieWord();
-			rst.word=word;
-			return rst;
-		}
-
-		TrieWord.createTrieWordList=function(wordList){
-			var wordDic;
-			wordDic={};
-			var i=0,len=0;
-			len=wordList.length;
-			var tWord;
-			var tTrieWord;
-			for (i=0;i < len;i++){
-				tWord=wordList[i];
-				if (!wordDic[tWord.word]){
-					wordDic[tWord.word]=TrieWord.createByWord(tWord.word);
-				}
-				tTrieWord=wordDic[tWord.word];
-				tTrieWord.addWord(tWord);
-			};
-			var twList;
-			twList=[];
-			var key;
-			for (key in wordDic){
-				tTrieWord=wordDic[key];
-				twList.push(tTrieWord);
-			}
-			twList.sort(TrieWord.sortWordByLen);
-			return twList;
-		}
-
-		TrieWord.sortWordByLen=function(word0,word1){
-			return word0.word.length-word1.word.length;
-		}
-
-		return TrieWord;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.WordDicParser
-	var WordDicParser=(function(){
-		function WordDicParser(){
-			this.complete=null;
-			this.wordList=null;
-			this.vocList=null;
-			this.trie=null;
-			this.cutter=null;
-			this.wordList=[];
-			this.vocList=[];
-			this.trie=new Trie();
-		}
-
-		__class(WordDicParser,'nlp.WordDicParser');
-		var __proto=WordDicParser.prototype;
-		__proto.loadDic=function(filePath,complete){
-			this.complete=complete;
-			Laya.loader.load(filePath,Handler.create(this,this.onFileLoaded),null,"text");
-		}
-
-		__proto.onFileLoaded=function(txt){
-			this.initByDicTxt(txt);
-			if (this.complete){
-				this.complete.run();
-			}
-		}
-
-		__proto.initByDicTxt=function(txt){
-			var lines;
-			lines=txt.split("\n");
-			var pinyin;
-			pinyin=new PingYinDic();
-			this.wordList=[];
-			var tWord;
-			var i=0,len=0;
-			len=lines.length;
-			var tLine;
-			for (i=0;i < len;i++){
-				tLine=lines[i];
-				tLine=tLine.replace("\r","");
-				pinyin.addIfOK(tLine);
-				if (tLine.charAt(0)=="*"){
-					if (tWord)tWord.wordParseComplete();
-					tWord=new WordParser();
-					tWord.addHead(tLine);
-					this.wordList.push(tWord);
-					}else{
-					if (tWord){
-						tWord.addLine(tLine);
-					}
-				}
-			}
-			if (tWord)tWord.wordParseComplete();
-			console.log("word count:",this.wordList.length,this.wordList);
-			pinyin.makeCharDic();
-			console.log(pinyin);
-			this.addToWordList(this.wordList);
-			console.log("vocList:",this.vocList);
-			this.trie.buildByWordList(this.vocList);
-			console.log("trie:",this.trie);
-			this.cutter=new WordCutter();
-			this.cutter.trie=this.trie;
-		}
-
-		__proto.cut=function(str){
-			return this.cutter.cut(str);
-		}
-
-		__proto.addToWordList=function(wList){
-			var i=0,len=0;
-			len=wList.length;
-			var tWord;
-			for (i=0;i < len;i++){
-				tWord=wList[i];
-				this.addWordToVocList(tWord);
-			}
-		}
-
-		__proto.addWordToVocList=function(word){
-			var tList;
-			tList=word.wordList;
-			if (!tList)return;
-			var i=0,len=0;
-			len=tList.length;
-			for (i=0;i < len;i++){
-				this.vocList.push(tList[i]);
-			}
-		}
-
-		__static(WordDicParser,
-		['I',function(){return this.I=new WordDicParser();}
-		]);
-		return WordDicParser;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.WordOne
-	var WordOne=(function(){
-		function WordOne(){
-			this.oWord=null;
-			this.word=null;
-			this.pinyin=null;
-			this.twPY=null;
-			this.type=null;
-			this.detail=null;
-			this.lines=null;
-			this.des=null;
-			this.detailParsed=false;
-			this.lines=[];
-		}
-
-		__class(WordOne,'nlp.WordOne');
-		var __proto=WordOne.prototype;
-		__proto.addLine=function(line){
-			this.lines.push(line);
-		}
-
-		__proto.parseEnd=function(removeLast){
-			if (removeLast)this.lines.pop();
-		}
-
-		__proto.parseDetail=function(){
-			if (this.detailParsed)return;
-			this.detailParsed=true;
-			this.des=[];
-			var i=0,len=0;
-			len=this.lines.length;
-			var tDes;
-			var tLine;
-			for (i=0;i < len;i++){
-				tLine=this.lines[i];
-				if (tLine.length==1){
-					console.log("one:",tLine);
-				}
-				if (WordOne.getKeyStartWords(tLine)){
-					tDes=[];
-					tDes.push(tLine);
-					this.des.push(tDes);
-				}else
-				if (WordOne.getKeyWords(tLine)){
-					tDes=[];
-					tDes.push(tLine);
-					this.des.push(tDes);
-					}else{
-					if (!tDes){
-						tDes=[];
-						this.des.push(tDes);
-					}
-					tDes.push(tLine);
-				}
-			}
-		}
-
-		WordOne.getKeyWords=function(str){
-			var i=0,len=0;
-			len=WordOne.DesKeyWords.length;
-			for (i=0;i < len;i++){
-				if (str.indexOf(WordOne.DesKeyWords[i])>=0){
-					return WordOne.DesKeyWords[i];
-				}
-			}
-			return null;
-		}
-
-		WordOne.getKeyStartWords=function(str){
-			var i=0,len=0;
-			len=WordOne.DesKeyStartWords.length;
-			for (i=0;i < len;i++){
-				if (str.indexOf(WordOne.DesKeyStartWords[i])==0){
-					return WordOne.DesKeyStartWords[i];
-				}
-			}
-			return null;
-		}
-
-		__static(WordOne,
-		['DesKeyWords',function(){return this.DesKeyWords=["：","如:","∶表示","同\“","另见"];},'DesKeyStartWords',function(){return this.DesKeyStartWords=["∶","：","用在","姓"];}
-		]);
-		return WordOne;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.WordParser
-	var WordParser=(function(){
-		function WordParser(){
-			this.word=null;
-			this.alasDic=null;
-			this.lineCount=0;
-			this.part=null;
-			this.tWord=null;
-			this.wordList=null;
-			this._isParsed=false;
-			this.lines=null;
-			this.preLine=null;
-			this.preIsPinYin=false;
-			this.lines=[];
-			this.wordList=[];
-			this.alasDic={};
-			this._isParsed=false;
-		}
-
-		__class(WordParser,'nlp.WordParser');
-		var __proto=WordParser.prototype;
-		__proto.wordParseComplete=function(){
-			if (this._isParsed)return;
-			var i=0,len=0;
-			len=this.wordList.length;
-			for (i=0;i < len;i++){
-				(this.wordList [i]).parseDetail();
-			}
-		}
-
-		__proto.addToAlasDic=function(word){
-			word=word.replace("（","").replace("）","");
-			this.alasDic[word]=word;
-		}
-
-		__proto.addLine=function(line){
-			this.lines.push(line);
-			var tLine;
-			tLine=line;
-			var isPinYin=false;
-			isPinYin=false;
-			if (line.length==1&&this.alasDic[line]){
-				tLine=this.preLine;
-			}else
-			if (line.charAt(0)=="（"){
-				this.addToAlasDic(line);
-				tLine=this.preLine;
-			}else
-			if (line.charAt(0)=="〖"){
-				if (this.tWord){
-					this.tWord.addLine(line);
-				}
-			}else
-			if (line.charAt(0)=="∶"){
-				if (this.tWord){
-					this.tWord.addLine(line);
-				}
-			}else
-			if (line.charAt(0)=="【"){
-				if (this.tWord){
-					this.tWord.type=StringTool.getBetween(line,"【","】");
-				}
-			}else
-			if (line.indexOf("详细解释：")>=0){
-				tLine=line.replace("详细解释：","");
-				this.tWord=null;
-			}else
-			if (line.indexOf("部首：")>=0){
-				this.part=line.replace("部首：","").replace("；","");
-			}else
-			if (line.indexOf("笔画数：")>=0){
-				this.lineCount=parseInt(line.replace("笔画数：",""));
-			}else
-			if (line.indexOf("基本解释：")>=0){
-				tLine=this.word;
-			}else
-			if (PingYinDic.isPinYin(line)){
-				if (this.preIsPinYin){
-					if (this.tWord){
-						this.tWord.twPY=line;
-					}
-					}else{
-					if (this.tWord){
-						this.tWord.parseEnd(true);
-					}
-					this.tWord=this.createWord();
-					this.tWord.word=this.preLine;
-					this.tWord.pinyin=line;
-					isPinYin=true;
-				}
-				}else{
-				if (this.tWord){
-					this.tWord.addLine(line);
-				}
-			}
-			this.preLine=tLine;
-			this.preIsPinYin=isPinYin;
-		}
-
-		__proto.addHead=function(line){
-			var tArr;
-			tArr=line.split(" ");
-			var tt;
-			tt=tArr[0];
-			this.word=tt.charAt(1);
-		}
-
-		__proto.createWord=function(){
-			var rst;
-			rst=new WordOne();
-			rst.word=this.word;
-			rst.oWord=this;
-			this.wordList.push(rst);
-			return rst;
-		}
-
-		return WordParser;
-	})()
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class nlp.WordUtils
-	var WordUtils=(function(){
-		function WordUtils(){}
-		__class(WordUtils,'nlp.WordUtils');
-		WordUtils.printLines=function(lines){
-			var i=0,len=0;
-			len=lines.length;
-			for (i=0;i < len;i++){
-				console.log(lines[i]);
-			}
-		}
-
-		WordUtils.showChars=function(start,end){
-			var i=0;
-			for (i=start;i <=end;i++){
-				console.log("char:",i,":(",String.fromCharCode(i),")");
-			}
-		}
-
-		WordUtils.arrToDic=function(arr){
-			var rst;
-			rst={};
-			var i=0,len=0;
-			len=arr.length;
-			for (i=0;i < len;i++){
-				rst[arr[i]]=arr[i];
-			}
-			return rst;
-		}
-
-		WordUtils.getDicKeys=function(dic){
-			var rst;
-			rst=[];
-			var key;
-			for (key in dic){
-				rst.push(key);
-			}
-			return rst;
-		}
-
-		WordUtils.dic2Arr=function(dic){
-			var rst;
-			rst=[];
-			var key;
-			for (key in dic){
-				rst.push({key:key,value:dic[key]});
-			}
-			return rst;
-		}
-
-		WordUtils.isWordListSame=function(wordList1,wordList2){
-			if (!wordList1.length==wordList2.length)return false;
-			var i=0,len=0;
-			len=wordList1.length;
-			var word1,word2;
-			for (i=0;i < len;i++){
-				word1=wordList1[i];
-				word2=wordList2[i];
-				if (word1.start !=word2.start){
-					console.log("Dif:",i,word1.word,word2.word);
-					return false;
-				}
-				if (word1.end !=word2.end){
-					console.log("Dif:",i,word1.word,word2.word);
-					return false;
-				}
-			}
-			return true;
-		}
-
-		WordUtils.getMaxScore=function(dic){
-			var score=NaN;
-			score=0;
-			var key;
-			var tScore=NaN;
-			for (key in dic){
-				tScore=dic[key];
-				if (tScore>score){
-					score=tScore;
-				}
-			}
-			return score;
-		}
-
-		WordUtils.scoreWordList=function(wordList){
-			var i=0,len=0;
-			len=wordList.length;
-			var score=NaN;
-			score=0;
-			var tWord;
-			for (i=0;i < len;i++){
-				tWord=wordList[i];
-				if (tWord.typeO){
-					score+=WordUtils.getMaxScore(tWord.typeO);
-				}
-			}
-			return score/len;
-		}
-
-		WordUtils.getWordScore=function(word){
-			var tTypeO;
-			tTypeO=WordUtils.typeDic.getWordType(word);
-			if (!tTypeO||!tTypeO.type)return 1;
-			return WordUtils.getMaxScore(tTypeO.type);
-		}
-
-		WordUtils.removeSameNB=function(arr){
-			var i=0;
-			i=arr.length-1;
-			for (i=arr.length-1;i >=0;i--){
-				if (arr[i+1]==arr[i])arr.splice(i,1);
-			}
-			return arr;
-		}
-
-		WordUtils.splitWordBySpecial=function(str){
-			var rst;
-			rst=[];
-			var i=0,len=0;
-			len=str.length;
-			var tStart=NaN;
-			var tEnd=NaN;
-			tStart=0;
-			tEnd=tStart;
-			var tChar;
-			var lastChar=0;
-			lastChar=-1;
-			while (tEnd < len){
-				tChar=str.charAt(tEnd);
-				if (PingYinDic.checkIsHasSpecialStr(tChar)){
-					rst.push(str.substring(tStart,tEnd),tChar);
-					lastChar=tEnd;
-					tStart=tEnd+1;
-					tEnd=tStart;
-					}else{
-					tEnd++;
-				}
-			}
-			if (tStart > lastChar&&tStart<len){
-				rst.push(str.substring(tStart));
-			}
-			return rst;
-		}
-
-		WordUtils.arr2keyObj=function(arr,KeyList){
-			var rst;
-			rst=new Object();
-			var i=0,len=0;
-			len=KeyList.length;
-			for (i=0;i < len;i++){
-				rst[KeyList[i]]=arr[i];
-			}
-			return rst;
-		}
-
-		WordUtils.typeDic=null
-		return WordUtils;
-	})()
-
-
-	/**
 	*Config 用于配置一些全局参数。如需更改，请在初始化引擎之前设置。
 	*/
 	//class Config
@@ -3140,6 +847,21 @@ var Laya=window.Laya=(function(window,document){
 		Config.isStencil=true;
 		Config.preserveDrawingBuffer=false;
 		return Config;
+	})()
+
+
+	/**全局配置*/
+	//class UIConfig
+	var UIConfig=(function(){
+		function UIConfig(){};
+		__class(UIConfig,'UIConfig');
+		UIConfig.touchScrollEnable=true;
+		UIConfig.mouseWheelEnable=true;
+		UIConfig.showButtons=true;
+		UIConfig.popupBgColor="#000000";
+		UIConfig.popupBgAlpha=0.5;
+		UIConfig.closeDialogOnSide=true;
+		return UIConfig;
 	})()
 
 
@@ -4624,6 +2346,311 @@ var Laya=window.Laya=(function(window,document){
 
 	/**
 	*@private
+	*Graphic bounds数据类
+	*/
+	//class laya.display.GraphicsBounds
+	var GraphicsBounds=(function(){
+		function GraphicsBounds(){
+			//this._temp=null;
+			//this._bounds=null;
+			//this._rstBoundPoints=null;
+			this._cacheBoundsType=false;
+			//this._graphics=null;
+		}
+
+		__class(GraphicsBounds,'laya.display.GraphicsBounds');
+		var __proto=GraphicsBounds.prototype;
+		/**
+		*销毁
+		*/
+		__proto.destroy=function(){
+			this._graphics=null;
+			this._temp=null;
+			this._rstBoundPoints=null;
+			this._bounds=null;
+		}
+
+		/**
+		*重置数据
+		*/
+		__proto.reset=function(){
+			this._temp && (this._temp.length=0);
+		}
+
+		/**
+		*获取位置及宽高信息矩阵(比较耗CPU，频繁使用会造成卡顿，尽量少用)。
+		*@param realSize （可选）使用图片的真实大小，默认为false
+		*@return 位置与宽高组成的 一个 Rectangle 对象。
+		*/
+		__proto.getBounds=function(realSize){
+			(realSize===void 0)&& (realSize=false);
+			if (!this._bounds || !this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType){
+				this._bounds=Rectangle._getWrapRec(this.getBoundPoints(realSize),this._bounds)
+			}
+			this._cacheBoundsType=realSize;
+			return this._bounds;
+		}
+
+		/**
+		*@private
+		*@param realSize （可选）使用图片的真实大小，默认为false
+		*获取端点列表。
+		*/
+		__proto.getBoundPoints=function(realSize){
+			(realSize===void 0)&& (realSize=false);
+			if (!this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType)
+				this._temp=this._getCmdPoints(realSize);
+			this._cacheBoundsType=realSize;
+			return this._rstBoundPoints=Utils.copyArray(this._rstBoundPoints,this._temp);
+		}
+
+		__proto._getCmdPoints=function(realSize){
+			(realSize===void 0)&& (realSize=false);
+			var context=Render._context;
+			var cmds=this._graphics.cmds;
+			var rst;
+			rst=this._temp || (this._temp=[]);
+			rst.length=0;
+			if (!cmds && this._graphics._one !=null){
+				GraphicsBounds._tempCmds.length=0;
+				GraphicsBounds._tempCmds.push(this._graphics._one);
+				cmds=GraphicsBounds._tempCmds;
+			}
+			if (!cmds)
+				return rst;
+			var matrixs;
+			matrixs=GraphicsBounds._tempMatrixArrays;
+			matrixs.length=0;
+			var tMatrix=GraphicsBounds._initMatrix;
+			tMatrix.identity();
+			var tempMatrix=GraphicsBounds._tempMatrix;
+			var cmd;
+			var tex;
+			for (var i=0,n=cmds.length;i < n;i++){
+				cmd=cmds[i];
+				switch (cmd.callee){
+					case context._save:
+					case 7:
+						matrixs.push(tMatrix);
+						tMatrix=tMatrix.clone();
+						break ;
+					case context._restore:
+					case 8:
+						tMatrix=matrixs.pop();
+						break ;
+					case context._scale:
+					case 5:
+						tempMatrix.identity();
+						tempMatrix.translate(-cmd[2],-cmd[3]);
+						tempMatrix.scale(cmd[0],cmd[1]);
+						tempMatrix.translate(cmd[2],cmd[3]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case context._rotate:
+					case 3:
+						tempMatrix.identity();
+						tempMatrix.translate(-cmd[1],-cmd[2]);
+						tempMatrix.rotate(cmd[0]);
+						tempMatrix.translate(cmd[1],cmd[2]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case context._translate:
+					case 6:
+						tempMatrix.identity();
+						tempMatrix.translate(cmd[0],cmd[1]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case context._transform:
+					case 4:
+						tempMatrix.identity();
+						tempMatrix.translate(-cmd[1],-cmd[2]);
+						tempMatrix.concat(cmd[0]);
+						tempMatrix.translate(cmd[1],cmd[2]);
+						this._switchMatrix(tMatrix,tempMatrix);
+						break ;
+					case 16:
+					case 24:
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
+						break ;
+					case 17:
+						tMatrix.copyTo(tempMatrix);
+						tempMatrix.concat(cmd[4]);
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tempMatrix);
+						break ;
+					case context._drawTexture:
+						tex=cmd[0];
+						if (realSize){
+							if (cmd[3] && cmd[4]){
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
+								}else {
+								tex=cmd[0];
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
+							}
+							}else {
+							var wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
+							var hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
+							var oWidth=wRate *tex.sourceWidth;
+							var oHeight=hRate *tex.sourceHeight;
+							var offX=tex.offsetX > 0 ? tex.offsetX :0;
+							var offY=tex.offsetY > 0 ? tex.offsetY :0;
+							offX *=wRate;
+							offY *=hRate;
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),tMatrix);
+						}
+						break ;
+					case context._fillTexture:
+						if (cmd[3] && cmd[4]){
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
+							}else {
+							tex=cmd[0];
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
+						}
+						break ;
+					case context._drawTextureWithTransform:;
+						var drawMatrix;
+						if (cmd[5]){
+							tMatrix.copyTo(tempMatrix);
+							tempMatrix.concat(cmd[5]);
+							drawMatrix=tempMatrix;
+							}else {
+							drawMatrix=tMatrix;
+						}
+						if (realSize){
+							if (cmd[3] && cmd[4]){
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),drawMatrix);
+								}else {
+								tex=cmd[0];
+								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),drawMatrix);
+							}
+							}else {
+							tex=cmd[0];
+							wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
+							hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
+							oWidth=wRate *tex.sourceWidth;
+							oHeight=hRate *tex.sourceHeight;
+							offX=tex.offsetX > 0 ? tex.offsetX :0;
+							offY=tex.offsetY > 0 ? tex.offsetY :0;
+							offX *=wRate;
+							offY *=hRate;
+							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),drawMatrix);
+						}
+						break ;
+					case context._drawRect:
+					case 13:
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
+						break ;
+					case context._drawCircle:
+					case context._fillCircle:
+					case 14:
+						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0]-cmd[2],cmd[1]-cmd[2],cmd[2]+cmd[2],cmd[2]+cmd[2]),tMatrix);
+						break ;
+					case context._drawLine:
+					case 20:
+						GraphicsBounds._tempPoints.length=0;
+						var lineWidth=NaN;
+						lineWidth=cmd[5] *0.5;
+						if (cmd[0]==cmd[2]){
+							GraphicsBounds._tempPoints.push(cmd[0]+lineWidth,cmd[1],cmd[2]+lineWidth,cmd[3],cmd[0]-lineWidth,cmd[1],cmd[2]-lineWidth,cmd[3]);
+							}else if (cmd[1]==cmd[3]){
+							GraphicsBounds._tempPoints.push(cmd[0],cmd[1]+lineWidth,cmd[2],cmd[3]+lineWidth,cmd[0],cmd[1]-lineWidth,cmd[2],cmd[3]-lineWidth);
+							}else {
+							GraphicsBounds._tempPoints.push(cmd[0],cmd[1],cmd[2],cmd[3]);
+						}
+						GraphicsBounds._addPointArrToRst(rst,GraphicsBounds._tempPoints,tMatrix);
+						break ;
+					case context._drawCurves:
+					case 22:
+						GraphicsBounds._addPointArrToRst(rst,Bezier.I.getBezierPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
+						break ;
+					case context._drawPoly:
+					case context._drawLines:
+					case 18:
+						GraphicsBounds._addPointArrToRst(rst,cmd[2],tMatrix,cmd[0],cmd[1]);
+						break ;
+					case context._drawPath:
+					case 19:
+						GraphicsBounds._addPointArrToRst(rst,this._getPathPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
+						break ;
+					case context._drawPie:
+					case 15:
+						GraphicsBounds._addPointArrToRst(rst,this._getPiePoints(cmd[0],cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
+						break ;
+					}
+			}
+			if (rst.length > 200){
+				rst=Utils.copyArray(rst,Rectangle._getWrapRec(rst)._getBoundPoints());
+			}else if (rst.length > 8)
+			rst=GrahamScan.scanPList(rst);
+			return rst;
+		}
+
+		__proto._switchMatrix=function(tMatix,tempMatrix){
+			tempMatrix.concat(tMatix);
+			tempMatrix.copyTo(tMatix);
+		}
+
+		__proto._getPiePoints=function(x,y,radius,startAngle,endAngle){
+			var rst=GraphicsBounds._tempPoints;
+			GraphicsBounds._tempPoints.length=0;
+			rst.push(x,y);
+			var dP=Math.PI / 10;
+			var i=NaN;
+			for (i=startAngle;i < endAngle;i+=dP){
+				rst.push(x+radius *Math.cos(i),y+radius *Math.sin(i));
+			}
+			if (endAngle !=i){
+				rst.push(x+radius *Math.cos(endAngle),y+radius *Math.sin(endAngle));
+			}
+			return rst;
+		}
+
+		__proto._getPathPoints=function(paths){
+			var i=0,len=0;
+			var rst=GraphicsBounds._tempPoints;
+			rst.length=0;
+			len=paths.length;
+			var tCMD;
+			for (i=0;i < len;i++){
+				tCMD=paths[i];
+				if (tCMD.length > 1){
+					rst.push(tCMD[1],tCMD[2]);
+					if (tCMD.length > 3){
+						rst.push(tCMD[3],tCMD[4]);
+					}
+				}
+			}
+			return rst;
+		}
+
+		GraphicsBounds._addPointArrToRst=function(rst,points,matrix,dx,dy){
+			(dx===void 0)&& (dx=0);
+			(dy===void 0)&& (dy=0);
+			var i=0,len=0;
+			len=points.length;
+			for (i=0;i < len;i+=2){
+				GraphicsBounds._addPointToRst(rst,points[i]+dx,points[i+1]+dy,matrix);
+			}
+		}
+
+		GraphicsBounds._addPointToRst=function(rst,x,y,matrix){
+			var _tempPoint=Point.TEMP;
+			_tempPoint.setTo(x ? x :0,y ? y :0);
+			matrix.transformPoint(_tempPoint);
+			rst.push(_tempPoint.x,_tempPoint.y);
+		}
+
+		GraphicsBounds._tempPoints=[];
+		GraphicsBounds._tempMatrixArrays=[];
+		GraphicsBounds._tempCmds=[];
+		__static(GraphicsBounds,
+		['_tempMatrix',function(){return this._tempMatrix=new Matrix();},'_initMatrix',function(){return this._initMatrix=new Matrix();}
+		]);
+		return GraphicsBounds;
+	})()
+
+
+	/**
+	*@private
 	*<code>Style</code> 类是元素样式定义类。
 	*/
 	//class laya.display.css.Style
@@ -4990,311 +3017,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*@private
-	*Graphic bounds数据类
-	*/
-	//class laya.display.GraphicsBounds
-	var GraphicsBounds=(function(){
-		function GraphicsBounds(){
-			//this._temp=null;
-			//this._bounds=null;
-			//this._rstBoundPoints=null;
-			this._cacheBoundsType=false;
-			//this._graphics=null;
-		}
-
-		__class(GraphicsBounds,'laya.display.GraphicsBounds');
-		var __proto=GraphicsBounds.prototype;
-		/**
-		*销毁
-		*/
-		__proto.destroy=function(){
-			this._graphics=null;
-			this._temp=null;
-			this._rstBoundPoints=null;
-			this._bounds=null;
-		}
-
-		/**
-		*重置数据
-		*/
-		__proto.reset=function(){
-			this._temp && (this._temp.length=0);
-		}
-
-		/**
-		*获取位置及宽高信息矩阵(比较耗CPU，频繁使用会造成卡顿，尽量少用)。
-		*@param realSize （可选）使用图片的真实大小，默认为false
-		*@return 位置与宽高组成的 一个 Rectangle 对象。
-		*/
-		__proto.getBounds=function(realSize){
-			(realSize===void 0)&& (realSize=false);
-			if (!this._bounds || !this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType){
-				this._bounds=Rectangle._getWrapRec(this.getBoundPoints(realSize),this._bounds)
-			}
-			this._cacheBoundsType=realSize;
-			return this._bounds;
-		}
-
-		/**
-		*@private
-		*@param realSize （可选）使用图片的真实大小，默认为false
-		*获取端点列表。
-		*/
-		__proto.getBoundPoints=function(realSize){
-			(realSize===void 0)&& (realSize=false);
-			if (!this._temp || this._temp.length < 1 || realSize !=this._cacheBoundsType)
-				this._temp=this._getCmdPoints(realSize);
-			this._cacheBoundsType=realSize;
-			return this._rstBoundPoints=Utils.copyArray(this._rstBoundPoints,this._temp);
-		}
-
-		__proto._getCmdPoints=function(realSize){
-			(realSize===void 0)&& (realSize=false);
-			var context=Render._context;
-			var cmds=this._graphics.cmds;
-			var rst;
-			rst=this._temp || (this._temp=[]);
-			rst.length=0;
-			if (!cmds && this._graphics._one !=null){
-				GraphicsBounds._tempCmds.length=0;
-				GraphicsBounds._tempCmds.push(this._graphics._one);
-				cmds=GraphicsBounds._tempCmds;
-			}
-			if (!cmds)
-				return rst;
-			var matrixs;
-			matrixs=GraphicsBounds._tempMatrixArrays;
-			matrixs.length=0;
-			var tMatrix=GraphicsBounds._initMatrix;
-			tMatrix.identity();
-			var tempMatrix=GraphicsBounds._tempMatrix;
-			var cmd;
-			var tex;
-			for (var i=0,n=cmds.length;i < n;i++){
-				cmd=cmds[i];
-				switch (cmd.callee){
-					case context._save:
-					case 7:
-						matrixs.push(tMatrix);
-						tMatrix=tMatrix.clone();
-						break ;
-					case context._restore:
-					case 8:
-						tMatrix=matrixs.pop();
-						break ;
-					case context._scale:
-					case 5:
-						tempMatrix.identity();
-						tempMatrix.translate(-cmd[2],-cmd[3]);
-						tempMatrix.scale(cmd[0],cmd[1]);
-						tempMatrix.translate(cmd[2],cmd[3]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case context._rotate:
-					case 3:
-						tempMatrix.identity();
-						tempMatrix.translate(-cmd[1],-cmd[2]);
-						tempMatrix.rotate(cmd[0]);
-						tempMatrix.translate(cmd[1],cmd[2]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case context._translate:
-					case 6:
-						tempMatrix.identity();
-						tempMatrix.translate(cmd[0],cmd[1]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case context._transform:
-					case 4:
-						tempMatrix.identity();
-						tempMatrix.translate(-cmd[1],-cmd[2]);
-						tempMatrix.concat(cmd[0]);
-						tempMatrix.translate(cmd[1],cmd[2]);
-						this._switchMatrix(tMatrix,tempMatrix);
-						break ;
-					case 16:
-					case 24:
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
-						break ;
-					case 17:
-						tMatrix.copyTo(tempMatrix);
-						tempMatrix.concat(cmd[4]);
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tempMatrix);
-						break ;
-					case context._drawTexture:
-						tex=cmd[0];
-						if (realSize){
-							if (cmd[3] && cmd[4]){
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
-								}else {
-								tex=cmd[0];
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
-							}
-							}else {
-							var wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
-							var hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
-							var oWidth=wRate *tex.sourceWidth;
-							var oHeight=hRate *tex.sourceHeight;
-							var offX=tex.offsetX > 0 ? tex.offsetX :0;
-							var offY=tex.offsetY > 0 ? tex.offsetY :0;
-							offX *=wRate;
-							offY *=hRate;
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),tMatrix);
-						}
-						break ;
-					case context._fillTexture:
-						if (cmd[3] && cmd[4]){
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
-							}else {
-							tex=cmd[0];
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),tMatrix);
-						}
-						break ;
-					case context._drawTextureWithTransform:;
-						var drawMatrix;
-						if (cmd[5]){
-							tMatrix.copyTo(tempMatrix);
-							tempMatrix.concat(cmd[5]);
-							drawMatrix=tempMatrix;
-							}else {
-							drawMatrix=tMatrix;
-						}
-						if (realSize){
-							if (cmd[3] && cmd[4]){
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],cmd[3],cmd[4]),drawMatrix);
-								}else {
-								tex=cmd[0];
-								GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1],cmd[2],tex.width,tex.height),drawMatrix);
-							}
-							}else {
-							tex=cmd[0];
-							wRate=(cmd[3] || tex.sourceWidth)/ tex.width;
-							hRate=(cmd[4] || tex.sourceHeight)/ tex.height;
-							oWidth=wRate *tex.sourceWidth;
-							oHeight=hRate *tex.sourceHeight;
-							offX=tex.offsetX > 0 ? tex.offsetX :0;
-							offY=tex.offsetY > 0 ? tex.offsetY :0;
-							offX *=wRate;
-							offY *=hRate;
-							GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[1]-offX,cmd[2]-offY,oWidth,oHeight),drawMatrix);
-						}
-						break ;
-					case context._drawRect:
-					case 13:
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0],cmd[1],cmd[2],cmd[3]),tMatrix);
-						break ;
-					case context._drawCircle:
-					case context._fillCircle:
-					case 14:
-						GraphicsBounds._addPointArrToRst(rst,Rectangle._getBoundPointS(cmd[0]-cmd[2],cmd[1]-cmd[2],cmd[2]+cmd[2],cmd[2]+cmd[2]),tMatrix);
-						break ;
-					case context._drawLine:
-					case 20:
-						GraphicsBounds._tempPoints.length=0;
-						var lineWidth=NaN;
-						lineWidth=cmd[5] *0.5;
-						if (cmd[0]==cmd[2]){
-							GraphicsBounds._tempPoints.push(cmd[0]+lineWidth,cmd[1],cmd[2]+lineWidth,cmd[3],cmd[0]-lineWidth,cmd[1],cmd[2]-lineWidth,cmd[3]);
-							}else if (cmd[1]==cmd[3]){
-							GraphicsBounds._tempPoints.push(cmd[0],cmd[1]+lineWidth,cmd[2],cmd[3]+lineWidth,cmd[0],cmd[1]-lineWidth,cmd[2],cmd[3]-lineWidth);
-							}else {
-							GraphicsBounds._tempPoints.push(cmd[0],cmd[1],cmd[2],cmd[3]);
-						}
-						GraphicsBounds._addPointArrToRst(rst,GraphicsBounds._tempPoints,tMatrix);
-						break ;
-					case context._drawCurves:
-					case 22:
-						GraphicsBounds._addPointArrToRst(rst,Bezier.I.getBezierPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
-						break ;
-					case context._drawPoly:
-					case context._drawLines:
-					case 18:
-						GraphicsBounds._addPointArrToRst(rst,cmd[2],tMatrix,cmd[0],cmd[1]);
-						break ;
-					case context._drawPath:
-					case 19:
-						GraphicsBounds._addPointArrToRst(rst,this._getPathPoints(cmd[2]),tMatrix,cmd[0],cmd[1]);
-						break ;
-					case context._drawPie:
-					case 15:
-						GraphicsBounds._addPointArrToRst(rst,this._getPiePoints(cmd[0],cmd[1],cmd[2],cmd[3],cmd[4]),tMatrix);
-						break ;
-					}
-			}
-			if (rst.length > 200){
-				rst=Utils.copyArray(rst,Rectangle._getWrapRec(rst)._getBoundPoints());
-			}else if (rst.length > 8)
-			rst=GrahamScan.scanPList(rst);
-			return rst;
-		}
-
-		__proto._switchMatrix=function(tMatix,tempMatrix){
-			tempMatrix.concat(tMatix);
-			tempMatrix.copyTo(tMatix);
-		}
-
-		__proto._getPiePoints=function(x,y,radius,startAngle,endAngle){
-			var rst=GraphicsBounds._tempPoints;
-			GraphicsBounds._tempPoints.length=0;
-			rst.push(x,y);
-			var dP=Math.PI / 10;
-			var i=NaN;
-			for (i=startAngle;i < endAngle;i+=dP){
-				rst.push(x+radius *Math.cos(i),y+radius *Math.sin(i));
-			}
-			if (endAngle !=i){
-				rst.push(x+radius *Math.cos(endAngle),y+radius *Math.sin(endAngle));
-			}
-			return rst;
-		}
-
-		__proto._getPathPoints=function(paths){
-			var i=0,len=0;
-			var rst=GraphicsBounds._tempPoints;
-			rst.length=0;
-			len=paths.length;
-			var tCMD;
-			for (i=0;i < len;i++){
-				tCMD=paths[i];
-				if (tCMD.length > 1){
-					rst.push(tCMD[1],tCMD[2]);
-					if (tCMD.length > 3){
-						rst.push(tCMD[3],tCMD[4]);
-					}
-				}
-			}
-			return rst;
-		}
-
-		GraphicsBounds._addPointArrToRst=function(rst,points,matrix,dx,dy){
-			(dx===void 0)&& (dx=0);
-			(dy===void 0)&& (dy=0);
-			var i=0,len=0;
-			len=points.length;
-			for (i=0;i < len;i+=2){
-				GraphicsBounds._addPointToRst(rst,points[i]+dx,points[i+1]+dy,matrix);
-			}
-		}
-
-		GraphicsBounds._addPointToRst=function(rst,x,y,matrix){
-			var _tempPoint=Point.TEMP;
-			_tempPoint.setTo(x ? x :0,y ? y :0);
-			matrix.transformPoint(_tempPoint);
-			rst.push(_tempPoint.x,_tempPoint.y);
-		}
-
-		GraphicsBounds._tempPoints=[];
-		GraphicsBounds._tempMatrixArrays=[];
-		GraphicsBounds._tempCmds=[];
-		__static(GraphicsBounds,
-		['_tempMatrix',function(){return this._tempMatrix=new Matrix();},'_initMatrix',function(){return this._initMatrix=new Matrix();}
-		]);
-		return GraphicsBounds;
-	})()
-
-
-	/**
 	*<code>Event</code> 是事件类型的集合。一般当发生事件时，<code>Event</code> 对象将作为参数传递给事件侦听器。
 	*/
 	//class laya.events.Event
@@ -5468,6 +3190,56 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*<p><code>KeyBoardManager</code> 是键盘事件管理类。该类从浏览器中接收键盘事件，并派发该事件。</p>
+	*<p>派发事件时若 Stage.focus 为空则只从 Stage 上派发该事件，否则将从 Stage.focus 对象开始一直冒泡派发该事件。所以在 Laya.stage 上监听键盘事件一定能够收到，如果在其他地方监听，则必须处在Stage.focus的冒泡链上才能收到该事件。</p>
+	*<p>用户可以通过代码 Laya.stage.focus=someNode 的方式来设置focus对象。</p>
+	*<p>用户可统一的根据事件对象中 e.keyCode 来判断按键类型，该属性兼容了不同浏览器的实现。</p>
+	*/
+	//class laya.events.KeyBoardManager
+	var KeyBoardManager=(function(){
+		function KeyBoardManager(){};
+		__class(KeyBoardManager,'laya.events.KeyBoardManager');
+		KeyBoardManager.__init__=function(){
+			KeyBoardManager._addEvent("keydown");
+			KeyBoardManager._addEvent("keypress");
+			KeyBoardManager._addEvent("keyup");
+		}
+
+		KeyBoardManager._addEvent=function(type){
+			Browser.document.addEventListener(type,function(e){
+				laya.events.KeyBoardManager._dispatch(e,type);
+			},true);
+		}
+
+		KeyBoardManager._dispatch=function(e,type){
+			if (!KeyBoardManager.enabled)return;
+			KeyBoardManager._event._stoped=false;
+			KeyBoardManager._event.nativeEvent=e;
+			KeyBoardManager._event.keyCode=e.keyCode || e.which || e.charCode;
+			if (type==="keydown")KeyBoardManager._pressKeys[KeyBoardManager._event.keyCode]=true;
+			else if (type==="keyup")KeyBoardManager._pressKeys[KeyBoardManager._event.keyCode]=null;
+			var target=(Laya.stage.focus && (Laya.stage.focus.event !=null)&& Laya.stage.focus.displayedInStage)? Laya.stage.focus :Laya.stage;
+			var ct=target;
+			while (ct){
+				ct.event(type,KeyBoardManager._event.setTo(type,ct,target));
+				ct=ct.parent;
+			}
+		}
+
+		KeyBoardManager.hasKeyDown=function(key){
+			return KeyBoardManager._pressKeys[key];
+		}
+
+		KeyBoardManager._pressKeys={};
+		KeyBoardManager.enabled=true;
+		__static(KeyBoardManager,
+		['_event',function(){return this._event=new Event();}
+		]);
+		return KeyBoardManager;
+	})()
+
+
+	/**
 	*<code>Keyboard</code> 类的属性是一些常数，这些常数表示控制游戏时最常用的键。
 	*/
 	//class laya.events.Keyboard
@@ -5574,56 +3346,6 @@ var Laya=window.Laya=(function(window,document){
 		Keyboard.TAB=9;
 		Keyboard.INSERT=45;
 		return Keyboard;
-	})()
-
-
-	/**
-	*<p><code>KeyBoardManager</code> 是键盘事件管理类。该类从浏览器中接收键盘事件，并派发该事件。</p>
-	*<p>派发事件时若 Stage.focus 为空则只从 Stage 上派发该事件，否则将从 Stage.focus 对象开始一直冒泡派发该事件。所以在 Laya.stage 上监听键盘事件一定能够收到，如果在其他地方监听，则必须处在Stage.focus的冒泡链上才能收到该事件。</p>
-	*<p>用户可以通过代码 Laya.stage.focus=someNode 的方式来设置focus对象。</p>
-	*<p>用户可统一的根据事件对象中 e.keyCode 来判断按键类型，该属性兼容了不同浏览器的实现。</p>
-	*/
-	//class laya.events.KeyBoardManager
-	var KeyBoardManager=(function(){
-		function KeyBoardManager(){};
-		__class(KeyBoardManager,'laya.events.KeyBoardManager');
-		KeyBoardManager.__init__=function(){
-			KeyBoardManager._addEvent("keydown");
-			KeyBoardManager._addEvent("keypress");
-			KeyBoardManager._addEvent("keyup");
-		}
-
-		KeyBoardManager._addEvent=function(type){
-			Browser.document.addEventListener(type,function(e){
-				laya.events.KeyBoardManager._dispatch(e,type);
-			},true);
-		}
-
-		KeyBoardManager._dispatch=function(e,type){
-			if (!KeyBoardManager.enabled)return;
-			KeyBoardManager._event._stoped=false;
-			KeyBoardManager._event.nativeEvent=e;
-			KeyBoardManager._event.keyCode=e.keyCode || e.which || e.charCode;
-			if (type==="keydown")KeyBoardManager._pressKeys[KeyBoardManager._event.keyCode]=true;
-			else if (type==="keyup")KeyBoardManager._pressKeys[KeyBoardManager._event.keyCode]=null;
-			var target=(Laya.stage.focus && (Laya.stage.focus.event !=null)&& Laya.stage.focus.displayedInStage)? Laya.stage.focus :Laya.stage;
-			var ct=target;
-			while (ct){
-				ct.event(type,KeyBoardManager._event.setTo(type,ct,target));
-				ct=ct.parent;
-			}
-		}
-
-		KeyBoardManager.hasKeyDown=function(key){
-			return KeyBoardManager._pressKeys[key];
-		}
-
-		KeyBoardManager._pressKeys={};
-		KeyBoardManager.enabled=true;
-		__static(KeyBoardManager,
-		['_event',function(){return this._event=new Event();}
-		]);
-		return KeyBoardManager;
 	})()
 
 
@@ -10569,6 +8291,109 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*@private
+	*<code>HTMLChar</code> 是一个 HTML 字符类。
+	*/
+	//class laya.utils.HTMLChar
+	var HTMLChar=(function(){
+		function HTMLChar(char,w,h,style){
+			//this._sprite=null;
+			//this._x=NaN;
+			//this._y=NaN;
+			//this._w=NaN;
+			//this._h=NaN;
+			//this.isWord=false;
+			//this.char=null;
+			//this.charNum=NaN;
+			//this.style=null;
+			this.char=char;
+			this.charNum=char.charCodeAt(0);
+			this._x=this._y=0;
+			this.width=w;
+			this.height=h;
+			this.style=style;
+			this.isWord=!HTMLChar._isWordRegExp.test(char);
+		}
+
+		__class(HTMLChar,'laya.utils.HTMLChar');
+		var __proto=HTMLChar.prototype;
+		Laya.imps(__proto,{"laya.display.ILayout":true})
+		/**
+		*设置与此对象绑定的显示对象 <code>Sprite</code> 。
+		*@param sprite 显示对象 <code>Sprite</code> 。
+		*/
+		__proto.setSprite=function(sprite){
+			this._sprite=sprite;
+		}
+
+		/**
+		*获取与此对象绑定的显示对象 <code>Sprite</code>。
+		*@return
+		*/
+		__proto.getSprite=function(){
+			return this._sprite;
+		}
+
+		/**@private */
+		__proto._isChar=function(){
+			return true;
+		}
+
+		/**@private */
+		__proto._getCSSStyle=function(){
+			return this.style;
+		}
+
+		/**
+		*宽度。
+		*/
+		__getset(0,__proto,'width',function(){
+			return this._w;
+			},function(value){
+			this._w=value;
+		});
+
+		/**
+		*此对象存储的 X 轴坐标值。
+		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 x 的值。
+		*/
+		__getset(0,__proto,'x',function(){
+			return this._x;
+			},function(value){
+			if (this._sprite){
+				this._sprite.x=value;
+			}
+			this._x=value;
+		});
+
+		/**
+		*此对象存储的 Y 轴坐标值。
+		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 y 的值。
+		*/
+		__getset(0,__proto,'y',function(){
+			return this._y;
+			},function(value){
+			if (this._sprite){
+				this._sprite.y=value;
+			}
+			this._y=value;
+		});
+
+		/**
+		*高度。
+		*/
+		__getset(0,__proto,'height',function(){
+			return this._h;
+			},function(value){
+			this._h=value;
+		});
+
+		HTMLChar._isWordRegExp=new RegExp("[\\w\.]","");
+		return HTMLChar;
+	})()
+
+
+	/**
 	*鼠标点击区域，可以设置绘制一系列矢量图作为点击区域和非点击区域（目前只支持圆形，矩形，多边形）
 	*/
 	//class laya.utils.HitArea
@@ -10713,109 +8538,6 @@ var Laya=window.Laya=(function(window,document){
 		['_rec',function(){return this._rec=new Rectangle();},'_ptPoint',function(){return this._ptPoint=new Point();}
 		]);
 		return HitArea;
-	})()
-
-
-	/**
-	*@private
-	*<code>HTMLChar</code> 是一个 HTML 字符类。
-	*/
-	//class laya.utils.HTMLChar
-	var HTMLChar=(function(){
-		function HTMLChar(char,w,h,style){
-			//this._sprite=null;
-			//this._x=NaN;
-			//this._y=NaN;
-			//this._w=NaN;
-			//this._h=NaN;
-			//this.isWord=false;
-			//this.char=null;
-			//this.charNum=NaN;
-			//this.style=null;
-			this.char=char;
-			this.charNum=char.charCodeAt(0);
-			this._x=this._y=0;
-			this.width=w;
-			this.height=h;
-			this.style=style;
-			this.isWord=!HTMLChar._isWordRegExp.test(char);
-		}
-
-		__class(HTMLChar,'laya.utils.HTMLChar');
-		var __proto=HTMLChar.prototype;
-		Laya.imps(__proto,{"laya.display.ILayout":true})
-		/**
-		*设置与此对象绑定的显示对象 <code>Sprite</code> 。
-		*@param sprite 显示对象 <code>Sprite</code> 。
-		*/
-		__proto.setSprite=function(sprite){
-			this._sprite=sprite;
-		}
-
-		/**
-		*获取与此对象绑定的显示对象 <code>Sprite</code>。
-		*@return
-		*/
-		__proto.getSprite=function(){
-			return this._sprite;
-		}
-
-		/**@private */
-		__proto._isChar=function(){
-			return true;
-		}
-
-		/**@private */
-		__proto._getCSSStyle=function(){
-			return this.style;
-		}
-
-		/**
-		*宽度。
-		*/
-		__getset(0,__proto,'width',function(){
-			return this._w;
-			},function(value){
-			this._w=value;
-		});
-
-		/**
-		*此对象存储的 X 轴坐标值。
-		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 x 的值。
-		*/
-		__getset(0,__proto,'x',function(){
-			return this._x;
-			},function(value){
-			if (this._sprite){
-				this._sprite.x=value;
-			}
-			this._x=value;
-		});
-
-		/**
-		*此对象存储的 Y 轴坐标值。
-		*当设置此值时，如果此对象有绑定的 Sprite 对象，则改变 Sprite 对象的属性 y 的值。
-		*/
-		__getset(0,__proto,'y',function(){
-			return this._y;
-			},function(value){
-			if (this._sprite){
-				this._sprite.y=value;
-			}
-			this._y=value;
-		});
-
-		/**
-		*高度。
-		*/
-		__getset(0,__proto,'height',function(){
-			return this._h;
-			},function(value){
-			this._h=value;
-		});
-
-		HTMLChar._isWordRegExp=new RegExp("[\\w\.]","");
-		return HTMLChar;
 	})()
 
 
@@ -12007,21 +9729,6 @@ var Laya=window.Laya=(function(window,document){
 	})()
 
 
-	/**全局配置*/
-	//class UIConfig
-	var UIConfig=(function(){
-		function UIConfig(){};
-		__class(UIConfig,'UIConfig');
-		UIConfig.touchScrollEnable=true;
-		UIConfig.mouseWheelEnable=true;
-		UIConfig.showButtons=true;
-		UIConfig.popupBgColor="#000000";
-		UIConfig.popupBgAlpha=0.5;
-		UIConfig.closeDialogOnSide=true;
-		return UIConfig;
-	})()
-
-
 	/**
 	*...
 	*@author ww
@@ -12117,6 +9824,2299 @@ var Laya=window.Laya=(function(window,document){
 
 		Sys.langPack=null
 		return Sys;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordUtils
+	var WordUtils=(function(){
+		function WordUtils(){}
+		__class(WordUtils,'nlp.WordUtils');
+		WordUtils.printLines=function(lines){
+			var i=0,len=0;
+			len=lines.length;
+			for (i=0;i < len;i++){
+				console.log(lines[i]);
+			}
+		}
+
+		WordUtils.showChars=function(start,end){
+			var i=0;
+			for (i=start;i <=end;i++){
+				console.log("char:",i,":(",String.fromCharCode(i),")");
+			}
+		}
+
+		WordUtils.arrToDic=function(arr){
+			var rst;
+			rst={};
+			var i=0,len=0;
+			len=arr.length;
+			for (i=0;i < len;i++){
+				rst[arr[i]]=arr[i];
+			}
+			return rst;
+		}
+
+		WordUtils.getDicKeys=function(dic){
+			var rst;
+			rst=[];
+			var key;
+			for (key in dic){
+				rst.push(key);
+			}
+			return rst;
+		}
+
+		WordUtils.dic2Arr=function(dic){
+			var rst;
+			rst=[];
+			var key;
+			for (key in dic){
+				rst.push({key:key,value:dic[key]});
+			}
+			return rst;
+		}
+
+		WordUtils.isWordListSame=function(wordList1,wordList2){
+			if (!wordList1.length==wordList2.length)return false;
+			var i=0,len=0;
+			len=wordList1.length;
+			var word1,word2;
+			for (i=0;i < len;i++){
+				word1=wordList1[i];
+				word2=wordList2[i];
+				if (word1.start !=word2.start){
+					console.log("Dif:",i,word1.word,word2.word);
+					return false;
+				}
+				if (word1.end !=word2.end){
+					console.log("Dif:",i,word1.word,word2.word);
+					return false;
+				}
+			}
+			return true;
+		}
+
+		WordUtils.getMaxScore=function(dic){
+			var score=NaN;
+			score=0;
+			var key;
+			var tScore=NaN;
+			for (key in dic){
+				tScore=dic[key];
+				if (tScore>score){
+					score=tScore;
+				}
+			}
+			return score;
+		}
+
+		WordUtils.scoreWordList=function(wordList){
+			var i=0,len=0;
+			len=wordList.length;
+			var score=NaN;
+			score=0;
+			var tWord;
+			for (i=0;i < len;i++){
+				tWord=wordList[i];
+				if (tWord.typeO){
+					score+=WordUtils.getMaxScore(tWord.typeO);
+				}
+			}
+			return score/len;
+		}
+
+		WordUtils.getWordScore=function(word){
+			var tTypeO;
+			tTypeO=WordUtils.typeDic.getWordType(word);
+			if (!tTypeO||!tTypeO.type)return 1;
+			return WordUtils.getMaxScore(tTypeO.type);
+		}
+
+		WordUtils.removeSameNB=function(arr){
+			var i=0;
+			i=arr.length-1;
+			for (i=arr.length-1;i >=0;i--){
+				if (arr[i+1]==arr[i])arr.splice(i,1);
+			}
+			return arr;
+		}
+
+		WordUtils.splitWordBySpecial=function(str){
+			var rst;
+			rst=[];
+			var i=0,len=0;
+			len=str.length;
+			var tStart=NaN;
+			var tEnd=NaN;
+			tStart=0;
+			tEnd=tStart;
+			var tChar;
+			var lastChar=0;
+			lastChar=-1;
+			while (tEnd < len){
+				tChar=str.charAt(tEnd);
+				if (PingYinDic.checkIsHasSpecialStr(tChar)){
+					rst.push(str.substring(tStart,tEnd),tChar);
+					lastChar=tEnd;
+					tStart=tEnd+1;
+					tEnd=tStart;
+					}else{
+					tEnd++;
+				}
+			}
+			if (tStart > lastChar&&tStart<len){
+				rst.push(str.substring(tStart));
+			}
+			return rst;
+		}
+
+		WordUtils.arr2keyObj=function(arr,KeyList){
+			var rst;
+			rst=new Object();
+			var i=0,len=0;
+			len=KeyList.length;
+			for (i=0;i < len;i++){
+				rst[KeyList[i]]=arr[i];
+			}
+			return rst;
+		}
+
+		WordUtils.typeDic=null
+		return WordUtils;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.PingYinDic
+	var PingYinDic=(function(){
+		function PingYinDic(){
+			this.pinYinList=null;
+			this.charDic=null;
+			this.headDic=null;
+			this.pinYinList=[];
+		}
+
+		__class(PingYinDic,'nlp.PingYinDic');
+		var __proto=PingYinDic.prototype;
+		__proto.addIfOK=function(line){
+			if (PingYinDic.isPinYin(line)){
+				this.pinYinList.push(line);
+			}
+		}
+
+		__proto.makeCharDic=function(){
+			this.charDic={};
+			this.headDic={};
+			var i=0,len=0;
+			len=this.pinYinList.length;
+			for (i=0;i < len;i++){
+				this.addWordToDic(this.pinYinList[i]);
+			}
+		}
+
+		__proto.addWordToDic=function(word){
+			var charList;
+			charList=word.split("");
+			if (!charList.length)return;
+			var i=0,len=0;
+			len=charList.length;
+			var tChar;
+			tChar=charList[0];
+			this.headDic[tChar]=tChar;
+			for (i=0;i < len;i++){
+				tChar=charList[i];
+				this.charDic[tChar]=tChar;
+			}
+		}
+
+		PingYinDic.checkIsHasSpecialStr=function(str){
+			var pattern=new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
+			if (pattern.test(str)){
+				return true;
+			}
+			return false;
+		}
+
+		PingYinDic.hasChina=function(obj){
+			var reg=/[\u4E00-\u9FA5\uF900-\uFA2D]/;
+			return reg.test(obj);
+		}
+
+		PingYinDic.isPinYin=function(line){
+			if (line.length < 1)
+				return false;
+			if (line.charAt(0)=="∶")return false;
+			if (PingYinDic.checkIsHasSpecialStr(line))
+				return false;
+			if (PingYinDic.hasChina(line))
+				return false;
+			var char0;
+			char0=line.charAt(0);
+			var charCode0=0;
+			charCode0=line.charCodeAt(0);
+			return true;
+		}
+
+		PingYinDic.isNumChar=function(char){
+			return PingYinDic.NumCharDic[char];
+		}
+
+		PingYinDic.isEnglishChar=function(char){
+			return PingYinDic.EnglishCharDic[char];
+		}
+
+		PingYinDic.inits=function(){
+			PingYinDic.DebugDic=WordUtils.arrToDic(PingYinDic.DebugChars);
+			var i=0,len=0;
+			var start=0;
+			start="A".charCodeAt(0);
+			len="Z".charCodeAt(0);
+			for (i=start;i <=len;i++){
+				PingYinDic.EnglishCharDic[String.fromCharCode(i)]=true;
+			}
+			start="a".charCodeAt(0);
+			len="z".charCodeAt(0);
+			for (i=start;i <=len;i++){
+				PingYinDic.EnglishCharDic[String.fromCharCode(i)]=true;
+			}
+			for (i=0;i < 10;i++){
+				PingYinDic.NumCharDic[i]=true;
+			}
+		}
+
+		PingYinDic.DebugDic=null
+		PingYinDic.EnglishCharDic={};
+		PingYinDic.NumCharDic={};
+		__static(PingYinDic,
+		['DebugChars',function(){return this.DebugChars=["’"];}
+		]);
+		PingYinDic.__init$=function(){
+			;;
+			PingYinDic.inits();
+		}
+
+		return PingYinDic;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordDicParser
+	var WordDicParser=(function(){
+		function WordDicParser(){
+			this.complete=null;
+			this.wordList=null;
+			this.vocList=null;
+			this.trie=null;
+			this.cutter=null;
+			this.wordList=[];
+			this.vocList=[];
+			this.trie=new Trie();
+		}
+
+		__class(WordDicParser,'nlp.WordDicParser');
+		var __proto=WordDicParser.prototype;
+		__proto.loadDic=function(filePath,complete){
+			this.complete=complete;
+			Laya.loader.load(filePath,Handler.create(this,this.onFileLoaded),null,"text");
+		}
+
+		__proto.onFileLoaded=function(txt){
+			this.initByDicTxt(txt);
+			if (this.complete){
+				this.complete.run();
+			}
+		}
+
+		__proto.initByDicTxt=function(txt){
+			var lines;
+			lines=txt.split("\n");
+			var pinyin;
+			pinyin=new PingYinDic();
+			this.wordList=[];
+			var tWord;
+			var i=0,len=0;
+			len=lines.length;
+			var tLine;
+			for (i=0;i < len;i++){
+				tLine=lines[i];
+				tLine=tLine.replace("\r","");
+				pinyin.addIfOK(tLine);
+				if (tLine.charAt(0)=="*"){
+					if (tWord)tWord.wordParseComplete();
+					tWord=new WordParser();
+					tWord.addHead(tLine);
+					this.wordList.push(tWord);
+					}else{
+					if (tWord){
+						tWord.addLine(tLine);
+					}
+				}
+			}
+			if (tWord)tWord.wordParseComplete();
+			console.log("word count:",this.wordList.length,this.wordList);
+			pinyin.makeCharDic();
+			console.log(pinyin);
+			this.addToWordList(this.wordList);
+			console.log("vocList:",this.vocList);
+			this.trie.buildByWordList(this.vocList);
+			console.log("trie:",this.trie);
+			this.cutter=new WordCutter();
+			this.cutter.trie=this.trie;
+		}
+
+		__proto.cut=function(str){
+			return this.cutter.cut(str);
+		}
+
+		__proto.addToWordList=function(wList){
+			var i=0,len=0;
+			len=wList.length;
+			var tWord;
+			for (i=0;i < len;i++){
+				tWord=wList[i];
+				this.addWordToVocList(tWord);
+			}
+		}
+
+		__proto.addWordToVocList=function(word){
+			var tList;
+			tList=word.wordList;
+			if (!tList)return;
+			var i=0,len=0;
+			len=tList.length;
+			for (i=0;i < len;i++){
+				this.vocList.push(tList[i]);
+			}
+		}
+
+		__static(WordDicParser,
+		['I',function(){return this.I=new WordDicParser();}
+		]);
+		return WordDicParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordOne
+	var WordOne=(function(){
+		function WordOne(){
+			this.oWord=null;
+			this.word=null;
+			this.pinyin=null;
+			this.twPY=null;
+			this.type=null;
+			this.detail=null;
+			this.lines=null;
+			this.des=null;
+			this.detailParsed=false;
+			this.lines=[];
+		}
+
+		__class(WordOne,'nlp.WordOne');
+		var __proto=WordOne.prototype;
+		__proto.addLine=function(line){
+			this.lines.push(line);
+		}
+
+		__proto.parseEnd=function(removeLast){
+			if (removeLast)this.lines.pop();
+		}
+
+		__proto.parseDetail=function(){
+			if (this.detailParsed)return;
+			this.detailParsed=true;
+			this.des=[];
+			var i=0,len=0;
+			len=this.lines.length;
+			var tDes;
+			var tLine;
+			for (i=0;i < len;i++){
+				tLine=this.lines[i];
+				if (tLine.length==1){
+					console.log("one:",tLine);
+				}
+				if (WordOne.getKeyStartWords(tLine)){
+					tDes=[];
+					tDes.push(tLine);
+					this.des.push(tDes);
+				}else
+				if (WordOne.getKeyWords(tLine)){
+					tDes=[];
+					tDes.push(tLine);
+					this.des.push(tDes);
+					}else{
+					if (!tDes){
+						tDes=[];
+						this.des.push(tDes);
+					}
+					tDes.push(tLine);
+				}
+			}
+		}
+
+		WordOne.getKeyWords=function(str){
+			var i=0,len=0;
+			len=WordOne.DesKeyWords.length;
+			for (i=0;i < len;i++){
+				if (str.indexOf(WordOne.DesKeyWords[i])>=0){
+					return WordOne.DesKeyWords[i];
+				}
+			}
+			return null;
+		}
+
+		WordOne.getKeyStartWords=function(str){
+			var i=0,len=0;
+			len=WordOne.DesKeyStartWords.length;
+			for (i=0;i < len;i++){
+				if (str.indexOf(WordOne.DesKeyStartWords[i])==0){
+					return WordOne.DesKeyStartWords[i];
+				}
+			}
+			return null;
+		}
+
+		__static(WordOne,
+		['DesKeyWords',function(){return this.DesKeyWords=["：","如:","∶表示","同\“","另见"];},'DesKeyStartWords',function(){return this.DesKeyStartWords=["∶","：","用在","姓"];}
+		]);
+		return WordOne;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordParser
+	var WordParser=(function(){
+		function WordParser(){
+			this.word=null;
+			this.alasDic=null;
+			this.lineCount=0;
+			this.part=null;
+			this.tWord=null;
+			this.wordList=null;
+			this._isParsed=false;
+			this.lines=null;
+			this.preLine=null;
+			this.preIsPinYin=false;
+			this.lines=[];
+			this.wordList=[];
+			this.alasDic={};
+			this._isParsed=false;
+		}
+
+		__class(WordParser,'nlp.WordParser');
+		var __proto=WordParser.prototype;
+		__proto.wordParseComplete=function(){
+			if (this._isParsed)return;
+			var i=0,len=0;
+			len=this.wordList.length;
+			for (i=0;i < len;i++){
+				(this.wordList [i]).parseDetail();
+			}
+		}
+
+		__proto.addToAlasDic=function(word){
+			word=word.replace("（","").replace("）","");
+			this.alasDic[word]=word;
+		}
+
+		__proto.addLine=function(line){
+			this.lines.push(line);
+			var tLine;
+			tLine=line;
+			var isPinYin=false;
+			isPinYin=false;
+			if (line.length==1&&this.alasDic[line]){
+				tLine=this.preLine;
+			}else
+			if (line.charAt(0)=="（"){
+				this.addToAlasDic(line);
+				tLine=this.preLine;
+			}else
+			if (line.charAt(0)=="〖"){
+				if (this.tWord){
+					this.tWord.addLine(line);
+				}
+			}else
+			if (line.charAt(0)=="∶"){
+				if (this.tWord){
+					this.tWord.addLine(line);
+				}
+			}else
+			if (line.charAt(0)=="【"){
+				if (this.tWord){
+					this.tWord.type=StringTool.getBetween(line,"【","】");
+				}
+			}else
+			if (line.indexOf("详细解释：")>=0){
+				tLine=line.replace("详细解释：","");
+				this.tWord=null;
+			}else
+			if (line.indexOf("部首：")>=0){
+				this.part=line.replace("部首：","").replace("；","");
+			}else
+			if (line.indexOf("笔画数：")>=0){
+				this.lineCount=parseInt(line.replace("笔画数：",""));
+			}else
+			if (line.indexOf("基本解释：")>=0){
+				tLine=this.word;
+			}else
+			if (PingYinDic.isPinYin(line)){
+				if (this.preIsPinYin){
+					if (this.tWord){
+						this.tWord.twPY=line;
+					}
+					}else{
+					if (this.tWord){
+						this.tWord.parseEnd(true);
+					}
+					this.tWord=this.createWord();
+					this.tWord.word=this.preLine;
+					this.tWord.pinyin=line;
+					isPinYin=true;
+				}
+				}else{
+				if (this.tWord){
+					this.tWord.addLine(line);
+				}
+			}
+			this.preLine=tLine;
+			this.preIsPinYin=isPinYin;
+		}
+
+		__proto.addHead=function(line){
+			var tArr;
+			tArr=line.split(" ");
+			var tt;
+			tt=tArr[0];
+			this.word=tt.charAt(1);
+		}
+
+		__proto.createWord=function(){
+			var rst;
+			rst=new WordOne();
+			rst.word=this.word;
+			rst.oWord=this;
+			this.wordList.push(rst);
+			return rst;
+		}
+
+		return WordParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.cutwords.WordPiece
+	var WordPiece=(function(){
+		function WordPiece(){
+			this.word=null;
+			this.start=0;
+			this.end=0;
+			this.wordRef=null;
+			this.type=null;
+			this.typeO=null;
+		}
+
+		__class(WordPiece,'nlp.cutwords.WordPiece');
+		var __proto=WordPiece.prototype;
+		__proto.update=function(){
+			if (this.wordRef){
+				this.word=this.wordRef.word;
+			}
+			return this;
+		}
+
+		return WordPiece;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.cutwords.CharDicCutter
+	var CharDicCutter=(function(){
+		function CharDicCutter(){
+			this.allDic={};
+			this.typeDic={};
+		}
+
+		__class(CharDicCutter,'nlp.cutwords.CharDicCutter');
+		var __proto=CharDicCutter.prototype;
+		__proto.addCutDic=function(type,charDic){
+			var tConfig;
+			tConfig={};
+			tConfig.type=type;
+			tConfig.charDic=charDic;
+			var key;
+			for (key in charDic){
+				this.allDic[key]=tConfig;
+			};
+			var typeO;
+			typeO={};
+			typeO.typecns=[type];
+			typeO.types=[type];
+			this.typeDic[type]=typeO;
+		}
+
+		__proto.adptWordPiece=function(wordPiece){
+			wordPiece.typeO=this.typeDic[wordPiece.type];
+			return wordPiece;
+		}
+
+		__proto.findMaxWord=function(str,tPos){
+			var tChar;
+			tChar=str.charAt(tPos);
+			var tCutConfig;
+			tCutConfig=this.allDic[tChar];
+			if (!tCutConfig)return null;
+			var tPiece;
+			tPiece=new WordPiece();
+			tPiece.start=tPos;
+			tPiece.end=tPos+1;
+			var charDic;
+			charDic=tCutConfig.charDic;
+			var start=0;
+			start=tPos;
+			var end=0;
+			end=tPos;
+			while (charDic[tChar]){
+				tPiece.end=tPiece.end+1;
+				if (tPiece.end >=str.length)break ;
+				tChar=str.charAt(tPiece.end);
+			}
+			tPiece.word=str.substring(tPiece.start,tPiece.end);
+			tPiece.type=tCutConfig.type;
+			return this.adptWordPiece(tPiece);
+		}
+
+		__proto.findMaxWordR=function(str,tPos){
+			var tChar;
+			tChar=str.charAt(tPos);
+			var tCutConfig;
+			tCutConfig=this.allDic[tChar];
+			if (!tCutConfig)return null;
+			var tPiece;
+			tPiece=new WordPiece();
+			tPiece.start=tPos;
+			tPiece.end=tPos+1;
+			var charDic;
+			charDic=tCutConfig.charDic;
+			var start=0;
+			start=tPos;
+			var end=0;
+			end=tPos;
+			while (charDic[tChar]){
+				tPiece.start=start;
+				start--;
+				if (start<0)break ;
+				tChar=str.charAt(start);
+			}
+			tPiece.word=str.substring(tPiece.start,tPiece.end);
+			tPiece.type=tCutConfig.type;
+			return this.adptWordPiece(tPiece);
+		}
+
+		return CharDicCutter;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.cutwords.WordCutter
+	var WordCutter=(function(){
+		function WordCutter(){
+			this.trie=null;
+			this.typeDic=null;
+			this.charDicCutter=null;
+			this.init();
+		}
+
+		__class(WordCutter,'nlp.cutwords.WordCutter');
+		var __proto=WordCutter.prototype;
+		__proto.init=function(){
+			this.charDicCutter=new CharDicCutter();
+			this.charDicCutter.addCutDic("NUMBER",PingYinDic.NumCharDic);
+			this.charDicCutter.addCutDic("ENG",PingYinDic.EnglishCharDic);
+		}
+
+		__proto.cut=function(str){
+			var splitStrs;
+			splitStrs=WordUtils.splitWordBySpecial(str);
+			console.log("cutStr:",str);
+			console.log("split:",splitStrs);
+			var i=0,len=0;
+			var rst;
+			var tempRst;
+			rst=[];
+			len=splitStrs.length;
+			for (i=0;i < len;i++){
+				tempRst=this.cutSmallPiece(splitStrs[i]);
+				rst=rst.concat(tempRst);
+			}
+			return rst;
+		}
+
+		__proto.cutSmallPiece=function(str){
+			console.log("cutSmall:",str);
+			var rst;
+			rst=this.cutWork(str);
+			var score=NaN;
+			score=WordUtils.scoreWordList(rst);
+			console.log("cut:"+score,rst);
+			var rst1;
+			rst1=this.cutWorkR(str);
+			var score1=NaN;
+			score1=WordUtils.scoreWordList(rst1);
+			console.log("cut:"+score1,rst1);
+			var isSame=false;
+			isSame=WordUtils.isWordListSame(rst,rst1);
+			console.log("isSame:",isSame);
+			if (!isSame){
+				if (score > score1){
+					return rst;
+					}else{
+					return rst1;
+				}
+			}
+			return rst;
+		}
+
+		__proto.cutToMap=function(str){
+			var i=0,len=0;
+			len=str.length;
+			var map;
+			map=new MapStruct();
+			for (i=0;i < len;i++){
+				this.findWordToMap(str,i,map);
+			};
+			var wList;
+			wList=map.findMaxWeightPath(str.length);
+			console.log("wList:",wList);
+		}
+
+		__proto.findWordToMap=function(str,pos,map){
+			var start=0;
+			start=pos;
+			var tChar;
+			var tchar;
+			tchar=str.charAt(pos);
+			var tTrieNode;
+			tTrieNode=this.trie.findByChar(tchar);
+			if (!tTrieNode){
+				map.addEdge(start,pos+1,WordUtils.getWordScore(tchar),tchar);
+			}
+			while (tTrieNode){
+				if (tTrieNode.isWord()){
+					map.addEdge(start,pos+1,-1,tTrieNode);
+				}
+				pos++;
+				tchar=str.charAt(pos);
+				tTrieNode=tTrieNode.findByChar(tchar);
+			}
+		}
+
+		__proto.cutWork=function(str){
+			var tPos=0;
+			tPos=0;
+			var rst;
+			rst=[];
+			var tPiece;
+			while (tPos < str.length){
+				tPiece=this.findMaxWord(str,tPos);
+				if (!tPiece)break ;
+				rst.push(tPiece);
+				tPos=tPiece.end;
+			}
+			return rst;
+		}
+
+		__proto.cutWorkR=function(str){
+			var tPos=0;
+			tPos=str.length-1;
+			var rst;
+			rst=[];
+			var tPiece;
+			while (tPos >=0){
+				tPiece=this.findMaxWordR(str,tPos);
+				if (!tPiece)break ;
+				rst.push(tPiece);
+				tPos=tPiece.start-1;
+			}
+			rst.reverse();
+			return rst;
+		}
+
+		__proto.adptPiece=function(piece){
+			if (piece.word==" ")debugger;
+			piece.update();
+			if (this.typeDic){
+				piece.typeO=this.typeDic.getWordType(piece.word);
+			}
+			return piece;
+		}
+
+		__proto.findMaxWord=function(str,pos){
+			(pos===void 0)&& (pos=0);
+			var tPiece;
+			tPiece=this.charDicCutter.findMaxWord(str,pos);
+			if (tPiece)return tPiece;
+			var tchar;
+			tchar=str.charAt(pos);
+			var tTrieNode;
+			tTrieNode=this.trie.findByChar(tchar);
+			tPiece=new WordPiece();
+			tPiece.start=pos;
+			tPiece.end=pos+1;
+			if (!tTrieNode){
+				tPiece.word=tchar;
+				tPiece.type="new";
+				return this.adptPiece(tPiece);
+			}
+			if (tTrieNode.isWord()){
+				tPiece.end=pos+1;
+				tPiece.wordRef=tTrieNode.word;
+				}else{
+				tPiece.word=tchar;
+				tPiece.type="new";
+			};
+			var end=0;
+			end=pos;
+			var next;
+			while (tTrieNode){
+				end++;
+				if (end >=str.length){
+					break ;
+				}
+				tchar=str.charAt(end);
+				next=tTrieNode.findByChar(tchar);
+				if (!next)break ;
+				tTrieNode=next;
+				if (tTrieNode.isWord()){
+					tPiece.end=end+1;
+					tPiece.wordRef=tTrieNode.word;
+				}
+			}
+			return this.adptPiece(tPiece);
+		}
+
+		__proto.findMaxWordR=function(str,pos){
+			(pos===void 0)&& (pos=-2);
+			if (pos==-2){
+				pos=str.length-1;
+			};
+			var tPiece;
+			tPiece=this.charDicCutter.findMaxWordR(str,pos);
+			if (tPiece)return tPiece;
+			var tchar;
+			tchar=str.charAt(pos);
+			var tTrieNode;
+			tTrieNode=this.trie.findByCharR(tchar);
+			tPiece=new WordPiece();
+			tPiece.start=pos;
+			tPiece.end=pos+1;
+			if (!tTrieNode){
+				tPiece.word=tchar;
+				tPiece.type="new";
+				return this.adptPiece(tPiece);
+			}
+			if (tTrieNode.isWord()){
+				tPiece.end=pos+1;
+				tPiece.wordRef=tTrieNode.word;
+			}
+			if (!tTrieNode.isWord()){
+				tPiece.word=tchar;
+				tPiece.type="new";
+			};
+			var start=0;
+			start=pos;
+			var next;
+			while (tTrieNode){
+				start--;
+				if (start < 0){
+					break ;
+				}
+				tchar=str.charAt(start);
+				next=tTrieNode.findByChar(tchar);
+				if (!next)break ;
+				tTrieNode=next;
+				if (tTrieNode.isWord()){
+					tPiece.start=start;
+					tPiece.wordRef=tTrieNode.word;
+				}
+			}
+			return this.adptPiece(tPiece);
+		}
+
+		return WordCutter;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.dictools.TypeDefine
+	var TypeDefine=(function(){
+		function TypeDefine(){}
+		__class(TypeDefine,'nlp.dictools.TypeDefine');
+		TypeDefine.getCHType=function(type){
+			return TypeDefine.TypeDesDic[type] || "未知";
+		}
+
+		__static(TypeDefine,
+		['TypeDesDic',function(){return this.TypeDesDic={
+				"a":"形容词",
+				"ad":"副形词",
+				"ag":"形容词性语素",
+				"al":"形容词性惯用语",
+				"an":"名形词",
+				"b":"区别词",
+				"begin":"仅用于始##始",
+				"bg":"区别语素",
+				"bl":"区别词性惯用语",
+				"c":"连词",
+				"cc":"并列连词",
+				"d":"副词",
+				"dg":"辄,俱,复之类的副词",
+				"dl":"连语",
+				"e":"叹词",
+				"end":"仅用于终##终",
+				"f":"方位词",
+				"g":"学术词汇",
+				"gb":"生物相关词汇",
+				"gbc":"生物类别",
+				"gc":"化学相关词汇",
+				"gg":"地理地质相关词汇",
+				"gi":"计算机相关词汇",
+				"gm":"数学相关词汇",
+				"gp":"物理相关词汇",
+				"h":"前缀",
+				"i":"成语",
+				"j":"简称略语",
+				"k":"后缀",
+				"l":"习用语",
+				"m":"数词",
+				"mg":"数语素",
+				"Mg":"甲乙丙丁之类的数词",
+				"mq":"数量词",
+				"n":"名词",
+				"nb":"生物名",
+				"nba":"动物名",
+				"nbc":"动物纲目",
+				"nbp":"植物名",
+				"nf":"食品，比如“薯片”",
+				"ng":"名词性语素",
+				"nh":"医药疾病等健康相关名词",
+				"nhd":"疾病",
+				"nhm":"药品",
+				"ni":"机构相关（不是独立机构名）",
+				"nic":"下属机构",
+				"nis":"机构后缀",
+				"nit":"教育相关机构",
+				"nl":"名词性惯用语",
+				"nm":"物品名",
+				"nmc":"化学品名",
+				"nn":"工作相关名词",
+				"nnd":"职业",
+				"nnt":"职务职称",
+				"nr":"人名",
+				"nr1":"复姓",
+				"nr2":"蒙古姓名",
+				"nrf":"音译人名",
+				"nrj":"日语人名",
+				"ns":"地名",
+				"nsf":"音译地名",
+				"nt":"机构团体名",
+				"ntc":"公司名",
+				"ntcb":"银行",
+				"ntcf":"工厂",
+				"ntch":"酒店宾馆",
+				"nth":"医院",
+				"nto":"政府机构",
+				"nts":"中小学",
+				"ntu":"大学",
+				"nx":"字母专名",
+				"nz":"其他专名",
+				"o":"拟声词",
+				"p":"介词",
+				"pba":"介词'把'",
+				"pbei":"介词'被'",
+				"q":"量词",
+				"qg":"量词语素",
+				"qt":"时量词",
+				"qv":"动量词",
+				"r":"代词",
+				"rg":"代词性语素",
+				"Rg":"古汉语代词性语素",
+				"rr":"人称代词",
+				"ry":"疑问代词",
+				"rys":"处所疑问代词",
+				"ryt":"时间疑问代词",
+				"ryv":"谓词性疑问代词",
+				"rz":"指示代词",
+				"rzs":"处所指示代词",
+				"rzt":"时间指示代词",
+				"rzv":"谓词性指示代词",
+				"s":"处所词",
+				"t":"时间词",
+				"tg":"时间词性语素",
+				"u":"助词",
+				"ud":"助词",
+				"ude1":"的 底",
+				"ude2":"地",
+				"ude3":"得",
+				"udeng":"等 等等 云云",
+				"udh":"的话",
+				"ug":"过",
+				"uguo":"过",
+				"uj":"助词",
+				"ul":"连词",
+				"ule":"了 喽",
+				"ulian":"连 （“连小学生都会”）",
+				"uls":"来讲 来说 而言 说来",
+				"usuo":"所",
+				"uv":"连词",
+				"uyy":"一样 一般 似的 般",
+				"uz":"着",
+				"uzhe":"着",
+				"uzhi":"之",
+				"v":"动词",
+				"vd":"副动词",
+				"vf":"趋向动词",
+				"vg":"动词性语素",
+				"vi":"不及物动词（内动词",
+				"vl":"动词性惯用语",
+				"vn":"名动词",
+				"vshi":"动词“是”",
+				"vx":"形式动词",
+				"vyou":"动词“有”",
+				"w":"标点符号",
+				"wb":"百分号千分号，全角：％ ‰   半角：%",
+				"wd":"逗号，全角：， 半角：,",
+				"wf":"分号，全角：； 半角： ;",
+				"wh":"单位符号，全角：￥ ＄ ￡  °  ℃  半角：$",
+				"wj":"句号，全角：。",
+				"wky":"右括号，全角：） 〕  ］ ｝ 》  】 〗 〉 半角： ) ] { >",
+				"wkz":"左括号，全角：（ 〔  ［  ｛  《 【  〖 〈   半角：( [ { <",
+				"wm":"冒号，全角：： 半角： :",
+				"wn":"顿号，全角：、",
+				"wp":"破折号，全角：——   －－   ——－   半角：—  —-	",
+				"ws":"省略号，全角：……  …",
+				"wt":"叹号，全角：！",
+				"ww":"问号，全角：？",
+				"wyy":"右引号，全角：” ’ 』",
+				"wyz":"左引号，全角：“ ‘ 『",
+				"x":"字符串",
+				"xu":"网址URL",
+				"xx":"非语素字",
+				"y":"语气词(delete yg)",
+				"yg":"语气语素",
+				"z":"状态词",
+				"zg":"状态词"
+		};}
+
+		]);
+		return TypeDefine;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.dictools.TypeDicParser
+	var TypeDicParser=(function(){
+		function TypeDicParser(){
+			this.wordDic=null;
+			this.wordList=null;
+			this.wordDic={};
+		}
+
+		__class(TypeDicParser,'nlp.dictools.TypeDicParser');
+		var __proto=TypeDicParser.prototype;
+		__proto.getWordType=function(word){
+			var typeO;
+			typeO=this.wordDic[word];
+			if (!typeO)return null;
+			return typeO;
+		}
+
+		__proto.getWordTypeStr=function(word){
+			var typeO;
+			typeO=this.getWordType(word);
+			if (!typeO)return "unknow";
+			return typeO.types[0];
+			return typeO.types.join(";");
+		}
+
+		__proto.getWordTypeCNStr=function(word){
+			var typeO;
+			typeO=this.getWordType(word);
+			if (!typeO)return "unknow";
+			return typeO.typecns[0];
+			return typeO.typecns.join(";");
+		}
+
+		__proto.initByTxt=function(txt){
+			this.wordList=[];
+			var lines;
+			lines=txt.split("\n");
+			var i=0,len=0;
+			len=lines.length;
+			var tLine;
+			var tWordO;
+			for (i=0;i < len;i++){
+				tLine=lines[i];
+				tLine=tLine.replace("\r","");
+				tWordO=this.parseLine(tLine);
+				this.wordDic[tWordO.word]=tWordO;
+				this.wordList.push(this.createWordOneByTypeO(tWordO));
+			}
+		}
+
+		//if (i > 100)break;
+		__proto.parseLine=function(line){
+			var arr;
+			arr=line.split("	");
+			var rst;
+			rst={};
+			rst.word=arr[0];
+			rst.type={};
+			rst.types=[];
+			rst.typecns=[];
+			var i=0,len=0;
+			len=arr.length;
+			var score=NaN;
+			var ttype;
+			for (i=1;i < len;i+=2){
+				score=parseInt(arr[i+1]);
+				ttype=arr[i];
+				rst.type[ttype]=score;
+				rst.type[TypeDefine.getCHType(ttype)]=score;
+				rst.types.push(ttype);
+				rst.typecns.push(TypeDefine.getCHType(ttype));
+			}
+			return rst;
+		}
+
+		__proto.createWordOneByTypeO=function(typeO){
+			var rst;
+			rst=new WordOne();
+			rst.word=typeO.word;
+			return rst;
+		}
+
+		__proto.addType=function(wordList,types,typecns){
+			var tWordO;
+			var i=0,len=0;
+			len=wordList.length;
+			for (i=0;i < len;i++){
+				tWordO={};
+				tWordO.word=wordList[i];
+				tWordO.type={};
+				tWordO.types=types;
+				tWordO.typecns=typecns || types;
+				if(!this.wordDic[tWordO.word])
+					this.wordDic[tWordO.word]=tWordO;
+			}
+		}
+
+		TypeDicParser.Tab="	";
+		return TypeDicParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.trie.TrieWord
+	var TrieWord=(function(){
+		function TrieWord(){
+			this.words=null;
+			this.word=null;
+			this.words=[];
+		}
+
+		__class(TrieWord,'nlp.trie.TrieWord');
+		var __proto=TrieWord.prototype;
+		__proto.addWord=function(word){
+			this.words.push(word);
+		}
+
+		TrieWord.createByWord=function(word){
+			var rst;
+			rst=new TrieWord();
+			rst.word=word;
+			return rst;
+		}
+
+		TrieWord.createTrieWordList=function(wordList){
+			var wordDic;
+			wordDic={};
+			var i=0,len=0;
+			len=wordList.length;
+			var tWord;
+			var tTrieWord;
+			for (i=0;i < len;i++){
+				tWord=wordList[i];
+				if (!wordDic[tWord.word]){
+					wordDic[tWord.word]=TrieWord.createByWord(tWord.word);
+				}
+				tTrieWord=wordDic[tWord.word];
+				tTrieWord.addWord(tWord);
+			};
+			var twList;
+			twList=[];
+			var key;
+			for (key in wordDic){
+				tTrieWord=wordDic[key];
+				twList.push(tTrieWord);
+			}
+			twList.sort(TrieWord.sortWordByLen);
+			return twList;
+		}
+
+		TrieWord.sortWordByLen=function(word0,word1){
+			return word0.word.length-word1.word.length;
+		}
+
+		return TrieWord;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.trie.Trie
+	var Trie=(function(){
+		function Trie(){
+			this.root=null;
+			this.rootR=null;
+		}
+
+		__class(Trie,'nlp.trie.Trie');
+		var __proto=Trie.prototype;
+		__proto.addWord=function(word){
+			this.root.addWord(0,word);
+			this.rootR.addWordR(0,word);
+		}
+
+		__proto.addWordIfNotExist=function(wordOne){
+			if (this.getWord(wordOne.word)){
+				return;
+			}
+			this.addWord(wordOne);
+		}
+
+		__proto.addWordOneList=function(wordList){
+			var trieWordList;
+			trieWordList=TrieWord.createTrieWordList(wordList);
+			var i=0,len=0;
+			len=trieWordList.length;
+			for (i=0;i < len;i++){
+				this.addWordIfNotExist(trieWordList[i]);
+			}
+		}
+
+		__proto.getWord=function(word){
+			if (!word)return null;
+			var tWord;
+			var tchar;
+			var tPos=0;
+			tPos=0;
+			tchar=word.charAt(tPos);
+			tWord=this.findByChar(tchar);
+			while (tWord){
+				tPos++;
+				if (tPos >=word.length)break ;
+				tchar=word.charAt(tPos);
+				tWord=tWord.findByChar(tchar);
+			}
+			if (tWord && tWord.isWord()&& tWord.word.word==word){
+				return tWord;
+			}
+			return null;
+		}
+
+		__proto.buildByWordList=function(wordList){
+			this.root=new TrieNode();
+			this.rootR=new TrieNode();
+			var twList;
+			twList=TrieWord.createTrieWordList(wordList);
+			var i=0,len=0;
+			len=twList.length;
+			var tWord;
+			for (i=0;i < len;i++){
+				tWord=twList[i];
+				this.addWord(tWord);
+			}
+		}
+
+		__proto.findByChar=function(char){
+			return this.root.findByChar(char);
+		}
+
+		__proto.findByCharR=function(char){
+			return this.rootR.findByChar(char);
+		}
+
+		return Trie;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.trie.TrieNode
+	var TrieNode=(function(){
+		function TrieNode(){
+			this.childDic=null;
+			this.char="";
+			this.word=null;
+			this.wordStr=null;
+			this.childDic={};
+		}
+
+		__class(TrieNode,'nlp.trie.TrieNode');
+		var __proto=TrieNode.prototype;
+		__proto.findByChar=function(char){
+			return this.childDic[char];
+		}
+
+		__proto.isWord=function(){
+			return this.word?true:false;
+		}
+
+		__proto.getChildByChar=function(char){
+			if (!this.childDic[char]){
+				this.childDic[char]=TrieNode.createByChar(char);
+			}
+			return this.childDic[char];
+		}
+
+		__proto.addWord=function(pos,word){
+			if (pos==word.word.length){
+				this.word=word;
+				this.wordStr=word.word;
+				return;
+			};
+			var tchar;
+			tchar=word.word.charAt(pos);
+			var tChild;
+			tChild=this.getChildByChar(tchar);
+			tChild.addWord(pos+1,word);
+		}
+
+		__proto.addWordR=function(pos,word){
+			if (pos==word.word.length){
+				this.word=word;
+				this.wordStr=word.word;
+				return;
+			};
+			var tchar;
+			tchar=word.word.charAt(word.word.length-1-pos);
+			var tChild;
+			tChild=this.getChildByChar(tchar);
+			tChild.addWordR(pos+1,word);
+		}
+
+		TrieNode.createByChar=function(char){
+			var rst;
+			rst=new TrieNode();
+			rst.char=char;
+			return rst;
+		}
+
+		return TrieNode;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.bookutils.BookParser
+	var BookParser=(function(){
+		function BookParser(){
+			this.lines=null;
+			this.index=0;
+		}
+
+		__class(BookParser,'nlp.bookutils.BookParser');
+		var __proto=BookParser.prototype;
+		__proto.setTxt=function(txt){
+			txt=txt.replace("\r","");
+			this.lines=txt.split("\n");
+			this.index=0;
+		}
+
+		__proto.reset=function(){
+			this.index=0;
+		}
+
+		__proto.getCurLine=function(){
+			return this.lines[this.index];
+		}
+
+		__proto.pre=function(){
+			this.index--;
+			this.normalIndex();
+			return this.getCurLine();
+		}
+
+		__proto.next=function(){
+			this.index++;
+			this.normalIndex();
+			return this.getCurLine();
+		}
+
+		__proto.normalIndex=function(){
+			if (this.index < 0)this.index=0;
+			if (this.index >=this.lines.length)this.index=this.lines.length-1;
+		}
+
+		BookParser.createByTxt=function(txt){
+			var rst;
+			rst=new BookParser();
+			rst.setTxt(txt);
+			return rst;
+		}
+
+		return BookParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.LineDP
+	var LineDP=(function(){
+		function LineDP(){
+			this.defaultValue=0;
+			this.relations=null;
+			this.tarDic=null;
+			this.preDic=null;
+			this.walkAble=null;
+		}
+
+		__class(LineDP,'nlp.algorithm.LineDP');
+		var __proto=LineDP.prototype;
+		__proto.dp=function(){
+			this.relations=TopoSort.sort(this.relations,"start","end",null);
+			var i=0,len=0;
+			len=this.relations.length;
+			this.tarDic={};
+			this.preDic={};
+			var tRelation;
+			var tEnd=0;
+			var tValue=NaN;
+			for (i=0;i < len;i++){
+				tRelation=this.relations[i];
+				tEnd=tRelation.end;
+				tValue=this.getWeight(tRelation.start)+tRelation.weight;
+				if (!this.preDic[tEnd] || this.getWeight(tRelation.end)< tValue){
+					this.preDic[tEnd]=tRelation;
+					this.tarDic[tEnd]=tValue;
+				}
+			}
+		}
+
+		__proto.dpWithStart=function(startList,startValue,defaultValue){
+			(startValue===void 0)&& (startValue=0);
+			(defaultValue===void 0)&& (defaultValue=0);
+			this.relations=TopoSort.sort(this.relations,"start","end",null);
+			var i=0,len=0;
+			this.tarDic={};
+			this.preDic={};
+			this.walkAble={};
+			this.defaultValue=defaultValue;
+			var hasStart=false;
+			hasStart=false;
+			if (startList && startList.length){
+				hasStart=true;
+				len=startList.length;
+				for (i=0;i < len;i++){
+					this.walkAble[startList[i]]=true;
+					this.setWeight(startList[i],startValue);
+				}
+			}
+			len=this.relations.length;
+			var tRelation;
+			var tEnd=0;
+			var tValue=NaN;
+			var tStart=0;
+			for (i=0;i < len;i++){
+				tRelation=this.relations[i];
+				tEnd=tRelation.end;
+				tStart=tRelation.start;
+				if (hasStart && !this.walkAble[tStart])continue ;
+				if (hasStart){
+					if (!this.walkAble[tStart])continue ;
+					this.walkAble[tEnd]=true;
+				}
+				tValue=this.getWeight(tRelation.start)+tRelation.weight;
+				if (!this.preDic[tEnd] || this.getWeight(tRelation.end)< tValue){
+					this.preDic[tEnd]=tRelation;
+					this.tarDic[tEnd]=tValue;
+				}
+			}
+		}
+
+		__proto.getMaxWeightPath=function(end){
+			var pathList;
+			pathList=[];
+			var tID=0;
+			tID=end;
+			while (this.preDic[tID]){
+				pathList.push(this.preDic[tID]);
+				tID=this.preDic[tID].start;
+			}
+			pathList.reverse();
+			return pathList;
+		}
+
+		__proto.getWeight=function(id){
+			if (!this.tarDic.hasOwnProperty(id)){
+				this.tarDic[id]=this.defaultValue;
+			}
+			return this.tarDic[id];
+		}
+
+		__proto.setWeight=function(id,value){
+			this.tarDic[id]=value;
+		}
+
+		LineDP.simpleDP=function(relations){
+			var lDP;
+			lDP=new LineDP();
+			lDP.relations=relations;
+			lDP.dp();
+			return lDP;
+		}
+
+		LineDP.dpEx=function(relations,startList,startValue,defaultValue){
+			(startValue===void 0)&& (startValue=0);
+			(defaultValue===void 0)&& (defaultValue=0);
+			var lDP;
+			lDP=new LineDP();
+			lDP.relations=relations;
+			lDP.dpWithStart(startList,startValue,defaultValue);
+			return lDP;
+		}
+
+		return LineDP;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.TopoSort
+	var TopoSort=(function(){
+		function TopoSort(){
+			this.startKey=null;
+			this.endKey=null;
+			this.relationList=null;
+			this.nodeDic=null;
+			this.otherSort=null;
+		}
+
+		__class(TopoSort,'nlp.algorithm.TopoSort');
+		var __proto=TopoSort.prototype;
+		__proto.findOKNode=function(startPos){
+			var i=0,len=0;
+			len=this.relationList.length;
+			var tRelation;
+			var tSelect;
+			var tI=0;
+			tI=-1;
+			for (i=startPos;i < len;i++){
+				tRelation=this.relationList[i];
+				if (this.nodeDic[tRelation[this.startKey]]==0){
+					if (this.otherSort==null)return i;
+					if (tI<0||this.otherSort(tRelation,this.relationList[tI])){
+						tI=i;
+					}
+				}
+			}
+			return tI;
+		}
+
+		__proto.switchPos=function(i,j){
+			var tp;
+			tp=this.relationList[i];
+			this.relationList[i]=this.relationList[j];
+			this.relationList[j]=tp;
+		}
+
+		__proto.removeRefer=function(tRelation){
+			this.nodeDic[tRelation[this.endKey]]=this.nodeDic[tRelation[this.endKey]]-1;
+		}
+
+		__proto.sort=function(relationList){
+			this.nodeDic={};
+			this.relationList=relationList;
+			var i=0,len=0;
+			var tRelation;
+			len=relationList.length;
+			for (i=0;i < len;i++){
+				tRelation=relationList[i];
+				if (!this.nodeDic[tRelation[this.startKey]]){
+					this.nodeDic[tRelation[this.startKey]]=0;
+				}
+				if (!this.nodeDic[tRelation[this.endKey]]){
+					this.nodeDic[tRelation[this.endKey]]=0;
+				}
+				this.nodeDic[tRelation[this.endKey]]=this.nodeDic[tRelation[this.endKey]]+1;
+			};
+			var okPos=0;
+			for (i=0;i < len;i++){
+				okPos=this.findOKNode(i);
+				if (okPos >=0){
+					this.removeRefer(relationList[okPos]);
+					this.switchPos(i,okPos);
+				}
+			}
+			return relationList;
+		}
+
+		TopoSort.sort=function(relationList,startKey,endKey,otherSort){
+			(startKey===void 0)&& (startKey="start");
+			(endKey===void 0)&& (endKey="end");
+			var tp;
+			tp=new TopoSort();
+			tp.startKey=startKey;
+			tp.endKey=endKey;
+			tp.otherSort=otherSort;
+			tp.sort(relationList);
+			return relationList;
+		}
+
+		return TopoSort;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.map.Edge
+	var Edge=(function(){
+		function Edge(){
+			this.data=null;
+			this.start=0;
+			this.end=0;
+			this.weight=0;
+		}
+
+		__class(Edge,'nlp.algorithm.map.Edge');
+		Edge.create=function(start,end,weight,data){
+			var rst;
+			rst=new Edge();
+			rst.start=start;
+			rst.end=end;
+			rst.weight=weight;
+			rst.data=data;
+			return rst;
+		}
+
+		return Edge;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.map.MapStruct
+	var MapStruct=(function(){
+		function MapStruct(){
+			this.vList=null;
+			this.eList=null;
+			this.reset();
+		}
+
+		__class(MapStruct,'nlp.algorithm.map.MapStruct');
+		var __proto=MapStruct.prototype;
+		__proto.reset=function(){
+			this.vList=[];
+			this.eList=[];
+		}
+
+		__proto.getVertex=function(id){
+			if (!this.vList[id])this.vList[id]=Vertex$1.createByID(id);
+			return this.vList[id];
+		}
+
+		__proto.addEdge=function(start,end,weight,data){
+			var edge;
+			edge=Edge.create(start,end,weight,data);
+			var startV;
+			var endV;
+			startV=this.getVertex(start);
+			endV=this.getVertex(end);
+			startV.addOut(end,weight);
+			endV.addIn(start,weight);
+			this.eList.push(edge);
+		}
+
+		__proto.findMaxWeightPath=function(endI){
+			return LineDP.dpEx(this.eList,[0],0,-999).getMaxWeightPath(endI);
+			return LineDP.simpleDP(this.eList).getMaxWeightPath(endI);
+		}
+
+		//var
+		__proto.buildMap=function(){}
+		MapStruct.showEdgeList=function(eList){
+			var i=0,len=0;
+		}
+
+		return MapStruct;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.map.Vertex
+	var Vertex$1=(function(){
+		function Vertex(){
+			this.inList=null;
+			this.outList=null;
+			this.inDic=null;
+			this.outDic=null;
+			this.id=0;
+			this.reset();
+		}
+
+		__class(Vertex,'nlp.algorithm.map.Vertex',null,'Vertex$1');
+		var __proto=Vertex.prototype;
+		__proto.reset=function(){
+			this.inList=[];
+			this.outList=[];
+			this.inDic={};
+			this.outDic={};
+		}
+
+		__proto.addEdge=function(edge){
+			if (edge.start==this.id){
+				this.addOut(edge.end,edge.weight);
+			}else
+			if (edge.end==this.id){
+				this.addIn(edge.start,edge.weight);
+			}
+		}
+
+		__proto.addIn=function(id,weight){
+			this.inList.push(id);
+			this.inDic[id]=weight;
+		}
+
+		__proto.addOut=function(id,weight){
+			this.outList.push(id);
+			this.outDic[id]=weight;
+		}
+
+		Vertex.createByID=function(id){
+			var rst;
+			rst=new Vertex();
+			rst.reset();
+			rst.id=id;
+			return rst;
+		}
+
+		return Vertex;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllRelation
+	var ConllRelation=(function(){
+		function ConllRelation(){
+			this.start=0;
+			this.end=0;
+			this.type=null;
+			this.len=0;
+		}
+
+		__class(ConllRelation,'nlp.conll.ConllRelation');
+		ConllRelation.buildByWord=function(word){
+			var rst;
+			rst=new ConllRelation();
+			rst.start=word.id;
+			rst.end=word.head;
+			rst.type=word.deprel;
+			rst.len=Math.abs(rst.start-rst.end);
+			return rst;
+		}
+
+		return ConllRelation;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllDesParser
+	var ConllDesParser=(function(){
+		function ConllDesParser(){
+			this.desDic=null;
+		}
+
+		__class(ConllDesParser,'nlp.conll.ConllDesParser');
+		var __proto=ConllDesParser.prototype;
+		__proto.parseLine=function(line){
+			var data;
+			data=WordUtils.arr2keyObj(line.split("\t"),ConllDesParser.KeyList);
+			this.desDic[data.type]=data;
+			return data;
+		}
+
+		__proto.parseTxt=function(txt){
+			this.desDic={};
+			var lines;
+			lines=txt.split("\n");
+			var i=0,len=0;
+			len=lines.length;
+			var tLine;
+			for (i=0;i < len;i++){
+				tLine=lines[i];
+				this.parseLine(tLine);
+			}
+			console.log("ConllDesParser:",this);
+		}
+
+		ConllDesParser.getCNType=function(type){
+			if (ConllDesParser.I && ConllDesParser.I.desDic[type])return ConllDesParser.I.desDic[type].desCN;
+			return type;
+		}
+
+		ConllDesParser.I=null
+		__static(ConllDesParser,
+		['KeyList',function(){return this.KeyList=["desCN","type","desEN","detail"];}
+		]);
+		return ConllDesParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllWordDic
+	var ConllWordDic=(function(){
+		function ConllWordDic(){
+			this.wordDic={};
+			this.wordList=[];
+			this.typeDic={};
+		}
+
+		__class(ConllWordDic,'nlp.conll.ConllWordDic');
+		var __proto=ConllWordDic.prototype;
+		__proto.getWordCacheKey=function(word){
+			return word.word+"@"+word.postag;
+		}
+
+		__proto.addToTypeDic=function(word){
+			var tType;
+			tType=word.postag;
+			if (!this.typeDic[tType])this.typeDic[tType]=[];
+			var typeList;
+			typeList=this.typeDic[tType];
+			typeList.push(word);
+		}
+
+		__proto.addWord=function(word){
+			var key;
+			key=this.getWordCacheKey(word);
+			if (this.wordDic[key])return;
+			this.wordDic[key]=word;
+			this.wordList.push(word);
+			this.addToTypeDic(word);
+		}
+
+		__static(ConllWordDic,
+		['I',function(){return this.I=new ConllWordDic();}
+		]);
+		return ConllWordDic;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllFileParser
+	var ConllFileParser=(function(){
+		function ConllFileParser(conllDes){
+			this.index=0;
+			this.conllDes=null;
+			this.treeList=null;
+			this.conllDes=conllDes;
+			this.treeList=[];
+		}
+
+		__class(ConllFileParser,'nlp.conll.ConllFileParser');
+		var __proto=ConllFileParser.prototype;
+		__proto.loadFile=function(file,complete){
+			Laya.loader.load(file,Handler.create(this,this.onFileLoaded,[complete]),null,"text");
+		}
+
+		__proto.onFileLoaded=function(complete,txt){
+			this.parseTxt(txt);
+			if (complete){
+				complete.run();
+			}
+		}
+
+		__proto.parseTxt=function(txt){
+			var lines;
+			lines=txt.split("\n");
+			var i=0,len=0;
+			len=lines.length;
+			var tLine;
+			var tTree;
+			for (i=0;i < len;i++){
+				tLine=lines[i];
+				if (tLine.indexOf("\t")<0){
+					tTree=null;
+					}else{
+					if (!tTree){
+						tTree=new ConllTree();
+						this.treeList.push(tTree);
+					}
+					tTree.addLine(tLine);
+				}
+			}
+			console.log("conllfileParser:",this);
+			console.log("contypeDic:",ConllWordDic.I);
+		}
+
+		__proto.reset=function(){
+			this.index=0;
+		}
+
+		__proto.getCurLine=function(){
+			return this.treeList[this.index];
+		}
+
+		__proto.pre=function(){
+			this.index--;
+			this.normalIndex();
+			return this.getCurLine();
+		}
+
+		__proto.next=function(){
+			this.index++;
+			this.normalIndex();
+			return this.getCurLine();
+		}
+
+		__proto.normalIndex=function(){
+			if (this.index < 0)this.index=0;
+			if (this.index >=this.treeList.length)this.index=this.treeList.length-1;
+		}
+
+		return ConllFileParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllTree
+	var ConllTree=(function(){
+		function ConllTree(){
+			this.wordList=null;
+			this.relations=null;
+			this.wordList=[];
+		}
+
+		__class(ConllTree,'nlp.conll.ConllTree');
+		var __proto=ConllTree.prototype;
+		__proto.getWordByIndex=function(index){
+			return this.wordList[index];
+		}
+
+		__proto.addLine=function(line){
+			var tWord;
+			tWord=ConllWord.parseFromLine(line);
+			if (!this.wordList[tWord.id]){
+				this.wordList.push(tWord);
+				tWord.tree=this;
+				ConllWordDic.I.addWord(tWord);
+			}
+		}
+
+		__proto.dealRelation=function(relation){
+			var enWord;
+			enWord=this.wordList[relation.end];
+			if(enWord)
+				enWord.refers.push(relation.start);
+			var sWord;
+			sWord=this.wordList[relation.start];
+			if(sWord)
+				sWord.refers.push(relation.end);
+		}
+
+		__proto.buildRelation=function(){
+			this.relations=[];
+			var i=0,len=0;
+			len=this.wordList.length;
+			var tRelation;
+			for (i=0;i < len;i++){
+				tRelation=ConllRelation.buildByWord(this.wordList[i]);
+				this.relations.push(tRelation);
+				this.dealRelation(tRelation);
+			}
+			len=this.wordList.length;
+			var tWord;
+			for (i=0;i < len;i++){
+				tWord=this.wordList[i];
+				tWord.sortRefers(i);
+			}
+			TopoSort.sort(this.relations,"start","end",ConllTree.otherSort);
+		}
+
+		ConllTree.otherSort=function(item0,item1){
+			return item0.len < item1.len;
+		}
+
+		return ConllTree;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllTreeAnalyse
+	var ConllTreeAnalyse=(function(){
+		function ConllTreeAnalyse(){
+			this.keyDic={};
+			this.keys=null;
+			this.dependDic={};
+			this.depends=null;
+		}
+
+		__class(ConllTreeAnalyse,'nlp.conll.ConllTreeAnalyse');
+		var __proto=ConllTreeAnalyse.prototype;
+		__proto.analyse=function(treeList){
+			var i=0,len=0;
+			len=treeList.length;
+			var tKey;
+			var tree;
+			for (i=0;i < len;i++){
+				tree=treeList[i];
+				tree.buildRelation();
+				this.analyseRelation(tree);
+				this.analyseWordLists(ConllTreeAnalyse.splitWordListByPu(tree.wordList));
+			}
+			this.keys=WordUtils.getDicKeys(this.keyDic);
+			this.keys.sort();
+			console.log("keys:",this.keys);
+			this.depends=WordUtils.dic2Arr(this.dependDic);
+			this.depends.sort(MathUtil.sortByKey("value"));
+			console.log("depends",this.depends);
+		}
+
+		__proto.getWordTypeEx=function(word){
+			if (!word)return "null";
+			return word.postag;
+		}
+
+		//return typeDic.getWordTypeCNStr(word.word);
+		__proto.getRelationKey=function(relation,tree){
+			var startWord;
+			var endWord;
+			startWord=tree.getWordByIndex(relation.start);
+			endWord=tree.getWordByIndex(relation.end);
+			return this.getWordRelationKey(startWord,endWord,relation.end-relation.start);
+			return "unknow";
+		}
+
+		__proto.getWordRelationKey=function(startWord,endWord,pos){
+			return this.getWordTypeEx(startWord)+":"+this.getWordTypeEx(endWord)+":"+(pos>0);
+		}
+
+		__proto.getWordRelationScore=function(start,end,pos){
+			var key;
+			key=this.getWordRelationKey(start,end,pos);
+			if (this.dependDic[key]){
+				return this.dependDic[key];
+			}
+			return 0;
+		}
+
+		__proto.analyseRelation=function(tree){
+			var relations;
+			relations=tree.relations;
+			var i=0,len=0;
+			len=relations.length;
+			var tRelation;
+			var tkey;
+			for (i=0;i < len;i++){
+				tRelation=relations[i];
+				tkey=this.getRelationKey(tRelation,tree);
+				if (!this.dependDic[tkey]){
+					this.dependDic[tkey]=1;
+					}else{
+					this.dependDic[tkey]=this.dependDic[tkey]+1;
+				}
+			}
+		}
+
+		__proto.analyseWordLists=function(lists){
+			var i=0,len=0;
+			len=lists.length;
+			var tKey;
+			for (i=0;i < len;i++){
+				tKey=ConllTreeAnalyse.getWordListKey(lists[i]);
+				this.keyDic[tKey]=lists;
+			}
+		}
+
+		ConllTreeAnalyse.getTreeKey=function(tree){
+			var wordList;
+			wordList=tree.wordList;
+			return ConllTreeAnalyse.getWordListKey(wordList);
+		}
+
+		ConllTreeAnalyse.getWordListKey=function(wordList){
+			var i=0,len=0;
+			len=wordList.length;
+			var signList;
+			signList=[];
+			var tword;
+			for (i=0;i < len;i++){
+				tword=wordList[i];
+				signList.push(tword.postag);
+			}
+			WordUtils.removeSameNB(signList);
+			return signList.join(",");
+		}
+
+		ConllTreeAnalyse.splitWordListByPu=function(wordList){
+			var rst;
+			rst=[];
+			var tarr;
+			var i=0,len=0;
+			len=wordList.length;
+			var tword;
+			for (i=0;i < len;i++){
+				tword=wordList[i];
+				if (tword.postag=="PU"){
+					if (tarr && tarr.length){
+						tarr=null;
+					}
+					}else{
+					if (!tarr){
+						tarr=[];
+						rst.push(tarr);
+					}
+					tarr.push(tword);
+				}
+			}
+			return rst;
+		}
+
+		ConllTreeAnalyse.typeDic=null
+		return ConllTreeAnalyse;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllWord
+	var ConllWord=(function(){
+		function ConllWord(){
+			this.id=0;
+			this.form=null;
+			this.lemma=null;
+			this.cpostag=null;
+			this.postag=null;
+			this.feats=null;
+			this.head=0;
+			this.deprel=null;
+			this.word=null;
+			this.tree=null;
+			this.refers=null;
+		}
+
+		__class(ConllWord,'nlp.conll.ConllWord');
+		var __proto=ConllWord.prototype;
+		__proto.sortRefers=function(i){
+			function mSort (v0,v1){
+				if (v0==i||v1==i){
+					return v0-v1;
+				}
+				if (v0 > i && v1 > i){
+					return v1-v0;
+				}
+				if (v0 < i && v1 < i){
+					return v1-v0;
+				}
+				return v0-v1;
+			}
+			this.refers.sort(mSort);
+		}
+
+		ConllWord.parseFromLine=function(line){
+			var values;
+			values=line.split("\t");
+			var rst;
+			rst=new ConllWord();
+			var i=0,len=0;
+			len=ConllWord.KeyList.length;
+			for (i=0;i < len;i++){
+				rst[ConllWord.KeyList[i]]=values[i];
+			}
+			rst.id=Sys.mParseInt(rst.id)-1;
+			rst.head=Sys.mParseInt(rst.head)-1;
+			rst.word=rst.form;
+			rst.refers=[];
+			return rst;
+		}
+
+		__static(ConllWord,
+		['KeyList',function(){return this.KeyList=["id","form","lemma","cpostag","postag","feats","head","deprel"];}
+		]);
+		return ConllWord;
 	})()
 
 
@@ -13250,6 +13250,119 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*<code>Sound</code> 类是用来播放控制声音的类。
+	*/
+	//class laya.media.Sound extends laya.events.EventDispatcher
+	var Sound=(function(_super){
+		function Sound(){Sound.__super.call(this);;
+		};
+
+		__class(Sound,'laya.media.Sound',_super);
+		var __proto=Sound.prototype;
+		/**
+		*加载声音。
+		*@param url 地址。
+		*
+		*/
+		__proto.load=function(url){}
+		/**
+		*播放声音。
+		*@param startTime 开始时间,单位秒
+		*@param loops 循环次数,0表示一直循环
+		*@return 声道 SoundChannel 对象。
+		*
+		*/
+		__proto.play=function(startTime,loops){
+			(startTime===void 0)&& (startTime=0);
+			(loops===void 0)&& (loops=0);
+			return null;
+		}
+
+		/**
+		*释放声音资源。
+		*
+		*/
+		__proto.dispose=function(){}
+		/**
+		*获取总时间。
+		*/
+		__getset(0,__proto,'duration',function(){
+			return 0;
+		});
+
+		return Sound;
+	})(EventDispatcher)
+
+
+	/**
+	*<p> <code>SoundChannel</code> 用来控制程序中的声音。每个声音均分配给一个声道，而且应用程序可以具有混合在一起的多个声道。</p>
+	*<p> <code>SoundChannel</code> 类包含控制声音的播放、暂停、停止、音量的方法，以及获取声音的播放状态、总时间、当前播放时间、总循环次数、播放地址等信息的方法。</p>
+	*/
+	//class laya.media.SoundChannel extends laya.events.EventDispatcher
+	var SoundChannel=(function(_super){
+		function SoundChannel(){
+			this.url=null;
+			this.loops=0;
+			this.startTime=NaN;
+			this.isStopped=false;
+			this.completeHandler=null;
+			SoundChannel.__super.call(this);
+		}
+
+		__class(SoundChannel,'laya.media.SoundChannel',_super);
+		var __proto=SoundChannel.prototype;
+		/**
+		*播放。
+		*/
+		__proto.play=function(){}
+		/**
+		*停止。
+		*/
+		__proto.stop=function(){}
+		/**
+		*暂停。
+		*/
+		__proto.pause=function(){}
+		/**
+		*继续播放。
+		*/
+		__proto.resume=function(){}
+		/**
+		*private
+		*/
+		__proto.__runComplete=function(handler){
+			if (handler){
+				handler.run();
+			}
+		}
+
+		/**
+		*音量范围从 0（静音）至 1（最大音量）。
+		*/
+		__getset(0,__proto,'volume',function(){
+			return 1;
+			},function(v){
+		});
+
+		/**
+		*获取当前播放时间。
+		*/
+		__getset(0,__proto,'position',function(){
+			return 0;
+		});
+
+		/**
+		*获取总时间。
+		*/
+		__getset(0,__proto,'duration',function(){
+			return 0;
+		});
+
+		return SoundChannel;
+	})(EventDispatcher)
+
+
+	/**
 	*@private
 	*使用Audio标签播放声音
 	*/
@@ -13408,119 +13521,6 @@ var Laya=window.Laya=(function(window,document){
 		AudioSound._audioCache={};
 		AudioSound._musicAudio=null
 		return AudioSound;
-	})(EventDispatcher)
-
-
-	/**
-	*<p> <code>SoundChannel</code> 用来控制程序中的声音。每个声音均分配给一个声道，而且应用程序可以具有混合在一起的多个声道。</p>
-	*<p> <code>SoundChannel</code> 类包含控制声音的播放、暂停、停止、音量的方法，以及获取声音的播放状态、总时间、当前播放时间、总循环次数、播放地址等信息的方法。</p>
-	*/
-	//class laya.media.SoundChannel extends laya.events.EventDispatcher
-	var SoundChannel=(function(_super){
-		function SoundChannel(){
-			this.url=null;
-			this.loops=0;
-			this.startTime=NaN;
-			this.isStopped=false;
-			this.completeHandler=null;
-			SoundChannel.__super.call(this);
-		}
-
-		__class(SoundChannel,'laya.media.SoundChannel',_super);
-		var __proto=SoundChannel.prototype;
-		/**
-		*播放。
-		*/
-		__proto.play=function(){}
-		/**
-		*停止。
-		*/
-		__proto.stop=function(){}
-		/**
-		*暂停。
-		*/
-		__proto.pause=function(){}
-		/**
-		*继续播放。
-		*/
-		__proto.resume=function(){}
-		/**
-		*private
-		*/
-		__proto.__runComplete=function(handler){
-			if (handler){
-				handler.run();
-			}
-		}
-
-		/**
-		*音量范围从 0（静音）至 1（最大音量）。
-		*/
-		__getset(0,__proto,'volume',function(){
-			return 1;
-			},function(v){
-		});
-
-		/**
-		*获取当前播放时间。
-		*/
-		__getset(0,__proto,'position',function(){
-			return 0;
-		});
-
-		/**
-		*获取总时间。
-		*/
-		__getset(0,__proto,'duration',function(){
-			return 0;
-		});
-
-		return SoundChannel;
-	})(EventDispatcher)
-
-
-	/**
-	*<code>Sound</code> 类是用来播放控制声音的类。
-	*/
-	//class laya.media.Sound extends laya.events.EventDispatcher
-	var Sound=(function(_super){
-		function Sound(){Sound.__super.call(this);;
-		};
-
-		__class(Sound,'laya.media.Sound',_super);
-		var __proto=Sound.prototype;
-		/**
-		*加载声音。
-		*@param url 地址。
-		*
-		*/
-		__proto.load=function(url){}
-		/**
-		*播放声音。
-		*@param startTime 开始时间,单位秒
-		*@param loops 循环次数,0表示一直循环
-		*@return 声道 SoundChannel 对象。
-		*
-		*/
-		__proto.play=function(startTime,loops){
-			(startTime===void 0)&& (startTime=0);
-			(loops===void 0)&& (loops=0);
-			return null;
-		}
-
-		/**
-		*释放声音资源。
-		*
-		*/
-		__proto.dispose=function(){}
-		/**
-		*获取总时间。
-		*/
-		__getset(0,__proto,'duration',function(){
-			return 0;
-		});
-
-		return Sound;
 	})(EventDispatcher)
 
 
@@ -25933,6 +25933,99 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*<code>LayoutBox</code> 是一个布局容器类。
+	*/
+	//class laya.ui.LayoutBox extends laya.ui.Box
+	var LayoutBox=(function(_super){
+		function LayoutBox(){
+			this._space=0;
+			this._align="none";
+			this._itemChanged=false;
+			LayoutBox.__super.call(this);
+		}
+
+		__class(LayoutBox,'laya.ui.LayoutBox',_super);
+		var __proto=LayoutBox.prototype;
+		/**@inheritDoc */
+		__proto.addChild=function(child){
+			child.on("resize",this,this.onResize);
+			this._setItemChanged();
+			return laya.display.Node.prototype.addChild.call(this,child);
+		}
+
+		__proto.onResize=function(e){
+			this._setItemChanged();
+		}
+
+		/**@inheritDoc */
+		__proto.addChildAt=function(child,index){
+			child.on("resize",this,this.onResize);
+			this._setItemChanged();
+			return laya.display.Node.prototype.addChildAt.call(this,child,index);
+		}
+
+		/**@inheritDoc */
+		__proto.removeChild=function(child){
+			child.off("resize",this,this.onResize);
+			this._setItemChanged();
+			return laya.display.Node.prototype.removeChild.call(this,child);
+		}
+
+		/**@inheritDoc */
+		__proto.removeChildAt=function(index){
+			this.getChildAt(index).off("resize",this,this.onResize);
+			this._setItemChanged();
+			return laya.display.Node.prototype.removeChildAt.call(this,index);
+		}
+
+		/**刷新。*/
+		__proto.refresh=function(){
+			this._setItemChanged();
+		}
+
+		/**
+		*改变子对象的布局。
+		*/
+		__proto.changeItems=function(){
+			this._itemChanged=false;
+		}
+
+		/**
+		*排序项目列表。可通过重写改变默认排序规则。
+		*@param items 项目列表。
+		*/
+		__proto.sortItem=function(items){
+			if (items)items.sort(function(a,b){return a.y-b.y;});
+		}
+
+		__proto._setItemChanged=function(){
+			if (!this._itemChanged){
+				this._itemChanged=true;
+				this.callLater(this.changeItems);
+			}
+		}
+
+		/**子对象的间隔。*/
+		__getset(0,__proto,'space',function(){
+			return this._space;
+			},function(value){
+			this._space=value;
+			this._setItemChanged();
+		});
+
+		/**子对象对齐方式。*/
+		__getset(0,__proto,'align',function(){
+			return this._align;
+			},function(value){
+			this._align=value;
+			this._setItemChanged();
+		});
+
+		return LayoutBox;
+	})(Box)
+
+
+	/**
 	*<code>TextInput</code> 类用于创建显示对象以显示和输入文本。
 	*
 	*@example <caption>以下示例代码，创建了一个 <code>TextInput</code> 实例。</caption>
@@ -26253,99 +26346,6 @@ var Laya=window.Laya=(function(window,document){
 
 		return TextInput;
 	})(Label)
-
-
-	/**
-	*<code>LayoutBox</code> 是一个布局容器类。
-	*/
-	//class laya.ui.LayoutBox extends laya.ui.Box
-	var LayoutBox=(function(_super){
-		function LayoutBox(){
-			this._space=0;
-			this._align="none";
-			this._itemChanged=false;
-			LayoutBox.__super.call(this);
-		}
-
-		__class(LayoutBox,'laya.ui.LayoutBox',_super);
-		var __proto=LayoutBox.prototype;
-		/**@inheritDoc */
-		__proto.addChild=function(child){
-			child.on("resize",this,this.onResize);
-			this._setItemChanged();
-			return laya.display.Node.prototype.addChild.call(this,child);
-		}
-
-		__proto.onResize=function(e){
-			this._setItemChanged();
-		}
-
-		/**@inheritDoc */
-		__proto.addChildAt=function(child,index){
-			child.on("resize",this,this.onResize);
-			this._setItemChanged();
-			return laya.display.Node.prototype.addChildAt.call(this,child,index);
-		}
-
-		/**@inheritDoc */
-		__proto.removeChild=function(child){
-			child.off("resize",this,this.onResize);
-			this._setItemChanged();
-			return laya.display.Node.prototype.removeChild.call(this,child);
-		}
-
-		/**@inheritDoc */
-		__proto.removeChildAt=function(index){
-			this.getChildAt(index).off("resize",this,this.onResize);
-			this._setItemChanged();
-			return laya.display.Node.prototype.removeChildAt.call(this,index);
-		}
-
-		/**刷新。*/
-		__proto.refresh=function(){
-			this._setItemChanged();
-		}
-
-		/**
-		*改变子对象的布局。
-		*/
-		__proto.changeItems=function(){
-			this._itemChanged=false;
-		}
-
-		/**
-		*排序项目列表。可通过重写改变默认排序规则。
-		*@param items 项目列表。
-		*/
-		__proto.sortItem=function(items){
-			if (items)items.sort(function(a,b){return a.y-b.y;});
-		}
-
-		__proto._setItemChanged=function(){
-			if (!this._itemChanged){
-				this._itemChanged=true;
-				this.callLater(this.changeItems);
-			}
-		}
-
-		/**子对象的间隔。*/
-		__getset(0,__proto,'space',function(){
-			return this._space;
-			},function(value){
-			this._space=value;
-			this._setItemChanged();
-		});
-
-		/**子对象对齐方式。*/
-		__getset(0,__proto,'align',function(){
-			return this._align;
-			},function(value){
-			this._align=value;
-			this._setItemChanged();
-		});
-
-		return LayoutBox;
-	})(Box)
 
 
 	/**
@@ -28474,23 +28474,6 @@ var Laya=window.Laya=(function(window,document){
 	})(FrameAnimation)
 
 
-	//class ui.wordparser.MainUI extends laya.ui.View
-	var MainUI=(function(_super){
-		function MainUI(){MainUI.__super.call(this);;
-		};
-
-		__class(MainUI,'ui.wordparser.MainUI',_super);
-		var __proto=MainUI.prototype;
-		__proto.createChildren=function(){
-			laya.ui.Component.prototype.createChildren.call(this);
-			this.createView(MainUI.uiView);
-		}
-
-		MainUI.uiView={"type":"View","props":{"width":720,"height":1280},"child":[{"type":"Button","props":{"y":535,"x":336,"skin":"comp/button.png","label":"label","labelColors":"#fffff"}}]};
-		return MainUI;
-	})(View)
-
-
 	//class ui.wordparser.WordForTreeUI extends laya.ui.View
 	var WordForTreeUI=(function(_super){
 		function WordForTreeUI(){
@@ -28549,6 +28532,23 @@ var Laya=window.Laya=(function(window,document){
 	})(View)
 
 
+	//class ui.wordparser.MainUI extends laya.ui.View
+	var MainUI=(function(_super){
+		function MainUI(){MainUI.__super.call(this);;
+		};
+
+		__class(MainUI,'ui.wordparser.MainUI',_super);
+		var __proto=MainUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(MainUI.uiView);
+		}
+
+		MainUI.uiView={"type":"View","props":{"width":720,"height":1280},"child":[{"type":"Button","props":{"y":535,"x":336,"skin":"comp/button.png","label":"label","labelColors":"#fffff"}}]};
+		return MainUI;
+	})(View)
+
+
 	//class ui.wordparser.WordViewerUI extends laya.ui.View
 	var WordViewerUI=(function(_super){
 		function WordViewerUI(){
@@ -28568,6 +28568,119 @@ var Laya=window.Laya=(function(window,document){
 		WordViewerUI.uiView={"type":"View","props":{"width":85,"height":60},"child":[{"type":"Label","props":{"y":30,"x":0,"width":85,"var":"txt","text":"文字","runtime":"commoncomponent.AutoSizeLabel","height":29,"fontSize":20,"color":"#0dcd62"}},{"type":"Label","props":{"y":0,"x":0,"width":85,"var":"typeTxt","text":"文字","runtime":"commoncomponent.AutoSizeLabel","height":29,"fontSize":20,"color":"#eac654"}}]};
 		return WordViewerUI;
 	})(View)
+
+
+	/**
+	*<code>HBox</code> 是一个水平布局容器类。
+	*/
+	//class laya.ui.HBox extends laya.ui.LayoutBox
+	var HBox=(function(_super){
+		function HBox(){HBox.__super.call(this);;
+		};
+
+		__class(HBox,'laya.ui.HBox',_super);
+		var __proto=HBox.prototype;
+		/**@inheritDoc */
+		__proto.sortItem=function(items){
+			if (items)items.sort(function(a,b){return a.x-b.x;});
+		}
+
+		/**@inheritDoc */
+		__proto.changeItems=function(){
+			this._itemChanged=false;
+			var items=[];
+			var maxHeight=0;
+			for (var i=0,n=this.numChildren;i < n;i++){
+				var item=this.getChildAt(i);
+				if (item&&item.layoutEnabled){
+					items.push(item);
+					maxHeight=this._height?this._height:Math.max(maxHeight,item.height *item.scaleY);
+				}
+			}
+			this.sortItem(items);
+			var left=0;
+			for (i=0,n=items.length;i < n;i++){
+				item=items[i];
+				item.x=left;
+				left+=item.width *item.scaleX+this._space;
+				if (this._align=="top"){
+					item.y=0;
+					}else if (this._align=="middle"){
+					item.y=(maxHeight-item.height *item.scaleY)*0.5;
+					}else if (this._align=="bottom"){
+					item.y=maxHeight-item.height *item.scaleY;
+				}
+			}
+			this.changeSize();
+		}
+
+		__getset(0,__proto,'height',_super.prototype._$get_height,function(value){
+			if (this._height !=value){
+				_super.prototype._$set_height.call(this,value);
+				this.callLater(this.changeItems);
+			}
+		});
+
+		HBox.NONE="none";
+		HBox.TOP="top";
+		HBox.MIDDLE="middle";
+		HBox.BOTTOM="bottom";
+		return HBox;
+	})(LayoutBox)
+
+
+	/**
+	*<code>VBox</code> 是一个垂直布局容器类。
+	*/
+	//class laya.ui.VBox extends laya.ui.LayoutBox
+	var VBox=(function(_super){
+		function VBox(){VBox.__super.call(this);;
+		};
+
+		__class(VBox,'laya.ui.VBox',_super);
+		var __proto=VBox.prototype;
+		/**@inheritDoc */
+		__proto.changeItems=function(){
+			this._itemChanged=false;
+			var items=[];
+			var maxWidth=0;
+			for (var i=0,n=this.numChildren;i < n;i++){
+				var item=this.getChildAt(i);
+				if (item&&item.layoutEnabled){
+					items.push(item);
+					maxWidth=this._width?this._width:Math.max(maxWidth,item.width *item.scaleX);
+				}
+			}
+			this.sortItem(items);
+			var top=0;
+			for (i=0,n=items.length;i < n;i++){
+				item=items[i];
+				item.y=top;
+				top+=item.height *item.scaleY+this._space;
+				if (this._align=="left"){
+					item.x=0;
+					}else if (this._align=="center"){
+					item.x=(maxWidth-item.width *item.scaleX)*0.5;
+					}else if (this._align=="right"){
+					item.x=maxWidth-item.width *item.scaleX;
+				}
+			}
+			this.changeSize();
+		}
+
+		__getset(0,__proto,'width',_super.prototype._$get_width,function(value){
+			if (this._width !=value){
+				_super.prototype._$set_width.call(this,value);
+				this.callLater(this.changeItems);
+			}
+		});
+
+		VBox.NONE="none";
+		VBox.LEFT="left";
+		VBox.CENTER="center";
+		VBox.RIGHT="right";
+		return VBox;
+	})(LayoutBox)
 
 
 	/**
@@ -28793,119 +28906,6 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
-	*<code>HBox</code> 是一个水平布局容器类。
-	*/
-	//class laya.ui.HBox extends laya.ui.LayoutBox
-	var HBox=(function(_super){
-		function HBox(){HBox.__super.call(this);;
-		};
-
-		__class(HBox,'laya.ui.HBox',_super);
-		var __proto=HBox.prototype;
-		/**@inheritDoc */
-		__proto.sortItem=function(items){
-			if (items)items.sort(function(a,b){return a.x-b.x;});
-		}
-
-		/**@inheritDoc */
-		__proto.changeItems=function(){
-			this._itemChanged=false;
-			var items=[];
-			var maxHeight=0;
-			for (var i=0,n=this.numChildren;i < n;i++){
-				var item=this.getChildAt(i);
-				if (item&&item.layoutEnabled){
-					items.push(item);
-					maxHeight=this._height?this._height:Math.max(maxHeight,item.height *item.scaleY);
-				}
-			}
-			this.sortItem(items);
-			var left=0;
-			for (i=0,n=items.length;i < n;i++){
-				item=items[i];
-				item.x=left;
-				left+=item.width *item.scaleX+this._space;
-				if (this._align=="top"){
-					item.y=0;
-					}else if (this._align=="middle"){
-					item.y=(maxHeight-item.height *item.scaleY)*0.5;
-					}else if (this._align=="bottom"){
-					item.y=maxHeight-item.height *item.scaleY;
-				}
-			}
-			this.changeSize();
-		}
-
-		__getset(0,__proto,'height',_super.prototype._$get_height,function(value){
-			if (this._height !=value){
-				_super.prototype._$set_height.call(this,value);
-				this.callLater(this.changeItems);
-			}
-		});
-
-		HBox.NONE="none";
-		HBox.TOP="top";
-		HBox.MIDDLE="middle";
-		HBox.BOTTOM="bottom";
-		return HBox;
-	})(LayoutBox)
-
-
-	/**
-	*<code>VBox</code> 是一个垂直布局容器类。
-	*/
-	//class laya.ui.VBox extends laya.ui.LayoutBox
-	var VBox=(function(_super){
-		function VBox(){VBox.__super.call(this);;
-		};
-
-		__class(VBox,'laya.ui.VBox',_super);
-		var __proto=VBox.prototype;
-		/**@inheritDoc */
-		__proto.changeItems=function(){
-			this._itemChanged=false;
-			var items=[];
-			var maxWidth=0;
-			for (var i=0,n=this.numChildren;i < n;i++){
-				var item=this.getChildAt(i);
-				if (item&&item.layoutEnabled){
-					items.push(item);
-					maxWidth=this._width?this._width:Math.max(maxWidth,item.width *item.scaleX);
-				}
-			}
-			this.sortItem(items);
-			var top=0;
-			for (i=0,n=items.length;i < n;i++){
-				item=items[i];
-				item.y=top;
-				top+=item.height *item.scaleY+this._space;
-				if (this._align=="left"){
-					item.x=0;
-					}else if (this._align=="center"){
-					item.x=(maxWidth-item.width *item.scaleX)*0.5;
-					}else if (this._align=="right"){
-					item.x=maxWidth-item.width *item.scaleX;
-				}
-			}
-			this.changeSize();
-		}
-
-		__getset(0,__proto,'width',_super.prototype._$get_width,function(value){
-			if (this._width !=value){
-				_super.prototype._$set_width.call(this,value);
-				this.callLater(this.changeItems);
-			}
-		});
-
-		VBox.NONE="none";
-		VBox.LEFT="left";
-		VBox.CENTER="center";
-		VBox.RIGHT="right";
-		return VBox;
-	})(LayoutBox)
-
-
-	/**
 	*<code>RadioGroup</code> 控件定义一组 <code>Radio</code> 控件，这些控件相互排斥；
 	*因此，用户每次只能选择一个 <code>Radio</code> 控件。
 	*
@@ -29090,21 +29090,6 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class view.Main extends ui.wordparser.MainUI
-	var Main=(function(_super){
-		function Main(){
-			Main.__super.call(this);
-		}
-
-		__class(Main,'view.Main',_super);
-		return Main;
-	})(MainUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
 	//class view.WordForTree extends ui.wordparser.WordForTreeUI
 	var WordForTree=(function(_super){
 		function WordForTree(){
@@ -29193,6 +29178,21 @@ var Laya=window.Laya=(function(window,document){
 
 		return WordListViewer;
 	})(WordListViewerUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class view.Main extends ui.wordparser.MainUI
+	var Main=(function(_super){
+		function Main(){
+			Main.__super.call(this);
+		}
+
+		__class(Main,'view.Main',_super);
+		return Main;
+	})(MainUI)
 
 
 	/**
@@ -29350,7 +29350,7 @@ var Laya=window.Laya=(function(window,document){
 	})(WordViewerUI)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,PingYinDic,Render,View,Timer,GraphicAnimation,Browser,LocalStorage]);
+	Laya.__init([LoaderManager,EventDispatcher,Browser,LocalStorage,Render,Timer,View,GraphicAnimation,PingYinDic]);
 	new Game();
 
 })(window,document,Laya);

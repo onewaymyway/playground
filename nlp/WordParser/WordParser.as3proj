@@ -18,6 +18,7 @@
     <class path="src" />
     <class path="..\..\libs\laya\src" />
     <class path="..\..\libs\commonui\src" />
+    <class path="..\..\libs\nlp\src" />
   </classpaths>
   <!-- Build options -->
   <build>

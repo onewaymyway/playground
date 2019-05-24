@@ -1,29 +1,29 @@
-1,0.00,,0,Project command:D:\codes\playground.git\trunk\debugtoolplatform\NLPPlatform\NLPPlatform.as3proj;iflash=false;chromerun=false;outlaya=false
-Project configuration:D:\codes\playground.git\trunk\debugtoolplatform\NLPPlatform\NLPPlatform.as3proj.
+1,0.00,,0,Project command:E:\onewaymyway\codes\playground\playground\debugtoolplatform\NLPPlatform\NLPPlatform.as3proj;iflash=false;chromerun=false;outlaya=false
+Project configuration:E:\onewaymyway\codes\playground\playground\debugtoolplatform\NLPPlatform\NLPPlatform.as3proj.
 1,0.00,,0,output file:NLPPlatform
-1,0.00,,0,output path:D:/codes/playground.git/trunk/debugtoolplatform/NLPPlatform/bin/h5/
-1,0.00,,0,Main Class:D:/codes/playground.git/trunk/debugtoolplatform/NLPPlatform/src/NLPPlatform.as
-1,0.00,D:/codes/playground.git/trunk/debugtoolplatform/NLPPlatform/src,0,Collect
-1,0.00,D:/codes/playground.git/trunk/libs/laya/src,0,Collect
-1,0.00,D:/codes/playground.git/trunk/libs/nodetools/src,0,Collect
+1,0.00,,0,output path:E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/
+1,0.00,,0,Main Class:E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/NLPPlatform.as
+1,0.00,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src,0,Collect
+1,0.00,E:/onewaymyway/codes/playground/playground/libs/laya/src,0,Collect
+1,0.00,E:/onewaymyway/codes/playground/playground/libs/nodetools/src,0,Collect
 1,2.00,,0,read class message
-7,87.68,D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/drags/DragEvent.as,84,SystemSetting.assetsPath This variable is not defined.
-7,88.43,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as,60,_getOneCell This variable is not defined.
-7,88.43,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as,87,_createItems This variable is not defined.
-7,88.54,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/NodeTree.as,49,_treeData This variable is not defined.
-7,89.19,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as,225,XMLElement This variable is not defined.
-7,89.19,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as,237,XMLElement This variable is not defined.
-7,89.24,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
-7,89.24,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
-7,89.62,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/NodeJSTools.as,37,Sys.mParseFloat This variable is not defined.
-1,89.95,,0,Disable Flash3D D:/codes/playground.git/trunk/debugtoolplatform/NLPPlatform/src/NLPPlatform.as
-12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.js,1141385,
-11,89.95,D:/codes/playground.git/trunk/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.html,798,
+7,87.73,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/electrontools/drags/DragEvent.as,84,SystemSetting.assetsPath This variable is not defined.
+7,88.32,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/ListBase.as,60,_getOneCell This variable is not defined.
+7,88.32,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/ListBase.as,87,_createItems This variable is not defined.
+7,88.43,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/NodeTree.as,49,_treeData This variable is not defined.
+7,89.14,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileManager.as,225,XMLElement This variable is not defined.
+7,89.14,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileManager.as,237,XMLElement This variable is not defined.
+7,89.19,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
+7,89.19,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
+7,89.62,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/NodeJSTools.as,37,Sys.mParseFloat This variable is not defined.
+1,89.95,,0,Disable Flash3D E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/NLPPlatform.as
+12,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.js,1141437,
+11,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.html,798,
 ******************************************************************************
 Error or warning message:NLPPlatform.max.js
-1 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as (225):warning:XMLElement This variable is not defined.
-2 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
-3 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
-4 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+1 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileManager.as (225):warning:XMLElement This variable is not defined.
+2 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
+3 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+4 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 ******************************************************************************
 14,89.95,,0,
