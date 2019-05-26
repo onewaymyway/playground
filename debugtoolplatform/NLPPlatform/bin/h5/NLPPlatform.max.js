@@ -412,9 +412,12 @@ var Laya=window.Laya=(function(window,document){
 			UIConfig.touchScrollEnable=false;
 			Styles.buttonLabelColors=["#ffffff","#32cc6b","#ff0000","#C0C0C0"];
 			this.init();
-			var resList;
-			resList=[{"url":"res/atlas/comp.json","type":"atlas"}];
-			Laya.loader.load(resList,new Handler(this,this.test));
+			var loadList;
+			loadList=[{"url":"res/atlas/comp.json","type":"atlas"}];
+			loadList.push({url:"data/CoreNatureDictionary.txt",type:"text" });
+			loadList.push({url:"data/中文字典1.txt",type:"text" });
+			Laya.loader.load(loadList,new Handler(this,this.test));
+			Laya.stage.graphics.fillText("loading",10,10,null,"#ff0000",null);
 		}
 
 		__class(NLPPlatform,'NLPPlatform');
@@ -429,12 +432,19 @@ var Laya=window.Laya=(function(window,document){
 			PythonTools.PythonFolder=FileTools.getAppPath("pythontools")+"/";
 			Paths.tempPath=FileTools.getAppPath("tempdata")+"/";
 			Paths.dataPath=FileTools.getAppPath("data")+"/";
+			DialogTools.init();
 			SystemDragOverManager.init();
 			ContextMenu$1.init();
 		}
 
 		__proto.test=function(){
 			console.log("AppPath:",FileTools.appPath);
+			NLP.initWordCutter("data/中文字典1.txt","data/CoreNatureDictionary.txt");
+			Laya.stage.graphics.fillText("ready",10,10,null,"#ff0000",null);
+			var mainUI;
+			mainUI=new PlatformMain();
+			mainUI.left=mainUI.right=mainUI.top=mainUI.bottom=0;
+			Laya.stage.addChild(mainUI);
 		}
 
 		return NLPPlatform;
@@ -751,6 +761,36 @@ var Laya=window.Laya=(function(window,document){
 		Config.isStencil=true;
 		Config.preserveDrawingBuffer=false;
 		return Config;
+	})()
+
+
+	/**
+	*...
+	*@author dongketao
+	*/
+	//class PathFinding.core.Node
+	var Node$1=(function(){
+		function Node(x,y,walkable){
+			this.x=0;
+			this.y=0;
+			this.g=0;
+			this.f=0;
+			this.h=0;
+			this.by=0;
+			this.parent=null;
+			this.opened=null;
+			this.closed=null;
+			this.tested=null;
+			this.retainCount=null;
+			this.walkable=false;
+			(walkable===void 0)&& (walkable=true);
+			this.x=x;
+			this.y=y;
+			this.walkable=walkable;
+		}
+
+		__class(Node,'PathFinding.core.Node',null,'Node$1');
+		return Node;
 	})()
 
 
@@ -8105,6 +8145,116 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*<code>Keyboard</code> 类的属性是一些常数，这些常数表示控制游戏时最常用的键。
+	*/
+	//class laya.events.Keyboard
+	var Keyboard=(function(){
+		function Keyboard(){};
+		__class(Keyboard,'laya.events.Keyboard');
+		Keyboard.NUMBER_0=48;
+		Keyboard.NUMBER_1=49;
+		Keyboard.NUMBER_2=50;
+		Keyboard.NUMBER_3=51;
+		Keyboard.NUMBER_4=52;
+		Keyboard.NUMBER_5=53;
+		Keyboard.NUMBER_6=54;
+		Keyboard.NUMBER_7=55;
+		Keyboard.NUMBER_8=56;
+		Keyboard.NUMBER_9=57;
+		Keyboard.A=65;
+		Keyboard.B=66;
+		Keyboard.C=67;
+		Keyboard.D=68;
+		Keyboard.E=69;
+		Keyboard.F=70;
+		Keyboard.G=71;
+		Keyboard.H=72;
+		Keyboard.I=73;
+		Keyboard.J=74;
+		Keyboard.K=75;
+		Keyboard.L=76;
+		Keyboard.M=77;
+		Keyboard.N=78;
+		Keyboard.O=79;
+		Keyboard.P=80;
+		Keyboard.Q=81;
+		Keyboard.R=82;
+		Keyboard.S=83;
+		Keyboard.T=84;
+		Keyboard.U=85;
+		Keyboard.V=86;
+		Keyboard.W=87;
+		Keyboard.X=88;
+		Keyboard.Y=89;
+		Keyboard.Z=90;
+		Keyboard.F1=112;
+		Keyboard.F2=113;
+		Keyboard.F3=114;
+		Keyboard.F4=115;
+		Keyboard.F5=116;
+		Keyboard.F6=117;
+		Keyboard.F7=118;
+		Keyboard.F8=119;
+		Keyboard.F9=120;
+		Keyboard.F10=121;
+		Keyboard.F11=122;
+		Keyboard.F12=123;
+		Keyboard.F13=124;
+		Keyboard.F14=125;
+		Keyboard.F15=126;
+		Keyboard.NUMPAD=21;
+		Keyboard.NUMPAD_0=96;
+		Keyboard.NUMPAD_1=97;
+		Keyboard.NUMPAD_2=98;
+		Keyboard.NUMPAD_3=99;
+		Keyboard.NUMPAD_4=100;
+		Keyboard.NUMPAD_5=101;
+		Keyboard.NUMPAD_6=102;
+		Keyboard.NUMPAD_7=103;
+		Keyboard.NUMPAD_8=104;
+		Keyboard.NUMPAD_9=105;
+		Keyboard.NUMPAD_ADD=107;
+		Keyboard.NUMPAD_DECIMAL=110;
+		Keyboard.NUMPAD_DIVIDE=111;
+		Keyboard.NUMPAD_ENTER=108;
+		Keyboard.NUMPAD_MULTIPLY=106;
+		Keyboard.NUMPAD_SUBTRACT=109;
+		Keyboard.SEMICOLON=186;
+		Keyboard.EQUAL=187;
+		Keyboard.COMMA=188;
+		Keyboard.MINUS=189;
+		Keyboard.PERIOD=190;
+		Keyboard.SLASH=191;
+		Keyboard.BACKQUOTE=192;
+		Keyboard.LEFTBRACKET=219;
+		Keyboard.BACKSLASH=220;
+		Keyboard.RIGHTBRACKET=221;
+		Keyboard.QUOTE=222;
+		Keyboard.ALTERNATE=18;
+		Keyboard.BACKSPACE=8;
+		Keyboard.CAPS_LOCK=20;
+		Keyboard.COMMAND=15;
+		Keyboard.CONTROL=17;
+		Keyboard.DELETE=46;
+		Keyboard.ENTER=13;
+		Keyboard.ESCAPE=27;
+		Keyboard.PAGE_UP=33;
+		Keyboard.PAGE_DOWN=34;
+		Keyboard.END=35;
+		Keyboard.HOME=36;
+		Keyboard.LEFT=37;
+		Keyboard.UP=38;
+		Keyboard.RIGHT=39;
+		Keyboard.DOWN=40;
+		Keyboard.SHIFT=16;
+		Keyboard.SPACE=32;
+		Keyboard.TAB=9;
+		Keyboard.INSERT=45;
+		return Keyboard;
+	})()
+
+
+	/**
 	*<p><code>MouseManager</code> 是鼠标、触摸交互管理器。</p>
 	*<p>鼠标事件流包括捕获阶段、目标阶段、冒泡阶段。<br/>
 	*捕获阶段：此阶段引擎会从stage开始递归检测stage及其子对象，直到找到命中的目标对象或者未命中任何对象；<br/>
@@ -14712,6 +14862,94 @@ var Laya=window.Laya=(function(window,document){
 	})()
 
 
+	/**
+	*本类封装弹出本地对话框
+	*@author ww
+	*/
+	//class nodetools.devices.DialogTools
+	var DialogTools=(function(){
+		function DialogTools(){}
+		__class(DialogTools,'nodetools.devices.DialogTools');
+		DialogTools.init=function(){
+			DialogTools.dialog=Device.requireRemote("dialog");
+		}
+
+		DialogTools.showOpenDialog=function(win,options,callBack){
+			DialogTools.dialog.showOpenDialog(win,options,callBack);
+		}
+
+		DialogTools.showSaveDialog=function(win,options,callBack){
+			DialogTools.dialog.showSaveDialog(win,options,callBack);
+		}
+
+		DialogTools.showSave=function(title,fileName,callBack){
+			var option={
+				title:title,
+				defaultPath:fileName,
+				filters:[],
+				properties:[]
+			};
+			DialogTools.showSaveDialog(null,option,callBack);
+		}
+
+		DialogTools.showMessageBox=function(win,options,callBack){
+			return DialogTools.dialog.showMessageBox(win,options,callBack);
+		}
+
+		DialogTools.showErrorBox=function(title,content){
+			DialogTools.dialog.showErrorBox(title,content);
+		}
+
+		DialogTools.getOpenDirO=function(title,defaultPath){
+			(title===void 0)&& (title="open Dir");
+			var rst;
+			rst={title:title,properties:["openDirectory"]};
+			if(defaultPath!=null){
+				rst.defaultPath=defaultPath;
+			}
+			return rst;
+		}
+
+		DialogTools.getOpenProO=function(title,extension){
+			(title===void 0)&& (title="open Project");
+			(extension===void 0)&& (extension="laya");
+			return {title:title,filters:[{name:'*.'+extension,extensions:[extension]}]};
+		}
+
+		DialogTools.showOpenDir=function(title,callBack,defaultPath){
+			(title===void 0)&& (title="open Dir");
+			DialogTools.showOpenDialog(null,DialogTools.getOpenDirO(title,defaultPath),callBack);
+		}
+
+		DialogTools.showOpenFile=function(title,callBack,filter,defaultPath){
+			(title===void 0)&& (title="open file");
+			if (!filter)filter=DialogTools.filterO;
+			filter.title=title;
+			if(defaultPath){
+				filter.defaultPath=defaultPath;
+			}
+			DialogTools.showOpenDialog(null,filter,callBack);
+		}
+
+		DialogTools.getOpenParticleO=function(title){
+			(title===void 0)&& (title="open Particle");
+			return {title:title,filters:[{name:'*.json',extensions:['json']}]};
+		}
+
+		DialogTools.dialog=null
+		__static(DialogTools,
+		['tempOptionO',function(){return this.tempOptionO={
+				title:"",
+				defaultPath:null,
+				filters:[],
+				properties:[]
+		};},'txtFilterO',function(){return this.txtFilterO={title:"open txt file",filters:[{name:'Txt',extensions:['txt']},{name:'All Files',extensions:['*']}]};},'imgFilterO',function(){return this.imgFilterO={title:"open Img",filters:[{name:'Images',extensions:['jpg','png']}]};},'filterO',function(){return this.filterO={title:"open file",filters:[{name:'Images',extensions:['jpg','png','gif']},{name:'Movies',extensions:['mkv','avi','mp4']},{name:'Custom File Type',extensions:['as']},{name:'All Files',extensions:['*']}]};}
+
+		]);
+		return DialogTools;
+	})()
+
+
 	/**文件管理类
 	*@author yung
 	*/
@@ -14775,7 +15013,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				FileTools.createDirectory(path);
 				}catch (e){
-				Sys.alert("Create folder failed:"+path);
+				Sys$1.alert("Create folder failed:"+path);
 			}
 		}
 
@@ -14783,7 +15021,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				FileTools.createFile(path,value);
 				}catch (e){
-				Sys.alert("Create file failed:"+path);
+				Sys$1.alert("Create file failed:"+path);
 			}
 		}
 
@@ -14791,7 +15029,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				FileTools.createFile(path,JSON.stringify(value));
 				}catch (e){
-				Sys.alert("Create file failed:"+path+e.message);
+				Sys$1.alert("Create file failed:"+path+e.message);
 			}
 		}
 
@@ -14799,7 +15037,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				FileTools.createFile(path,bytes);
 				}catch (e){
-				Sys.alert("Create file failed:"+path);
+				Sys$1.alert("Create file failed:"+path);
 			}
 		}
 
@@ -14811,7 +15049,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				FileTools.copyE(from,to);
 				}catch (e){
-				Sys.alert("Copy file failed:(from:"+from+" to:"+to+")");
+				Sys$1.alert("Copy file failed:(from:"+from+" to:"+to+")");
 				console.log("Copy file failed:(from:"+from+" to:"+to+")");
 			}
 		}
@@ -14821,7 +15059,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				return FileTools.readFile(path);
 				}catch (e){
-				if (errorAlert)Sys.alert("Read file failed:"+path);
+				if (errorAlert)Sys$1.alert("Read file failed:"+path);
 			}
 			return null;
 		}
@@ -14832,7 +15070,7 @@ var Laya=window.Laya=(function(window,document){
 				var str=nodetools.devices.FileManager.readTxtFile(path);
 				return JSON.parse(str);
 				}catch (e){
-				if (errorAlert)Sys.alert("Read file failed:"+path);
+				if (errorAlert)Sys$1.alert("Read file failed:"+path);
 				debugger;
 			}
 			return null;
@@ -14843,7 +15081,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				return FileTools.readFile(path);
 				}catch (e){
-				if (errorAlert)Sys.alert("Read file failed:"+path);
+				if (errorAlert)Sys$1.alert("Read file failed:"+path);
 			}
 			return null;
 		}
@@ -14893,7 +15131,7 @@ var Laya=window.Laya=(function(window,document){
 			try {
 				FileTools.rename(oldPath,newPath);
 				}catch (e){
-				Sys.alert("Rename file failed:(from:"+oldPath+" to:"+newPath+")");
+				Sys$1.alert("Rename file failed:(from:"+oldPath+" to:"+newPath+")");
 			}
 		}
 
@@ -15498,9 +15736,9 @@ var Laya=window.Laya=(function(window,document){
 	*@author ww
 	*/
 	//class nodetools.devices.Sys
-	var Sys=(function(){
+	var Sys$1=(function(){
 		function Sys(){};
-		__class(Sys,'nodetools.devices.Sys');
+		__class(Sys,'nodetools.devices.Sys',null,'Sys$1');
 		Sys.mParseFloat=function(v){
 			v=parseFloat(v);
 			if (isNaN(v))return 0;
@@ -15640,6 +15878,1908 @@ var Laya=window.Laya=(function(window,document){
 		Device.electron=null
 		Device.win=null
 		return Device;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.NLP
+	var NLP=(function(){
+		function NLP(){}
+		__class(NLP,'nlp.NLP');
+		NLP.cut=function(str){}
+		NLP.initWordCutter=function(dicFile,typeFile){
+			WordDicParser.I.initByDicTxt(Loader.getRes(dicFile));
+			var typeDic;
+			typeDic=new TypeDicParser();
+			typeDic.initByTxt(Loader.getRes(typeFile));
+			typeDic.addDefaultTypes();
+			WordUtils.typeDic=typeDic;
+			WordDicParser.I.cutter.typeDic=typeDic;
+			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
+		}
+
+		return NLP;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordUtils
+	var WordUtils=(function(){
+		function WordUtils(){}
+		__class(WordUtils,'nlp.WordUtils');
+		WordUtils.printLines=function(lines){
+			var i=0,len=0;
+			len=lines.length;
+			for (i=0;i < len;i++){
+				console.log(lines[i]);
+			}
+		}
+
+		WordUtils.showChars=function(start,end){
+			var i=0;
+			for (i=start;i <=end;i++){
+				console.log("char:",i,":(",String.fromCharCode(i),")");
+			}
+		}
+
+		WordUtils.arrToDic=function(arr){
+			var rst;
+			rst={};
+			var i=0,len=0;
+			len=arr.length;
+			for (i=0;i < len;i++){
+				rst[arr[i]]=arr[i];
+			}
+			return rst;
+		}
+
+		WordUtils.getDicKeys=function(dic){
+			var rst;
+			rst=[];
+			var key;
+			for (key in dic){
+				rst.push(key);
+			}
+			return rst;
+		}
+
+		WordUtils.dic2Arr=function(dic){
+			var rst;
+			rst=[];
+			var key;
+			for (key in dic){
+				rst.push({key:key,value:dic[key]});
+			}
+			return rst;
+		}
+
+		WordUtils.isWordListSame=function(wordList1,wordList2){
+			if (!wordList1.length==wordList2.length)return false;
+			var i=0,len=0;
+			len=wordList1.length;
+			var word1,word2;
+			for (i=0;i < len;i++){
+				word1=wordList1[i];
+				word2=wordList2[i];
+				if (word1.start !=word2.start){
+					console.log("Dif:",i,word1.word,word2.word);
+					return false;
+				}
+				if (word1.end !=word2.end){
+					console.log("Dif:",i,word1.word,word2.word);
+					return false;
+				}
+			}
+			return true;
+		}
+
+		WordUtils.getMaxScore=function(dic){
+			var score=NaN;
+			score=0;
+			var key;
+			var tScore=NaN;
+			for (key in dic){
+				tScore=dic[key];
+				if (tScore>score){
+					score=tScore;
+				}
+			}
+			return score;
+		}
+
+		WordUtils.scoreWordList=function(wordList){
+			var i=0,len=0;
+			len=wordList.length;
+			var score=NaN;
+			score=0;
+			var tWord;
+			for (i=0;i < len;i++){
+				tWord=wordList[i];
+				if (tWord.typeO){
+					score+=WordUtils.getMaxScore(tWord.typeO);
+				}
+			}
+			return score/len;
+		}
+
+		WordUtils.getWordScore=function(word){
+			var tTypeO;
+			tTypeO=WordUtils.typeDic.getWordType(word);
+			if (!tTypeO||!tTypeO.type)return 1;
+			return WordUtils.getMaxScore(tTypeO.type);
+		}
+
+		WordUtils.removeSameNB=function(arr){
+			var i=0;
+			i=arr.length-1;
+			for (i=arr.length-1;i >=0;i--){
+				if (arr[i+1]==arr[i])arr.splice(i,1);
+			}
+			return arr;
+		}
+
+		WordUtils.splitWordBySpecial=function(str){
+			var rst;
+			rst=[];
+			var i=0,len=0;
+			len=str.length;
+			var tStart=NaN;
+			var tEnd=NaN;
+			tStart=0;
+			tEnd=tStart;
+			var tChar;
+			var lastChar=0;
+			lastChar=-1;
+			while (tEnd < len){
+				tChar=str.charAt(tEnd);
+				if (PingYinDic.checkIsHasSpecialStr(tChar)){
+					rst.push(str.substring(tStart,tEnd),tChar);
+					lastChar=tEnd;
+					tStart=tEnd+1;
+					tEnd=tStart;
+					}else{
+					tEnd++;
+				}
+			}
+			if (tStart > lastChar&&tStart<len){
+				rst.push(str.substring(tStart));
+			}
+			return rst;
+		}
+
+		WordUtils.arr2keyObj=function(arr,KeyList){
+			var rst;
+			rst=new Object();
+			var i=0,len=0;
+			len=KeyList.length;
+			for (i=0;i < len;i++){
+				rst[KeyList[i]]=arr[i];
+			}
+			return rst;
+		}
+
+		WordUtils.typeDic=null
+		return WordUtils;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.PingYinDic
+	var PingYinDic=(function(){
+		function PingYinDic(){
+			this.pinYinList=null;
+			this.charDic=null;
+			this.headDic=null;
+			this.pinYinList=[];
+		}
+
+		__class(PingYinDic,'nlp.PingYinDic');
+		var __proto=PingYinDic.prototype;
+		__proto.addIfOK=function(line){
+			if (PingYinDic.isPinYin(line)){
+				this.pinYinList.push(line);
+			}
+		}
+
+		__proto.makeCharDic=function(){
+			this.charDic={};
+			this.headDic={};
+			var i=0,len=0;
+			len=this.pinYinList.length;
+			for (i=0;i < len;i++){
+				this.addWordToDic(this.pinYinList[i]);
+			}
+		}
+
+		__proto.addWordToDic=function(word){
+			var charList;
+			charList=word.split("");
+			if (!charList.length)return;
+			var i=0,len=0;
+			len=charList.length;
+			var tChar;
+			tChar=charList[0];
+			this.headDic[tChar]=tChar;
+			for (i=0;i < len;i++){
+				tChar=charList[i];
+				this.charDic[tChar]=tChar;
+			}
+		}
+
+		PingYinDic.checkIsHasSpecialStr=function(str){
+			var pattern=new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>《》/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？]");
+			if (pattern.test(str)){
+				return true;
+			}
+			return false;
+		}
+
+		PingYinDic.hasChina=function(obj){
+			var reg=/[\u4E00-\u9FA5\uF900-\uFA2D]/;
+			return reg.test(obj);
+		}
+
+		PingYinDic.isPinYin=function(line){
+			if (line.length < 1)
+				return false;
+			if (line.charAt(0)=="∶")return false;
+			if (PingYinDic.checkIsHasSpecialStr(line))
+				return false;
+			if (PingYinDic.hasChina(line))
+				return false;
+			var char0;
+			char0=line.charAt(0);
+			var charCode0=0;
+			charCode0=line.charCodeAt(0);
+			return true;
+		}
+
+		PingYinDic.isNumChar=function(char){
+			return PingYinDic.NumCharDic[char];
+		}
+
+		PingYinDic.isEnglishChar=function(char){
+			return PingYinDic.EnglishCharDic[char];
+		}
+
+		PingYinDic.inits=function(){
+			PingYinDic.DebugDic=WordUtils.arrToDic(PingYinDic.DebugChars);
+			var i=0,len=0;
+			var start=0;
+			start="A".charCodeAt(0);
+			len="Z".charCodeAt(0);
+			for (i=start;i <=len;i++){
+				PingYinDic.EnglishCharDic[String.fromCharCode(i)]=true;
+			}
+			start="a".charCodeAt(0);
+			len="z".charCodeAt(0);
+			for (i=start;i <=len;i++){
+				PingYinDic.EnglishCharDic[String.fromCharCode(i)]=true;
+			}
+			for (i=0;i < 10;i++){
+				PingYinDic.NumCharDic[i]=true;
+			}
+		}
+
+		PingYinDic.DebugDic=null
+		PingYinDic.EnglishCharDic={};
+		PingYinDic.NumCharDic={};
+		__static(PingYinDic,
+		['DebugChars',function(){return this.DebugChars=["’"];}
+		]);
+		PingYinDic.__init$=function(){
+			;;
+			PingYinDic.inits();
+		}
+
+		return PingYinDic;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordDicParser
+	var WordDicParser=(function(){
+		function WordDicParser(){
+			this.complete=null;
+			this.wordList=null;
+			this.vocList=null;
+			this.trie=null;
+			this.cutter=null;
+			this.wordList=[];
+			this.vocList=[];
+			this.trie=new Trie();
+		}
+
+		__class(WordDicParser,'nlp.WordDicParser');
+		var __proto=WordDicParser.prototype;
+		__proto.loadDic=function(filePath,complete){
+			this.complete=complete;
+			Laya.loader.load(filePath,Handler.create(this,this.onFileLoaded),null,"text");
+		}
+
+		__proto.onFileLoaded=function(txt){
+			this.initByDicTxt(txt);
+			if (this.complete){
+				this.complete.run();
+			}
+		}
+
+		__proto.initByDicTxt=function(txt){
+			var lines;
+			lines=txt.split("\n");
+			var pinyin;
+			pinyin=new PingYinDic();
+			this.wordList=[];
+			var tWord;
+			var i=0,len=0;
+			len=lines.length;
+			var tLine;
+			for (i=0;i < len;i++){
+				tLine=lines[i];
+				tLine=tLine.replace("\r","");
+				pinyin.addIfOK(tLine);
+				if (tLine.charAt(0)=="*"){
+					if (tWord)tWord.wordParseComplete();
+					tWord=new WordParser();
+					tWord.addHead(tLine);
+					this.wordList.push(tWord);
+					}else{
+					if (tWord){
+						tWord.addLine(tLine);
+					}
+				}
+			}
+			if (tWord)tWord.wordParseComplete();
+			console.log("word count:",this.wordList.length,this.wordList);
+			pinyin.makeCharDic();
+			console.log(pinyin);
+			this.addToWordList(this.wordList);
+			console.log("vocList:",this.vocList);
+			this.trie.buildByWordList(this.vocList);
+			console.log("trie:",this.trie);
+			this.cutter=new WordCutter();
+			this.cutter.trie=this.trie;
+		}
+
+		__proto.cut=function(str){
+			return this.cutter.cut(str);
+		}
+
+		__proto.addToWordList=function(wList){
+			var i=0,len=0;
+			len=wList.length;
+			var tWord;
+			for (i=0;i < len;i++){
+				tWord=wList[i];
+				this.addWordToVocList(tWord);
+			}
+		}
+
+		__proto.addWordToVocList=function(word){
+			var tList;
+			tList=word.wordList;
+			if (!tList)return;
+			var i=0,len=0;
+			len=tList.length;
+			for (i=0;i < len;i++){
+				this.vocList.push(tList[i]);
+			}
+		}
+
+		__static(WordDicParser,
+		['I',function(){return this.I=new WordDicParser();}
+		]);
+		return WordDicParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordOne
+	var WordOne=(function(){
+		function WordOne(){
+			this.oWord=null;
+			this.word=null;
+			this.pinyin=null;
+			this.twPY=null;
+			this.type=null;
+			this.detail=null;
+			this.lines=null;
+			this.des=null;
+			this.detailParsed=false;
+			this.lines=[];
+		}
+
+		__class(WordOne,'nlp.WordOne');
+		var __proto=WordOne.prototype;
+		__proto.addLine=function(line){
+			this.lines.push(line);
+		}
+
+		__proto.parseEnd=function(removeLast){
+			if (removeLast)this.lines.pop();
+		}
+
+		__proto.parseDetail=function(){
+			if (this.detailParsed)return;
+			this.detailParsed=true;
+			this.des=[];
+			var i=0,len=0;
+			len=this.lines.length;
+			var tDes;
+			var tLine;
+			for (i=0;i < len;i++){
+				tLine=this.lines[i];
+				if (tLine.length==1){
+					console.log("one:",tLine);
+				}
+				if (WordOne.getKeyStartWords(tLine)){
+					tDes=[];
+					tDes.push(tLine);
+					this.des.push(tDes);
+				}else
+				if (WordOne.getKeyWords(tLine)){
+					tDes=[];
+					tDes.push(tLine);
+					this.des.push(tDes);
+					}else{
+					if (!tDes){
+						tDes=[];
+						this.des.push(tDes);
+					}
+					tDes.push(tLine);
+				}
+			}
+		}
+
+		WordOne.getKeyWords=function(str){
+			var i=0,len=0;
+			len=WordOne.DesKeyWords.length;
+			for (i=0;i < len;i++){
+				if (str.indexOf(WordOne.DesKeyWords[i])>=0){
+					return WordOne.DesKeyWords[i];
+				}
+			}
+			return null;
+		}
+
+		WordOne.getKeyStartWords=function(str){
+			var i=0,len=0;
+			len=WordOne.DesKeyStartWords.length;
+			for (i=0;i < len;i++){
+				if (str.indexOf(WordOne.DesKeyStartWords[i])==0){
+					return WordOne.DesKeyStartWords[i];
+				}
+			}
+			return null;
+		}
+
+		__static(WordOne,
+		['DesKeyWords',function(){return this.DesKeyWords=["：","如:","∶表示","同\“","另见"];},'DesKeyStartWords',function(){return this.DesKeyStartWords=["∶","：","用在","姓"];}
+		]);
+		return WordOne;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.WordParser
+	var WordParser=(function(){
+		function WordParser(){
+			this.word=null;
+			this.alasDic=null;
+			this.lineCount=0;
+			this.part=null;
+			this.tWord=null;
+			this.wordList=null;
+			this._isParsed=false;
+			this.lines=null;
+			this.preLine=null;
+			this.preIsPinYin=false;
+			this.lines=[];
+			this.wordList=[];
+			this.alasDic={};
+			this._isParsed=false;
+		}
+
+		__class(WordParser,'nlp.WordParser');
+		var __proto=WordParser.prototype;
+		__proto.wordParseComplete=function(){
+			if (this._isParsed)return;
+			var i=0,len=0;
+			len=this.wordList.length;
+			for (i=0;i < len;i++){
+				(this.wordList [i]).parseDetail();
+			}
+		}
+
+		__proto.addToAlasDic=function(word){
+			word=word.replace("（","").replace("）","");
+			this.alasDic[word]=word;
+		}
+
+		__proto.addLine=function(line){
+			this.lines.push(line);
+			var tLine;
+			tLine=line;
+			var isPinYin=false;
+			isPinYin=false;
+			if (line.length==1&&this.alasDic[line]){
+				tLine=this.preLine;
+			}else
+			if (line.charAt(0)=="（"){
+				this.addToAlasDic(line);
+				tLine=this.preLine;
+			}else
+			if (line.charAt(0)=="〖"){
+				if (this.tWord){
+					this.tWord.addLine(line);
+				}
+			}else
+			if (line.charAt(0)=="∶"){
+				if (this.tWord){
+					this.tWord.addLine(line);
+				}
+			}else
+			if (line.charAt(0)=="【"){
+				if (this.tWord){
+					this.tWord.type=StringTool.getBetween(line,"【","】");
+				}
+			}else
+			if (line.indexOf("详细解释：")>=0){
+				tLine=line.replace("详细解释：","");
+				this.tWord=null;
+			}else
+			if (line.indexOf("部首：")>=0){
+				this.part=line.replace("部首：","").replace("；","");
+			}else
+			if (line.indexOf("笔画数：")>=0){
+				this.lineCount=parseInt(line.replace("笔画数：",""));
+			}else
+			if (line.indexOf("基本解释：")>=0){
+				tLine=this.word;
+			}else
+			if (PingYinDic.isPinYin(line)){
+				if (this.preIsPinYin){
+					if (this.tWord){
+						this.tWord.twPY=line;
+					}
+					}else{
+					if (this.tWord){
+						this.tWord.parseEnd(true);
+					}
+					this.tWord=this.createWord();
+					this.tWord.word=this.preLine;
+					this.tWord.pinyin=line;
+					isPinYin=true;
+				}
+				}else{
+				if (this.tWord){
+					this.tWord.addLine(line);
+				}
+			}
+			this.preLine=tLine;
+			this.preIsPinYin=isPinYin;
+		}
+
+		__proto.addHead=function(line){
+			var tArr;
+			tArr=line.split(" ");
+			var tt;
+			tt=tArr[0];
+			this.word=tt.charAt(1);
+		}
+
+		__proto.createWord=function(){
+			var rst;
+			rst=new WordOne();
+			rst.word=this.word;
+			rst.oWord=this;
+			this.wordList.push(rst);
+			return rst;
+		}
+
+		return WordParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.cutwords.WordPiece
+	var WordPiece=(function(){
+		function WordPiece(){
+			this.word=null;
+			this.start=0;
+			this.end=0;
+			this.wordRef=null;
+			this.type=null;
+			this.typeO=null;
+		}
+
+		__class(WordPiece,'nlp.cutwords.WordPiece');
+		var __proto=WordPiece.prototype;
+		__proto.update=function(){
+			if (this.wordRef){
+				this.word=this.wordRef.word;
+			}
+			return this;
+		}
+
+		return WordPiece;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.cutwords.CharDicCutter
+	var CharDicCutter=(function(){
+		function CharDicCutter(){
+			this.allDic={};
+			this.typeDic={};
+		}
+
+		__class(CharDicCutter,'nlp.cutwords.CharDicCutter');
+		var __proto=CharDicCutter.prototype;
+		__proto.addCutDic=function(type,charDic){
+			var tConfig;
+			tConfig={};
+			tConfig.type=type;
+			tConfig.charDic=charDic;
+			var key;
+			for (key in charDic){
+				this.allDic[key]=tConfig;
+			};
+			var typeO;
+			typeO={};
+			typeO.typecns=[type];
+			typeO.types=[type];
+			this.typeDic[type]=typeO;
+		}
+
+		__proto.adptWordPiece=function(wordPiece){
+			wordPiece.typeO=this.typeDic[wordPiece.type];
+			return wordPiece;
+		}
+
+		__proto.findMaxWord=function(str,tPos){
+			var tChar;
+			tChar=str.charAt(tPos);
+			var tCutConfig;
+			tCutConfig=this.allDic[tChar];
+			if (!tCutConfig)return null;
+			var tPiece;
+			tPiece=new WordPiece();
+			tPiece.start=tPos;
+			tPiece.end=tPos+1;
+			var charDic;
+			charDic=tCutConfig.charDic;
+			var start=0;
+			start=tPos;
+			var end=0;
+			end=tPos;
+			while (charDic[tChar]){
+				tPiece.end=tPiece.end+1;
+				if (tPiece.end >=str.length)break ;
+				tChar=str.charAt(tPiece.end);
+			}
+			tPiece.word=str.substring(tPiece.start,tPiece.end);
+			tPiece.type=tCutConfig.type;
+			return this.adptWordPiece(tPiece);
+		}
+
+		__proto.findMaxWordR=function(str,tPos){
+			var tChar;
+			tChar=str.charAt(tPos);
+			var tCutConfig;
+			tCutConfig=this.allDic[tChar];
+			if (!tCutConfig)return null;
+			var tPiece;
+			tPiece=new WordPiece();
+			tPiece.start=tPos;
+			tPiece.end=tPos+1;
+			var charDic;
+			charDic=tCutConfig.charDic;
+			var start=0;
+			start=tPos;
+			var end=0;
+			end=tPos;
+			while (charDic[tChar]){
+				tPiece.start=start;
+				start--;
+				if (start<0)break ;
+				tChar=str.charAt(start);
+			}
+			tPiece.word=str.substring(tPiece.start,tPiece.end);
+			tPiece.type=tCutConfig.type;
+			return this.adptWordPiece(tPiece);
+		}
+
+		return CharDicCutter;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.cutwords.WordCutter
+	var WordCutter=(function(){
+		function WordCutter(){
+			this.trie=null;
+			this.typeDic=null;
+			this.charDicCutter=null;
+			this.init();
+		}
+
+		__class(WordCutter,'nlp.cutwords.WordCutter');
+		var __proto=WordCutter.prototype;
+		__proto.init=function(){
+			this.charDicCutter=new CharDicCutter();
+			this.charDicCutter.addCutDic("NUMBER",PingYinDic.NumCharDic);
+			this.charDicCutter.addCutDic("ENG",PingYinDic.EnglishCharDic);
+		}
+
+		__proto.cut=function(str){
+			var splitStrs;
+			splitStrs=WordUtils.splitWordBySpecial(str);
+			console.log("cutStr:",str);
+			console.log("split:",splitStrs);
+			var i=0,len=0;
+			var rst;
+			var tempRst;
+			rst=[];
+			len=splitStrs.length;
+			for (i=0;i < len;i++){
+				tempRst=this.cutSmallPiece(splitStrs[i]);
+				rst=rst.concat(tempRst);
+			}
+			return rst;
+		}
+
+		__proto.cutSmallPiece=function(str){
+			console.log("cutSmall:",str);
+			var rst;
+			rst=this.cutWork(str);
+			var score=NaN;
+			score=WordUtils.scoreWordList(rst);
+			console.log("cut:"+score,rst);
+			var rst1;
+			rst1=this.cutWorkR(str);
+			var score1=NaN;
+			score1=WordUtils.scoreWordList(rst1);
+			console.log("cut:"+score1,rst1);
+			var isSame=false;
+			isSame=WordUtils.isWordListSame(rst,rst1);
+			console.log("isSame:",isSame);
+			if (!isSame){
+				if (score > score1){
+					return rst;
+					}else{
+					return rst1;
+				}
+			}
+			return rst;
+		}
+
+		__proto.cutToMap=function(str){
+			var i=0,len=0;
+			len=str.length;
+			var map;
+			map=new MapStruct();
+			for (i=0;i < len;i++){
+				this.findWordToMap(str,i,map);
+			};
+			var wList;
+			wList=map.findMaxWeightPath(str.length);
+			console.log("wList:",wList);
+		}
+
+		__proto.findWordToMap=function(str,pos,map){
+			var start=0;
+			start=pos;
+			var tChar;
+			var tchar;
+			tchar=str.charAt(pos);
+			var tTrieNode;
+			tTrieNode=this.trie.findByChar(tchar);
+			if (!tTrieNode){
+				map.addEdge(start,pos+1,WordUtils.getWordScore(tchar),tchar);
+			}
+			while (tTrieNode){
+				if (tTrieNode.isWord()){
+					map.addEdge(start,pos+1,-1,tTrieNode);
+				}
+				pos++;
+				tchar=str.charAt(pos);
+				tTrieNode=tTrieNode.findByChar(tchar);
+			}
+		}
+
+		__proto.cutWork=function(str){
+			var tPos=0;
+			tPos=0;
+			var rst;
+			rst=[];
+			var tPiece;
+			while (tPos < str.length){
+				tPiece=this.findMaxWord(str,tPos);
+				if (!tPiece)break ;
+				rst.push(tPiece);
+				tPos=tPiece.end;
+			}
+			return rst;
+		}
+
+		__proto.cutWorkR=function(str){
+			var tPos=0;
+			tPos=str.length-1;
+			var rst;
+			rst=[];
+			var tPiece;
+			while (tPos >=0){
+				tPiece=this.findMaxWordR(str,tPos);
+				if (!tPiece)break ;
+				rst.push(tPiece);
+				tPos=tPiece.start-1;
+			}
+			rst.reverse();
+			return rst;
+		}
+
+		__proto.adptPiece=function(piece){
+			if (piece.word==" ")debugger;
+			piece.update();
+			if (this.typeDic){
+				piece.typeO=this.typeDic.getWordType(piece.word);
+			}
+			return piece;
+		}
+
+		__proto.findMaxWord=function(str,pos){
+			(pos===void 0)&& (pos=0);
+			var tPiece;
+			tPiece=this.charDicCutter.findMaxWord(str,pos);
+			if (tPiece)return tPiece;
+			var tchar;
+			tchar=str.charAt(pos);
+			var tTrieNode;
+			tTrieNode=this.trie.findByChar(tchar);
+			tPiece=new WordPiece();
+			tPiece.start=pos;
+			tPiece.end=pos+1;
+			if (!tTrieNode){
+				tPiece.word=tchar;
+				tPiece.type="new";
+				return this.adptPiece(tPiece);
+			}
+			if (tTrieNode.isWord()){
+				tPiece.end=pos+1;
+				tPiece.wordRef=tTrieNode.word;
+				}else{
+				tPiece.word=tchar;
+				tPiece.type="new";
+			};
+			var end=0;
+			end=pos;
+			var next;
+			while (tTrieNode){
+				end++;
+				if (end >=str.length){
+					break ;
+				}
+				tchar=str.charAt(end);
+				next=tTrieNode.findByChar(tchar);
+				if (!next)break ;
+				tTrieNode=next;
+				if (tTrieNode.isWord()){
+					tPiece.end=end+1;
+					tPiece.wordRef=tTrieNode.word;
+				}
+			}
+			return this.adptPiece(tPiece);
+		}
+
+		__proto.findMaxWordR=function(str,pos){
+			(pos===void 0)&& (pos=-2);
+			if (pos==-2){
+				pos=str.length-1;
+			};
+			var tPiece;
+			tPiece=this.charDicCutter.findMaxWordR(str,pos);
+			if (tPiece)return tPiece;
+			var tchar;
+			tchar=str.charAt(pos);
+			var tTrieNode;
+			tTrieNode=this.trie.findByCharR(tchar);
+			tPiece=new WordPiece();
+			tPiece.start=pos;
+			tPiece.end=pos+1;
+			if (!tTrieNode){
+				tPiece.word=tchar;
+				tPiece.type="new";
+				return this.adptPiece(tPiece);
+			}
+			if (tTrieNode.isWord()){
+				tPiece.end=pos+1;
+				tPiece.wordRef=tTrieNode.word;
+			}
+			if (!tTrieNode.isWord()){
+				tPiece.word=tchar;
+				tPiece.type="new";
+			};
+			var start=0;
+			start=pos;
+			var next;
+			while (tTrieNode){
+				start--;
+				if (start < 0){
+					break ;
+				}
+				tchar=str.charAt(start);
+				next=tTrieNode.findByChar(tchar);
+				if (!next)break ;
+				tTrieNode=next;
+				if (tTrieNode.isWord()){
+					tPiece.start=start;
+					tPiece.wordRef=tTrieNode.word;
+				}
+			}
+			return this.adptPiece(tPiece);
+		}
+
+		return WordCutter;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.dictools.TypeDefine
+	var TypeDefine=(function(){
+		function TypeDefine(){}
+		__class(TypeDefine,'nlp.dictools.TypeDefine');
+		TypeDefine.getCHType=function(type){
+			return TypeDefine.TypeDesDic[type] || "未知";
+		}
+
+		__static(TypeDefine,
+		['TypeDesDic',function(){return this.TypeDesDic={
+				"a":"形容词",
+				"ad":"副形词",
+				"ag":"形容词性语素",
+				"al":"形容词性惯用语",
+				"an":"名形词",
+				"b":"区别词",
+				"begin":"仅用于始##始",
+				"bg":"区别语素",
+				"bl":"区别词性惯用语",
+				"c":"连词",
+				"cc":"并列连词",
+				"d":"副词",
+				"dg":"辄,俱,复之类的副词",
+				"dl":"连语",
+				"e":"叹词",
+				"end":"仅用于终##终",
+				"f":"方位词",
+				"g":"学术词汇",
+				"gb":"生物相关词汇",
+				"gbc":"生物类别",
+				"gc":"化学相关词汇",
+				"gg":"地理地质相关词汇",
+				"gi":"计算机相关词汇",
+				"gm":"数学相关词汇",
+				"gp":"物理相关词汇",
+				"h":"前缀",
+				"i":"成语",
+				"j":"简称略语",
+				"k":"后缀",
+				"l":"习用语",
+				"m":"数词",
+				"mg":"数语素",
+				"Mg":"甲乙丙丁之类的数词",
+				"mq":"数量词",
+				"n":"名词",
+				"nb":"生物名",
+				"nba":"动物名",
+				"nbc":"动物纲目",
+				"nbp":"植物名",
+				"nf":"食品，比如“薯片”",
+				"ng":"名词性语素",
+				"nh":"医药疾病等健康相关名词",
+				"nhd":"疾病",
+				"nhm":"药品",
+				"ni":"机构相关（不是独立机构名）",
+				"nic":"下属机构",
+				"nis":"机构后缀",
+				"nit":"教育相关机构",
+				"nl":"名词性惯用语",
+				"nm":"物品名",
+				"nmc":"化学品名",
+				"nn":"工作相关名词",
+				"nnd":"职业",
+				"nnt":"职务职称",
+				"nr":"人名",
+				"nr1":"复姓",
+				"nr2":"蒙古姓名",
+				"nrf":"音译人名",
+				"nrj":"日语人名",
+				"ns":"地名",
+				"nsf":"音译地名",
+				"nt":"机构团体名",
+				"ntc":"公司名",
+				"ntcb":"银行",
+				"ntcf":"工厂",
+				"ntch":"酒店宾馆",
+				"nth":"医院",
+				"nto":"政府机构",
+				"nts":"中小学",
+				"ntu":"大学",
+				"nx":"字母专名",
+				"nz":"其他专名",
+				"o":"拟声词",
+				"p":"介词",
+				"pba":"介词'把'",
+				"pbei":"介词'被'",
+				"q":"量词",
+				"qg":"量词语素",
+				"qt":"时量词",
+				"qv":"动量词",
+				"r":"代词",
+				"rg":"代词性语素",
+				"Rg":"古汉语代词性语素",
+				"rr":"人称代词",
+				"ry":"疑问代词",
+				"rys":"处所疑问代词",
+				"ryt":"时间疑问代词",
+				"ryv":"谓词性疑问代词",
+				"rz":"指示代词",
+				"rzs":"处所指示代词",
+				"rzt":"时间指示代词",
+				"rzv":"谓词性指示代词",
+				"s":"处所词",
+				"t":"时间词",
+				"tg":"时间词性语素",
+				"u":"助词",
+				"ud":"助词",
+				"ude1":"的 底",
+				"ude2":"地",
+				"ude3":"得",
+				"udeng":"等 等等 云云",
+				"udh":"的话",
+				"ug":"过",
+				"uguo":"过",
+				"uj":"助词",
+				"ul":"连词",
+				"ule":"了 喽",
+				"ulian":"连 （“连小学生都会”）",
+				"uls":"来讲 来说 而言 说来",
+				"usuo":"所",
+				"uv":"连词",
+				"uyy":"一样 一般 似的 般",
+				"uz":"着",
+				"uzhe":"着",
+				"uzhi":"之",
+				"v":"动词",
+				"vd":"副动词",
+				"vf":"趋向动词",
+				"vg":"动词性语素",
+				"vi":"不及物动词（内动词",
+				"vl":"动词性惯用语",
+				"vn":"名动词",
+				"vshi":"动词“是”",
+				"vx":"形式动词",
+				"vyou":"动词“有”",
+				"w":"标点符号",
+				"wb":"百分号千分号，全角：％ ‰   半角：%",
+				"wd":"逗号，全角：， 半角：,",
+				"wf":"分号，全角：； 半角： ;",
+				"wh":"单位符号，全角：￥ ＄ ￡  °  ℃  半角：$",
+				"wj":"句号，全角：。",
+				"wky":"右括号，全角：） 〕  ］ ｝ 》  】 〗 〉 半角： ) ] { >",
+				"wkz":"左括号，全角：（ 〔  ［  ｛  《 【  〖 〈   半角：( [ { <",
+				"wm":"冒号，全角：： 半角： :",
+				"wn":"顿号，全角：、",
+				"wp":"破折号，全角：——   －－   ——－   半角：—  —-	",
+				"ws":"省略号，全角：……  …",
+				"wt":"叹号，全角：！",
+				"ww":"问号，全角：？",
+				"wyy":"右引号，全角：” ’ 』",
+				"wyz":"左引号，全角：“ ‘ 『",
+				"x":"字符串",
+				"xu":"网址URL",
+				"xx":"非语素字",
+				"y":"语气词(delete yg)",
+				"yg":"语气语素",
+				"z":"状态词",
+				"zg":"状态词"
+		};}
+
+		]);
+		return TypeDefine;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.dictools.TypeDicParser
+	var TypeDicParser=(function(){
+		function TypeDicParser(){
+			this.wordDic=null;
+			this.wordList=null;
+			this.wordDic={};
+		}
+
+		__class(TypeDicParser,'nlp.dictools.TypeDicParser');
+		var __proto=TypeDicParser.prototype;
+		__proto.getWordType=function(word){
+			var typeO;
+			typeO=this.wordDic[word];
+			if (!typeO)return null;
+			return typeO;
+		}
+
+		__proto.getWordTypeStr=function(word){
+			var typeO;
+			typeO=this.getWordType(word);
+			if (!typeO)return "unknow";
+			return typeO.types[0];
+			return typeO.types.join(";");
+		}
+
+		__proto.getWordTypeCNStr=function(word){
+			var typeO;
+			typeO=this.getWordType(word);
+			if (!typeO)return "unknow";
+			return typeO.typecns[0];
+			return typeO.typecns.join(";");
+		}
+
+		__proto.initByTxt=function(txt){
+			this.wordList=[];
+			var lines;
+			lines=txt.split("\n");
+			var i=0,len=0;
+			len=lines.length;
+			var tLine;
+			var tWordO;
+			for (i=0;i < len;i++){
+				tLine=lines[i];
+				tLine=tLine.replace("\r","");
+				tWordO=this.parseLine(tLine);
+				this.wordDic[tWordO.word]=tWordO;
+				this.wordList.push(this.createWordOneByTypeO(tWordO));
+			}
+		}
+
+		//if (i > 100)break;
+		__proto.parseLine=function(line){
+			var arr;
+			arr=line.split("	");
+			var rst;
+			rst={};
+			rst.word=arr[0];
+			rst.type={};
+			rst.types=[];
+			rst.typecns=[];
+			var i=0,len=0;
+			len=arr.length;
+			var score=NaN;
+			var ttype;
+			for (i=1;i < len;i+=2){
+				score=parseInt(arr[i+1]);
+				ttype=arr[i];
+				rst.type[ttype]=score;
+				rst.type[TypeDefine.getCHType(ttype)]=score;
+				rst.types.push(ttype);
+				rst.typecns.push(TypeDefine.getCHType(ttype));
+			}
+			return rst;
+		}
+
+		__proto.createWordOneByTypeO=function(typeO){
+			var rst;
+			rst=new WordOne();
+			rst.word=typeO.word;
+			return rst;
+		}
+
+		__proto.addType=function(wordList,types,typecns){
+			var tWordO;
+			var i=0,len=0;
+			len=wordList.length;
+			for (i=0;i < len;i++){
+				tWordO={};
+				tWordO.word=wordList[i];
+				tWordO.type={};
+				tWordO.types=types;
+				tWordO.typecns=typecns || types;
+				if(!this.wordDic[tWordO.word])
+					this.wordDic[tWordO.word]=tWordO;
+			}
+		}
+
+		__proto.addDefaultTypes=function(){
+			this.addType([":","/",".","。"],["punk"],["标点"]);
+			this.addType(["\t"],["TAB"],["TAB"]);
+			this.addType([" ","　"],["EMPTY"],["空格"]);
+		}
+
+		TypeDicParser.Tab="	";
+		return TypeDicParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.trie.TrieWord
+	var TrieWord=(function(){
+		function TrieWord(){
+			this.words=null;
+			this.word=null;
+			this.words=[];
+		}
+
+		__class(TrieWord,'nlp.trie.TrieWord');
+		var __proto=TrieWord.prototype;
+		__proto.addWord=function(word){
+			this.words.push(word);
+		}
+
+		TrieWord.createByWord=function(word){
+			var rst;
+			rst=new TrieWord();
+			rst.word=word;
+			return rst;
+		}
+
+		TrieWord.createTrieWordList=function(wordList){
+			var wordDic;
+			wordDic={};
+			var i=0,len=0;
+			len=wordList.length;
+			var tWord;
+			var tTrieWord;
+			for (i=0;i < len;i++){
+				tWord=wordList[i];
+				if (!wordDic[tWord.word]){
+					wordDic[tWord.word]=TrieWord.createByWord(tWord.word);
+				}
+				tTrieWord=wordDic[tWord.word];
+				tTrieWord.addWord(tWord);
+			};
+			var twList;
+			twList=[];
+			var key;
+			for (key in wordDic){
+				tTrieWord=wordDic[key];
+				twList.push(tTrieWord);
+			}
+			twList.sort(TrieWord.sortWordByLen);
+			return twList;
+		}
+
+		TrieWord.sortWordByLen=function(word0,word1){
+			return word0.word.length-word1.word.length;
+		}
+
+		return TrieWord;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.trie.Trie
+	var Trie=(function(){
+		function Trie(){
+			this.root=null;
+			this.rootR=null;
+		}
+
+		__class(Trie,'nlp.trie.Trie');
+		var __proto=Trie.prototype;
+		__proto.addWord=function(word){
+			this.root.addWord(0,word);
+			this.rootR.addWordR(0,word);
+		}
+
+		__proto.addWordIfNotExist=function(wordOne){
+			if (this.getWord(wordOne.word)){
+				return;
+			}
+			this.addWord(wordOne);
+		}
+
+		__proto.addWordOneList=function(wordList){
+			var trieWordList;
+			trieWordList=TrieWord.createTrieWordList(wordList);
+			var i=0,len=0;
+			len=trieWordList.length;
+			for (i=0;i < len;i++){
+				this.addWordIfNotExist(trieWordList[i]);
+			}
+		}
+
+		__proto.getWord=function(word){
+			if (!word)return null;
+			var tWord;
+			var tchar;
+			var tPos=0;
+			tPos=0;
+			tchar=word.charAt(tPos);
+			tWord=this.findByChar(tchar);
+			while (tWord){
+				tPos++;
+				if (tPos >=word.length)break ;
+				tchar=word.charAt(tPos);
+				tWord=tWord.findByChar(tchar);
+			}
+			if (tWord && tWord.isWord()&& tWord.word.word==word){
+				return tWord;
+			}
+			return null;
+		}
+
+		__proto.buildByWordList=function(wordList){
+			this.root=new TrieNode();
+			this.rootR=new TrieNode();
+			var twList;
+			twList=TrieWord.createTrieWordList(wordList);
+			var i=0,len=0;
+			len=twList.length;
+			var tWord;
+			for (i=0;i < len;i++){
+				tWord=twList[i];
+				this.addWord(tWord);
+			}
+		}
+
+		__proto.findByChar=function(char){
+			return this.root.findByChar(char);
+		}
+
+		__proto.findByCharR=function(char){
+			return this.rootR.findByChar(char);
+		}
+
+		return Trie;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.trie.TrieNode
+	var TrieNode=(function(){
+		function TrieNode(){
+			this.childDic=null;
+			this.char="";
+			this.word=null;
+			this.wordStr=null;
+			this.childDic={};
+		}
+
+		__class(TrieNode,'nlp.trie.TrieNode');
+		var __proto=TrieNode.prototype;
+		__proto.findByChar=function(char){
+			return this.childDic[char];
+		}
+
+		__proto.isWord=function(){
+			return this.word?true:false;
+		}
+
+		__proto.getChildByChar=function(char){
+			if (!this.childDic[char]){
+				this.childDic[char]=TrieNode.createByChar(char);
+			}
+			return this.childDic[char];
+		}
+
+		__proto.addWord=function(pos,word){
+			if (pos==word.word.length){
+				this.word=word;
+				this.wordStr=word.word;
+				return;
+			};
+			var tchar;
+			tchar=word.word.charAt(pos);
+			var tChild;
+			tChild=this.getChildByChar(tchar);
+			tChild.addWord(pos+1,word);
+		}
+
+		__proto.addWordR=function(pos,word){
+			if (pos==word.word.length){
+				this.word=word;
+				this.wordStr=word.word;
+				return;
+			};
+			var tchar;
+			tchar=word.word.charAt(word.word.length-1-pos);
+			var tChild;
+			tChild=this.getChildByChar(tchar);
+			tChild.addWordR(pos+1,word);
+		}
+
+		TrieNode.createByChar=function(char){
+			var rst;
+			rst=new TrieNode();
+			rst.char=char;
+			return rst;
+		}
+
+		return TrieNode;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.bookutils.BookParser
+	var BookParser=(function(){
+		function BookParser(){
+			this.lines=null;
+			this.index=0;
+		}
+
+		__class(BookParser,'nlp.bookutils.BookParser');
+		var __proto=BookParser.prototype;
+		__proto.setTxt=function(txt){
+			txt=txt.replace("\r","");
+			this.lines=txt.split("\n");
+			this.index=0;
+		}
+
+		__proto.reset=function(){
+			this.index=0;
+		}
+
+		__proto.getCurLine=function(){
+			return this.lines[this.index];
+		}
+
+		__proto.pre=function(){
+			this.index--;
+			this.normalIndex();
+			return this.getCurLine();
+		}
+
+		__proto.next=function(){
+			this.index++;
+			this.normalIndex();
+			return this.getCurLine();
+		}
+
+		__proto.normalIndex=function(){
+			if (this.index < 0)this.index=0;
+			if (this.index >=this.lines.length)this.index=this.lines.length-1;
+		}
+
+		BookParser.createByTxt=function(txt){
+			var rst;
+			rst=new BookParser();
+			rst.setTxt(txt);
+			return rst;
+		}
+
+		return BookParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.LineDP
+	var LineDP=(function(){
+		function LineDP(){
+			this.defaultValue=0;
+			this.relations=null;
+			this.tarDic=null;
+			this.preDic=null;
+			this.walkAble=null;
+		}
+
+		__class(LineDP,'nlp.algorithm.LineDP');
+		var __proto=LineDP.prototype;
+		__proto.dp=function(){
+			this.relations=TopoSort.sort(this.relations,"start","end",null);
+			var i=0,len=0;
+			len=this.relations.length;
+			this.tarDic={};
+			this.preDic={};
+			var tRelation;
+			var tEnd=0;
+			var tValue=NaN;
+			for (i=0;i < len;i++){
+				tRelation=this.relations[i];
+				tEnd=tRelation.end;
+				tValue=this.getWeight(tRelation.start)+tRelation.weight;
+				if (!this.preDic[tEnd] || this.getWeight(tRelation.end)< tValue){
+					this.preDic[tEnd]=tRelation;
+					this.tarDic[tEnd]=tValue;
+				}
+			}
+		}
+
+		__proto.dpWithStart=function(startList,startValue,defaultValue){
+			(startValue===void 0)&& (startValue=0);
+			(defaultValue===void 0)&& (defaultValue=0);
+			this.relations=TopoSort.sort(this.relations,"start","end",null);
+			var i=0,len=0;
+			this.tarDic={};
+			this.preDic={};
+			this.walkAble={};
+			this.defaultValue=defaultValue;
+			var hasStart=false;
+			hasStart=false;
+			if (startList && startList.length){
+				hasStart=true;
+				len=startList.length;
+				for (i=0;i < len;i++){
+					this.walkAble[startList[i]]=true;
+					this.setWeight(startList[i],startValue);
+				}
+			}
+			len=this.relations.length;
+			var tRelation;
+			var tEnd=0;
+			var tValue=NaN;
+			var tStart=0;
+			for (i=0;i < len;i++){
+				tRelation=this.relations[i];
+				tEnd=tRelation.end;
+				tStart=tRelation.start;
+				if (hasStart && !this.walkAble[tStart])continue ;
+				if (hasStart){
+					if (!this.walkAble[tStart])continue ;
+					this.walkAble[tEnd]=true;
+				}
+				tValue=this.getWeight(tRelation.start)+tRelation.weight;
+				if (!this.preDic[tEnd] || this.getWeight(tRelation.end)< tValue){
+					this.preDic[tEnd]=tRelation;
+					this.tarDic[tEnd]=tValue;
+				}
+			}
+		}
+
+		__proto.getMaxWeightPath=function(end){
+			var pathList;
+			pathList=[];
+			var tID=0;
+			tID=end;
+			while (this.preDic[tID]){
+				pathList.push(this.preDic[tID]);
+				tID=this.preDic[tID].start;
+			}
+			pathList.reverse();
+			return pathList;
+		}
+
+		__proto.getWeight=function(id){
+			if (!this.tarDic.hasOwnProperty(id)){
+				this.tarDic[id]=this.defaultValue;
+			}
+			return this.tarDic[id];
+		}
+
+		__proto.setWeight=function(id,value){
+			this.tarDic[id]=value;
+		}
+
+		LineDP.simpleDP=function(relations){
+			var lDP;
+			lDP=new LineDP();
+			lDP.relations=relations;
+			lDP.dp();
+			return lDP;
+		}
+
+		LineDP.dpEx=function(relations,startList,startValue,defaultValue){
+			(startValue===void 0)&& (startValue=0);
+			(defaultValue===void 0)&& (defaultValue=0);
+			var lDP;
+			lDP=new LineDP();
+			lDP.relations=relations;
+			lDP.dpWithStart(startList,startValue,defaultValue);
+			return lDP;
+		}
+
+		return LineDP;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.TopoSort
+	var TopoSort=(function(){
+		function TopoSort(){
+			this.startKey=null;
+			this.endKey=null;
+			this.relationList=null;
+			this.nodeDic=null;
+			this.otherSort=null;
+		}
+
+		__class(TopoSort,'nlp.algorithm.TopoSort');
+		var __proto=TopoSort.prototype;
+		__proto.findOKNode=function(startPos){
+			var i=0,len=0;
+			len=this.relationList.length;
+			var tRelation;
+			var tSelect;
+			var tI=0;
+			tI=-1;
+			for (i=startPos;i < len;i++){
+				tRelation=this.relationList[i];
+				if (this.nodeDic[tRelation[this.startKey]]==0){
+					if (this.otherSort==null)return i;
+					if (tI<0||this.otherSort(tRelation,this.relationList[tI])){
+						tI=i;
+					}
+				}
+			}
+			return tI;
+		}
+
+		__proto.switchPos=function(i,j){
+			var tp;
+			tp=this.relationList[i];
+			this.relationList[i]=this.relationList[j];
+			this.relationList[j]=tp;
+		}
+
+		__proto.removeRefer=function(tRelation){
+			this.nodeDic[tRelation[this.endKey]]=this.nodeDic[tRelation[this.endKey]]-1;
+		}
+
+		__proto.sort=function(relationList){
+			this.nodeDic={};
+			this.relationList=relationList;
+			var i=0,len=0;
+			var tRelation;
+			len=relationList.length;
+			for (i=0;i < len;i++){
+				tRelation=relationList[i];
+				if (!this.nodeDic[tRelation[this.startKey]]){
+					this.nodeDic[tRelation[this.startKey]]=0;
+				}
+				if (!this.nodeDic[tRelation[this.endKey]]){
+					this.nodeDic[tRelation[this.endKey]]=0;
+				}
+				this.nodeDic[tRelation[this.endKey]]=this.nodeDic[tRelation[this.endKey]]+1;
+			};
+			var okPos=0;
+			for (i=0;i < len;i++){
+				okPos=this.findOKNode(i);
+				if (okPos >=0){
+					this.removeRefer(relationList[okPos]);
+					this.switchPos(i,okPos);
+				}
+			}
+			return relationList;
+		}
+
+		TopoSort.sort=function(relationList,startKey,endKey,otherSort){
+			(startKey===void 0)&& (startKey="start");
+			(endKey===void 0)&& (endKey="end");
+			var tp;
+			tp=new TopoSort();
+			tp.startKey=startKey;
+			tp.endKey=endKey;
+			tp.otherSort=otherSort;
+			tp.sort(relationList);
+			return relationList;
+		}
+
+		return TopoSort;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.map.Edge
+	var Edge=(function(){
+		function Edge(){
+			this.data=null;
+			this.start=0;
+			this.end=0;
+			this.weight=0;
+		}
+
+		__class(Edge,'nlp.algorithm.map.Edge');
+		Edge.create=function(start,end,weight,data){
+			var rst;
+			rst=new Edge();
+			rst.start=start;
+			rst.end=end;
+			rst.weight=weight;
+			rst.data=data;
+			return rst;
+		}
+
+		return Edge;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.map.MapStruct
+	var MapStruct=(function(){
+		function MapStruct(){
+			this.vList=null;
+			this.eList=null;
+			this.reset();
+		}
+
+		__class(MapStruct,'nlp.algorithm.map.MapStruct');
+		var __proto=MapStruct.prototype;
+		__proto.reset=function(){
+			this.vList=[];
+			this.eList=[];
+		}
+
+		__proto.getVertex=function(id){
+			if (!this.vList[id])this.vList[id]=Vertex$1.createByID(id);
+			return this.vList[id];
+		}
+
+		__proto.addEdge=function(start,end,weight,data){
+			var edge;
+			edge=Edge.create(start,end,weight,data);
+			var startV;
+			var endV;
+			startV=this.getVertex(start);
+			endV=this.getVertex(end);
+			startV.addOut(end,weight);
+			endV.addIn(start,weight);
+			this.eList.push(edge);
+		}
+
+		__proto.findMaxWeightPath=function(endI){
+			return LineDP.dpEx(this.eList,[0],0,-999).getMaxWeightPath(endI);
+			return LineDP.simpleDP(this.eList).getMaxWeightPath(endI);
+		}
+
+		//var
+		__proto.buildMap=function(){}
+		MapStruct.showEdgeList=function(eList){
+			var i=0,len=0;
+		}
+
+		return MapStruct;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.map.Vertex
+	var Vertex$1=(function(){
+		function Vertex(){
+			this.inList=null;
+			this.outList=null;
+			this.inDic=null;
+			this.outDic=null;
+			this.id=0;
+			this.reset();
+		}
+
+		__class(Vertex,'nlp.algorithm.map.Vertex',null,'Vertex$1');
+		var __proto=Vertex.prototype;
+		__proto.reset=function(){
+			this.inList=[];
+			this.outList=[];
+			this.inDic={};
+			this.outDic={};
+		}
+
+		__proto.addEdge=function(edge){
+			if (edge.start==this.id){
+				this.addOut(edge.end,edge.weight);
+			}else
+			if (edge.end==this.id){
+				this.addIn(edge.start,edge.weight);
+			}
+		}
+
+		__proto.addIn=function(id,weight){
+			this.inList.push(id);
+			this.inDic[id]=weight;
+		}
+
+		__proto.addOut=function(id,weight){
+			this.outList.push(id);
+			this.outDic[id]=weight;
+		}
+
+		Vertex.createByID=function(id){
+			var rst;
+			rst=new Vertex();
+			rst.reset();
+			rst.id=id;
+			return rst;
+		}
+
+		return Vertex;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commonlayout.WordLayout
+	var WordLayout=(function(){
+		function WordLayout(){
+			this.spaceX=2;
+			this.spaceY=2;
+			this.border=2;
+		}
+
+		__class(WordLayout,'commonlayout.WordLayout');
+		var __proto=WordLayout.prototype;
+		__proto.layout=function(items,width,height){
+			var i=0,len=0;
+			len=items.length;
+			var tX=NaN,tY=NaN;
+			width=width-this.border;
+			height=height-this.border;
+			tX=this.border;
+			tY=this.border;
+			var tItem;
+			var tHeight=NaN;
+			for (i=0;i < len;i++){
+				tItem=items[i];
+				tItem.x=tX;
+				tItem.y=tY;
+				tX+=tItem.width+this.spaceX;
+				if (tX > width){
+					tY+=tItem.height+this.spaceY;
+					tItem.x=this.spaceX;
+					tItem.y=tY;
+					tX=tItem.width+this.spaceX;
+				}
+			}
+		}
+
+		return WordLayout;
 	})()
 
 
@@ -31891,7 +34031,7 @@ var Laya=window.Laya=(function(window,document){
 
 		ContextMenu.getContextMenuLang=function(str){
 			var langStr;
-			langStr=Sys.lang(str);
+			langStr=Sys$1.lang(str);
 			if(langStr!=str){
 				ContextMenu.revertLangDic[langStr]=str;
 			}
@@ -34627,6 +36767,30 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*...
+	*@author ...
+	*/
+	//class commoncomponent.AutoSizeLabel extends laya.ui.Label
+	var AutoSizeLabel=(function(_super){
+		function AutoSizeLabel(text){
+			(text===void 0)&& (text="");
+			AutoSizeLabel.__super.call(this,text);
+		}
+
+		__class(AutoSizeLabel,'commoncomponent.AutoSizeLabel',_super);
+		var __proto=AutoSizeLabel.prototype;
+		__getset(0,__proto,'text',_super.prototype._$get_text,function(value){
+			this.width=9999;
+			_super.prototype._$set_text.call(this,value);
+			this.textField.typeset();
+			this.width=this.textField.textWidth+5;
+		});
+
+		return AutoSizeLabel;
+	})(Label)
+
+
+	/**
 	*@private
 	*/
 	//class laya.utils.GraphicAnimation extends laya.display.FrameAnimation
@@ -35113,6 +37277,89 @@ var Laya=window.Laya=(function(window,document){
 
 		return GraphicAnimation;
 	})(FrameAnimation)
+
+
+	//class ui.nlpplatform.BookReaderUI extends laya.ui.View
+	var BookReaderUI=(function(_super){
+		function BookReaderUI(){
+			this.wordView=null;
+			this.bookInfo=null;
+			BookReaderUI.__super.call(this);
+		}
+
+		__class(BookReaderUI,'ui.nlpplatform.BookReaderUI',_super);
+		var __proto=BookReaderUI.prototype;
+		__proto.createChildren=function(){
+			View.regComponent("view.nlpplatform.BookReader",BookReader);
+			View.regComponent("view.nlpplatform.WordListViewer",WordListViewer);
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(BookReaderUI.uiView);
+		}
+
+		BookReaderUI.uiView={"type":"View","props":{"width":600,"runtime":"view.nlpplatform.BookReader","height":400},"child":[{"type":"WordListViewer","props":{"var":"wordView","top":0,"runtime":"view.nlpplatform.WordListViewer","right":0,"left":150,"bottom":0}},{"type":"Label","props":{"y":16,"x":16,"width":120,"var":"bookInfo","text":"label","styleSkin":"comp/label.png","height":53,"fontSize":20}}]};
+		return BookReaderUI;
+	})(View)
+
+
+	//class ui.nlpplatform.PlatformMainUI extends laya.ui.View
+	var PlatformMainUI=(function(_super){
+		function PlatformMainUI(){
+			this.openBtn=null;
+			this.bookReader=null;
+			PlatformMainUI.__super.call(this);
+		}
+
+		__class(PlatformMainUI,'ui.nlpplatform.PlatformMainUI',_super);
+		var __proto=PlatformMainUI.prototype;
+		__proto.createChildren=function(){
+			View.regComponent("view.nlpplatform.BookReader",BookReader);
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(PlatformMainUI.uiView);
+		}
+
+		PlatformMainUI.uiView={"type":"View","props":{"width":600,"height":400},"child":[{"type":"Button","props":{"y":9,"x":9,"var":"openBtn","skin":"comp/button.png","label":"打开"}},{"type":"BookReader","props":{"var":"bookReader","top":40,"runtime":"view.nlpplatform.BookReader","right":5,"left":5,"bottom":5}}]};
+		return PlatformMainUI;
+	})(View)
+
+
+	//class ui.nlpplatform.WordViewerUI extends laya.ui.View
+	var WordViewerUI=(function(_super){
+		function WordViewerUI(){
+			this.txt=null;
+			this.typeTxt=null;
+			WordViewerUI.__super.call(this);
+		}
+
+		__class(WordViewerUI,'ui.nlpplatform.WordViewerUI',_super);
+		var __proto=WordViewerUI.prototype;
+		__proto.createChildren=function(){
+			View.regComponent("commoncomponent.AutoSizeLabel",AutoSizeLabel);
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(WordViewerUI.uiView);
+		}
+
+		WordViewerUI.uiView={"type":"View","props":{"width":85,"height":60},"child":[{"type":"Label","props":{"y":30,"x":0,"width":85,"var":"txt","text":"文字","runtime":"commoncomponent.AutoSizeLabel","height":29,"fontSize":20,"color":"#0dcd62"}},{"type":"Label","props":{"y":0,"x":0,"width":85,"var":"typeTxt","text":"文字","runtime":"commoncomponent.AutoSizeLabel","height":29,"fontSize":20,"color":"#eac654"}}]};
+		return WordViewerUI;
+	})(View)
+
+
+	//class ui.nlpplatform.WordListViewerUI extends laya.ui.View
+	var WordListViewerUI=(function(_super){
+		function WordListViewerUI(){
+			this.container=null;
+			WordListViewerUI.__super.call(this);
+		}
+
+		__class(WordListViewerUI,'ui.nlpplatform.WordListViewerUI',_super);
+		var __proto=WordListViewerUI.prototype;
+		__proto.createChildren=function(){
+			laya.ui.Component.prototype.createChildren.call(this);
+			this.createView(WordListViewerUI.uiView);
+		}
+
+		WordListViewerUI.uiView={"type":"View","props":{"width":600,"height":400},"child":[{"type":"Box","props":{"var":"container","top":5,"right":5,"left":5,"bottom":5}}]};
+		return WordListViewerUI;
+	})(View)
 
 
 	//class laya.debug.ui.debugui.DebugPanelUI extends laya.ui.View
@@ -36189,6 +38436,170 @@ var Laya=window.Laya=(function(window,document){
 
 	/**
 	*...
+	*@ww
+	*/
+	//class view.nlpplatform.BookReader extends ui.nlpplatform.BookReaderUI
+	var BookReader=(function(_super){
+		function BookReader(){
+			this.book=null;
+			BookReader.__super.call(this);
+			Laya.stage.on("keydown",this,this.onKeyDown);
+		}
+
+		__class(BookReader,'view.nlpplatform.BookReader',_super);
+		var __proto=BookReader.prototype;
+		__proto.loadFile=function(filePath){
+			var fileStr;
+			fileStr=FileTools.readFile(filePath);
+			this.book=BookParser.createByTxt(fileStr);
+			this.showTxt(this.book.getCurLine());
+		}
+
+		__proto.showTxt=function(str){
+			str=str || "no words";
+			var words;
+			words=WordDicParser.I.cut(str);
+			this.wordView.setWordList(words);
+		}
+
+		__proto.onKeyDown=function(e){
+			switch(e.keyCode){
+				case 38:
+					this.showTxt(this.book.pre());
+					break ;
+				case 40:
+					this.showTxt(this.book.next());
+					break ;
+				}
+		}
+
+		return BookReader;
+	})(BookReaderUI)
+
+
+	/**
+	*...
+	*@ww
+	*/
+	//class view.nlpplatform.PlatformMain extends ui.nlpplatform.PlatformMainUI
+	var PlatformMain=(function(_super){
+		function PlatformMain(){
+			PlatformMain.__super.call(this);
+			this.openBtn.on("click",this,this.onOpenBtn);
+		}
+
+		__class(PlatformMain,'view.nlpplatform.PlatformMain',_super);
+		var __proto=PlatformMain.prototype;
+		__proto.onOpenBtn=function(){
+			DialogTools.showOpenFile("打开文件",Utils.bind(this.onOpenFileBack,this),DialogTools.txtFilterO);
+		}
+
+		__proto.onOpenFileBack=function(dataO){
+			debugger;
+			if (!dataO || !dataO.length)return;
+			var filePath;
+			filePath=dataO[0];
+			this.bookReader.loadFile(filePath);
+		}
+
+		return PlatformMain;
+	})(PlatformMainUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class view.nlpplatform.WordViewer extends ui.nlpplatform.WordViewerUI
+	var WordViewer=(function(_super){
+		function WordViewer(){
+			this.dataO=null;
+			WordViewer.__super.call(this);
+		}
+
+		__class(WordViewer,'view.nlpplatform.WordViewer',_super);
+		var __proto=WordViewer.prototype;
+		__proto.getWordTypeStr=function(word){
+			if (!word.typeO)return "unknow";
+			return word.typeO.typecns.join(":");
+		}
+
+		__proto.centerItem=function(item){
+			item.x=(this.width-item.width)*0.5;
+		}
+
+		__proto.setData=function(dataO){
+			this.dataO=dataO;
+			this.txt.text=dataO.word;
+			this.typeTxt.text="("+this.getWordTypeStr(dataO)+")";
+			var maxWidth=0;
+			maxWidth=Math.max(this.txt.width,this.typeTxt.width);
+			this.width=maxWidth;
+			this.centerItem(this.txt);
+			this.centerItem(this.typeTxt);
+		}
+
+		return WordViewer;
+	})(WordViewerUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class view.nlpplatform.WordListViewer extends ui.nlpplatform.WordListViewerUI
+	var WordListViewer=(function(_super){
+		function WordListViewer(){
+			this.layouter=null;
+			this.wList=null;
+			this.wordItemList=null;
+			WordListViewer.__super.call(this);
+			this.layouter=new WordLayout();
+			this.container.on("resize",this,this.freshUI);
+		}
+
+		__class(WordListViewer,'view.nlpplatform.WordListViewer',_super);
+		var __proto=WordListViewer.prototype;
+		__proto.clearPre=function(){
+			if (!this.wordItemList)return;
+			var i=0,len=0;
+			len=this.wordItemList.length;
+			var tItem;
+			for (i=0;i < len;i++){
+				tItem=this.wordItemList[i];
+				tItem.removeSelf();
+				Pool.recover("WordViewer",tItem);
+			}
+			this.wordItemList.length=0;
+		}
+
+		__proto.setWordList=function(wList){
+			this.wList=wList;
+			this.clearPre();
+			this.wordItemList=[];
+			var i=0,len=0;
+			var tWord;
+			len=wList.length;
+			for (i=0;i < len;i++){
+				tWord=Pool.getItemByClass("WordViewer",WordViewer);
+				tWord.setData(wList[i]);
+				this.wordItemList.push(tWord);
+				this.container.addChild(tWord);
+			}
+			this.freshUI();
+		}
+
+		__proto.freshUI=function(){
+			if (!this.wordItemList)return;
+			this.layouter.layout(this.wordItemList,this.container.width,this.container.height);
+		}
+
+		return WordListViewer;
+	})(WordListViewerUI)
+
+
+	/**
+	*...
 	*@author ww
 	*/
 	//class laya.debug.view.nodeInfo.nodetree.DebugPage extends laya.debug.ui.debugui.DebugPanelUI
@@ -36834,7 +39245,7 @@ var Laya=window.Laya=(function(window,document){
 	})(ToolBarUI)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,Render,View,LocalStorage,Timer,Browser,GraphicAnimation]);
+	Laya.__init([EventDispatcher,LoaderManager,LocalStorage,Render,Timer,View,Browser,GraphicAnimation,PingYinDic]);
 	new NLPPlatform();
 
 })(window,document,Laya);

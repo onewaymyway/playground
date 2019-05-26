@@ -93,6 +93,7 @@ package nodetools.devices
 			return {title:title,filters: [{name: '*.json', extensions: ['json']}]};
 		}
 		
+		public static var txtFilterO:Object= {title:"open txt file",filters: [{name: 'Txt', extensions: ['txt']}, {name: 'All Files', extensions: ['*']}]};
 		public static var imgFilterO:Object= {title:"open Img",filters: [{name: 'Images', extensions: ['jpg', 'png']}]};
 		public static var filterO:Object = {title:"open file",filters: [{name: 'Images', extensions: ['jpg', 'png', 'gif']}, {name: 'Movies', extensions: ['mkv', 'avi', 'mp4']}, {name: 'Custom File Type', extensions: ['as']}, {name: 'All Files', extensions: ['*']}]};
 	}

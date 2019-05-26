@@ -18,6 +18,8 @@
     <class path="src" />
     <class path="..\..\libs\laya\src" />
     <class path="..\..\libs\nodetools\src" />
+    <class path="..\..\libs\nlp\src" />
+    <class path="..\..\libs\commonui\src" />
   </classpaths>
   <!-- Build options -->
   <build>
