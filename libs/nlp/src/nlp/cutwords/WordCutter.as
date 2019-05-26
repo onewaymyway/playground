@@ -167,6 +167,19 @@ package nlp.cutwords
 			
 			return piece;
 		}
+		
+		public function findWordPiece(word:String):WordPiece
+		{
+			var wordPiece:WordPiece;
+			wordPiece = findMaxWord(word, 0);
+			if (wordPiece.word != word)
+			{
+				wordPiece = new WordPiece();
+				wordPiece.word = word;
+				wordPiece.type = "new";
+			}
+			return wordPiece;
+		}
 		public function findMaxWord(str:String, pos:int = 0):WordPiece
 		{
 			

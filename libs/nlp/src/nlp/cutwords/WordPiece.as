@@ -19,6 +19,12 @@ package nlp.cutwords
 			
 		}
 		
+		public function getWordTypeStr(word:WordPiece):String
+		{
+			if (!this.typeO) return "unknow";
+			return this.typeO.typecns.join(":");
+		}
+		
 		public function update():WordPiece
 		{
 			if (wordRef)

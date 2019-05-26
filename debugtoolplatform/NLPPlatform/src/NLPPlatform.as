@@ -31,6 +31,7 @@ package
 			UIConfig.touchScrollEnable = false;
 			Styles.buttonLabelColors = ["#ffffff", "#32cc6b", "#ff0000", "#C0C0C0"];
 			init();
+			trace("version:33");
 			var loadList:Array;
 			loadList = [{"url":"res/atlas/comp.json", "type":Loader.ATLAS}];
 			loadList.push({url:"data/CoreNatureDictionary.txt", type:Loader.TEXT });

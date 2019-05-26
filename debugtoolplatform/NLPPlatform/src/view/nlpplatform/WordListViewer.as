@@ -3,6 +3,7 @@ package view.nlpplatform
 	import commonlayout.WordLayout;
 	import laya.events.Event;
 	import laya.utils.Pool;
+	import nlp.tagging.TaggingBook;
 	import ui.nlpplatform.WordListViewerUI;
 	
 	/**
@@ -34,15 +35,42 @@ package view.nlpplatform
 			}
 			wordItemList.length = 0;
 		}
-		public function setWordList(wList:Array):void
+		
+		public var lines:Array;
+		public var book:TaggingBook;
+		public function setBook(book:TaggingBook):void
+		{
+			this.book = book;
+			book.line = 0;
+		}
+		
+		public function pre():void
+		{
+			book.pre();
+			showLine();
+		}
+		
+		public function next():void
+		{
+			book.next();
+			showLine();
+		}
+		public function showLine():void
+		{
+			var lineInfo:Object;
+			lineInfo = book.getCurLineInfo();
+			if (!lineInfo) return;
+			
+			setWordList(book.words,lineInfo.start,lineInfo.end);
+		}
+		public function setWordList(wList:Array,start:int,end:int):void
 		{
 			this.wList = wList;
 			clearPre();
 			wordItemList = [];
 			var i:int, len:int;
 			var tWord:WordViewer;
-			len = wList.length;
-			for (i = 0; i < len; i++)
+			for (i = start; i <= end; i++)
 			{
 				tWord = Pool.getItemByClass("WordViewer", WordViewer);
 				tWord.setData(wList[i]);

@@ -412,6 +412,7 @@ var Laya=window.Laya=(function(window,document){
 			UIConfig.touchScrollEnable=false;
 			Styles.buttonLabelColors=["#ffffff","#32cc6b","#ff0000","#C0C0C0"];
 			this.init();
+			console.log("version:33");
 			var loadList;
 			loadList=[{"url":"res/atlas/comp.json","type":"atlas"}];
 			loadList.push({url:"data/CoreNatureDictionary.txt",type:"text" });
@@ -16516,6 +16517,11 @@ var Laya=window.Laya=(function(window,document){
 
 		__class(WordPiece,'nlp.cutwords.WordPiece');
 		var __proto=WordPiece.prototype;
+		__proto.getWordTypeStr=function(word){
+			if (!this.typeO)return "unknow";
+			return this.typeO.typecns.join(":");
+		}
+
 		__proto.update=function(){
 			if (this.wordRef){
 				this.word=this.wordRef.word;
@@ -16753,6 +16759,17 @@ var Laya=window.Laya=(function(window,document){
 				piece.typeO=this.typeDic.getWordType(piece.word);
 			}
 			return piece;
+		}
+
+		__proto.findWordPiece=function(word){
+			var wordPiece;
+			wordPiece=this.findMaxWord(word,0);
+			if (wordPiece.word !=word){
+				wordPiece=new WordPiece();
+				wordPiece.word=word;
+				wordPiece.type="new";
+			}
+			return wordPiece;
 		}
 
 		__proto.findMaxWord=function(str,pos){
@@ -17738,6 +17755,153 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		return Vertex;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.tagging.TaggingWord
+	var TaggingWord=(function(){
+		function TaggingWord(){
+			this.word=null;
+			this.type=null;
+			this.meaning=null;
+			this.relations=[];
+			this.id=0;
+		}
+
+		__class(TaggingWord,'nlp.tagging.TaggingWord');
+		TaggingWord.createByWordPiece=function(word){
+			var rst;
+			rst=new TaggingWord();
+			rst.word=word.word;
+			rst.type=word.getWordTypeStr();
+			return rst;
+		}
+
+		TaggingWord.createByWordStr=function(word){
+			var wordPiece;
+		}
+
+		return TaggingWord;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.tagging.TaggingBook
+	var TaggingBook=(function(){
+		function TaggingBook(){
+			this.words=null;
+			this.lines=null;
+			this.index=0;
+		}
+
+		__class(TaggingBook,'nlp.tagging.TaggingBook');
+		var __proto=TaggingBook.prototype;
+		__proto.initByString=function(str){
+			var strLines;
+			strLines=str.split("\n");
+			var i=0,len=0;
+			len=strLines.length;
+			var lineSplit;
+			lineSplit=WordDicParser.I.cutter.findWordPiece("\n");
+			var wordList;
+			wordList=[];
+			for (i=0;i < len;i++){
+				if (i > 0){
+					wordList.push(TaggingWord.createByWordPiece(lineSplit));
+				}
+				TaggingBook.cutStr2Words(strLines[i],wordList);
+			}
+			this.words=wordList;
+			this.initLines();
+		}
+
+		__proto.initLines=function(){
+			this.lines=this.getLines();
+			this.index=0;
+		}
+
+		__proto.getLines=function(){
+			var rst;
+			var i=0,len=0;
+			rst=[];
+			len=this.words.length;
+			var tWord;
+			var tLineO;
+			for (i=0;i < len;i++){
+				tWord=this.words[i];
+				if (!tLineO){
+					tLineO={};
+					tLineO.start=i;
+					rst.push(tLineO);
+				}
+				if (tWord.word=="\n"){
+					tLineO.end=i;
+					tLineO=null;
+				}
+			}
+			if (tLineO){
+				tLineO.end=len-1;
+			}
+			return rst;
+		}
+
+		__proto.reset=function(){
+			this.index=0;
+		}
+
+		__proto.getCurLineInfo=function(){
+			return this.lines[this.index];
+		}
+
+		__proto.pre=function(){
+			this.index--;
+			this.normalIndex();
+			return this.getCurLineInfo();
+		}
+
+		__proto.next=function(){
+			this.index++;
+			this.normalIndex();
+			return this.getCurLineInfo();
+		}
+
+		__proto.normalIndex=function(){
+			if (this.index < 0)this.index=0;
+			if (this.index >=this.lines.length)this.index=this.lines.length-1;
+		}
+
+		__proto.initByData=function(dataO){}
+		__getset(0,__proto,'line',function(){
+			return this.index;
+			},function(value){
+			this.index=value;
+			this.normalIndex();
+		});
+
+		TaggingBook.cutStr2Words=function(str,tagWords){
+			var words;
+			words=WordDicParser.I.cut(str);
+			var tagWords;
+			var i=0,len=0;
+			len=words.length;
+			if(!tagWords)
+				tagWords=[];
+			var tWordPiece;
+			for (i=0;i < len;i++){
+				tWordPiece=words[i];
+				tagWords.push(TaggingWord.createByWordPiece(tWordPiece));
+			}
+			return tagWords;
+		}
+
+		return TaggingBook;
 	})()
 
 
@@ -37306,6 +37470,7 @@ var Laya=window.Laya=(function(window,document){
 		function PlatformMainUI(){
 			this.openBtn=null;
 			this.bookReader=null;
+			this.saveBtn=null;
 			PlatformMainUI.__super.call(this);
 		}
 
@@ -37317,7 +37482,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(PlatformMainUI.uiView);
 		}
 
-		PlatformMainUI.uiView={"type":"View","props":{"width":600,"height":400},"child":[{"type":"Button","props":{"y":9,"x":9,"var":"openBtn","skin":"comp/button.png","label":"打开"}},{"type":"BookReader","props":{"var":"bookReader","top":40,"runtime":"view.nlpplatform.BookReader","right":5,"left":5,"bottom":5}}]};
+		PlatformMainUI.uiView={"type":"View","props":{"width":600,"height":400},"child":[{"type":"Button","props":{"y":9,"x":9,"var":"openBtn","skin":"comp/button.png","label":"打开"}},{"type":"BookReader","props":{"var":"bookReader","top":40,"runtime":"view.nlpplatform.BookReader","right":5,"left":5,"bottom":5}},{"type":"Button","props":{"y":9,"x":110,"var":"saveBtn","skin":"comp/button.png","label":"保存"}}]};
 		return PlatformMainUI;
 	})(View)
 
@@ -38436,7 +38601,7 @@ var Laya=window.Laya=(function(window,document){
 
 	/**
 	*...
-	*@ww
+	*@author ww
 	*/
 	//class view.nlpplatform.BookReader extends ui.nlpplatform.BookReaderUI
 	var BookReader=(function(_super){
@@ -38451,24 +38616,18 @@ var Laya=window.Laya=(function(window,document){
 		__proto.loadFile=function(filePath){
 			var fileStr;
 			fileStr=FileTools.readFile(filePath);
-			this.book=BookParser.createByTxt(fileStr);
-			this.showTxt(this.book.getCurLine());
-		}
-
-		__proto.showTxt=function(str){
-			str=str || "no words";
-			var words;
-			words=WordDicParser.I.cut(str);
-			this.wordView.setWordList(words);
+			this.book=new TaggingBook();
+			this.book.initByString(fileStr);
+			this.wordView.setBook(this.book);
 		}
 
 		__proto.onKeyDown=function(e){
 			switch(e.keyCode){
 				case 38:
-					this.showTxt(this.book.pre());
+					this.wordView.pre();
 					break ;
 				case 40:
-					this.showTxt(this.book.next());
+					this.wordView.next();
 					break ;
 				}
 		}
@@ -38519,11 +38678,6 @@ var Laya=window.Laya=(function(window,document){
 
 		__class(WordViewer,'view.nlpplatform.WordViewer',_super);
 		var __proto=WordViewer.prototype;
-		__proto.getWordTypeStr=function(word){
-			if (!word.typeO)return "unknow";
-			return word.typeO.typecns.join(":");
-		}
-
 		__proto.centerItem=function(item){
 			item.x=(this.width-item.width)*0.5;
 		}
@@ -38531,7 +38685,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.setData=function(dataO){
 			this.dataO=dataO;
 			this.txt.text=dataO.word;
-			this.typeTxt.text="("+this.getWordTypeStr(dataO)+")";
+			this.typeTxt.text="("+dataO.type+")";
 			var maxWidth=0;
 			maxWidth=Math.max(this.txt.width,this.typeTxt.width);
 			this.width=maxWidth;
@@ -38553,6 +38707,8 @@ var Laya=window.Laya=(function(window,document){
 			this.layouter=null;
 			this.wList=null;
 			this.wordItemList=null;
+			this.lines=null;
+			this.book=null;
 			WordListViewer.__super.call(this);
 			this.layouter=new WordLayout();
 			this.container.on("resize",this,this.freshUI);
@@ -38573,14 +38729,35 @@ var Laya=window.Laya=(function(window,document){
 			this.wordItemList.length=0;
 		}
 
-		__proto.setWordList=function(wList){
+		__proto.setBook=function(book){
+			this.book=book;
+			book.line=0;
+		}
+
+		__proto.pre=function(){
+			this.book.pre();
+			this.showLine();
+		}
+
+		__proto.next=function(){
+			this.book.next();
+			this.showLine();
+		}
+
+		__proto.showLine=function(){
+			var lineInfo;
+			lineInfo=this.book.getCurLineInfo();
+			if (!lineInfo)return;
+			this.setWordList(this.book.words,lineInfo.start,lineInfo.end);
+		}
+
+		__proto.setWordList=function(wList,start,end){
 			this.wList=wList;
 			this.clearPre();
 			this.wordItemList=[];
 			var i=0,len=0;
 			var tWord;
-			len=wList.length;
-			for (i=0;i < len;i++){
+			for (i=start;i <=end;i++){
 				tWord=Pool.getItemByClass("WordViewer",WordViewer);
 				tWord.setData(wList[i]);
 				this.wordItemList.push(tWord);
@@ -38649,25 +38826,6 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
-	//class laya.debug.uicomps.RankListItem extends laya.debug.ui.debugui.comps.RankListItemUI
-	var RankListItem=(function(_super){
-		function RankListItem(){
-			RankListItem.__super.call(this);
-			Base64AtlasManager.replaceRes(RankListItemUI.uiView);
-			this.createView(RankListItemUI.uiView);
-		}
-
-		__class(RankListItem,'laya.debug.uicomps.RankListItem',_super);
-		var __proto=RankListItem.prototype;
-		__proto.createChildren=function(){}
-		return RankListItem;
-	})(RankListItemUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
 	//class laya.debug.view.nodeInfo.nodetree.FindNode extends laya.debug.ui.debugui.FindNodeUI
 	var FindNode=(function(_super){
 		function FindNode(){
@@ -38684,6 +38842,25 @@ var Laya=window.Laya=(function(window,document){
 
 		return FindNode;
 	})(FindNodeUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.uicomps.RankListItem extends laya.debug.ui.debugui.comps.RankListItemUI
+	var RankListItem=(function(_super){
+		function RankListItem(){
+			RankListItem.__super.call(this);
+			Base64AtlasManager.replaceRes(RankListItemUI.uiView);
+			this.createView(RankListItemUI.uiView);
+		}
+
+		__class(RankListItem,'laya.debug.uicomps.RankListItem',_super);
+		var __proto=RankListItem.prototype;
+		__proto.createChildren=function(){}
+		return RankListItem;
+	})(RankListItemUI)
 
 
 	/**
@@ -38826,26 +39003,6 @@ var Laya=window.Laya=(function(window,document){
 		__proto.createChildren=function(){}
 		return NodeTool;
 	})(NodeToolUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class laya.debug.view.nodeInfo.nodetree.NodeTreeSetting extends laya.debug.ui.debugui.NodeTreeSettingUI
-	var NodeTreeSetting=(function(_super){
-		function NodeTreeSetting(){
-			NodeTreeSetting.__super.call(this);
-			Base64AtlasManager.replaceRes(NodeTreeSettingUI.uiView);
-			this.createView(NodeTreeSettingUI.uiView);
-		}
-
-		__class(NodeTreeSetting,'laya.debug.view.nodeInfo.nodetree.NodeTreeSetting',_super);
-		var __proto=NodeTreeSetting.prototype;
-		//inits();
-		__proto.createChildren=function(){}
-		return NodeTreeSetting;
-	})(NodeTreeSettingUI)
 
 
 	/**
@@ -39089,6 +39246,26 @@ var Laya=window.Laya=(function(window,document){
 		]);
 		return NodeTree;
 	})(NodeTreeUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class laya.debug.view.nodeInfo.nodetree.NodeTreeSetting extends laya.debug.ui.debugui.NodeTreeSettingUI
+	var NodeTreeSetting=(function(_super){
+		function NodeTreeSetting(){
+			NodeTreeSetting.__super.call(this);
+			Base64AtlasManager.replaceRes(NodeTreeSettingUI.uiView);
+			this.createView(NodeTreeSettingUI.uiView);
+		}
+
+		__class(NodeTreeSetting,'laya.debug.view.nodeInfo.nodetree.NodeTreeSetting',_super);
+		var __proto=NodeTreeSetting.prototype;
+		//inits();
+		__proto.createChildren=function(){}
+		return NodeTreeSetting;
+	})(NodeTreeSettingUI)
 
 
 	/**
