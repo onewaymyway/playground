@@ -42,6 +42,7 @@ package view.nlpplatform
 		{
 			this.book = book;
 			book.line = 0;
+			showLine();
 		}
 		
 		public function pre():void

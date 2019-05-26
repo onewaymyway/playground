@@ -38732,6 +38732,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.setBook=function(book){
 			this.book=book;
 			book.line=0;
+			this.showLine();
 		}
 
 		__proto.pre=function(){
