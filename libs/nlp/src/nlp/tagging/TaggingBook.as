@@ -1,5 +1,6 @@
 package nlp.tagging 
 {
+	import commontoolkit.IDDicTool;
 	import nlp.WordDicParser;
 	import nlp.cutwords.WordPiece;
 	/**
@@ -9,11 +10,27 @@ package nlp.tagging
 	public class TaggingBook 
 	{
 		public var words:Array;
+		public var idWordDic:IDDicTool;
 		public function TaggingBook() 
 		{
-			
+			idWordDic = new IDDicTool();
 		}
+		public function toData():Object
+		{
+			var wList:Array;
+			wList = [];
+			var i:int, len:int;
+			len = words.length;
+			for (i = 0; i < len; i++)
+			{
+				wList.push(words[i].toData());
+			}
+			var rst:Object;
+			rst = {};
+			rst.words = wList;
+			return rst;
 		
+		}
 		public static function cutStr2Words(str:String,tagWords:Array=null):Array
 		{
 			var words:Array;
@@ -33,6 +50,7 @@ package nlp.tagging
 		}
 		public function initByString(str:String):void
 		{
+			
 			var strLines:Array;
 			strLines = str.split("\n");
 			var i:int, len:int;
@@ -53,6 +71,7 @@ package nlp.tagging
 				
 			}
 			words = wordList;
+			idWordDic.initByItems(words);
 			initLines();
 		}
 		
@@ -136,7 +155,21 @@ package nlp.tagging
 		
 		public function initByData(dataO:Object):void
 		{
-			
+			var wList:Array;
+			wList = dataO.words;
+			var i:int, len:int;
+			len = wList.length;
+			var wordList:Array;
+			wordList = [];
+			for (i = 0; i < len; i++)
+			{
+
+				wordList.push(TaggingWord.fromData(wList[i]));
+
+			}
+			words = wordList;
+			idWordDic.initByItems(words);
+			initLines();
 		}
 		
 	}

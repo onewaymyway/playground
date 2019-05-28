@@ -5,6 +5,7 @@ package view.nlpplatform
 	import nlp.WordDicParser;
 	import nlp.bookutils.BookParser;
 	import nlp.tagging.TaggingBook;
+	import nodetools.devices.FileManager;
 	import nodetools.devices.FileTools;
 	import ui.nlpplatform.BookReaderUI;
 	
@@ -24,10 +25,21 @@ package view.nlpplatform
 		
 		public function loadFile(filePath:String):void
 		{
-			var fileStr:String;
-			fileStr = FileTools.readFile(filePath);
 			book = new TaggingBook();
-			book.initByString(fileStr);
+			var fileStr:String;
+			var extension:String;
+			extension = FileTools.getExtensionName(filePath);
+			if (extension == NLPPlatFormConst.TaggingExtension)
+			{
+				book.initByData(FileManager.readJSONFile(filePath));
+			}else
+			{
+				fileStr = FileTools.readFile(filePath);
+			
+				book.initByString(fileStr);
+			}
+			
+			
 			wordView.setBook(book);
 			
 		}

@@ -19,6 +19,7 @@ package view.nlpplatform
 		}
 		
 		public var dataO:TaggingWord;
+		public var id:int;
 
 		
 		private function centerItem(item:Sprite):void
@@ -37,7 +38,11 @@ package view.nlpplatform
 			centerItem(txt);
 			centerItem(typeTxt);
 			
+			id = dataO.id;
+			
 		}
+		
+		
 		
 	}
 

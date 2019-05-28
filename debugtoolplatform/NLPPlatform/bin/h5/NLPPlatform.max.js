@@ -746,6 +746,22 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*...
+	*@author ww
+	*/
+	//class view.nlpplatform.NLPPlatFormConst
+	var NLPPlatFormConst=(function(){
+		function NLPPlatFormConst(){}
+		__class(NLPPlatFormConst,'view.nlpplatform.NLPPlatFormConst');
+		NLPPlatFormConst.TaggingExtension="nlptgf";
+		__static(NLPPlatFormConst,
+		['taggingFilterO',function(){return this.taggingFilterO={title:"open txt file",filters:[{name:'Txt',extensions:['txt']},{name:'nlptgf',extensions:['nlptgf']},{name:'All Files',extensions:['*']}]};}
+		]);
+		return NLPPlatFormConst;
+	})()
+
+
+	/**
 	*Config 用于配置一些全局参数。如需更改，请在初始化引擎之前设置。
 	*/
 	//class Config
@@ -6580,6 +6596,26 @@ var Laya=window.Laya=(function(window,document){
 				rst[tKey]=tItem;
 			}
 			return rst;
+		}
+
+		ObjectTools.toData=function(obj,keys){
+			var rst;
+			rst={};
+			var i=0,len=0;
+			len=keys.length;
+			for (i=0;i < len;i++){
+				rst[keys[i]]=obj[keys[i]];
+			}
+			return rst;
+		}
+
+		ObjectTools.fromData=function(obj,data,keys){
+			var i=0,len=0;
+			len=keys.length;
+			for (i=0;i < len;i++){
+				obj[keys[i]]=data[keys[i]];
+			}
+			return obj;
 		}
 
 		ObjectTools.sign="_";
@@ -17773,6 +17809,15 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__class(TaggingWord,'nlp.tagging.TaggingWord');
+		var __proto=TaggingWord.prototype;
+		__proto.toData=function(){
+			return ObjectTools.toData(this,TaggingWord.KEYS);
+		}
+
+		TaggingWord.fromData=function(data){
+			return ObjectTools.fromData(new TaggingWord(),data,TaggingWord.KEYS);
+		}
+
 		TaggingWord.createByWordPiece=function(word){
 			var rst;
 			rst=new TaggingWord();
@@ -17785,6 +17830,9 @@ var Laya=window.Laya=(function(window,document){
 			var wordPiece;
 		}
 
+		__static(TaggingWord,
+		['KEYS',function(){return this.KEYS=["word","type","meaning","relations","id"];}
+		]);
 		return TaggingWord;
 	})()
 
@@ -17797,12 +17845,28 @@ var Laya=window.Laya=(function(window,document){
 	var TaggingBook=(function(){
 		function TaggingBook(){
 			this.words=null;
+			this.idWordDic=null;
 			this.lines=null;
 			this.index=0;
+			this.idWordDic=new IDDicTool();
 		}
 
 		__class(TaggingBook,'nlp.tagging.TaggingBook');
 		var __proto=TaggingBook.prototype;
+		__proto.toData=function(){
+			var wList;
+			wList=[];
+			var i=0,len=0;
+			len=this.words.length;
+			for (i=0;i < len;i++){
+				wList.push(this.words[i].toData());
+			};
+			var rst;
+			rst={};
+			rst.words=wList;
+			return rst;
+		}
+
 		__proto.initByString=function(str){
 			var strLines;
 			strLines=str.split("\n");
@@ -17819,6 +17883,7 @@ var Laya=window.Laya=(function(window,document){
 				TaggingBook.cutStr2Words(strLines[i],wordList);
 			}
 			this.words=wordList;
+			this.idWordDic.initByItems(this.words);
 			this.initLines();
 		}
 
@@ -17877,7 +17942,21 @@ var Laya=window.Laya=(function(window,document){
 			if (this.index >=this.lines.length)this.index=this.lines.length-1;
 		}
 
-		__proto.initByData=function(dataO){}
+		__proto.initByData=function(dataO){
+			var wList;
+			wList=dataO.words;
+			var i=0,len=0;
+			len=wList.length;
+			var wordList;
+			wordList=[];
+			for (i=0;i < len;i++){
+				wordList.push(TaggingWord.fromData(wList[i]));
+			}
+			this.words=wordList;
+			this.idWordDic.initByItems(this.words);
+			this.initLines();
+		}
+
 		__getset(0,__proto,'line',function(){
 			return this.index;
 			},function(value){
@@ -17944,6 +18023,72 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		return WordLayout;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class commontoolkit.IDDicTool
+	var IDDicTool=(function(){
+		function IDDicTool(){
+			this.idDic=null;
+			this.tMax=0;
+			this.idKey="id";
+		}
+
+		__class(IDDicTool,'commontoolkit.IDDicTool');
+		var __proto=IDDicTool.prototype;
+		__proto.reset=function(){
+			this.idDic={};
+			this.tMax=1;
+		}
+
+		__proto.getItem=function(id){
+			return this.idDic[id];
+		}
+
+		__proto.addItem=function(item){
+			var tID=0;
+			tID=item[this.idKey];
+			if (tID && this.getItem(tID)==item)return;
+			item[this.idKey]=this.tMax;
+			this.tMax++;
+			this.idDic[item[this.idKey]]=item;
+		}
+
+		__proto.removeItem=function(item){
+			var tID=0;
+			tID=item[this.idKey];
+			if (tID && this.getItem(tID)==item){
+				delete this.idDic[tID];
+			}
+		}
+
+		__proto.initByItems=function(items){
+			this.reset();
+			var i=0,len=0;
+			len=items.length;
+			var tID=0;
+			for (i=0;i < len;i++){
+				tID=items[i][this.idKey] || 0;
+				if (tID > this.tMax){
+					this.tMax=tID;
+				}
+			};
+			var tItem;
+			for (i=0;i < len;i++){
+				tItem=items[i];
+				if (!tItem[this.idKey]){
+					tItem[this.idKey]=this.tMax;
+					this.tMax++;
+				}
+				this.idDic[tItem[this.idKey]]=tItem;
+			}
+		}
+
+		return IDDicTool;
 	})()
 
 
@@ -38614,10 +38759,16 @@ var Laya=window.Laya=(function(window,document){
 		__class(BookReader,'view.nlpplatform.BookReader',_super);
 		var __proto=BookReader.prototype;
 		__proto.loadFile=function(filePath){
-			var fileStr;
-			fileStr=FileTools.readFile(filePath);
 			this.book=new TaggingBook();
-			this.book.initByString(fileStr);
+			var fileStr;
+			var extension;
+			extension=FileTools.getExtensionName(filePath);
+			if (extension=="nlptgf"){
+				this.book.initByData(FileManager.readJSONFile(filePath));
+				}else{
+				fileStr=FileTools.readFile(filePath);
+				this.book.initByString(fileStr);
+			}
 			this.wordView.setBook(this.book);
 		}
 
@@ -38643,14 +38794,30 @@ var Laya=window.Laya=(function(window,document){
 	//class view.nlpplatform.PlatformMain extends ui.nlpplatform.PlatformMainUI
 	var PlatformMain=(function(_super){
 		function PlatformMain(){
+			this.tFile=null;
 			PlatformMain.__super.call(this);
 			this.openBtn.on("click",this,this.onOpenBtn);
+			this.saveBtn.on("click",this,this.onSaveBtn);
 		}
 
 		__class(PlatformMain,'view.nlpplatform.PlatformMain',_super);
 		var __proto=PlatformMain.prototype;
+		__proto.onSaveBtn=function(){
+			var savePath;
+			savePath=this.tFile;
+			var tExtension;
+			tExtension=FileTools.getExtensionName(this.tFile);
+			if (tExtension !="nlptgf"){
+				savePath=this.tFile.replace("."+tExtension,"."+"nlptgf");
+			};
+			var saveDataO;
+			saveDataO=this.bookReader.book.toData();
+			console.log("save:",savePath,saveDataO);
+			FileManager.createJSONFile(savePath,saveDataO);
+		}
+
 		__proto.onOpenBtn=function(){
-			DialogTools.showOpenFile("打开文件",Utils.bind(this.onOpenFileBack,this),DialogTools.txtFilterO);
+			DialogTools.showOpenFile("打开文件",Utils.bind(this.onOpenFileBack,this),NLPPlatFormConst.taggingFilterO);
 		}
 
 		__proto.onOpenFileBack=function(dataO){
@@ -38658,6 +38825,7 @@ var Laya=window.Laya=(function(window,document){
 			if (!dataO || !dataO.length)return;
 			var filePath;
 			filePath=dataO[0];
+			this.tFile=filePath;
 			this.bookReader.loadFile(filePath);
 		}
 
@@ -38673,6 +38841,7 @@ var Laya=window.Laya=(function(window,document){
 	var WordViewer=(function(_super){
 		function WordViewer(){
 			this.dataO=null;
+			this.id=0;
 			WordViewer.__super.call(this);
 		}
 
@@ -38691,6 +38860,7 @@ var Laya=window.Laya=(function(window,document){
 			this.width=maxWidth;
 			this.centerItem(this.txt);
 			this.centerItem(this.typeTxt);
+			this.id=dataO.id;
 		}
 
 		return WordViewer;
@@ -38707,11 +38877,13 @@ var Laya=window.Laya=(function(window,document){
 			this.layouter=null;
 			this.wList=null;
 			this.wordItemList=null;
+			this.idWordDic=null;
 			this.lines=null;
 			this.book=null;
 			WordListViewer.__super.call(this);
 			this.layouter=new WordLayout();
 			this.container.on("resize",this,this.freshUI);
+			this.idWordDic=new IDDicTool();
 		}
 
 		__class(WordListViewer,'view.nlpplatform.WordListViewer',_super);
@@ -38764,6 +38936,7 @@ var Laya=window.Laya=(function(window,document){
 				this.wordItemList.push(tWord);
 				this.container.addChild(tWord);
 			}
+			this.idWordDic.initByItems(this.wordItemList);
 			this.freshUI();
 		}
 
@@ -38827,6 +39000,25 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
+	var FindNodeSmall=(function(_super){
+		function FindNodeSmall(){
+			FindNodeSmall.__super.call(this);
+			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
+			this.createView(FindNodeSmallUI.uiView);
+		}
+
+		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
+		var __proto=FindNodeSmall.prototype;
+		__proto.createChildren=function(){}
+		return FindNodeSmall;
+	})(FindNodeSmallUI)
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class laya.debug.view.nodeInfo.nodetree.FindNode extends laya.debug.ui.debugui.FindNodeUI
 	var FindNode=(function(_super){
 		function FindNode(){
@@ -38862,25 +39054,6 @@ var Laya=window.Laya=(function(window,document){
 		__proto.createChildren=function(){}
 		return RankListItem;
 	})(RankListItemUI)
-
-
-	/**
-	*...
-	*@author ww
-	*/
-	//class laya.debug.view.nodeInfo.nodetree.FindNodeSmall extends laya.debug.ui.debugui.FindNodeSmallUI
-	var FindNodeSmall=(function(_super){
-		function FindNodeSmall(){
-			FindNodeSmall.__super.call(this);
-			Base64AtlasManager.replaceRes(FindNodeSmallUI.uiView);
-			this.createView(FindNodeSmallUI.uiView);
-		}
-
-		__class(FindNodeSmall,'laya.debug.view.nodeInfo.nodetree.FindNodeSmall',_super);
-		var __proto=FindNodeSmall.prototype;
-		__proto.createChildren=function(){}
-		return FindNodeSmall;
-	})(FindNodeSmallUI)
 
 
 	/**
@@ -39423,7 +39596,7 @@ var Laya=window.Laya=(function(window,document){
 	})(ToolBarUI)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,LocalStorage,Render,Timer,View,Browser,GraphicAnimation,PingYinDic]);
+	Laya.__init([LoaderManager,EventDispatcher,LocalStorage,Render,Timer,View,Browser,GraphicAnimation,PingYinDic]);
 	new NLPPlatform();
 
 })(window,document,Laya);

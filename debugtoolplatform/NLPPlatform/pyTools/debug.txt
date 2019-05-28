@@ -8,28 +8,29 @@ Project configuration:E:\onewaymyway\codes\playground\playground\debugtoolplatfo
 1,0.00,E:/onewaymyway/codes/playground/playground/libs/nodetools/src,0,Collect
 1,0.00,E:/onewaymyway/codes/playground/playground/libs/nlp/src,0,Collect
 1,0.00,E:/onewaymyway/codes/playground/playground/libs/commonui/src,0,Collect
+1,0.00,E:/onewaymyway/codes/playground/playground/libs/commontoolkit/src,0,Collect
 1,2.00,,0,read class message
-2,46.87,E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/wordmap/SimpleWordMap.as,55,
-2,46.87,E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/wordmap/SimpleWordMap.as,56,
-7,83.31,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/electrontools/drags/DragEvent.as,84,SystemSetting.assetsPath This variable is not defined.
-7,83.84,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/ListBase.as,60,_getOneCell This variable is not defined.
-7,83.84,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/ListBase.as,87,_createItems This variable is not defined.
-7,83.93,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/NodeTree.as,49,_treeData This variable is not defined.
-7,84.55,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileManager.as,225,XMLElement This variable is not defined.
-7,84.55,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileManager.as,237,XMLElement This variable is not defined.
-7,84.60,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
-7,84.60,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
-7,86.75,E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/memory/NGram.as,43,i This variable is not defined.
-7,86.75,E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/memory/NGram.as,44,i This variable is not defined.
-7,88.28,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonui/colorpanel/ColorPickerWithIndex.as,176,Server.url_file This variable is not defined.
-7,88.28,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonui/colorpanel/ColorPickerWithIndex.as,177,Server.url_file This variable is not defined.
-7,88.33,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonui/colorpanel/ColorRing.as,407,callLater This variable is not defined.
-7,88.52,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonui/colorpanel/colorselectorpanel/ColorSelectorControl.as,17,ColorPickerWithIndex This variable is not defined.
-7,88.57,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonui/colorpanel/colorselectorpanel/SelectorColorPicker.as,108,ColorTableTool.createColorTable This variable is not defined.
-7,88.95,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonlayout/relationmap/RelationMapItemBase.as,64,_childNodes This variable is not defined.
-7,89.67,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commontools/NestScrollControl.as,59,ScrollBarSwitch.createSwitch This variable is not defined.
+2,46.83,E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/wordmap/SimpleWordMap.as,55,
+2,46.83,E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/wordmap/SimpleWordMap.as,56,
+7,83.28,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/electrontools/drags/DragEvent.as,84,SystemSetting.assetsPath This variable is not defined.
+7,83.80,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/ListBase.as,60,_getOneCell This variable is not defined.
+7,83.80,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/ListBase.as,87,_createItems This variable is not defined.
+7,83.90,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/NodeTree.as,49,_treeData This variable is not defined.
+7,84.52,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileManager.as,225,XMLElement This variable is not defined.
+7,84.52,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileManager.as,237,XMLElement This variable is not defined.
+7,84.56,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
+7,84.56,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
+7,86.71,E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/memory/NGram.as,43,i This variable is not defined.
+7,86.71,E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/memory/NGram.as,44,i This variable is not defined.
+7,88.24,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonui/colorpanel/ColorPickerWithIndex.as,176,Server.url_file This variable is not defined.
+7,88.24,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonui/colorpanel/ColorPickerWithIndex.as,177,Server.url_file This variable is not defined.
+7,88.28,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonui/colorpanel/ColorRing.as,407,callLater This variable is not defined.
+7,88.47,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonui/colorpanel/colorselectorpanel/ColorSelectorControl.as,17,ColorPickerWithIndex This variable is not defined.
+7,88.52,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonui/colorpanel/colorselectorpanel/SelectorColorPicker.as,108,ColorTableTool.createColorTable This variable is not defined.
+7,88.90,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonlayout/relationmap/RelationMapItemBase.as,64,_childNodes This variable is not defined.
+7,89.62,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commontools/NestScrollControl.as,59,ScrollBarSwitch.createSwitch This variable is not defined.
 1,89.95,,0,Disable Flash3D E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/NLPPlatform.as
-12,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.js,1202099,
+12,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.js,1206152,
 11,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.html,798,
 ******************************************************************************
 Error or warning message:NLPPlatform.max.js

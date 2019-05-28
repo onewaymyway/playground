@@ -1,5 +1,6 @@
 package nlp.tagging 
 {
+	import laya.debug.tools.ObjectTools;
 	import nlp.cutwords.WordPiece;
 	/**
 	 * ...
@@ -7,6 +8,7 @@ package nlp.tagging
 	 */
 	public class TaggingWord 
 	{
+		public static const KEYS:Array = ["word","type","meaning","relations","id"];
 		public var word:String;
 		public var type:String;
 		public var meaning:String;
@@ -17,6 +19,15 @@ package nlp.tagging
 			
 		}
 		
+		public function toData():Object
+		{
+			return ObjectTools.toData(this, KEYS);
+		}
+		
+		public static function fromData(data:Object):TaggingWord
+		{
+			return ObjectTools.fromData(new TaggingWord(), data, KEYS);
+		}
 		public static function createByWordPiece(word:WordPiece):TaggingWord
 		{
 			var rst:TaggingWord;

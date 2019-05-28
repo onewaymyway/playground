@@ -1,6 +1,7 @@
 package view.nlpplatform 
 {
 	import commonlayout.WordLayout;
+	import commontoolkit.IDDicTool;
 	import laya.events.Event;
 	import laya.utils.Pool;
 	import nlp.tagging.TaggingBook;
@@ -17,10 +18,12 @@ package view.nlpplatform
 		{
 			layouter = new WordLayout();
 			container.on(Event.RESIZE, this, freshUI);
+			idWordDic = new IDDicTool();
 		}
 		
 		private var wList:Array;
 		private var wordItemList:Array;
+		private var idWordDic:IDDicTool;
 		private function clearPre():void
 		{
 			if (!wordItemList) return;
@@ -78,6 +81,7 @@ package view.nlpplatform
 				wordItemList.push(tWord);
 				container.addChild(tWord);
 			}
+			idWordDic.initByItems(wordItemList);
 			freshUI();
 			
 		}

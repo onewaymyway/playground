@@ -481,5 +481,29 @@ package laya.debug.tools
 			}
 			return rst;
 		}
+		
+		public static function toData(obj:Object, keys:Array):Object
+		{
+			var rst:Object;
+			rst = {};
+			var i:int, len:int;
+			len = keys.length;
+			for (i = 0; i < len; i++)
+			{
+				rst[keys[i]] = obj[keys[i]];
+			}
+			return rst;
+		}
+		
+		public static function fromData(obj:Object, data:Object, keys:Array):*
+		{
+			var i:int, len:int;
+			len = keys.length;
+			for (i = 0; i < len; i++)
+			{
+				obj[keys[i]] = data[keys[i]];
+			}
+			return obj;
+		}
 	}
 }

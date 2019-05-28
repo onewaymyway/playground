@@ -20,6 +20,7 @@
     <class path="..\..\libs\nodetools\src" />
     <class path="..\..\libs\nlp\src" />
     <class path="..\..\libs\commonui\src" />
+    <class path="..\..\libs\commontoolkit\src" />
   </classpaths>
   <!-- Build options -->
   <build>
