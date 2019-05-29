@@ -1,6 +1,8 @@
 package view.nlpplatform 
 {
+	import laya.debug.uicomps.ContextMenu;
 	import laya.display.Sprite;
+	import laya.events.Event;
 	import nlp.cutwords.WordPiece;
 	import nlp.tagging.TaggingWord;
 	import ui.nlpplatform.WordViewerUI;
@@ -15,9 +17,30 @@ package view.nlpplatform
 		
 		public function WordViewer() 
 		{
-			
+			this.on(Event.RIGHT_CLICK, this, onRightClick);
 		}
 		
+		private function onRightClick():void
+		{
+			var menu:ContextMenu;
+			menu = ContextMenu.createMenuByArray(["打散", "属性"]);
+			menu.on(Event.SELECT, this, onMenuSelect);
+			menu.show();
+		}
+		
+		private function onMenuSelect(dataO:Object):void
+		{
+			var label:String;
+			label = dataO.target.data;
+			switch(label)
+			{
+				case "打散":
+					break;
+				case "属性":
+					WordProp.showWordProp(this);
+					break;
+			}
+		}
 		public var dataO:TaggingWord;
 		public var id:int;
 

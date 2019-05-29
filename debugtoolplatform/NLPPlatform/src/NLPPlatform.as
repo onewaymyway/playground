@@ -1,7 +1,8 @@
 package  
 {
 	import electrontools.drags.SystemDragOverManager;
-	import electrontools.menus.ContextMenu;
+	import laya.debug.uicomps.ContextMenu;
+	import laya.debug.uicomps.ContextMenuItem;
 	import laya.display.Sprite;
 	import laya.display.Stage;
 	import laya.net.Loader;
@@ -30,6 +31,11 @@ package
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			UIConfig.touchScrollEnable = false;
 			Styles.buttonLabelColors = ["#ffffff", "#32cc6b", "#ff0000", "#C0C0C0"];
+			
+			ContextMenu.init();
+			ContextMenuItem.labelColors = "#ffffff,#ffffff,#ffffff,#ffffff";
+			ContextMenuItem.btnSkin = "comp/button.png";
+			ContextMenuItem.lineSkin = "comp/line2.png";
 			init();
 			trace("version:33");
 			var loadList:Array;
