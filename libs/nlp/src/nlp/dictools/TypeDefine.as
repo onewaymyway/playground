@@ -11,9 +11,25 @@ package nlp.dictools
 		{
 			
 		}
+		public static var TypeListCH:Array;
+		public static function _init():void
+		{
+			TypeListCH = [];
+			var key:String;
+			for (key in TypeDesDic)
+			{
+				TypeListCH.push(TypeDesDic[key]);
+			}
+			TypeListCH.sort();
+		}
 		public static function getCHType(type:String):String
 		{
 			return TypeDesDic[type] || "未知";
+		}
+		public static function hasCHType(type:String):Boolean
+		{
+			if (TypeDesDic[type]) return true;
+			return false;
 		}
 		public static const TypeDesDic:Object = {
 			"a":"形容词",
@@ -135,7 +151,7 @@ package nlp.dictools
 			"vd":"副动词",
 			"vf":"趋向动词",
 			"vg":"动词性语素",
-			"vi":"不及物动词（内动词",
+			"vi":"不及物动词",
 			"vl":"动词性惯用语",
 			"vn":"名动词",
 			"vshi":"动词“是”",

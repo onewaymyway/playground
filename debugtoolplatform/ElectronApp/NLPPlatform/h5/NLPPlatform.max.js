@@ -13078,7 +13078,7 @@ var Laya=window.Laya=(function(window,document){
 				"vd":"副动词",
 				"vf":"趋向动词",
 				"vg":"动词性语素",
-				"vi":"不及物动词（内动词",
+				"vi":"不及物动词",
 				"vl":"动词性惯用语",
 				"vn":"名动词",
 				"vshi":"动词“是”",

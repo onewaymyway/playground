@@ -10,6 +10,7 @@ package
 	import nlp.conll.ConllDesParser;
 	import nlp.conll.ConllFileParser;
 	import nlp.conll.ConllTreeAnalyse;
+	import nlp.conll.ConllTreeBuilder;
 	import nlp.dictools.TypeDicParser;
 	import nlp.WordDicParser;
 	import nlp.WordUtils;
@@ -34,6 +35,7 @@ package
 			loadList.push({url:"data/CoreNatureDictionary.txt", type:Loader.TEXT });
 			loadList.push( { url:"books/qqst.txt", type:Loader.TEXT } );
 			loadList.push({url:"data/text.train.conll", type:Loader.TEXT });
+			loadList.push({url:"data/news.train.conll", type:Loader.TEXT });
 			loadList.push( { url:"data/conlldes.txt", type:Loader.TEXT } );
 			loadList.push({url:"data/中文字典1.txt",type:Loader.TEXT });
 			Laya.loader.load( loadList, new Handler(this, initGameView));
@@ -55,7 +57,11 @@ package
 		
 		private function startWordParserTest():void
 		{
-			NLP.initWordCutter("data/中文字典1.txt","data/CoreNatureDictionary.txt");
+			NLP.initWordCutter("data/中文字典1.txt", "data/CoreNatureDictionary.txt");
+			NLP.initConllTreeParser("data/conlldes.txt", ["data/text.train.conll","data/news.train.conll"]);
+			
+			contreeBuilder = NLP.contreeBuilder;
+			conllParser = NLP.conllParser;
 
 			onDicLoaded();
 	
@@ -75,46 +81,48 @@ package
 			
 			wordView = new WordListViewer();
 			wordView.pos(20, 20);
+			wordView.width = Laya.stage.width - 40;
 			Laya.stage.addChild(wordView);
+			
+			wordTreeView2 = new WordTreeViewer();
+			wordTreeView2.pos(20, 400);
+			wordTreeView2.width = Laya.stage.width - 40;
+			Laya.stage.addChild(wordTreeView2);
 			
 			
 			WordDicParser.I.cutter.cutToMap("每个人的一生，都离不开金钱、离不开商业，但是，很多人从来没有试图好好地、认真地去走近它，了解它。它是一个我们每天都碰到的、陌生的朋友。");
+			wordTreeView2.setTree(NLP.contreeBuilder.cutStringToTree("每个人的一生，都离不开金钱、离不开商业，但是，很多人从来没有试图好好地、认真地去走近它"));
 			testCut();
 		}
 		
 		private var conllParser:ConllFileParser;
 		private var wordTreeView:WordTreeViewer;
+		private var wordTreeView2:WordTreeViewer;
+		private var contreeBuilder:ConllTreeBuilder;
 		private function testWordTree():void
 		{
 			
-			var typeDic:TypeDicParser;
-			typeDic = new TypeDicParser();
-			typeDic.initByTxt(Loader.getRes("data/CoreNatureDictionary.txt"));
-			typeDic.addType([" ",":","/",".","。","."],["punk"],["标点"]);
-			trace(typeDic);
-			WordUtils.typeDic = typeDic;
-			var conllDes:ConllDesParser;
-			conllDes = new ConllDesParser();
-			conllDes.parseTxt(Loader.getRes("data/conlldes.txt"));
+			NLP.initWordCutter("data/中文字典1.txt", "data/CoreNatureDictionary.txt");
 			
-			ConllDesParser.I = conllDes;
+			NLP.initConllTreeParser("data/conlldes.txt", ["data/text.train.conll","data/news.train.conll"]);
 			
-			conllParser = new ConllFileParser();
-			conllParser.parseTxt(Loader.getRes("data/text.train.conll"));
+			contreeBuilder = NLP.contreeBuilder;
+			conllParser = NLP.conllParser;
 			
-			
-			ConllTreeAnalyse.typeDic = typeDic;
-			var analyse:ConllTreeAnalyse;
-			analyse = new ConllTreeAnalyse();
-			analyse.analyse(conllParser.treeList);
-			
-			
+			trace("contreeBuilder:",contreeBuilder);
 			wordTreeView = new WordTreeViewer();
 			wordTreeView.pos(20, 10);
 			wordTreeView.width = Laya.stage.width - 40;
 			Laya.stage.addChild(wordTreeView);
 			//return;
 			wordTreeView.setTree(conllParser.getCurLine());
+			
+			wordTreeView2 = new WordTreeViewer();
+			wordTreeView2.pos(20, 400);
+			wordTreeView2.width = Laya.stage.width - 40;
+			Laya.stage.addChild(wordTreeView2);
+			//return;
+			wordTreeView2.setTree(contreeBuilder.rebuildConllTree(conllParser.getCurLine()));
 			
 			Laya.stage.on(Event.KEY_DOWN, this, onWordTreeKeyDown);
 		}
@@ -125,9 +133,11 @@ package
 			{
 				case Keyboard.UP:
 					wordTreeView.setTree(conllParser.pre());
+					wordTreeView2.setTree(contreeBuilder.rebuildConllTree(conllParser.getCurLine()));
 					break;
 				case Keyboard.DOWN:
 					wordTreeView.setTree(conllParser.next());
+					wordTreeView2.setTree(contreeBuilder.rebuildConllTree(conllParser.getCurLine()));
 					break;
 			}
 		}
@@ -166,6 +176,7 @@ package
 			var words:Array;
 			words = WordDicParser.I.cut(str);
 			wordView.setWordList(words);
+			wordTreeView2.setTree(NLP.contreeBuilder.cutStringToTree(str));
 		}
 		private function onKeyDown(e:Event):void
 		{

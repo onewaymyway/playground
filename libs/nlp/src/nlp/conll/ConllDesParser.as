@@ -18,6 +18,11 @@ package nlp.conll
 			if (I && I.desDic[type]) return I.desDic[type].desCN;
 			return type;
 		}
+		public static function hasCNType(type:String):Boolean
+		{
+			if (I && I.desDic[type]) return true;
+			return false;
+		}
 		public var desDic:Object;
 		public static const KeyList:Array = ["desCN","type","desEN","detail"];
 		public function parseLine(line:String):Object

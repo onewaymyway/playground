@@ -25,7 +25,7 @@ package nlp.dictools
 			var typeO:Object;
 			typeO = getWordType(word);
 			if (!typeO) return "unknow";
-			return typeO.types[0];
+			//return typeO.types[0];
 			return typeO.types.join(";");
 		}
 		
@@ -39,6 +39,7 @@ package nlp.dictools
 		}
 		public var wordDic:Object;
 		public var wordList:Array;
+		
 		public static const Tab:String = "	";
 		public function initByTxt(txt:String):void
 		{
@@ -85,7 +86,7 @@ package nlp.dictools
 				rst.types.push(ttype);
 				rst.typecns.push(TypeDefine.getCHType(ttype));
 			}
-			
+			rst.types.sort();
 			return rst;
 		}
 		

@@ -1,5 +1,6 @@
 package nlp.conll 
 {
+	import laya.debug.tools.ObjectTools;
 	/**
 	 * ...
 	 * @author ww
@@ -67,6 +68,22 @@ package nlp.conll
 			rst.word = rst.form;
 			rst.refers = [];
 			return rst;
+		}
+		
+		public function clone():ConllWord
+		{
+			var rst:ConllWord;
+			rst = new ConllWord();
+			ObjectTools.copyValueByArr(rst, this, KeyList);
+			rst.word = rst.form;
+			return rst;
+		}
+		
+		public function removeTreeInfo():void
+		{
+			head =-1;
+			deprel = null;
+			refers = [];
 		}
 		
 		public function sortRefers(i:int):void

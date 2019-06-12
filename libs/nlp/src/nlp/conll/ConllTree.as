@@ -32,6 +32,23 @@ package nlp.conll
 			
 		}
 		
+		public function getConllWordForRebuild():Array
+		{
+			var wList:Array;
+			wList = [];
+			var i:int, len:int;
+			var tWord:ConllWord;
+			len = wordList.length;
+			for (i = 0; i < len; i++)
+			{
+				tWord = wordList[i];
+				tWord = tWord.clone();
+				tWord.removeTreeInfo();
+				wList.push(tWord);
+			}
+			return wList;
+		}
+		
 		private static function otherSort(item0:Object, item1:Object):Boolean
 		{
 			return item0.len < item1.len;

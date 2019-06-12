@@ -26,7 +26,7 @@
 数量数组	Qp	Quantity-phrase	三本书 (三 --> 本)
 频率角色	Freq	Frequency	他每天看书 (每天 <-- 看)
 顺序角色	Seq	Sequence	他跑第一 (跑 --> 第一)
-描写角色	Desc(Feat)	Description	他长得胖 (长 --> 胖)
+描写角色	Desc	Description	他长得胖 (长 --> 胖)
 宿主角色	Host	Host	住房面积 (住房 <-- 面积)
 名字修饰角色	Nmod	Name-modifier	果戈里大街 (果戈里 <-- 大街)
 时间修饰角色	Tmod	Time-modifier	星期一上午 (星期一 <-- 上午)

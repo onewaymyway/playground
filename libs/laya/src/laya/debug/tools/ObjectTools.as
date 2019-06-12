@@ -191,6 +191,10 @@ package laya.debug.tools
 			}
 			return src;
 		}
+		public static function copyArrSimple(src:Array, a:Array):Array
+		{
+			return concatArr([], a);
+		}
 		public static function insertArrToArr(src:Array, insertArr:Array, pos:int = 0):Array
 		{
 			if (pos < 0) pos = 0;
