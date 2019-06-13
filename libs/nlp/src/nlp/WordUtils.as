@@ -148,9 +148,9 @@ package nlp
 			}
 			return arr;
 		}
-		public static function splitWordBySpecial(str:String):Array
+		public static function splitWordBySpecial(str:String,rst:Array=null):Array
 		{
-			var rst:Array;
+			if(!rst)
 			rst = [];
 			var i:int, len:int;
 			len = str.length;

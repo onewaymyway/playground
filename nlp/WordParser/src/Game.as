@@ -85,19 +85,26 @@ package
 			Laya.stage.addChild(wordView);
 			
 			wordTreeView2 = new WordTreeViewer();
-			wordTreeView2.pos(20, 400);
+			wordTreeView2.pos(20, 300);
 			wordTreeView2.width = Laya.stage.width - 40;
 			Laya.stage.addChild(wordTreeView2);
+			
+			wordTreeView3 = new WordTreeViewer();
+			wordTreeView3.pos(20, 600);
+			wordTreeView3.width = Laya.stage.width - 40;
+			Laya.stage.addChild(wordTreeView3);
 			
 			
 			WordDicParser.I.cutter.cutToMap("每个人的一生，都离不开金钱、离不开商业，但是，很多人从来没有试图好好地、认真地去走近它，了解它。它是一个我们每天都碰到的、陌生的朋友。");
 			wordTreeView2.setTree(NLP.contreeBuilder.cutStringToTree("每个人的一生，都离不开金钱、离不开商业，但是，很多人从来没有试图好好地、认真地去走近它"));
+			wordTreeView3.setTree(NLP.contreeBuilder.cutStringToTree("每个人的一生，都离不开金钱、离不开商业，但是，很多人从来没有试图好好地、认真地去走近它",true));
 			testCut();
 		}
 		
 		private var conllParser:ConllFileParser;
 		private var wordTreeView:WordTreeViewer;
 		private var wordTreeView2:WordTreeViewer;
+		private var wordTreeView3:WordTreeViewer;
 		private var contreeBuilder:ConllTreeBuilder;
 		private function testWordTree():void
 		{
@@ -118,11 +125,18 @@ package
 			wordTreeView.setTree(conllParser.getCurLine());
 			
 			wordTreeView2 = new WordTreeViewer();
-			wordTreeView2.pos(20, 400);
+			wordTreeView2.pos(20, 300);
 			wordTreeView2.width = Laya.stage.width - 40;
 			Laya.stage.addChild(wordTreeView2);
 			//return;
 			wordTreeView2.setTree(contreeBuilder.rebuildConllTree(conllParser.getCurLine()));
+			
+			wordTreeView3 = new WordTreeViewer();
+			wordTreeView3.pos(20, 600);
+			wordTreeView3.width = Laya.stage.width - 40;
+			Laya.stage.addChild(wordTreeView3);
+			//return;
+			wordTreeView3.setTree(contreeBuilder.rebuildConllTree(conllParser.getCurLine(),true));
 			
 			Laya.stage.on(Event.KEY_DOWN, this, onWordTreeKeyDown);
 		}
@@ -134,10 +148,12 @@ package
 				case Keyboard.UP:
 					wordTreeView.setTree(conllParser.pre());
 					wordTreeView2.setTree(contreeBuilder.rebuildConllTree(conllParser.getCurLine()));
+					wordTreeView3.setTree(contreeBuilder.rebuildConllTree(conllParser.getCurLine(),true));
 					break;
 				case Keyboard.DOWN:
 					wordTreeView.setTree(conllParser.next());
 					wordTreeView2.setTree(contreeBuilder.rebuildConllTree(conllParser.getCurLine()));
+					wordTreeView3.setTree(contreeBuilder.rebuildConllTree(conllParser.getCurLine(),true));
 					break;
 			}
 		}
@@ -177,6 +193,7 @@ package
 			words = WordDicParser.I.cut(str);
 			wordView.setWordList(words);
 			wordTreeView2.setTree(NLP.contreeBuilder.cutStringToTree(str));
+			wordTreeView3.setTree(NLP.contreeBuilder.cutStringToTree(str,true));
 		}
 		private function onKeyDown(e:Event):void
 		{

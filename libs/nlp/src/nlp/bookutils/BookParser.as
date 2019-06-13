@@ -1,5 +1,6 @@
 package nlp.bookutils 
 {
+	import nlp.WordUtils;
 	/**
 	 * ...
 	 * @author ww
@@ -18,7 +19,21 @@ package nlp.bookutils
 		{
 			txt = txt.replace("\r", "");
 			lines = txt.split("\n");
+			lines = splitLinesToSentence(lines);
 			index = 0;
+		}
+		
+		public static function splitLinesToSentence(lines:Array):void
+		{
+			var i:int, len:int;
+			len = lines.length;
+			var rst:Array;
+			rst = [];
+			for (i = 0; i < len; i++)
+			{
+				WordUtils.splitWordBySpecial(lines[i], rst);
+			}
+			return rst;
 		}
 		
 		public function reset():void

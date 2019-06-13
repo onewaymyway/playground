@@ -704,6 +704,7 @@ var Laya=window.Laya=(function(window,document){
 			this.conllParser=null;
 			this.wordTreeView=null;
 			this.wordTreeView2=null;
+			this.wordTreeView3=null;
 			this.contreeBuilder=null;
 			this.book=null;
 			Laya.init(Browser.width,900);
@@ -743,13 +744,19 @@ var Laya=window.Laya=(function(window,document){
 		__proto.testWordParser=function(){
 			this.wordView=new WordListViewer();
 			this.wordView.pos(20,20);
+			this.wordView.width=Laya.stage.width-40;
 			Laya.stage.addChild(this.wordView);
 			this.wordTreeView2=new WordTreeViewer();
-			this.wordTreeView2.pos(20,400);
+			this.wordTreeView2.pos(20,300);
 			this.wordTreeView2.width=Laya.stage.width-40;
 			Laya.stage.addChild(this.wordTreeView2);
+			this.wordTreeView3=new WordTreeViewer();
+			this.wordTreeView3.pos(20,600);
+			this.wordTreeView3.width=Laya.stage.width-40;
+			Laya.stage.addChild(this.wordTreeView3);
 			WordDicParser.I.cutter.cutToMap("每个人的一生，都离不开金钱、离不开商业，但是，很多人从来没有试图好好地、认真地去走近它，了解它。它是一个我们每天都碰到的、陌生的朋友。");
 			this.wordTreeView2.setTree(NLP.contreeBuilder.cutStringToTree("每个人的一生，都离不开金钱、离不开商业，但是，很多人从来没有试图好好地、认真地去走近它"));
+			this.wordTreeView3.setTree(NLP.contreeBuilder.cutStringToTree("每个人的一生，都离不开金钱、离不开商业，但是，很多人从来没有试图好好地、认真地去走近它",true));
 			this.testCut();
 		}
 
@@ -765,10 +772,15 @@ var Laya=window.Laya=(function(window,document){
 			Laya.stage.addChild(this.wordTreeView);
 			this.wordTreeView.setTree(this.conllParser.getCurLine());
 			this.wordTreeView2=new WordTreeViewer();
-			this.wordTreeView2.pos(20,400);
+			this.wordTreeView2.pos(20,300);
 			this.wordTreeView2.width=Laya.stage.width-40;
 			Laya.stage.addChild(this.wordTreeView2);
 			this.wordTreeView2.setTree(this.contreeBuilder.rebuildConllTree(this.conllParser.getCurLine()));
+			this.wordTreeView3=new WordTreeViewer();
+			this.wordTreeView3.pos(20,600);
+			this.wordTreeView3.width=Laya.stage.width-40;
+			Laya.stage.addChild(this.wordTreeView3);
+			this.wordTreeView3.setTree(this.contreeBuilder.rebuildConllTree(this.conllParser.getCurLine(),true));
 			Laya.stage.on("keydown",this,this.onWordTreeKeyDown);
 		}
 
@@ -777,10 +789,12 @@ var Laya=window.Laya=(function(window,document){
 				case 38:
 					this.wordTreeView.setTree(this.conllParser.pre());
 					this.wordTreeView2.setTree(this.contreeBuilder.rebuildConllTree(this.conllParser.getCurLine()));
+					this.wordTreeView3.setTree(this.contreeBuilder.rebuildConllTree(this.conllParser.getCurLine(),true));
 					break ;
 				case 40:
 					this.wordTreeView.setTree(this.conllParser.next());
 					this.wordTreeView2.setTree(this.contreeBuilder.rebuildConllTree(this.conllParser.getCurLine()));
+					this.wordTreeView3.setTree(this.contreeBuilder.rebuildConllTree(this.conllParser.getCurLine(),true));
 					break ;
 				}
 		}
@@ -811,6 +825,7 @@ var Laya=window.Laya=(function(window,document){
 			words=WordDicParser.I.cut(str);
 			this.wordView.setWordList(words);
 			this.wordTreeView2.setTree(NLP.contreeBuilder.cutStringToTree(str));
+			this.wordTreeView3.setTree(NLP.contreeBuilder.cutStringToTree(str,true));
 		}
 
 		__proto.onKeyDown=function(e){
@@ -10416,9 +10431,9 @@ var Laya=window.Laya=(function(window,document){
 			return arr;
 		}
 
-		WordUtils.splitWordBySpecial=function(str){
-			var rst;
-			rst=[];
+		WordUtils.splitWordBySpecial=function(str,rst){
+			if(!rst)
+				rst=[];
 			var i=0,len=0;
 			len=str.length;
 			var tStart=NaN;
@@ -11144,7 +11159,6 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.adptPiece=function(piece){
-			if (piece.word==" ")debugger;
 			piece.update();
 			if (this.typeDic){
 				piece.typeO=this.typeDic.getWordType(piece.word);
@@ -11779,6 +11793,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.setTxt=function(txt){
 			txt=txt.replace("\r","");
 			this.lines=txt.split("\n");
+			this.lines=BookParser.splitLinesToSentence(this.lines);
 			this.index=0;
 		}
 
@@ -11805,6 +11820,17 @@ var Laya=window.Laya=(function(window,document){
 		__proto.normalIndex=function(){
 			if (this.index < 0)this.index=0;
 			if (this.index >=this.lines.length)this.index=this.lines.length-1;
+		}
+
+		BookParser.splitLinesToSentence=function(lines){
+			var i=0,len=0;
+			len=lines.length;
+			var rst;
+			rst=[];
+			for (i=0;i < len;i++){
+				WordUtils.splitWordBySpecial(lines[i],rst);
+			}
+			return rst;
 		}
 
 		BookParser.createByTxt=function(txt){
@@ -12232,6 +12258,86 @@ var Laya=window.Laya=(function(window,document){
 		KeysCounter.CountKey="_@_Count";
 		KeysCounter.TypeKey="_@_Type";
 		return KeysCounter;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.datastruct.AutoTensor
+	var AutoTensor=(function(){
+		function AutoTensor(){
+			this.defaultValue=0;
+			this._dic=null;
+			this._dic={};
+		}
+
+		__class(AutoTensor,'nlp.algorithm.datastruct.AutoTensor');
+		var __proto=AutoTensor.prototype;
+		__proto.hasValue=function(__args){
+			var args=arguments;
+			var i=0,len=0;
+			len=args.length-1;
+			var key;
+			var tDic;
+			tDic=this._dic;
+			for (i=0;i < len;i++){
+				key=args[i];
+				if (!tDic[key]){
+					return false;
+				}
+				tDic=tDic[key];
+			}
+			if (!tDic)return false;
+			key=args[len];
+			if (tDic.hasOwnProperty(key)){
+				return true;
+			}
+			return false;
+		}
+
+		__proto.getValue=function(__args){
+			var args=arguments;
+			var i=0,len=0;
+			len=args.length-1;
+			var key;
+			var tDic;
+			tDic=this._dic;
+			for (i=0;i < len;i++){
+				key=args[i];
+				if (!tDic[key]){
+					return this.defaultValue;
+				}
+				tDic=tDic[key];
+			}
+			if (!tDic)return this.defaultValue;
+			key=args[len];
+			if (tDic.hasOwnProperty(key)){
+				return tDic[key];
+			}
+			return this.defaultValue;
+		}
+
+		__proto.setValue=function(value,__args){
+			var args=[];for(var i=1,sz=arguments.length;i<sz;i++)args.push(arguments[i]);
+			var i=0,len=0;
+			len=args.length-1;
+			var key;
+			var tDic;
+			tDic=this._dic;
+			for (i=0;i < len;i++){
+				key=args[i];
+				if (!tDic[key]){
+					tDic[key]={};
+				}
+				tDic=tDic[key];
+			}
+			key=args[len];
+			tDic[key]=value;
+		}
+
+		return AutoTensor;
 	})()
 
 
@@ -12856,11 +12962,15 @@ var Laya=window.Laya=(function(window,document){
 	var ConllTreeBuilder=(function(){
 		function ConllTreeBuilder(){
 			this.treeAnalyseer=null;
+			this.valueTensor=null;
+			this.relationTensor=null;
+			this.wordList=null;
 		}
 
 		__class(ConllTreeBuilder,'nlp.conll.ConllTreeBuilder');
 		var __proto=ConllTreeBuilder.prototype;
-		__proto.cutStringToTree=function(str){
+		__proto.cutStringToTree=function(str,useDP){
+			(useDP===void 0)&& (useDP=false);
 			var words;
 			words=WordDicParser.I.cut(str);
 			var i=0,len=0;
@@ -12877,9 +12987,10 @@ var Laya=window.Laya=(function(window,document){
 				tConllWord.word=tWordPiece.word;
 				tConllWord.postag=WordUtils.typeDic.getWordTypeStr(tConllWord.word);
 				tConllWord.refers=[];
+				tConllWord.head=-1;
 				wordList.push(tConllWord);
 			}
-			return this.buildConllTree(wordList);
+			return this.buildConllTree(wordList,useDP);
 		}
 
 		__proto.scoreRelation=function(wordA,wordB,type){
@@ -12887,13 +12998,19 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		//return treeAnalyseer.dependCounter.getKeyNum(wordA.postag,wordB.postag,wordB.id>wordA.id);
-		__proto.rebuildConllTree=function(tree){
-			return this.buildConllTree(tree.getConllWordForRebuild());
+		__proto.rebuildConllTree=function(tree,useDP){
+			(useDP===void 0)&& (useDP=false);
+			return this.buildConllTree(tree.getConllWordForRebuild(),useDP);
 		}
 
-		__proto.buildWordRelation=function(wordList){
+		__proto.buildWordRelation=function(wordList,useDP){
+			(useDP===void 0)&& (useDP=false);
 			var wList;
 			wList=ObjectTools.concatArr([],wordList);
+			if (useDP){
+				this.buildByDP(wList);
+				return;
+			};
 			var i=0,len=0;
 			len=wList.length;
 			var tSelectWord;
@@ -12906,7 +13023,7 @@ var Laya=window.Laya=(function(window,document){
 			var tScore=NaN;
 			var j=0,jLen=0;
 			var k=0;
-			jLen=wList.length;
+			jLen=wList.length-1;
 			for (j=0;j < jLen;j++){
 				len=wList.length;
 				tSelectWord=null;
@@ -12937,10 +13054,116 @@ var Laya=window.Laya=(function(window,document){
 			}
 		}
 
-		__proto.buildConllTree=function(wordList){
+		__proto.buildByDP=function(wordList){
+			this.wordList=wordList;
+			this.valueTensor=new AutoTensor();
+			this.relationTensor=new AutoTensor();
+			var i=0,len=0;
+			len=wordList.length;
+			var tSelectRoot=-1;
+			var tRoot=0;
+			var tScore=NaN;
+			var tSelectScore=NaN;
+			var start=0,end=0;
+			start=0;
+			end=wordList.length-1;
+			for (i=0;i < len;i++){
+				tRoot=i;
+				tScore=this.getMaxTree(start,end,tRoot);
+				if (tSelectRoot<0||tScore>tSelectScore){
+					tSelectScore=tScore;
+					tSelectRoot=tRoot;
+				}
+			}
+			this.decodeTreeInfo(start,end,tSelectRoot);
+		}
+
+		__proto.decodeTreeInfo=function(start,end,root){
+			if (start==end)return;
+			if (!this.relationTensor.hasValue(start,end,root)){
+				console.log("noRelation",end,root);
+				debugger;
+				return;
+			};
+			var info;
+			info=this.relationTensor.getValue(start,end,root);
+			console.log("decodeTreeInfo",info);
+			var oRoot=0;
+			oRoot=info[3];
+			var bound=0;
+			bound=info[1];
+			var wordStart;
+			wordStart=this.wordList[oRoot];
+			var wordEnd;
+			wordEnd=this.wordList[root];
+			if (wordStart && wordEnd){
+				wordStart.head=wordEnd.id;
+				wordStart.deprel="depends";
+			}
+			if (oRoot > root){
+				var temp=NaN;
+				temp=root;
+				root=oRoot;
+				oRoot=temp;
+			}
+			this.decodeTreeInfo(start,bound-1,oRoot);
+			this.decodeTreeInfo(bound,end,root);
+		}
+
+		__proto.scoreRelationByIndex=function(start,end){
+			return this.scoreRelation(this.wordList[start],this.wordList[end],1);
+		}
+
+		__proto.getMaxTree=function(start,end,root){
+			if (root > end)debugger;
+			if (start==end)return 0;
+			if (this.valueTensor.hasValue(start,end,root))return this.valueTensor.getValue(start,end,root);
+			var tValue=NaN;
+			var i=0,len=0;
+			var oRoot=0;
+			var bound=0;
+			var tScore=NaN;
+			var selectScore=NaN;
+			var tSelectORoot=0;
+			var tSelectBound=0;
+			var hasValue=false;
+			hasValue=true;
+			selectScore=-10000000;
+			for (oRoot=start;oRoot <=end;oRoot++){
+				if (oRoot !=root){
+					if (oRoot < root){
+						for (bound=oRoot+1;bound <=root;bound++){
+							tScore=this.getMaxTree(start,bound-1,oRoot)+this.getMaxTree(bound,end,root)+this.scoreRelationByIndex(oRoot,root);
+							if (!hasValue||tScore > selectScore){
+								hasValue=true;
+								selectScore=tScore;
+								tSelectORoot=oRoot;
+								tSelectBound=bound;
+							}
+						}
+						}else{
+						for (bound=root+1;bound <=oRoot;bound++){
+							tScore=this.getMaxTree(start,bound-1,root)+this.getMaxTree(bound,end,oRoot)+this.scoreRelationByIndex(oRoot,root);;
+							if (!hasValue||tScore > selectScore){
+								hasValue=true;
+								selectScore=tScore;
+								tSelectORoot=oRoot;
+								tSelectBound=bound;
+							}
+						}
+					}
+				}
+			}
+			this.valueTensor.setValue(selectScore,start,end,root);
+			this.relationTensor.setValue([start,tSelectBound,end,tSelectORoot],start,end,root);
+			return selectScore;
+		}
+
+		__proto.buildConllTree=function(wordList,useDP){
+			(useDP===void 0)&& (useDP=false);
 			var conllTree;
 			conllTree=new ConllTree();
-			this.buildWordRelation(wordList);
+			this.buildWordRelation(wordList,useDP);
 			conllTree.wordList=wordList;
 			return conllTree;
 		}
@@ -30179,7 +30402,7 @@ var Laya=window.Laya=(function(window,document){
 	})(WordViewerUI)
 
 
-	Laya.__init([EventDispatcher,LoaderManager,Browser,LocalStorage,Render,Timer,View,GraphicAnimation,PingYinDic]);
+	Laya.__init([LoaderManager,EventDispatcher,Browser,LocalStorage,Render,Timer,View,GraphicAnimation,PingYinDic]);
 	new Game();
 
 })(window,document,Laya);

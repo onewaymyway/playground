@@ -158,7 +158,7 @@ package nlp.cutwords
 		
 		public function adptPiece(piece:WordPiece):WordPiece
 		{
-			if (piece.word == " ") debugger;
+			//if (piece.word == " ") debugger;
 			piece.update();
 			if (typeDic)
 			{
