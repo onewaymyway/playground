@@ -12,9 +12,10 @@ package nlp.conll
 	public class ConllTreeBuilder 
 	{
 		public var treeAnalyseer:ConllTreeAnalyse;
+		public var arcAnalyser:ConllTreeArcAnalyser;
 		public function ConllTreeBuilder() 
 		{
-			
+			arcAnalyser = new ConllTreeArcAnalyser();
 		}
 		
 		public function cutStringToTree(str:String,useDP:Boolean=false):ConllTree
@@ -49,6 +50,7 @@ package nlp.conll
 		
 		public function rebuildConllTree(tree:ConllTree,useDP:Boolean=false):ConllTree
 		{
+			arcAnalyser.analyseTree(tree);
 			return buildConllTree(tree.getConllWordForRebuild(),useDP);
 		}
 		
@@ -136,7 +138,7 @@ package nlp.conll
 			for (i = 0; i < len; i++)
 			{
 				tRoot = i;
-				tScore = getMaxTree(start, end, tRoot);
+				tScore = getMaxTree(start, end, tRoot)+treeAnalyseer.scoreUtils.getRootScore(wordList[tRoot]);
 				if (tSelectRoot<0||tScore>tSelectScore)
 				{
 					tSelectScore = tScore;

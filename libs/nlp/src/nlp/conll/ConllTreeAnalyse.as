@@ -192,7 +192,8 @@ package nlp.conll
 				
 			}else
 			{
-				dependCounter.addKey("Root",startWord.postag,true);
+				dependCounter.addKey("Root", startWord.postag, true);
+				scoreUtils.addRoot(startWord);
 			}
 			
 			

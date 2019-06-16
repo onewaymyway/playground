@@ -724,10 +724,9 @@ var Laya=window.Laya=(function(window,document){
 		__class(Game,'Game');
 		var __proto=Game.prototype;
 		__proto.initGameView=function(){
-			this.startWordParserTest();
+			this.testWordTree();
 		}
 
-		//testWordTree();
 		__proto.startWordParserTest=function(){
 			NLP.initWordCutter("data/中文字典1.txt","data/CoreNatureDictionary.txt");
 			NLP.initConllTreeParser("data/conlldes.txt",["data/text.train.conll","data/news.train.conll"]);
@@ -12727,6 +12726,7 @@ var Laya=window.Laya=(function(window,document){
 				this.scoreUtils.addRelation(startWord,endWord);
 				}else{
 				this.dependCounter.addKey("Root",startWord.postag,true);
+				this.scoreUtils.addRoot(startWord);
 			}
 			return this.getWordRelationKey(startWord,endWord,relation.end-relation.start);
 			return "unknow";
@@ -12913,10 +12913,12 @@ var Laya=window.Laya=(function(window,document){
 			this.tag2wordCounter=null;
 			this.word2tagCounter=null;
 			this.tag2tagCounter=null;
+			this.rootCounter=null;
 			this.word2wordCounter=new KeysCounter();
 			this.tag2wordCounter=new KeysCounter();
 			this.word2tagCounter=new KeysCounter();
 			this.tag2tagCounter=new KeysCounter();
+			this.rootCounter=new KeysCounter();
 		}
 
 		__class(ConllTreeScoreUtils,'nlp.conll.ConllTreeScoreUtils');
@@ -12936,6 +12938,18 @@ var Laya=window.Laya=(function(window,document){
 			this.word2wordCounter.addKey(startWord.form,endWord.form,type);
 			this.tag2wordCounter.addKey(this.getAdptWordType(startWord.postag),endWord.form,type);
 			this.word2tagCounter.addKey(startWord.form,this.getAdptWordType(endWord.postag),type);
+		}
+
+		__proto.addRoot=function(startWord){
+			this.rootCounter.addKey(startWord.form);
+			this.rootCounter.addKey(startWord.postag);
+		}
+
+		__proto.getRootScore=function(startWord){
+			var rst=NaN;
+			rst=this.rootCounter.getKeyLogNum(startWord.form);
+			rst+=this.rootCounter.getKeyLogNum(startWord.postag)*0.01;
+			return rst;
 		}
 
 		__proto.getScore=function(startWord,endWord){
@@ -12962,9 +12976,11 @@ var Laya=window.Laya=(function(window,document){
 	var ConllTreeBuilder=(function(){
 		function ConllTreeBuilder(){
 			this.treeAnalyseer=null;
+			this.arcAnalyser=null;
 			this.valueTensor=null;
 			this.relationTensor=null;
 			this.wordList=null;
+			this.arcAnalyser=new ConllTreeArcAnalyser();
 		}
 
 		__class(ConllTreeBuilder,'nlp.conll.ConllTreeBuilder');
@@ -13000,6 +13016,7 @@ var Laya=window.Laya=(function(window,document){
 		//return treeAnalyseer.dependCounter.getKeyNum(wordA.postag,wordB.postag,wordB.id>wordA.id);
 		__proto.rebuildConllTree=function(tree,useDP){
 			(useDP===void 0)&& (useDP=false);
+			this.arcAnalyser.analyseTree(tree);
 			return this.buildConllTree(tree.getConllWordForRebuild(),useDP);
 		}
 
@@ -13069,7 +13086,7 @@ var Laya=window.Laya=(function(window,document){
 			end=wordList.length-1;
 			for (i=0;i < len;i++){
 				tRoot=i;
-				tScore=this.getMaxTree(start,end,tRoot);
+				tScore=this.getMaxTree(start,end,tRoot)+this.treeAnalyseer.scoreUtils.getRootScore(wordList[tRoot]);
 				if (tSelectRoot<0||tScore>tSelectScore){
 					tSelectScore=tScore;
 					tSelectRoot=tRoot;
@@ -13169,6 +13186,173 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		return ConllTreeBuilder;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllTreeArcAnalyser
+	var ConllTreeArcAnalyser=(function(){
+		function ConllTreeArcAnalyser(){
+			this.stack=null;
+			this.buffer=null;
+			this.actionList=null;
+			this.isBuildMode=false;
+		}
+
+		__class(ConllTreeArcAnalyser,'nlp.conll.ConllTreeArcAnalyser');
+		var __proto=ConllTreeArcAnalyser.prototype;
+		__proto.reset=function(){
+			this.stack=[];
+			this.buffer=[];
+			this.actionList=[];
+		}
+
+		__proto.recordState=function(action){
+			console.log("recordState:",action);
+		}
+
+		__proto.shift=function(){
+			this.actionList.push("shift");
+			if (this.isBuildMode){
+				}else{
+				this.recordState("shift");
+			};
+			var item;
+			item=this.buffer.shift();
+			this.stack.push(item);
+		}
+
+		__proto.leftAsParent=function(){
+			this.actionList.push("leftAsParent");
+			var itemL;
+			var itemR;
+			var tail=0;
+			tail=this.stack.length-1;
+			itemL=this.stack[tail-1];
+			itemR=this.stack[tail];
+			if (this.isBuildMode){
+				itemR.head=itemL.id;
+				}else{
+				this.recordState("leftAsParent");
+			}
+			this.stack.pop();
+		}
+
+		__proto.rightAsParent=function(){
+			this.actionList.push("rightAsParent");
+			var itemL;
+			var itemR;
+			var tail=0;
+			tail=this.stack.length-1;
+			itemL=this.stack[tail-1];
+			itemR=this.stack[tail];
+			if (this.isBuildMode){
+				itemL.head=itemR.id;
+				}else{
+				this.recordState("rightAsParent");
+			}
+			this.stack.pop();
+			this.stack.pop();
+			this.stack.push(itemR);
+		}
+
+		__proto.buildTree=function(wordList){
+			this.reset();
+			this.isBuildMode=true;
+			var i=0,len=0;
+			len=wordList.length;
+			for (i=0;i < len;i++){
+				this.buffer.push(wordList[i]);
+			}
+			this.doTrans();
+		}
+
+		__proto.getMove=function(){
+			return "shift";
+		}
+
+		__proto.doTrans=function(){
+			var moveType;
+			debugger;
+			while (true){
+				if (this.stack.length==1 && this.buffer.length==0){
+					break ;
+				}
+				if (this.stack.length < 2){
+					this.shift();
+					}else{
+					moveType=this.getMove();
+					switch(moveType){
+						case "shift":
+							this.shift();
+							break ;
+						case "leftAsParent":
+							this.leftAsParent();
+							break ;
+						case "rightAsParent":
+							this.rightAsParent();
+							break ;
+						default :
+							debugger;
+							return
+						}
+				}
+			}
+		}
+
+		__proto.analyseTree=function(conllTree){
+			this.reset();
+			this.isBuildMode=false;
+			var i=0,len=0;
+			var wordList;
+			wordList=conllTree.wordList;
+			len=wordList.length;
+			for (i=0;i < len;i++){
+				this.buffer.push(wordList[i]);
+			}
+			this.analyseTrans();
+			console.log("actionList:",this.actionList);
+		}
+
+		__proto.analyseTrans=function(){
+			var itemL;
+			var itemR;
+			var tail=0;
+			debugger;
+			while (true){
+				if (this.stack.length==1 && this.buffer.length==0){
+					break ;
+				}
+				if (this.stack.length < 2){
+					this.shift();
+					}else{
+					tail=this.stack.length-1;
+					itemL=this.stack[tail-1];
+					itemR=this.stack[tail];
+					if (itemL.head==itemR.id){
+						this.rightAsParent();
+					}else
+					if (itemR.head==itemL.id){
+						this.leftAsParent();
+						}else{
+						if (this.buffer.length){
+							this.shift();
+							}else{
+							debugger;
+							break ;
+						}
+					}
+				}
+			}
+		}
+
+		ConllTreeArcAnalyser.SHIFT="shift";
+		ConllTreeArcAnalyser.LEFTASPARENT="leftAsParent";
+		ConllTreeArcAnalyser.RIGHTASPARENT="rightAsParent";
+		return ConllTreeArcAnalyser;
 	})()
 
 

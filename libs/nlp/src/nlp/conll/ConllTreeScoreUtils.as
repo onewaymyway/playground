@@ -12,6 +12,7 @@ package nlp.conll
 		public var tag2wordCounter:KeysCounter;
 		public var word2tagCounter:KeysCounter;
 		public var tag2tagCounter:KeysCounter;
+		public var rootCounter:KeysCounter;
 		
 		private function getAdptWordType(word:ConllWord):String
 		{
@@ -30,6 +31,8 @@ package nlp.conll
 			tag2wordCounter = new KeysCounter();
 			word2tagCounter = new KeysCounter();
 			tag2tagCounter = new KeysCounter();
+			rootCounter = new KeysCounter();
+			
 		}
 		
 		public function addRelation(startWord:ConllWord, endWord:ConllWord):void
@@ -42,6 +45,19 @@ package nlp.conll
 			word2tagCounter.addKey(startWord.form, getAdptWordType(endWord.postag), type);
 		}
 		
+		public function addRoot(startWord:ConllWord):void
+		{
+			rootCounter.addKey(startWord.form);
+			rootCounter.addKey(startWord.postag);
+		}
+		
+		public function getRootScore(startWord:ConllWord):Number
+		{
+			var rst:Number;
+			rst = rootCounter.getKeyLogNum(startWord.form);
+			rst += rootCounter.getKeyLogNum(startWord.postag) * 0.01;
+			return rst;
+		}
 		public function getScore(startWord:ConllWord, endWord:ConllWord):Number
 		{
 			var type:*;
