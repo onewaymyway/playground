@@ -35,10 +35,33 @@ package nlp.conll
 			
 		}
 		
+		
+		public function getWordWordType(startWord:ConllWord, endWord:ConllWord):int
+		{
+			var type:int;
+			type = endWord.id - startWord.id;
+			if (type == 1 || type ==-1||type==0)
+			{
+				
+			}else
+			{
+				if (tye > 0)
+				{
+					type = 3;
+				}else
+				{
+					type = -3;
+				}
+				
+			}
+			
+			return type;
+		}
+		
 		public function addRelation(startWord:ConllWord, endWord:ConllWord):void
 		{
 			var type:*;
-			type = endWord.id > startWord.id;
+			type = getWordWordType(startWord, endWord);
 			tag2tagCounter.addKey(getAdptWordType(startWord.postag), getAdptWordType(endWord.postag), type);
 			word2wordCounter.addKey(startWord.form, endWord.form, type);
 			tag2wordCounter.addKey(getAdptWordType(startWord.postag), endWord.form, type);
@@ -61,7 +84,7 @@ package nlp.conll
 		public function getScore(startWord:ConllWord, endWord:ConllWord):Number
 		{
 			var type:*;
-			type = endWord.id > startWord.id;
+			type = getWordWordType(startWord, endWord);
 			var rst:Number;
 			rst = word2wordCounter.getKeyLogNum(startWord.form, endWord.form, type);
 			//rst = 0;

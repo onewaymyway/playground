@@ -2965,6 +2965,10 @@ var Laya=window.Laya=(function(window,document){
 			return src;
 		}
 
+		ObjectTools.copyArrSimple=function(src,a){
+			return ObjectTools.concatArr([],a);
+		}
+
 		ObjectTools.insertArrToArr=function(src,insertArr,pos){
 			(pos===void 0)&& (pos=0);
 			if (pos < 0)pos=0;
@@ -11979,6 +11983,28 @@ var Laya=window.Laya=(function(window,document){
 			WordDicParser.I.trie.addWordOneList(typeDic.wordList);
 		}
 
+		NLP.initConllTreeParser=function(conllDesFile,conllTrees){
+			NLP.contreeBuilder=new ConllTreeBuilder();
+			var conllDes;
+			conllDes=new ConllDesParser();
+			conllDes.parseTxt(Loader.getRes(conllDesFile));
+			ConllDesParser.I=conllDes;
+			NLP.conllParser=new ConllFileParser();
+			var i=0,len=0;
+			len=conllTrees.length;
+			for (i=0;i < len;i++){
+				NLP.conllParser.parseTxt(Loader.getRes(conllTrees[i]));
+			}
+			ConllTreeAnalyse.typeDic=WordUtils.typeDic;
+			var analyse;
+			analyse=new ConllTreeAnalyse();
+			analyse.analyse(NLP.conllParser.treeList);
+			NLP.contreeBuilder.arcAnalyser.analyseTreeList(NLP.conllParser.treeList);
+			NLP.contreeBuilder.treeAnalyseer=analyse;
+		}
+
+		NLP.contreeBuilder=null
+		NLP.conllParser=null
 		return NLP;
 	})()
 
@@ -11991,6 +12017,14 @@ var Laya=window.Laya=(function(window,document){
 	var WordUtils=(function(){
 		function WordUtils(){}
 		__class(WordUtils,'nlp.WordUtils');
+		WordUtils.getAdptWordType=function(word){
+			if (nlp.WordUtils.typeDic.getWordType(word.word)){
+				return nlp.WordUtils.typeDic.getWordTypeStr(word.word);
+				}else{
+				return word.postag;
+			}
+		}
+
 		WordUtils.printLines=function(lines){
 			var i=0,len=0;
 			len=lines.length;
@@ -12102,9 +12136,9 @@ var Laya=window.Laya=(function(window,document){
 			return arr;
 		}
 
-		WordUtils.splitWordBySpecial=function(str){
-			var rst;
-			rst=[];
+		WordUtils.splitWordBySpecial=function(str,rst){
+			if(!rst)
+				rst=[];
 			var i=0,len=0;
 			len=str.length;
 			var tStart=NaN;
@@ -12830,7 +12864,6 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__proto.adptPiece=function(piece){
-			if (piece.word==" ")debugger;
 			piece.update();
 			if (this.typeDic){
 				piece.typeO=this.typeDic.getWordType(piece.word);
@@ -12953,10 +12986,25 @@ var Laya=window.Laya=(function(window,document){
 	var TypeDefine=(function(){
 		function TypeDefine(){}
 		__class(TypeDefine,'nlp.dictools.TypeDefine');
+		TypeDefine._init=function(){
+			TypeDefine.TypeListCH=[];
+			var key;
+			for (key in TypeDefine.TypeDesDic){
+				TypeDefine.TypeListCH.push(TypeDefine.TypeDesDic[key]);
+			}
+			TypeDefine.TypeListCH.sort();
+		}
+
 		TypeDefine.getCHType=function(type){
 			return TypeDefine.TypeDesDic[type] || "未知";
 		}
 
+		TypeDefine.hasCHType=function(type){
+			if (TypeDefine.TypeDesDic[type])return true;
+			return false;
+		}
+
+		TypeDefine.TypeListCH=null
 		__static(TypeDefine,
 		['TypeDesDic',function(){return this.TypeDesDic={
 				"a":"形容词",
@@ -13139,7 +13187,6 @@ var Laya=window.Laya=(function(window,document){
 			var typeO;
 			typeO=this.getWordType(word);
 			if (!typeO)return "unknow";
-			return typeO.types[0];
 			return typeO.types.join(";");
 		}
 
@@ -13190,6 +13237,7 @@ var Laya=window.Laya=(function(window,document){
 				rst.types.push(ttype);
 				rst.typecns.push(TypeDefine.getCHType(ttype));
 			}
+			rst.types.sort();
 			return rst;
 		}
 
@@ -13450,6 +13498,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.setTxt=function(txt){
 			txt=txt.replace("\r","");
 			this.lines=txt.split("\n");
+			this.lines=BookParser.splitLinesToSentence(this.lines);
 			this.index=0;
 		}
 
@@ -13476,6 +13525,17 @@ var Laya=window.Laya=(function(window,document){
 		__proto.normalIndex=function(){
 			if (this.index < 0)this.index=0;
 			if (this.index >=this.lines.length)this.index=this.lines.length-1;
+		}
+
+		BookParser.splitLinesToSentence=function(lines){
+			var i=0,len=0;
+			len=lines.length;
+			var rst;
+			rst=[];
+			for (i=0;i < len;i++){
+				WordUtils.splitWordBySpecial(lines[i],rst);
+			}
+			return rst;
 		}
 
 		BookParser.createByTxt=function(txt){
@@ -13839,6 +13899,1302 @@ var Laya=window.Laya=(function(window,document){
 	*...
 	*@author ww
 	*/
+	//class nlp.algorithm.KeysCounter
+	var KeysCounter=(function(){
+		function KeysCounter(){
+			this._dic={};
+			this._dic["_@_Count"]=0;
+			this._dic["_@_Type"]=0;
+		}
+
+		__class(KeysCounter,'nlp.algorithm.KeysCounter');
+		var __proto=KeysCounter.prototype;
+		__proto.getKeyRateNum=function(__args){
+			var args=arguments;
+			return this.getKeyNum.apply(this,args)/ this._dic["_@_Count"];
+		}
+
+		__proto.getKeyLogNum=function(__args){
+			var args=arguments;
+			var num=NaN;
+			num=(this.getKeyNum.apply(this,args)||0.5)/ this._dic["_@_Count"]
+			return Math.log(num);
+		}
+
+		__proto.getMaxKey=function(__args){
+			var args=arguments;
+			var i=0,len=0;
+			len=args.length;
+			var key;
+			var tDic;
+			tDic=this._dic;
+			for (i=0;i < len;i++){
+				key=args[i];
+				if (!tDic[key]){
+					return null;
+				}
+				tDic=tDic[key];
+			}
+			if (!tDic)return null;
+			var key;
+			var tMaxCount=0;
+			var tMaxKey;
+			var tData;
+			for (key in tDic){
+				tData=tDic[key];
+				if (tData["_@_Count"] && tData["_@_Count"] > tMaxCount){
+					tMaxKey=key;
+					tMaxCount=tData["_@_Count"];
+				}
+			}
+			return tMaxKey;
+		}
+
+		__proto.getKeyNum=function(__args){
+			var args=arguments;
+			var i=0,len=0;
+			len=args.length;
+			var key;
+			var tDic;
+			tDic=this._dic;
+			for (i=0;i < len;i++){
+				key=args[i];
+				if (!tDic[key]){
+					return 0;
+				}
+				tDic=tDic[key];
+			}
+			if (!tDic)return 0;
+			return tDic["_@_Count"];
+		}
+
+		__proto.addKey=function(__args){
+			var args=arguments;
+			var i=0,len=0;
+			len=args.length;
+			var key;
+			var tDic;
+			tDic=this._dic;
+			tDic["_@_Count"]=tDic["_@_Count"]+1;
+			for (i=0;i < len;i++){
+				key=args[i];
+				if (!tDic[key]){
+					tDic[key]={};
+					tDic[key]["_@_Count"]=0;
+					tDic[key]["_@_Type"]=0;
+					tDic["_@_Type"]=tDic["_@_Type"]+1;
+				}
+				tDic=tDic[key];
+				tDic["_@_Count"]=tDic["_@_Count"]+1;
+			}
+		}
+
+		KeysCounter.CountKey="_@_Count";
+		KeysCounter.TypeKey="_@_Type";
+		return KeysCounter;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.algorithm.datastruct.AutoTensor
+	var AutoTensor=(function(){
+		function AutoTensor(){
+			this.defaultValue=0;
+			this._dic=null;
+			this._dic={};
+		}
+
+		__class(AutoTensor,'nlp.algorithm.datastruct.AutoTensor');
+		var __proto=AutoTensor.prototype;
+		__proto.hasValue=function(__args){
+			var args=arguments;
+			var i=0,len=0;
+			len=args.length-1;
+			var key;
+			var tDic;
+			tDic=this._dic;
+			for (i=0;i < len;i++){
+				key=args[i];
+				if (!tDic[key]){
+					return false;
+				}
+				tDic=tDic[key];
+			}
+			if (!tDic)return false;
+			key=args[len];
+			if (tDic.hasOwnProperty(key)){
+				return true;
+			}
+			return false;
+		}
+
+		__proto.getValue=function(__args){
+			var args=arguments;
+			var i=0,len=0;
+			len=args.length-1;
+			var key;
+			var tDic;
+			tDic=this._dic;
+			for (i=0;i < len;i++){
+				key=args[i];
+				if (!tDic[key]){
+					return this.defaultValue;
+				}
+				tDic=tDic[key];
+			}
+			if (!tDic)return this.defaultValue;
+			key=args[len];
+			if (tDic.hasOwnProperty(key)){
+				return tDic[key];
+			}
+			return this.defaultValue;
+		}
+
+		__proto.setValue=function(value,__args){
+			var args=[];for(var i=1,sz=arguments.length;i<sz;i++)args.push(arguments[i]);
+			var i=0,len=0;
+			len=args.length-1;
+			var key;
+			var tDic;
+			tDic=this._dic;
+			for (i=0;i < len;i++){
+				key=args[i];
+				if (!tDic[key]){
+					tDic[key]={};
+				}
+				tDic=tDic[key];
+			}
+			key=args[len];
+			tDic[key]=value;
+		}
+
+		return AutoTensor;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllRelation
+	var ConllRelation=(function(){
+		function ConllRelation(){
+			this.start=0;
+			this.end=0;
+			this.type=null;
+			this.len=0;
+		}
+
+		__class(ConllRelation,'nlp.conll.ConllRelation');
+		ConllRelation.buildByWord=function(word){
+			var rst;
+			rst=new ConllRelation();
+			rst.start=word.id;
+			rst.end=word.head;
+			rst.type=word.deprel;
+			rst.len=Math.abs(rst.start-rst.end);
+			return rst;
+		}
+
+		return ConllRelation;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllDesParser
+	var ConllDesParser=(function(){
+		function ConllDesParser(){
+			this.desDic=null;
+		}
+
+		__class(ConllDesParser,'nlp.conll.ConllDesParser');
+		var __proto=ConllDesParser.prototype;
+		__proto.parseLine=function(line){
+			var data;
+			data=WordUtils.arr2keyObj(line.split("\t"),ConllDesParser.KeyList);
+			this.desDic[data.type]=data;
+			return data;
+		}
+
+		__proto.parseTxt=function(txt){
+			this.desDic={};
+			var lines;
+			lines=txt.split("\n");
+			var i=0,len=0;
+			len=lines.length;
+			var tLine;
+			for (i=0;i < len;i++){
+				tLine=lines[i];
+				this.parseLine(tLine);
+			}
+			console.log("ConllDesParser:",this);
+		}
+
+		ConllDesParser.getCNType=function(type){
+			if (ConllDesParser.I && ConllDesParser.I.desDic[type])return ConllDesParser.I.desDic[type].desCN;
+			return type;
+		}
+
+		ConllDesParser.hasCNType=function(type){
+			if (ConllDesParser.I && ConllDesParser.I.desDic[type])return true;
+			return false;
+		}
+
+		ConllDesParser.I=null
+		__static(ConllDesParser,
+		['KeyList',function(){return this.KeyList=["desCN","type","desEN","detail"];}
+		]);
+		return ConllDesParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllWordDic
+	var ConllWordDic=(function(){
+		function ConllWordDic(){
+			this.wordDic={};
+			this.wordList=[];
+			this.typeDic={};
+		}
+
+		__class(ConllWordDic,'nlp.conll.ConllWordDic');
+		var __proto=ConllWordDic.prototype;
+		__proto.getWordCacheKey=function(word){
+			return word.word+"@"+word.postag;
+		}
+
+		__proto.addToTypeDic=function(word){
+			var tType;
+			tType=word.postag;
+			if (!this.typeDic[tType])this.typeDic[tType]=[];
+			var typeList;
+			typeList=this.typeDic[tType];
+			typeList.push(word);
+		}
+
+		__proto.addWord=function(word){
+			var key;
+			key=this.getWordCacheKey(word);
+			if (this.wordDic[key])return;
+			this.wordDic[key]=word;
+			this.wordList.push(word);
+			this.addToTypeDic(word);
+		}
+
+		__static(ConllWordDic,
+		['I',function(){return this.I=new ConllWordDic();}
+		]);
+		return ConllWordDic;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllFileParser
+	var ConllFileParser=(function(){
+		function ConllFileParser(conllDes){
+			this.index=0;
+			this.conllDes=null;
+			this.treeList=null;
+			this.conllDes=conllDes;
+			this.treeList=[];
+		}
+
+		__class(ConllFileParser,'nlp.conll.ConllFileParser');
+		var __proto=ConllFileParser.prototype;
+		__proto.loadFile=function(file,complete){
+			Laya.loader.load(file,Handler.create(this,this.onFileLoaded,[complete]),null,"text");
+		}
+
+		__proto.onFileLoaded=function(complete,txt){
+			this.parseTxt(txt);
+			if (complete){
+				complete.run();
+			}
+		}
+
+		__proto.parseTxt=function(txt){
+			var lines;
+			lines=txt.split("\n");
+			var i=0,len=0;
+			len=lines.length;
+			var tLine;
+			var tTree;
+			for (i=0;i < len;i++){
+				tLine=lines[i];
+				if (tLine.indexOf("\t")<0){
+					tTree=null;
+					}else{
+					if (!tTree){
+						tTree=new ConllTree();
+						this.treeList.push(tTree);
+					}
+					tTree.addLine(tLine);
+				}
+			}
+			console.log("conllfileParser:",this);
+			console.log("contypeDic:",ConllWordDic.I);
+		}
+
+		__proto.reset=function(){
+			this.index=0;
+		}
+
+		__proto.getCurLine=function(){
+			return this.treeList[this.index];
+		}
+
+		__proto.pre=function(){
+			this.index--;
+			this.normalIndex();
+			return this.getCurLine();
+		}
+
+		__proto.next=function(){
+			this.index++;
+			this.normalIndex();
+			return this.getCurLine();
+		}
+
+		__proto.normalIndex=function(){
+			if (this.index < 0)this.index=0;
+			if (this.index >=this.treeList.length)this.index=this.treeList.length-1;
+		}
+
+		return ConllFileParser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllTree
+	var ConllTree=(function(){
+		function ConllTree(){
+			this.wordList=null;
+			this.relations=null;
+			this.wordList=[];
+		}
+
+		__class(ConllTree,'nlp.conll.ConllTree');
+		var __proto=ConllTree.prototype;
+		__proto.getWordByIndex=function(index){
+			return this.wordList[index];
+		}
+
+		__proto.addLine=function(line){
+			var tWord;
+			tWord=ConllWord.parseFromLine(line);
+			if (!this.wordList[tWord.id]){
+				this.wordList.push(tWord);
+				tWord.tree=this;
+				ConllWordDic.I.addWord(tWord);
+			}
+		}
+
+		__proto.getConllWordForRebuild=function(){
+			var wList;
+			wList=[];
+			var i=0,len=0;
+			var tWord;
+			len=this.wordList.length;
+			for (i=0;i < len;i++){
+				tWord=this.wordList[i];
+				tWord=tWord.clone();
+				tWord.removeTreeInfo();
+				wList.push(tWord);
+			}
+			return wList;
+		}
+
+		__proto.dealRelation=function(relation){
+			var enWord;
+			enWord=this.wordList[relation.end];
+			if(enWord)
+				enWord.refers.push(relation.start);
+			var sWord;
+			sWord=this.wordList[relation.start];
+			if(sWord)
+				sWord.refers.push(relation.end);
+		}
+
+		__proto.buildRelation=function(){
+			this.relations=[];
+			var i=0,len=0;
+			len=this.wordList.length;
+			var tRelation;
+			for (i=0;i < len;i++){
+				tRelation=ConllRelation.buildByWord(this.wordList[i]);
+				this.relations.push(tRelation);
+				this.dealRelation(tRelation);
+			}
+			len=this.wordList.length;
+			var tWord;
+			for (i=0;i < len;i++){
+				tWord=this.wordList[i];
+				tWord.sortRefers(i);
+			}
+			TopoSort.sort(this.relations,"start","end",ConllTree.otherSort);
+		}
+
+		ConllTree.otherSort=function(item0,item1){
+			return item0.len < item1.len;
+		}
+
+		return ConllTree;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllTreeAnalyse
+	var ConllTreeAnalyse=(function(){
+		function ConllTreeAnalyse(){
+			this.keyDic={};
+			this.keys=null;
+			this.dependDic={};
+			this.depends=null;
+			this.wordDic=null;
+			this.wordDic2=null;
+			this.word2wordCounter=new KeysCounter();
+			this.relationCounter=new KeysCounter();
+			this.noneCNRelationCounter=new KeysCounter();
+			this.noneCNTypeCounter=new KeysCounter();
+			this.dependCounter=new KeysCounter();
+			this.unkknowTypeCounter=new KeysCounter();
+			this.scoreUtils=new ConllTreeScoreUtils();
+		}
+
+		__class(ConllTreeAnalyse,'nlp.conll.ConllTreeAnalyse');
+		var __proto=ConllTreeAnalyse.prototype;
+		__proto.analyse=function(treeList){
+			var i=0,len=0;
+			len=treeList.length;
+			var tKey;
+			var tree;
+			this.wordDic={};
+			this.wordDic2={};
+			for (i=0;i < len;i++){
+				tree=treeList[i];
+				tree.buildRelation();
+				this.analyseRelation(tree);
+				this.analyseWordLists(ConllTreeAnalyse.splitWordListByPu(tree.wordList));
+				this.analyseWords(tree.wordList);
+			}
+			this.keys=WordUtils.getDicKeys(this.keyDic);
+			this.keys.sort();
+			console.log("keys:",this.keys);
+			this.depends=WordUtils.dic2Arr(this.dependDic);
+			this.depends.sort(MathUtil.sortByKey("value"));
+			console.log("depends",this.depends);
+			console.log("depends",this.dependCounter);
+			var wList;
+			wList=WordUtils.getDicKeys(this.wordDic);
+			console.log("wordList:",wList);
+			var wList2;
+			wList2=WordUtils.getDicKeys(this.wordDic2);
+			console.log("wordList2:",wList2);
+			console.log("word2word:",this.word2wordCounter);
+			console.log("wordDic:",ConllWordDic.I);
+			console.log("relation:",this.relationCounter);
+			console.log("noneCNRelationCounter:",this.noneCNRelationCounter);
+			console.log("noneCNTypeCounter:",this.noneCNTypeCounter);
+			console.log("unkknowTypeCounter:",this.unkknowTypeCounter);
+			console.log("scoreUtils",this.scoreUtils);
+		}
+
+		__proto.analyseWords=function(wordList){
+			var i=0,len=0;
+			len=wordList.length;
+			var tWord;
+			var key;
+			for (i=0;i < len;i++){
+				tWord=wordList[i];
+				key=tWord.form;
+				this.wordDic[key]=this.wordDic[key]?this.wordDic[key]+1:1;
+				key=tWord.form+"_"+tWord.cpostag;
+				this.wordDic2[key]=this.wordDic2[key]?this.wordDic2[key]+1:1;
+			}
+		}
+
+		__proto.getWordTypeEx=function(word){
+			if (!word)return "null";
+			return word.postag;
+			return ConllTreeAnalyse.typeDic.getWordTypeCNStr(word.word);
+		}
+
+		__proto.getAdptWordType=function(word){
+			if (ConllTreeAnalyse.typeDic.getWordType(word.word)){
+				return ConllTreeAnalyse.typeDic.getWordTypeStr(word.word);
+				}else{
+				return word.postag;
+			}
+		}
+
+		__proto.getRelationKey=function(relation,tree){
+			var startWord;
+			var endWord;
+			startWord=tree.getWordByIndex(relation.start);
+			endWord=tree.getWordByIndex(relation.end);
+			var tType;
+			tType=startWord.postag;
+			if (!ConllTreeAnalyse.typeDic.getWordType(startWord.word)){
+				this.unkknowTypeCounter.addKey(startWord.postag,startWord.form);
+			}
+			this.noneCNTypeCounter.addKey(tType,startWord.form);
+			if (endWord){
+				this.word2wordCounter.addKey(startWord.form,endWord.form,relation.end > relation.start);
+				this.scoreUtils.addRelation(startWord,endWord);
+				}else{
+				this.dependCounter.addKey("Root",startWord.postag,true);
+				this.scoreUtils.addRoot(startWord);
+			}
+			return this.getWordRelationKey(startWord,endWord,relation.end-relation.start);
+			return "unknow";
+		}
+
+		__proto.getWordRelationKey=function(startWord,endWord,pos){
+			return this.getWordTypeEx(startWord)+":"+this.getWordTypeEx(endWord)+":"+(pos>0);
+		}
+
+		__proto.getWordRelationScore=function(start,end,pos){
+			var key;
+			key=this.getWordRelationKey(start,end,pos);
+			if (this.dependDic[key]){
+				return this.dependDic[key];
+			}
+			return 0;
+		}
+
+		__proto.analyseRelation=function(tree){
+			var relations;
+			relations=tree.relations;
+			var i=0,len=0;
+			len=relations.length;
+			var tRelation;
+			var tkey;
+			for (i=0;i < len;i++){
+				tRelation=relations[i];
+				tkey=this.getRelationKey(tRelation,tree);
+				if (!this.dependDic[tkey]){
+					this.dependDic[tkey]=1;
+					}else{
+					this.dependDic[tkey]=this.dependDic[tkey]+1;
+				}
+				this.relationCounter.addKey(tRelation.type,tkey);
+				if (!ConllDesParser.hasCNType(tRelation.type)){
+					this.noneCNRelationCounter.addKey(tRelation.type);
+				}
+			}
+		}
+
+		__proto.analyseWordLists=function(lists){
+			var i=0,len=0;
+			len=lists.length;
+			var tKey;
+			for (i=0;i < len;i++){
+				tKey=ConllTreeAnalyse.getWordListKey(lists[i]);
+				this.keyDic[tKey]=lists;
+			}
+		}
+
+		ConllTreeAnalyse.getTreeKey=function(tree){
+			var wordList;
+			wordList=tree.wordList;
+			return ConllTreeAnalyse.getWordListKey(wordList);
+		}
+
+		ConllTreeAnalyse.getWordListKey=function(wordList){
+			var i=0,len=0;
+			len=wordList.length;
+			var signList;
+			signList=[];
+			var tword;
+			for (i=0;i < len;i++){
+				tword=wordList[i];
+				signList.push(tword.postag);
+			}
+			WordUtils.removeSameNB(signList);
+			return signList.join(",");
+		}
+
+		ConllTreeAnalyse.splitWordListByPu=function(wordList){
+			var rst;
+			rst=[];
+			var tarr;
+			var i=0,len=0;
+			len=wordList.length;
+			var tword;
+			for (i=0;i < len;i++){
+				tword=wordList[i];
+				if (tword.postag=="PU"){
+					if (tarr && tarr.length){
+						tarr=null;
+					}
+					}else{
+					if (!tarr){
+						tarr=[];
+						rst.push(tarr);
+					}
+					tarr.push(tword);
+				}
+			}
+			return rst;
+		}
+
+		ConllTreeAnalyse.typeDic=null
+		return ConllTreeAnalyse;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllWord
+	var ConllWord=(function(){
+		function ConllWord(){
+			this.id=0;
+			this.form=null;
+			this.lemma=null;
+			this.cpostag=null;
+			this.postag=null;
+			this.feats=null;
+			this.head=0;
+			this.deprel=null;
+			this.word=null;
+			this.tree=null;
+			this.refers=null;
+		}
+
+		__class(ConllWord,'nlp.conll.ConllWord');
+		var __proto=ConllWord.prototype;
+		__proto.clone=function(){
+			var rst;
+			rst=new ConllWord();
+			ObjectTools.copyValueByArr(rst,this,ConllWord.KeyList);
+			rst.word=rst.form;
+			return rst;
+		}
+
+		__proto.removeTreeInfo=function(){
+			this.head=-1;
+			this.deprel=null;
+			this.refers=[];
+		}
+
+		__proto.sortRefers=function(i){
+			function mSort (v0,v1){
+				if (v0==i||v1==i){
+					return v0-v1;
+				}
+				if (v0 > i && v1 > i){
+					return v1-v0;
+				}
+				if (v0 < i && v1 < i){
+					return v1-v0;
+				}
+				return v0-v1;
+			}
+			this.refers.sort(mSort);
+		}
+
+		ConllWord.parseFromLine=function(line){
+			var values;
+			values=line.split("\t");
+			var rst;
+			rst=new ConllWord();
+			var i=0,len=0;
+			len=ConllWord.KeyList.length;
+			for (i=0;i < len;i++){
+				rst[ConllWord.KeyList[i]]=values[i];
+			}
+			rst.id=Sys.mParseInt(rst.id)-1;
+			rst.head=Sys.mParseInt(rst.head)-1;
+			rst.word=rst.form;
+			rst.refers=[];
+			return rst;
+		}
+
+		__static(ConllWord,
+		['KeyList',function(){return this.KeyList=["id","form","lemma","cpostag","postag","feats","head","deprel"];}
+		]);
+		return ConllWord;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllTreeScoreUtils
+	var ConllTreeScoreUtils=(function(){
+		function ConllTreeScoreUtils(){
+			this.word2wordCounter=null;
+			this.tag2wordCounter=null;
+			this.word2tagCounter=null;
+			this.tag2tagCounter=null;
+			this.rootCounter=null;
+			this.word2wordCounter=new KeysCounter();
+			this.tag2wordCounter=new KeysCounter();
+			this.word2tagCounter=new KeysCounter();
+			this.tag2tagCounter=new KeysCounter();
+			this.rootCounter=new KeysCounter();
+		}
+
+		__class(ConllTreeScoreUtils,'nlp.conll.ConllTreeScoreUtils');
+		var __proto=ConllTreeScoreUtils.prototype;
+		__proto.getAdptWordType=function(word){
+			if (WordUtils.typeDic.getWordType(word.word)){
+				return WordUtils.typeDic.getWordTypeStr(word.word);
+				}else{
+				return word.postag;
+			}
+		}
+
+		__proto.addRelation=function(startWord,endWord){
+			var type;
+			type=endWord.id > startWord.id;
+			this.tag2tagCounter.addKey(this.getAdptWordType(startWord.postag),this.getAdptWordType(endWord.postag),type);
+			this.word2wordCounter.addKey(startWord.form,endWord.form,type);
+			this.tag2wordCounter.addKey(this.getAdptWordType(startWord.postag),endWord.form,type);
+			this.word2tagCounter.addKey(startWord.form,this.getAdptWordType(endWord.postag),type);
+		}
+
+		__proto.addRoot=function(startWord){
+			this.rootCounter.addKey(startWord.form);
+			this.rootCounter.addKey(startWord.postag);
+		}
+
+		__proto.getRootScore=function(startWord){
+			var rst=NaN;
+			rst=this.rootCounter.getKeyLogNum(startWord.form);
+			rst+=this.rootCounter.getKeyLogNum(startWord.postag)*0.01;
+			return rst;
+		}
+
+		__proto.getScore=function(startWord,endWord){
+			var type;
+			type=endWord.id > startWord.id;
+			var rst=NaN;
+			rst=this.word2wordCounter.getKeyLogNum(startWord.form,endWord.form,type);
+			rst+=this.word2tagCounter.getKeyLogNum(startWord.form,this.getAdptWordType(endWord.postag),type)*0.01;
+			rst+=this.tag2wordCounter.getKeyLogNum(this.getAdptWordType(startWord.postag),endWord.form,type)*0.01;
+			rst+=this.tag2tagCounter.getKeyLogNum(this.getAdptWordType(startWord.postag),this.getAdptWordType(endWord.postag),type)*0.0001;
+			rst+=-Math.abs(startWord.id-endWord.id)*0.1;
+			return rst;
+		}
+
+		return ConllTreeScoreUtils;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllTreeBuilder
+	var ConllTreeBuilder=(function(){
+		function ConllTreeBuilder(){
+			this.treeAnalyseer=null;
+			this.arcAnalyser=null;
+			this.valueTensor=null;
+			this.relationTensor=null;
+			this.wordList=null;
+			this.arcAnalyser=new ConllTreeArcAnalyser();
+		}
+
+		__class(ConllTreeBuilder,'nlp.conll.ConllTreeBuilder');
+		var __proto=ConllTreeBuilder.prototype;
+		__proto.cutStringToTree=function(str,useDP){
+			(useDP===void 0)&& (useDP=false);
+			var words;
+			words=WordDicParser.I.cut(str);
+			var i=0,len=0;
+			len=words.length;
+			var tWordPiece;
+			var tConllWord;
+			var wordList;
+			wordList=[];
+			for (i=0;i < len;i++){
+				tWordPiece=words[i];
+				tConllWord=new ConllWord();
+				tConllWord.id=i;
+				tConllWord.form=tWordPiece.word;
+				tConllWord.word=tWordPiece.word;
+				tConllWord.postag=WordUtils.typeDic.getWordTypeStr(tConllWord.word);
+				tConllWord.refers=[];
+				tConllWord.head=-1;
+				wordList.push(tConllWord);
+			}
+			return this.buildConllTree(wordList,useDP);
+		}
+
+		__proto.scoreRelation=function(wordA,wordB,type){
+			return this.treeAnalyseer.scoreUtils.getScore(wordA,wordB);
+		}
+
+		//return treeAnalyseer.dependCounter.getKeyNum(wordA.postag,wordB.postag,wordB.id>wordA.id);
+		__proto.rebuildConllTree=function(tree,useDP){
+			(useDP===void 0)&& (useDP=false);
+			if(useDP)
+				return this.arcAnalyser.buildTree(tree.getConllWordForRebuild());
+			return this.buildConllTree(tree.getConllWordForRebuild(),useDP);
+		}
+
+		__proto.buildWordRelation=function(wordList,useDP){
+			(useDP===void 0)&& (useDP=false);
+			var wList;
+			wList=ObjectTools.concatArr([],wordList);
+			if (useDP){
+				this.buildByDP(wList);
+				return;
+			};
+			var i=0,len=0;
+			len=wList.length;
+			var tSelectWord;
+			var tSelectRWord;
+			var tSelectScore=NaN;
+			var tSelectIndex=-1;
+			var tDir=-1;
+			var tWord;
+			var tRWord;
+			var tScore=NaN;
+			var j=0,jLen=0;
+			var k=0;
+			jLen=wList.length-1;
+			for (j=0;j < jLen;j++){
+				len=wList.length;
+				tSelectWord=null;
+				tSelectIndex=-1;
+				for (i=0;i < len;i++){
+					tWord=wList[i];
+					for (k=0;k < len;k++){
+						if (i==k)continue ;
+						if (Math.abs(i-k)> 1)continue ;
+						tRWord=wList[k];
+						if (tRWord){
+							tScore=this.scoreRelation(tWord,tRWord,1);
+							if (!tSelectWord || tScore > tSelectScore){
+								tSelectWord=tWord;
+								tSelectScore=tScore;
+								tSelectRWord=tRWord;
+								tDir=1;
+								tSelectIndex=i;
+							}
+						}
+					}
+				}
+				if (tSelectWord){
+					tSelectWord.head=tSelectRWord.id;
+					wList.splice(tSelectIndex,1);
+					tSelectWord.deprel="ds"+tSelectScore.toFixed(3);
+				}
+			}
+		}
+
+		__proto.buildByDP=function(wordList){
+			this.wordList=wordList;
+			this.valueTensor=new AutoTensor();
+			this.relationTensor=new AutoTensor();
+			var i=0,len=0;
+			len=wordList.length;
+			var tSelectRoot=-1;
+			var tRoot=0;
+			var tScore=NaN;
+			var tSelectScore=NaN;
+			var start=0,end=0;
+			start=0;
+			end=wordList.length-1;
+			for (i=0;i < len;i++){
+				tRoot=i;
+				tScore=this.getMaxTree(start,end,tRoot)+this.treeAnalyseer.scoreUtils.getRootScore(wordList[tRoot]);
+				if (tSelectRoot<0||tScore>tSelectScore){
+					tSelectScore=tScore;
+					tSelectRoot=tRoot;
+				}
+			}
+			this.decodeTreeInfo(start,end,tSelectRoot);
+		}
+
+		__proto.decodeTreeInfo=function(start,end,root){
+			if (start==end)return;
+			if (!this.relationTensor.hasValue(start,end,root)){
+				console.log("noRelation",end,root);
+				debugger;
+				return;
+			};
+			var info;
+			info=this.relationTensor.getValue(start,end,root);
+			console.log("decodeTreeInfo",info);
+			var oRoot=0;
+			oRoot=info[3];
+			var bound=0;
+			bound=info[1];
+			var wordStart;
+			wordStart=this.wordList[oRoot];
+			var wordEnd;
+			wordEnd=this.wordList[root];
+			if (wordStart && wordEnd){
+				wordStart.head=wordEnd.id;
+				wordStart.deprel="depends";
+			}
+			if (oRoot > root){
+				var temp=NaN;
+				temp=root;
+				root=oRoot;
+				oRoot=temp;
+			}
+			this.decodeTreeInfo(start,bound-1,oRoot);
+			this.decodeTreeInfo(bound,end,root);
+		}
+
+		__proto.scoreRelationByIndex=function(start,end){
+			return this.scoreRelation(this.wordList[start],this.wordList[end],1);
+		}
+
+		__proto.getMaxTree=function(start,end,root){
+			if (root > end)debugger;
+			if (start==end)return 0;
+			if (this.valueTensor.hasValue(start,end,root))return this.valueTensor.getValue(start,end,root);
+			var tValue=NaN;
+			var i=0,len=0;
+			var oRoot=0;
+			var bound=0;
+			var tScore=NaN;
+			var selectScore=NaN;
+			var tSelectORoot=0;
+			var tSelectBound=0;
+			var hasValue=false;
+			hasValue=true;
+			selectScore=-10000000;
+			for (oRoot=start;oRoot <=end;oRoot++){
+				if (oRoot !=root){
+					if (oRoot < root){
+						for (bound=oRoot+1;bound <=root;bound++){
+							tScore=this.getMaxTree(start,bound-1,oRoot)+this.getMaxTree(bound,end,root)+this.scoreRelationByIndex(oRoot,root);
+							if (!hasValue||tScore > selectScore){
+								hasValue=true;
+								selectScore=tScore;
+								tSelectORoot=oRoot;
+								tSelectBound=bound;
+							}
+						}
+						}else{
+						for (bound=root+1;bound <=oRoot;bound++){
+							tScore=this.getMaxTree(start,bound-1,root)+this.getMaxTree(bound,end,oRoot)+this.scoreRelationByIndex(oRoot,root);;
+							if (!hasValue||tScore > selectScore){
+								hasValue=true;
+								selectScore=tScore;
+								tSelectORoot=oRoot;
+								tSelectBound=bound;
+							}
+						}
+					}
+				}
+			}
+			this.valueTensor.setValue(selectScore,start,end,root);
+			this.relationTensor.setValue([start,tSelectBound,end,tSelectORoot],start,end,root);
+			return selectScore;
+		}
+
+		__proto.buildConllTree=function(wordList,useDP){
+			(useDP===void 0)&& (useDP=false);
+			var conllTree;
+			conllTree=new ConllTree();
+			this.buildWordRelation(wordList,useDP);
+			conllTree.wordList=wordList;
+			return conllTree;
+		}
+
+		return ConllTreeBuilder;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class nlp.conll.ConllTreeArcAnalyser
+	var ConllTreeArcAnalyser=(function(){
+		function ConllTreeArcAnalyser(){
+			this.stack=null;
+			this.buffer=null;
+			this.actionList=null;
+			this.isBuildMode=false;
+			this.infoCounter=null;
+			this.infoCounter=new KeysCounter();
+		}
+
+		__class(ConllTreeArcAnalyser,'nlp.conll.ConllTreeArcAnalyser');
+		var __proto=ConllTreeArcAnalyser.prototype;
+		__proto.reset=function(){
+			this.stack=[];
+			this.buffer=[];
+			this.actionList=[];
+		}
+
+		__proto.getAdptWordKey=function(word,id){
+			var rst;
+			switch(id){
+				case 0:
+				rst=WordUtils.getAdptWordType(ConllTreeArcAnalyser.defaultBufferHead);
+					break ;
+				case 1:
+					rst=WordUtils.getAdptWordType(word);
+					break ;
+				case 2:
+					rst=word.form;
+					break ;
+				}
+			return rst;
+		}
+
+		__proto.recordState=function(action){
+			console.log("recordState:",action);
+			var itemL;
+			var itemR;
+			var bufferHead;
+			var tail=0;
+			tail=this.stack.length-1;
+			itemL=this.stack[tail-1]||ConllTreeArcAnalyser.defaultBufferHead;
+			itemR=this.stack[tail]||ConllTreeArcAnalyser.defaultBufferHead;
+			bufferHead=this.buffer[0] || ConllTreeArcAnalyser.defaultBufferHead;
+			var i=0,len=0;
+			var tArr;
+			len=ConllTreeArcAnalyser.typeConfigs.length;
+			for (i=0;i < len;i++){
+				tArr=ConllTreeArcAnalyser.typeConfigs[i];
+				this.infoCounter.addKey(this.getAdptWordKey(itemL,tArr[0]),this.getAdptWordKey(itemR,tArr[1]),this.getAdptWordKey(bufferHead,tArr[2]),action);
+			}
+		}
+
+		__proto.shift=function(){
+			this.actionList.push("shift");
+			if (this.isBuildMode){
+				}else{
+				this.recordState("shift");
+			};
+			var item;
+			item=this.buffer.shift();
+			this.stack.push(item);
+		}
+
+		__proto.leftAsParent=function(){
+			this.actionList.push("leftAsParent");
+			var itemL;
+			var itemR;
+			var tail=0;
+			tail=this.stack.length-1;
+			itemL=this.stack[tail-1];
+			itemR=this.stack[tail];
+			if (this.isBuildMode){
+				itemR.head=itemL.id;
+				}else{
+				this.recordState("leftAsParent");
+			}
+			this.stack.pop();
+		}
+
+		__proto.rightAsParent=function(){
+			this.actionList.push("rightAsParent");
+			var itemL;
+			var itemR;
+			var tail=0;
+			tail=this.stack.length-1;
+			itemL=this.stack[tail-1];
+			itemR=this.stack[tail];
+			if (this.isBuildMode){
+				itemL.head=itemR.id;
+				}else{
+				this.recordState("rightAsParent");
+			}
+			this.stack.pop();
+			this.stack.pop();
+			this.stack.push(itemR);
+		}
+
+		__proto.buildTree=function(wordList){
+			this.reset();
+			this.isBuildMode=true;
+			var i=0,len=0;
+			len=wordList.length;
+			for (i=0;i < len;i++){
+				this.buffer.push(wordList[i]);
+			}
+			this.doTrans();
+			var conllTree;
+			conllTree=new ConllTree();
+			conllTree.wordList=wordList;
+			return conllTree;
+		}
+
+		__proto.canAct=function(action){
+			if (this.buffer.length==0 && action=="shift")return false;
+			if (this.stack.length < 2 && action !="shift")return false;
+			return true;
+		}
+
+		__proto.getRandomAct=function(){
+			if (this.canAct("shift"))return "shift";
+			return "leftAsParent";
+		}
+
+		__proto.getMove=function(){
+			if (this.stack.length < 2){
+				return "shift";
+				}else{
+				var itemL;
+				var itemR;
+				var bufferHead;
+				var tail=0;
+				tail=this.stack.length-1;
+				itemL=this.stack[tail-1]||ConllTreeArcAnalyser.defaultBufferHead;
+				itemR=this.stack[tail]||ConllTreeArcAnalyser.defaultBufferHead;
+				bufferHead=this.buffer[0] || ConllTreeArcAnalyser.defaultBufferHead;
+				var i=0,len=0;
+				var tArr;
+				len=ConllTreeArcAnalyser.typeConfigs.length;
+				var tType;
+				for (i=0;i < len;i++){
+					tArr=ConllTreeArcAnalyser.typeConfigs[i];
+					tType=this.infoCounter.getMaxKey(this.getAdptWordKey(itemL,tArr[0]),this.getAdptWordKey(itemR,tArr[1]),this.getAdptWordKey(bufferHead,tArr[2]));
+					if (tType&& this.canAct(tType))return tType;
+				}
+			}
+			return this.getRandomAct();
+		}
+
+		__proto.doTrans=function(){
+			var moveType;
+			debugger;
+			while (true){
+				if (this.stack.length==1 && this.buffer.length==0){
+					break ;
+				}
+				if (this.stack.length < 2){
+					this.shift();
+					}else{
+					moveType=this.getMove();
+					switch(moveType){
+						case "shift":
+							this.shift();
+							break ;
+						case "leftAsParent":
+							this.leftAsParent();
+							break ;
+						case "rightAsParent":
+							this.rightAsParent();
+							break ;
+						default :
+							debugger;
+							return
+						}
+				}
+			}
+		}
+
+		__proto.analyseTreeList=function(treeList){
+			var i=0,len=0;
+			len=treeList.length;
+			for (i=0;i < len;i++){
+				this.analyseTree(treeList[i]);
+			}
+		}
+
+		__proto.analyseTree=function(conllTree){
+			this.reset();
+			this.isBuildMode=false;
+			var i=0,len=0;
+			var wordList;
+			wordList=conllTree.wordList;
+			len=wordList.length;
+			for (i=0;i < len;i++){
+				this.buffer.push(wordList[i]);
+			}
+			this.analyseTrans();
+			console.log("actionList:",this.actionList);
+		}
+
+		__proto.analyseTrans=function(){
+			var itemL;
+			var itemR;
+			var tail=0;
+			debugger;
+			while (true){
+				if (this.stack.length==1 && this.buffer.length==0){
+					break ;
+				}
+				if (this.stack.length < 2){
+					this.shift();
+					}else{
+					tail=this.stack.length-1;
+					itemL=this.stack[tail-1];
+					itemR=this.stack[tail];
+					if (itemL.head==itemR.id){
+						this.rightAsParent();
+					}else
+					if (itemR.head==itemL.id){
+						this.leftAsParent();
+						}else{
+						if (this.buffer.length){
+							this.shift();
+							}else{
+							debugger;
+							break ;
+						}
+					}
+				}
+			}
+		}
+
+		ConllTreeArcAnalyser.inits=function(){
+			ConllTreeArcAnalyser.defaultBufferHead=new ConllWord();
+			ConllTreeArcAnalyser.defaultBufferHead.form="Empty";
+			ConllTreeArcAnalyser.defaultBufferHead.postag="Empty";
+		}
+
+		ConllTreeArcAnalyser.SHIFT="shift";
+		ConllTreeArcAnalyser.LEFTASPARENT="leftAsParent";
+		ConllTreeArcAnalyser.RIGHTASPARENT="rightAsParent";
+		ConllTreeArcAnalyser.defaultBufferHead=null
+		__static(ConllTreeArcAnalyser,
+		['typeConfigs',function(){return this.typeConfigs=[
+			[2,2,2],
+			[1,1,1],
+			[1,1,0],
+			[0,1,1],
+			[1,0,1],
+			[0,0,1],
+			[1,0,0],
+			[0,1,0]];}
+		]);
+		ConllTreeArcAnalyser.__init$=function(){
+			ConllTreeArcAnalyser.inits();;
+		}
+
+		return ConllTreeArcAnalyser;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
 	//class nlp.tagging.TaggingWord
 	var TaggingWord=(function(){
 		function TaggingWord(){
@@ -14064,6 +15420,62 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		return WordLayout;
+	})()
+
+
+	/**
+	*编辑器全局静态入口
+	*@author yung
+	*/
+	//class Sys
+	var Sys=(function(){
+		function Sys(){};
+		__class(Sys,'Sys');
+		Sys.mParseInt=function(v){
+			return parseInt(v);
+		}
+
+		Sys.lang=function(body,__args){
+			var args=[];for(var i=1,sz=arguments.length;i<sz;i++)args.push(arguments[i]);
+			var i=0,len=0;
+			len=args.length;
+			if(Sys.langPack&&Sys.langPack[body]){
+				body=Sys.langPack[body];
+			}
+			for (i=0;i < len;i++){
+				body=body.replace("{"+i+"}",args[i]);
+			}
+			return body;
+		}
+
+		Sys.adptLangPack=function(){
+			if(!Sys.langPack)return;
+			var key;
+			var newKey;
+			for(key in Sys.langPack){
+				if(key.indexOf("\\n")>=0){
+					newKey=StringTool.getReplace(key,"\\\\n","\n");
+					Sys.langPack[newKey]=StringTool.getReplace(Sys.langPack[key],"\\\\n","\n");
+				}
+			}
+		}
+
+		Sys.langArr=function(txtList){
+			if(!Sys.langPack)return txtList;
+			var i=0,len=0;
+			len=txtList.length;
+			var tTxt;
+			for(i=0;i<len;i++){
+				tTxt=txtList[i];
+				if(Sys.langPack[tTxt]){
+					txtList[i]=Sys.langPack[tTxt];
+				}
+			}
+			return txtList;
+		}
+
+		Sys.langPack=null
+		return Sys;
 	})()
 
 
@@ -32213,7 +33625,7 @@ var Laya=window.Laya=(function(window,document){
 	})(WordPropUI)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,Render,Browser,Timer,View,GraphicAnimation,LocalStorage,PingYinDic]);
+	Laya.__init([LoaderManager,EventDispatcher,Render,Browser,Timer,View,ConllTreeArcAnalyser,GraphicAnimation,LocalStorage,PingYinDic]);
 	new NLPPlatform();
 
 })(window,document,Laya);

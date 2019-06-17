@@ -62,6 +62,7 @@ package nlp
 			var analyse:ConllTreeAnalyse;
 			analyse = new ConllTreeAnalyse();
 			analyse.analyse(conllParser.treeList);
+			contreeBuilder.arcAnalyser.analyseTreeList(conllParser.treeList);
 			contreeBuilder.treeAnalyseer = analyse;
 		}
 		

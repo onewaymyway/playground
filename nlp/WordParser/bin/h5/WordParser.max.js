@@ -10302,6 +10302,7 @@ var Laya=window.Laya=(function(window,document){
 			var analyse;
 			analyse=new ConllTreeAnalyse();
 			analyse.analyse(NLP.conllParser.treeList);
+			NLP.contreeBuilder.arcAnalyser.analyseTreeList(NLP.conllParser.treeList);
 			NLP.contreeBuilder.treeAnalyseer=analyse;
 		}
 
@@ -10319,6 +10320,14 @@ var Laya=window.Laya=(function(window,document){
 	var WordUtils=(function(){
 		function WordUtils(){}
 		__class(WordUtils,'nlp.WordUtils');
+		WordUtils.getAdptWordType=function(word){
+			if (nlp.WordUtils.typeDic.getWordType(word.word)){
+				return nlp.WordUtils.typeDic.getWordTypeStr(word.word);
+				}else{
+				return word.postag;
+			}
+		}
+
 		WordUtils.printLines=function(lines){
 			var i=0,len=0;
 			len=lines.length;
@@ -12215,6 +12224,35 @@ var Laya=window.Laya=(function(window,document){
 			return Math.log(num);
 		}
 
+		__proto.getMaxKey=function(__args){
+			var args=arguments;
+			var i=0,len=0;
+			len=args.length;
+			var key;
+			var tDic;
+			tDic=this._dic;
+			for (i=0;i < len;i++){
+				key=args[i];
+				if (!tDic[key]){
+					return null;
+				}
+				tDic=tDic[key];
+			}
+			if (!tDic)return null;
+			var key;
+			var tMaxCount=0;
+			var tMaxKey;
+			var tData;
+			for (key in tDic){
+				tData=tDic[key];
+				if (tData["_@_Count"] && tData["_@_Count"] > tMaxCount){
+					tMaxKey=key;
+					tMaxCount=tData["_@_Count"];
+				}
+			}
+			return tMaxKey;
+		}
+
 		__proto.getKeyNum=function(__args){
 			var args=arguments;
 			var i=0,len=0;
@@ -12931,9 +12969,23 @@ var Laya=window.Laya=(function(window,document){
 			}
 		}
 
+		__proto.getWordWordType=function(startWord,endWord){
+			var type=0;
+			type=endWord.id-startWord.id;
+			if (type==1 || type==-1||type==0){
+				}else{
+				if (/*no*/this.tye > 0){
+					type=3;
+					}else{
+					type=-3;
+				}
+			}
+			return type;
+		}
+
 		__proto.addRelation=function(startWord,endWord){
 			var type;
-			type=endWord.id > startWord.id;
+			type=this.getWordWordType(startWord,endWord);
 			this.tag2tagCounter.addKey(this.getAdptWordType(startWord.postag),this.getAdptWordType(endWord.postag),type);
 			this.word2wordCounter.addKey(startWord.form,endWord.form,type);
 			this.tag2wordCounter.addKey(this.getAdptWordType(startWord.postag),endWord.form,type);
@@ -12954,7 +13006,7 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.getScore=function(startWord,endWord){
 			var type;
-			type=endWord.id > startWord.id;
+			type=this.getWordWordType(startWord,endWord);
 			var rst=NaN;
 			rst=this.word2wordCounter.getKeyLogNum(startWord.form,endWord.form,type);
 			rst+=this.word2tagCounter.getKeyLogNum(startWord.form,this.getAdptWordType(endWord.postag),type)*0.01;
@@ -13016,7 +13068,8 @@ var Laya=window.Laya=(function(window,document){
 		//return treeAnalyseer.dependCounter.getKeyNum(wordA.postag,wordB.postag,wordB.id>wordA.id);
 		__proto.rebuildConllTree=function(tree,useDP){
 			(useDP===void 0)&& (useDP=false);
-			this.arcAnalyser.analyseTree(tree);
+			if(useDP)
+				return this.arcAnalyser.buildTree(tree.getConllWordForRebuild());
 			return this.buildConllTree(tree.getConllWordForRebuild(),useDP);
 		}
 
@@ -13200,6 +13253,8 @@ var Laya=window.Laya=(function(window,document){
 			this.buffer=null;
 			this.actionList=null;
 			this.isBuildMode=false;
+			this.infoCounter=null;
+			this.infoCounter=new KeysCounter();
 		}
 
 		__class(ConllTreeArcAnalyser,'nlp.conll.ConllTreeArcAnalyser');
@@ -13210,8 +13265,41 @@ var Laya=window.Laya=(function(window,document){
 			this.actionList=[];
 		}
 
+		__proto.getAdptWordKey=function(word,id){
+			var rst;
+			switch(id){
+				case 0:
+				rst=WordUtils.getAdptWordType(ConllTreeArcAnalyser.defaultBufferHead);
+					break ;
+				case 1:
+					rst=WordUtils.getAdptWordType(word);
+					break ;
+				case 2:
+					rst=word.form;
+					break ;
+				}
+			return rst;
+		}
+
 		__proto.recordState=function(action){
 			console.log("recordState:",action);
+			var itemL;
+			var itemR;
+			var bufferHead;
+			var tail=0;
+			tail=this.stack.length-1;
+			itemL=this.stack[tail-1]||ConllTreeArcAnalyser.defaultBufferHead;
+			itemR=this.stack[tail]||ConllTreeArcAnalyser.defaultBufferHead;
+			bufferHead=this.buffer[0] || ConllTreeArcAnalyser.defaultBufferHead;
+			var posInt;
+			posInt=itemL-itemR==-1?true:false;
+			var i=0,len=0;
+			var tArr;
+			len=ConllTreeArcAnalyser.typeConfigs.length;
+			for (i=0;i < len;i++){
+				tArr=ConllTreeArcAnalyser.typeConfigs[i];
+				this.infoCounter.addKey(this.getAdptWordKey(itemL,tArr[0]),this.getAdptWordKey(itemR,tArr[1]),this.getAdptWordKey(bufferHead,tArr[2]),action);
+			}
 		}
 
 		__proto.shift=function(){
@@ -13268,10 +13356,48 @@ var Laya=window.Laya=(function(window,document){
 				this.buffer.push(wordList[i]);
 			}
 			this.doTrans();
+			var conllTree;
+			conllTree=new ConllTree();
+			conllTree.wordList=wordList;
+			return conllTree;
+		}
+
+		__proto.canAct=function(action){
+			if (this.buffer.length==0 && action=="shift")return false;
+			if (this.stack.length < 2 && action !="shift")return false;
+			return true;
+		}
+
+		__proto.getRandomAct=function(){
+			if (this.canAct("shift"))return "shift";
+			return "leftAsParent";
 		}
 
 		__proto.getMove=function(){
-			return "shift";
+			if (this.stack.length < 2){
+				return "shift";
+				}else{
+				var itemL;
+				var itemR;
+				var bufferHead;
+				var tail=0;
+				tail=this.stack.length-1;
+				itemL=this.stack[tail-1]||ConllTreeArcAnalyser.defaultBufferHead;
+				itemR=this.stack[tail]||ConllTreeArcAnalyser.defaultBufferHead;
+				bufferHead=this.buffer[0] || ConllTreeArcAnalyser.defaultBufferHead;
+				var posInt;
+				posInt=itemL-itemR==-1?true:false;
+				var i=0,len=0;
+				var tArr;
+				len=ConllTreeArcAnalyser.typeConfigs.length;
+				var tType;
+				for (i=0;i < len;i++){
+					tArr=ConllTreeArcAnalyser.typeConfigs[i];
+					tType=this.infoCounter.getMaxKey(this.getAdptWordKey(itemL,tArr[0]),this.getAdptWordKey(itemR,tArr[1]),this.getAdptWordKey(bufferHead,tArr[2]));
+					if (tType&& this.canAct(tType))return tType;
+				}
+			}
+			return this.getRandomAct();
 		}
 
 		__proto.doTrans=function(){
@@ -13300,6 +13426,14 @@ var Laya=window.Laya=(function(window,document){
 							return
 						}
 				}
+			}
+		}
+
+		__proto.analyseTreeList=function(treeList){
+			var i=0,len=0;
+			len=treeList.length;
+			for (i=0;i < len;i++){
+				this.analyseTree(treeList[i]);
 			}
 		}
 
@@ -13349,9 +13483,31 @@ var Laya=window.Laya=(function(window,document){
 			}
 		}
 
+		ConllTreeArcAnalyser.inits=function(){
+			ConllTreeArcAnalyser.defaultBufferHead=new ConllWord();
+			ConllTreeArcAnalyser.defaultBufferHead.form="Empty";
+			ConllTreeArcAnalyser.defaultBufferHead.postag="Empty";
+		}
+
 		ConllTreeArcAnalyser.SHIFT="shift";
 		ConllTreeArcAnalyser.LEFTASPARENT="leftAsParent";
 		ConllTreeArcAnalyser.RIGHTASPARENT="rightAsParent";
+		ConllTreeArcAnalyser.defaultBufferHead=null
+		__static(ConllTreeArcAnalyser,
+		['typeConfigs',function(){return this.typeConfigs=[
+			[2,2,2],
+			[1,1,1],
+			[1,1,0],
+			[0,1,1],
+			[1,0,1],
+			[0,0,1],
+			[1,0,0],
+			[0,1,0]];}
+		]);
+		ConllTreeArcAnalyser.__init$=function(){
+			ConllTreeArcAnalyser.inits();;
+		}
+
 		return ConllTreeArcAnalyser;
 	})()
 
@@ -30586,7 +30742,12 @@ var Laya=window.Laya=(function(window,document){
 	})(WordViewerUI)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,Browser,LocalStorage,Render,Timer,View,GraphicAnimation,PingYinDic]);
+	Laya.__init([LoaderManager,EventDispatcher,ConllTreeArcAnalyser,Browser,LocalStorage,Render,Timer,View,GraphicAnimation,PingYinDic]);
 	new Game();
 
 })(window,document,Laya);
+
+
+/*
+1 file:///E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/conll/ConllTreeScoreUtils.as (47):warning:tye This variable is not defined.
+*/

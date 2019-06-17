@@ -50,7 +50,9 @@ package nlp.conll
 		
 		public function rebuildConllTree(tree:ConllTree,useDP:Boolean=false):ConllTree
 		{
-			arcAnalyser.analyseTree(tree);
+			//arcAnalyser.analyseTree(tree);
+			if(useDP)
+			 return arcAnalyser.buildTree(tree.getConllWordForRebuild());
 			return buildConllTree(tree.getConllWordForRebuild(),useDP);
 		}
 		

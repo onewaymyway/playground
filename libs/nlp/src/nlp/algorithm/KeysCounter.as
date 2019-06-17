@@ -24,6 +24,39 @@ package nlp.algorithm
 			num=(getKeyNum.apply(this, args)||0.5) / _dic[CountKey]
 			return Math.log(num);
 		}
+		public function getMaxKey(...args):String
+		{
+			var i:int, len:int;
+			len = args.length;
+			var key:String;
+			var tDic:Object;
+			tDic = _dic;
+			for (i = 0; i < len; i++)
+			{
+				key = args[i];
+				if (!tDic[key])
+				{
+					return null;
+				}
+				tDic = tDic[key];
+			}
+			if (!tDic) return null;
+			var key:String;
+			var tMaxCount:int = 0;
+			var tMaxKey:String;
+			var tData:Object;
+			
+			for (key in tDic)
+			{
+				tData = tDic[key];
+				if (tData[CountKey] && tData[CountKey] > tMaxCount)
+				{
+					tMaxKey = key;
+					tMaxCount = tData[CountKey];
+				}
+			}
+			return tMaxKey;
+		}
 		public function getKeyNum(...args):int
 		{
 			var i:int, len:int;

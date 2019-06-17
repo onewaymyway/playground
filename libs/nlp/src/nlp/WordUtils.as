@@ -1,5 +1,6 @@
 package nlp 
 {
+	import nlp.conll.ConllWord;
 	import nlp.cutwords.WordPiece;
 	import nlp.dictools.TypeDicParser;
 	/**
@@ -13,7 +14,16 @@ package nlp
 		{
 			
 		}
-		
+		public static function getAdptWordType(word:ConllWord):String
+		{
+			if (WordUtils.typeDic.getWordType(word.word))
+			{
+				return WordUtils.typeDic.getWordTypeStr(word.word);
+			}else
+			{
+				return word.postag;
+			}
+		}
 		public static function printLines(lines:Array):void
 		{
 			var i:int, len:int;

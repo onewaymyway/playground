@@ -1,5 +1,7 @@
 package nlp.conll 
 {
+	import nlp.WordUtils;
+	import nlp.algorithm.KeysCounter;
 	/**
 	 * ...
 	 * @author ww
@@ -9,14 +11,24 @@ package nlp.conll
 		public static const SHIFT:String = "shift";
 		public static const LEFTASPARENT:String = "leftAsParent";
 		public static const RIGHTASPARENT:String = "rightAsParent";
+		public static var defaultBufferHead:ConllWord;
 		public function ConllTreeArcAnalyser() 
 		{
-			
+			infoCounter = new KeysCounter();
 		}
+		
+		private static function inits():void
+		{
+			defaultBufferHead = new ConllWord();
+			defaultBufferHead.form = "Empty";
+			defaultBufferHead.postag = "Empty";
+		}
+		inits();
 		private var stack:Array;
 		private var buffer:Array;
 		private var actionList:Array;
 		public var isBuildMode:Boolean = false;
+		private var infoCounter:KeysCounter;
 		public function reset():void
 		{
 			stack = [];
@@ -24,9 +36,54 @@ package nlp.conll
 			actionList = [];
 		}
 		
+		public static var typeConfigs:Array = [
+		[2, 2, 2],
+		[1, 1, 1],
+		[1, 1, 0],
+		[0, 1, 1],
+		[1, 0, 1],
+		[0, 0, 1],
+		[1, 0, 0],
+		[0, 1, 0]
+		];
+		public function getAdptWordKey(word:ConllWord, id:int):String
+		{
+			var rst:String;
+			switch(id)
+			{
+				case 0:
+					rst= WordUtils.getAdptWordType(defaultBufferHead);
+					break;
+				case 1:
+					rst= WordUtils.getAdptWordType(word);
+					break;
+				case 2:
+					rst= word.form;
+					break;
+			}
+			return rst;
+		}
 		private function recordState(action:String):void
 		{
-			trace("recordState:",action);
+			trace("recordState:", action);
+			var itemL:ConllWord;
+			var itemR:ConllWord;
+			var bufferHead:ConllWord;
+			var tail:int;
+			tail = stack.length - 1;
+			itemL = stack[tail - 1]||defaultBufferHead;
+			itemR = stack[tail]||defaultBufferHead;
+			bufferHead = buffer[0] || defaultBufferHead;
+			var posInt:*;
+			posInt = itemL - itemR==-1?true:false;
+			var i:int, len:int;
+			var tArr:Array;
+			len = typeConfigs.length;
+			for (i = 0; i < len; i++)
+			{
+				tArr = typeConfigs[i];
+				infoCounter.addKey(getAdptWordKey(itemL,tArr[0]), getAdptWordKey(itemR,tArr[1]), getAdptWordKey(bufferHead,tArr[2]), action);
+			}
 		}
 		
 		public function shift():void
@@ -84,7 +141,7 @@ package nlp.conll
 			stack.push(itemR);
 		}
 		
-		public  function buildTree(wordList:Array):void
+		public  function buildTree(wordList:Array):ConllTree
 		{
 			reset();
 			isBuildMode = true;
@@ -95,11 +152,58 @@ package nlp.conll
 				buffer.push(wordList[i]);
 			}
 			doTrans();
+			var conllTree:ConllTree;
+			conllTree = new ConllTree();
+			conllTree.wordList = wordList;
+			return conllTree;
 		}
 		
+		public function canAct(action:String):Boolean
+		{
+			if (buffer.length == 0 && action == SHIFT) return false;
+			if (stack.length < 2 && action != SHIFT) return false;
+			return true;
+		}
+		
+		public function getRandomAct():String
+		{
+			if (canAct(SHIFT)) return SHIFT;
+			return LEFTASPARENT;
+		}
 		public function getMove():String
 		{
-			return SHIFT;
+			if (stack.length < 2)
+			{
+				return  SHIFT;
+			}else
+			{
+				var itemL:ConllWord;
+				var itemR:ConllWord;
+				var bufferHead:ConllWord;
+				var tail:int;
+				tail = stack.length - 1;
+				itemL = stack[tail - 1]||defaultBufferHead;
+				itemR = stack[tail]||defaultBufferHead;
+				bufferHead = buffer[0] || defaultBufferHead;
+				var posInt:*;
+				posInt = itemL - itemR==-1?true:false;
+				
+				var i:int, len:int;
+				var tArr:Array;
+				len = typeConfigs.length;
+				var tType:String;
+				for (i = 0; i < len; i++)
+				{
+					tArr = typeConfigs[i];
+					tType = infoCounter.getMaxKey(getAdptWordKey(itemL,tArr[0]), getAdptWordKey(itemR,tArr[1]), getAdptWordKey(bufferHead,tArr[2]));
+					
+					if (tType&& canAct(tType)) return tType;
+				}
+				
+				
+				
+			}
+			return getRandomAct();
 		}
 		public function doTrans():void
 		{
@@ -134,6 +238,16 @@ package nlp.conll
 					}
 				}
 				
+			}
+		}
+		
+		public function analyseTreeList(treeList:Array):void
+		{
+			var i:int, len:int;
+			len = treeList.length;
+			for (i = 0; i < len; i++)
+			{
+				analyseTree(treeList[i]);
 			}
 		}
 		
