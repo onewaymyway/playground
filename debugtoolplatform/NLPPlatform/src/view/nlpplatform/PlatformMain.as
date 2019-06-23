@@ -50,8 +50,10 @@ package view.nlpplatform
 			filePath = dataO[0];
 			tFile = filePath;
 			bookReader.loadFile(filePath);
+			bookInfo.text = FileTools.getFileNameWithExtension(filePath);
 			
 		}
+		
 		
 	}
 

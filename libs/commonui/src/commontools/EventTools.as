@@ -21,6 +21,22 @@ package commontools
 				tar = tar.parent as Sprite;
 			}
 		}
+		
+		public static function sendStopAbleEventOnTree(eventType:String, event:Event, tar:Sprite, root:Sprite):void
+		{
+			event._stoped = false;
+			while (tar)
+			{
+				tar.event(eventType, event);
+				if (tar != root&&!event._stoped)
+				{
+					tar = tar.parent as Sprite;
+				}else
+				{
+					break;
+				}
+			}
+		}
 	}
 
 }

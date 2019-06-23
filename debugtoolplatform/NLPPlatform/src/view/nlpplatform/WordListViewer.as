@@ -13,6 +13,7 @@ package view.nlpplatform
 	 */
 	public class WordListViewer extends WordListViewerUI 
 	{
+		public static const ShowWords:String = "ShowWords";
 		public var layouter:WordLayout;
 		public function WordListViewer() 
 		{
@@ -26,6 +27,7 @@ package view.nlpplatform
 		private var idWordDic:IDDicTool;
 		private function clearPre():void
 		{
+			BookReaderState.clearSelect();
 			if (!wordItemList) return;
 			var i:int, len:int;
 			len = wordItemList.length;
@@ -33,6 +35,7 @@ package view.nlpplatform
 			for (i = 0; i < len; i++)
 			{
 				tItem = wordItemList[i];
+				tItem.reset();
 				tItem.removeSelf();
 				Pool.recover("WordViewer", tItem);
 			}
@@ -65,7 +68,8 @@ package view.nlpplatform
 			lineInfo = book.getCurLineInfo();
 			if (!lineInfo) return;
 			
-			setWordList(book.words,lineInfo.start,lineInfo.end);
+			setWordList(book.words, lineInfo.start, lineInfo.end);
+			event(ShowWords);
 		}
 		public function setWordList(wList:Array,start:int,end:int):void
 		{

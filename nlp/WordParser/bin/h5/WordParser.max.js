@@ -10302,7 +10302,6 @@ var Laya=window.Laya=(function(window,document){
 			var analyse;
 			analyse=new ConllTreeAnalyse();
 			analyse.analyse(NLP.conllParser.treeList);
-			NLP.contreeBuilder.arcAnalyser.analyseTreeList(NLP.conllParser.treeList);
 			NLP.contreeBuilder.treeAnalyseer=analyse;
 		}
 
@@ -10740,7 +10739,6 @@ var Laya=window.Laya=(function(window,document){
 			for (i=0;i < len;i++){
 				tLine=this.lines[i];
 				if (tLine.length==1){
-					console.log("one:",tLine);
 				}
 				if (WordOne.getKeyStartWords(tLine)){
 					tDes=[];
@@ -12292,6 +12290,10 @@ var Laya=window.Laya=(function(window,document){
 			}
 		}
 
+		KeysCounter.create=function(){
+			return new KeysCounter();
+		}
+
 		KeysCounter.CountKey="_@_Count";
 		KeysCounter.TypeKey="_@_Type";
 		return KeysCounter;
@@ -12593,6 +12595,27 @@ var Laya=window.Laya=(function(window,document){
 
 		__class(ConllTree,'nlp.conll.ConllTree');
 		var __proto=ConllTree.prototype;
+		__proto.getWordTypeReferToWord=function(word,referWord){
+			var i=0;
+			var tword;
+			if (word.id < referWord.id){
+				for (i=referWord.id-1;i > word.id;i--){
+					tword=this.getWordByIndex(i);
+					if (tword.head==word.id){
+						return word.postag+"_"+tword.postag;
+					}
+				}
+				}else{
+				for (i=referWord.id-1;i > word.id;i++){
+					tword=this.getWordByIndex(i);
+					if (tword.head==word.id){
+						return word.postag+"_"+tword.postag;
+					}
+				}
+			}
+			return word.postag;
+		}
+
 		__proto.getWordByIndex=function(index){
 			return this.wordList[index];
 		}
@@ -12790,6 +12813,7 @@ var Laya=window.Laya=(function(window,document){
 			len=relations.length;
 			var tRelation;
 			var tkey;
+			this.scoreUtils.conllTree=tree;
 			for (i=0;i < len;i++){
 				tRelation=relations[i];
 				tkey=this.getRelationKey(tRelation,tree);
@@ -12947,16 +12971,17 @@ var Laya=window.Laya=(function(window,document){
 	//class nlp.conll.ConllTreeScoreUtils
 	var ConllTreeScoreUtils=(function(){
 		function ConllTreeScoreUtils(){
-			this.word2wordCounter=null;
-			this.tag2wordCounter=null;
-			this.word2tagCounter=null;
-			this.tag2tagCounter=null;
 			this.rootCounter=null;
-			this.word2wordCounter=new KeysCounter();
-			this.tag2wordCounter=new KeysCounter();
-			this.word2tagCounter=new KeysCounter();
-			this.tag2tagCounter=new KeysCounter();
+			this._workList=null;
+			this._workList2=null;
+			this.conllTree=null;
+			this._workList=[];
+			this._workList2=[];
 			this.rootCounter=new KeysCounter();
+			this._workList.push([KeysCounter.create(),[2,2],1]);
+			this._workList.push([KeysCounter.create(),[1,2],0.01]);
+			this._workList.push([KeysCounter.create(),[2,1],0.01]);
+			this._workList.push([KeysCounter.create(),[1,1],0.0001]);
 		}
 
 		__class(ConllTreeScoreUtils,'nlp.conll.ConllTreeScoreUtils');
@@ -12969,9 +12994,11 @@ var Laya=window.Laya=(function(window,document){
 			}
 		}
 
+		//_workList2.push([KeysCounter.create(),[1,1],0.0001]);
 		__proto.getWordWordType=function(startWord,endWord){
 			var type=0;
 			type=endWord.id-startWord.id;
+			return type > 0?1:-1;
 			if (type==1 || type==-1||type==0){
 				}else{
 				if (/*no*/this.tye > 0){
@@ -12983,13 +13010,49 @@ var Laya=window.Laya=(function(window,document){
 			return type;
 		}
 
+		__proto.getAdptWordKey=function(word,id,referWord){
+			var rst;
+			switch(id){
+				case 1:
+					rst=WordUtils.getAdptWordType(word);
+					break ;
+				case 2:
+					rst=word.form;
+					break ;
+				}
+			return rst;
+		}
+
+		__proto.getWordWordRelationKey=function(startWord,endWord,curWord){
+			(curWord===void 0)&& (curWord=0);
+			if (curWord==0){
+				return this.conllTree.getWordTypeReferToWord(startWord,endWord);
+				}else{
+				return this.conllTree.getWordTypeReferToWord(endWord,startWord);
+			}
+		}
+
 		__proto.addRelation=function(startWord,endWord){
 			var type;
 			type=this.getWordWordType(startWord,endWord);
-			this.tag2tagCounter.addKey(this.getAdptWordType(startWord.postag),this.getAdptWordType(endWord.postag),type);
-			this.word2wordCounter.addKey(startWord.form,endWord.form,type);
-			this.tag2wordCounter.addKey(this.getAdptWordType(startWord.postag),endWord.form,type);
-			this.word2tagCounter.addKey(startWord.form,this.getAdptWordType(endWord.postag),type);
+			var i=0,len=0;
+			var tCounter;
+			var tArr;
+			var tGroupArr;
+			len=this._workList.length;
+			for (i=0;i < len;i++){
+				tGroupArr=this._workList[i];
+				tCounter=tGroupArr[0];
+				tArr=tGroupArr[1];
+				tCounter.addKey(this.getAdptWordKey(startWord,tArr[0],endWord),this.getAdptWordKey(endWord,tArr[1],startWord),type);
+			}
+			len=this._workList2.length;
+			for (i=0;i < len;i++){
+				tGroupArr=this._workList2[i];
+				tCounter=tGroupArr[0];
+				tArr=tGroupArr[1];
+				tCounter.addKey(this.getAdptWordKey(endWord,tArr[0],startWord),this.getAdptWordKey(startWord,tArr[1],endWord),type);
+			}
 		}
 
 		__proto.addRoot=function(startWord){
@@ -13004,14 +13067,33 @@ var Laya=window.Laya=(function(window,document){
 			return rst;
 		}
 
-		__proto.getScore=function(startWord,endWord){
+		__proto.getScore=function(startWord,endWord,tree){
+			this.conllTree=tree;
 			var type;
 			type=this.getWordWordType(startWord,endWord);
 			var rst=NaN;
-			rst=this.word2wordCounter.getKeyLogNum(startWord.form,endWord.form,type);
-			rst+=this.word2tagCounter.getKeyLogNum(startWord.form,this.getAdptWordType(endWord.postag),type)*0.01;
-			rst+=this.tag2wordCounter.getKeyLogNum(this.getAdptWordType(startWord.postag),endWord.form,type)*0.01;
-			rst+=this.tag2tagCounter.getKeyLogNum(this.getAdptWordType(startWord.postag),this.getAdptWordType(endWord.postag),type)*0.0001;
+			var i=0,len=0;
+			var tCounter;
+			var tArr;
+			var tGroupArr;
+			var tWeight=NaN;
+			rst=0;
+			len=this._workList.length;
+			for (i=0;i < len;i++){
+				tGroupArr=this._workList[i];
+				tCounter=tGroupArr[0];
+				tArr=tGroupArr[1];
+				tWeight=tGroupArr[2];
+				rst+=tCounter.getKeyLogNum(this.getAdptWordKey(startWord,tArr[0],endWord),this.getAdptWordKey(endWord,tArr[1],startWord),type)*tWeight;
+			}
+			len=this._workList2.length;
+			for (i=0;i < len;i++){
+				tGroupArr=this._workList2[i];
+				tCounter=tGroupArr[0];
+				tArr=tGroupArr[1];
+				tWeight=tGroupArr[2];
+				rst+=tCounter.getKeyLogNum(this.getAdptWordKey(endWord,tArr[0],startWord),this.getAdptWordKey(startWord,tArr[1],endWord),type)*tWeight;
+			}
 			rst+=-Math.abs(startWord.id-endWord.id)*0.1;
 			return rst;
 		}
@@ -13061,8 +13143,8 @@ var Laya=window.Laya=(function(window,document){
 			return this.buildConllTree(wordList,useDP);
 		}
 
-		__proto.scoreRelation=function(wordA,wordB,type){
-			return this.treeAnalyseer.scoreUtils.getScore(wordA,wordB);
+		__proto.scoreRelation=function(wordA,wordB,type,tree){
+			return this.treeAnalyseer.scoreUtils.getScore(wordA,wordB,tree);
 		}
 
 		//return treeAnalyseer.dependCounter.getKeyNum(wordA.postag,wordB.postag,wordB.id>wordA.id);
@@ -13073,12 +13155,12 @@ var Laya=window.Laya=(function(window,document){
 			return this.buildConllTree(tree.getConllWordForRebuild(),useDP);
 		}
 
-		__proto.buildWordRelation=function(wordList,useDP){
+		__proto.buildWordRelation=function(wordList,useDP,tree){
 			(useDP===void 0)&& (useDP=false);
 			var wList;
 			wList=ObjectTools.concatArr([],wordList);
 			if (useDP){
-				this.buildByDP(wList);
+				this.buildByDP(wList,tree);
 				return;
 			};
 			var i=0,len=0;
@@ -13105,7 +13187,7 @@ var Laya=window.Laya=(function(window,document){
 						if (Math.abs(i-k)> 1)continue ;
 						tRWord=wList[k];
 						if (tRWord){
-							tScore=this.scoreRelation(tWord,tRWord,1);
+							tScore=this.scoreRelation(tWord,tRWord,1,tree);
 							if (!tSelectWord || tScore > tSelectScore){
 								tSelectWord=tWord;
 								tSelectScore=tScore;
@@ -13124,7 +13206,7 @@ var Laya=window.Laya=(function(window,document){
 			}
 		}
 
-		__proto.buildByDP=function(wordList){
+		__proto.buildByDP=function(wordList,tree){
 			this.wordList=wordList;
 			this.valueTensor=new AutoTensor();
 			this.relationTensor=new AutoTensor();
@@ -13139,7 +13221,7 @@ var Laya=window.Laya=(function(window,document){
 			end=wordList.length-1;
 			for (i=0;i < len;i++){
 				tRoot=i;
-				tScore=this.getMaxTree(start,end,tRoot)+this.treeAnalyseer.scoreUtils.getRootScore(wordList[tRoot]);
+				tScore=this.getMaxTree(start,end,tRoot,tree)+this.treeAnalyseer.scoreUtils.getRootScore(wordList[tRoot]);
 				if (tSelectRoot<0||tScore>tSelectScore){
 					tSelectScore=tScore;
 					tSelectRoot=tRoot;
@@ -13180,11 +13262,11 @@ var Laya=window.Laya=(function(window,document){
 			this.decodeTreeInfo(bound,end,root);
 		}
 
-		__proto.scoreRelationByIndex=function(start,end){
-			return this.scoreRelation(this.wordList[start],this.wordList[end],1);
+		__proto.scoreRelationByIndex=function(start,end,tree){
+			return this.scoreRelation(this.wordList[start],this.wordList[end],1,tree);
 		}
 
-		__proto.getMaxTree=function(start,end,root){
+		__proto.getMaxTree=function(start,end,root,tree){
 			if (root > end)debugger;
 			if (start==end)return 0;
 			if (this.valueTensor.hasValue(start,end,root))return this.valueTensor.getValue(start,end,root);
@@ -13203,7 +13285,7 @@ var Laya=window.Laya=(function(window,document){
 				if (oRoot !=root){
 					if (oRoot < root){
 						for (bound=oRoot+1;bound <=root;bound++){
-							tScore=this.getMaxTree(start,bound-1,oRoot)+this.getMaxTree(bound,end,root)+this.scoreRelationByIndex(oRoot,root);
+							tScore=this.getMaxTree(start,bound-1,oRoot,tree)+this.getMaxTree(bound,end,root,tree)+this.scoreRelationByIndex(oRoot,root,tree);
 							if (!hasValue||tScore > selectScore){
 								hasValue=true;
 								selectScore=tScore;
@@ -13213,7 +13295,7 @@ var Laya=window.Laya=(function(window,document){
 						}
 						}else{
 						for (bound=root+1;bound <=oRoot;bound++){
-							tScore=this.getMaxTree(start,bound-1,root)+this.getMaxTree(bound,end,oRoot)+this.scoreRelationByIndex(oRoot,root);;
+							tScore=this.getMaxTree(start,bound-1,root,tree)+this.getMaxTree(bound,end,oRoot,tree)+this.scoreRelationByIndex(oRoot,root,tree);;
 							if (!hasValue||tScore > selectScore){
 								hasValue=true;
 								selectScore=tScore;
@@ -13233,8 +13315,8 @@ var Laya=window.Laya=(function(window,document){
 			(useDP===void 0)&& (useDP=false);
 			var conllTree;
 			conllTree=new ConllTree();
-			this.buildWordRelation(wordList,useDP);
 			conllTree.wordList=wordList;
+			this.buildWordRelation(wordList,useDP,conllTree);
 			return conllTree;
 		}
 
@@ -13265,6 +13347,7 @@ var Laya=window.Laya=(function(window,document){
 			this.actionList=[];
 		}
 
+		//[0,1,0]
 		__proto.getAdptWordKey=function(word,id){
 			var rst;
 			switch(id){
@@ -13497,12 +13580,7 @@ var Laya=window.Laya=(function(window,document){
 		['typeConfigs',function(){return this.typeConfigs=[
 			[2,2,2],
 			[1,1,1],
-			[1,1,0],
-			[0,1,1],
-			[1,0,1],
-			[0,0,1],
-			[1,0,0],
-			[0,1,0]];}
+			[1,1,0]];}
 		]);
 		ConllTreeArcAnalyser.__init$=function(){
 			ConllTreeArcAnalyser.inits();;
@@ -30749,5 +30827,5 @@ var Laya=window.Laya=(function(window,document){
 
 
 /*
-1 file:///E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/conll/ConllTreeScoreUtils.as (47):warning:tye This variable is not defined.
+1 file:///E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/conll/ConllTreeScoreUtils.as (56):warning:tye This variable is not defined.
 */

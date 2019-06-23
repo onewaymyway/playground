@@ -1,5 +1,6 @@
 package view.nlpplatform 
 {
+	import commontools.EventTools;
 	import laya.debug.uicomps.ContextMenu;
 	import laya.display.Sprite;
 	import laya.events.Event;
@@ -18,8 +19,36 @@ package view.nlpplatform
 		public function WordViewer() 
 		{
 			this.on(Event.RIGHT_CLICK, this, onRightClick);
+			this.on(Event.CLICK, this, onMouseDown);
 		}
 		
+		private function onMouseDown(e:Event):void
+		{
+			BookReaderState.onWordMouseDown(this);
+		}
+		public var selectColor:String="#ff0000";
+		private var _isSelect:Boolean = false;
+		public function set isSelected(value:Boolean):void
+		{
+			_isSelect = value;
+			if (value)
+			{
+				txt.borderColor = selectColor;
+			}else
+			{
+				txt.borderColor = null;
+			}
+		}
+		
+		public function reset():void
+		{
+			isSelected = false;
+		}
+		
+		public function get isSelected():Boolean
+		{
+			return _isSelect;
+		}
 		private function onRightClick():void
 		{
 			var menu:ContextMenu;
@@ -35,6 +64,7 @@ package view.nlpplatform
 			switch(label)
 			{
 				case "打散":
+					EventTools.sendEventOnTree(this, "wordevent",["打散",this]);
 					break;
 				case "属性":
 					WordProp.showWordProp(this);

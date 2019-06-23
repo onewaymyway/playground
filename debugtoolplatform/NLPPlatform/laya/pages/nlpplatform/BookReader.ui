@@ -2,7 +2,7 @@
     "x":0,
     "type":"View",
     "selectedBox":1,
-    "selecteID":4,
+    "selecteID":5,
     "props":{"width":600,"sceneColor":"#000000","runtime":"view.nlpplatform.BookReader","height":400},
     "nodeParent":-1,
     "label":"View",
@@ -29,7 +29,7 @@
         {
             "x":15,
             "type":"Label",
-            "props":{"y":16,"x":16,"width":120,"var":"bookInfo","text":"label","styleSkin":"comp/label.png","height":53,"fontSize":20},
+            "props":{"y":16,"x":16,"width":120,"var":"bookInfo","text":"label","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"},
             "nodeParent":1,
             "label":"Label(bookInfo)",
             "isDirectory":false,
@@ -38,6 +38,110 @@
             "compId":5,
             "child":[
                 ]
+        },
+        {
+            "x":15,
+            "type":"Box",
+            "props":{"y":93,"x":16,"width":128,"var":"buttonBox","height":287},
+            "nodeParent":1,
+            "label":"Box(buttonBox)",
+            "isOpen":true,
+            "isDirectory":true,
+            "isAniNode":true,
+            "hasChild":true,
+            "compId":9,
+            "child":[
+                {
+                    "x":30,
+                    "type":"Button",
+                    "props":{"skin":"comp/button.png","name":"清空选择","label":"清空选择"},
+                    "nodeParent":9,
+                    "label":"Button(清空选择)",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":6,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Button",
+                    "props":{"y":34,"x":1,"skin":"comp/button.png","name":"创建关系","label":"创建关系"},
+                    "nodeParent":9,
+                    "label":"Button(创建关系)",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":7,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Button",
+                    "props":{"y":67,"x":1,"skin":"comp/button.png","name":"重建关系","label":"重建关系"},
+                    "nodeParent":9,
+                    "label":"Button(重建关系)",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":8,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Button",
+                    "props":{"y":101,"x":2,"skin":"comp/button.png","name":"打散","label":"打散"},
+                    "nodeParent":9,
+                    "label":"Button(打散)",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":10,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Button",
+                    "props":{"y":138,"x":2,"skin":"comp/button.png","name":"合词","label":"合词"},
+                    "nodeParent":9,
+                    "label":"Button(合词)",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":11,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Button",
+                    "props":{"y":170,"x":1,"skin":"comp/button.png","name":"全文合词","label":"全文合词"},
+                    "nodeParent":9,
+                    "label":"Button(全文合词)",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":12,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Button",
+                    "props":{"y":203,"x":2,"skin":"comp/button.png","name":"重新分词","label":"重新分词"},
+                    "nodeParent":9,
+                    "label":"Button(重新分词)",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":13,
+                    "child":[
+                        ]
+                }]
         }],
     "animations":[
         {

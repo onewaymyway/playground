@@ -39,12 +39,12 @@ package nlp.conll
 		public static var typeConfigs:Array = [
 		[2, 2, 2],
 		[1, 1, 1],
-		[1, 1, 0],
-		[0, 1, 1],
-		[1, 0, 1],
-		[0, 0, 1],
-		[1, 0, 0],
-		[0, 1, 0]
+		[1, 1, 0]//,
+		//[0, 1, 1],
+		//[1, 0, 1],
+		//[0, 0, 1],
+		//[1, 0, 0],
+		//[0, 1, 0]
 		];
 		public function getAdptWordKey(word:ConllWord, id:int):String
 		{

@@ -1,6 +1,7 @@
 package nlp.tagging 
 {
 	import laya.debug.tools.ObjectTools;
+	import nlp.WordDicParser;
 	import nlp.cutwords.WordPiece;
 	/**
 	 * ...
@@ -40,6 +41,8 @@ package nlp.tagging
 		public static function createByWordStr(word:String):TaggingWord
 		{
 			var wordPiece:WordPiece;
+			wordPiece=WordDicParser.I.cutter.findWordPiece(word);
+			return createByWordPiece(wordPiece);
 			
 		}
 		

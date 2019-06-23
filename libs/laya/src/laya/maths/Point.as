@@ -25,6 +25,11 @@ package laya.maths {
 			this.y = y;
 		}
 		
+		public function copy(value:Point):void
+		{
+			this.x = value.x;
+			this.y = value.y;
+		}
 		/**
 		 * 将 <code>Point</code> 的成员设置为指定值。
 		 * @param	x 水平坐标。

@@ -42,9 +42,9 @@ package nlp.conll
 			}
 			return buildConllTree(wordList,useDP);
 		}
-		public function scoreRelation(wordA:ConllWord, wordB:ConllWord, type:int):void
+		public function scoreRelation(wordA:ConllWord, wordB:ConllWord, type:int,tree:ConllTree):void
 		{
-			return treeAnalyseer.scoreUtils.getScore(wordA, wordB);
+			return treeAnalyseer.scoreUtils.getScore(wordA, wordB,tree);
 			//return treeAnalyseer.dependCounter.getKeyNum(wordA.postag, wordB.postag, wordB.id>wordA.id);
 		}
 		
@@ -56,14 +56,14 @@ package nlp.conll
 			return buildConllTree(tree.getConllWordForRebuild(),useDP);
 		}
 		
-		public function buildWordRelation(wordList:Array,useDP:Boolean=false):void
+		public function buildWordRelation(wordList:Array,useDP:Boolean=false,tree:ConllTree):void
 		{
 			var wList:Array;
 			wList = ObjectTools.concatArr([], wordList);
 			
 			if (useDP)
 			{
-				buildByDP(wList);
+				buildByDP(wList,tree);
 				return;
 			}
 			
@@ -95,7 +95,7 @@ package nlp.conll
 						tRWord = wList[k];
 						if (tRWord)
 						{
-							tScore = scoreRelation(tWord, tRWord, 1);
+							tScore = scoreRelation(tWord, tRWord, 1,tree);
 							if (!tSelectWord || tScore > tSelectScore)
 							{
 								tSelectWord = tWord;
@@ -121,7 +121,7 @@ package nlp.conll
 		private var valueTensor:AutoTensor;
 		private var relationTensor:AutoTensor;
 		private var wordList:Array;
-		public function buildByDP(wordList:Array):void
+		public function buildByDP(wordList:Array,tree:ConllTree):void
 		{
 			this.wordList = wordList;
 			//f(i,j,k) i-j之间以k为根的最大值
@@ -140,7 +140,7 @@ package nlp.conll
 			for (i = 0; i < len; i++)
 			{
 				tRoot = i;
-				tScore = getMaxTree(start, end, tRoot)+treeAnalyseer.scoreUtils.getRootScore(wordList[tRoot]);
+				tScore = getMaxTree(start, end, tRoot,tree)+treeAnalyseer.scoreUtils.getRootScore(wordList[tRoot]);
 				if (tSelectRoot<0||tScore>tSelectScore)
 				{
 					tSelectScore = tScore;
@@ -190,11 +190,11 @@ package nlp.conll
 			decodeTreeInfo(start, bound - 1, oRoot);
 			decodeTreeInfo(bound, end, root);
 		}
-		private function scoreRelationByIndex(start:int, end:int):Number
+		private function scoreRelationByIndex(start:int, end:int,tree:ConllTree):Number
 		{
-			return scoreRelation(wordList[start], wordList[end], 1);
+			return scoreRelation(wordList[start], wordList[end], 1,tree);
 		}
-		private function getMaxTree(start:int, end:int, root:int):Number
+		private function getMaxTree(start:int, end:int, root:int,tree:ConllTree):Number
 		{
 			if (root > end) debugger;
 			if (start == end) return 0;
@@ -218,7 +218,7 @@ package nlp.conll
 					{
 						for (bound = oRoot + 1; bound <= root;bound++ )
 						{
-							tScore = getMaxTree(start, bound - 1, oRoot) + getMaxTree(bound, end,root)+scoreRelationByIndex(oRoot,root);
+							tScore = getMaxTree(start, bound - 1, oRoot,tree) + getMaxTree(bound, end,root,tree)+scoreRelationByIndex(oRoot,root,tree);
 							if (!hasValue||tScore > selectScore)
 							{
 								hasValue = true;
@@ -231,7 +231,7 @@ package nlp.conll
 					{
 						for (bound = root + 1; bound <= oRoot;bound++ )
 						{
-							tScore = getMaxTree(start, bound - 1, root) + getMaxTree(bound, end,oRoot)+scoreRelationByIndex(oRoot,root);;
+							tScore = getMaxTree(start, bound - 1, root,tree) + getMaxTree(bound, end,oRoot,tree)+scoreRelationByIndex(oRoot,root,tree);;
 							if (!hasValue||tScore > selectScore)
 							{
 								hasValue = true;
@@ -254,8 +254,9 @@ package nlp.conll
 		{
 			var conllTree:ConllTree;
 			conllTree = new ConllTree();
-			buildWordRelation(wordList,useDP);
+			
 			conllTree.wordList = wordList;
+			buildWordRelation(wordList,useDP,conllTree);
 			return conllTree;
 		}
 	}

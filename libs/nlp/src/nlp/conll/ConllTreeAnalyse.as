@@ -231,7 +231,7 @@ package nlp.conll
 			len = relations.length;
 			var tRelation:ConllRelation;
 			var tkey:String;
-			
+			scoreUtils.conllTree = tree;
 			for (i = 0; i < len; i++)
 			{
 				tRelation = relations[i];

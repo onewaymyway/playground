@@ -2,7 +2,7 @@
     "x":0,
     "type":"View",
     "selectedBox":1,
-    "selecteID":4,
+    "selecteID":5,
     "props":{"width":600,"sceneColor":"#000000","height":400},
     "nodeParent":-1,
     "label":"View",
@@ -49,6 +49,19 @@
             "isAniNode":true,
             "hasChild":false,
             "compId":4,
+            "child":[
+                ]
+        },
+        {
+            "x":15,
+            "type":"Label",
+            "props":{"y":12,"x":205,"width":383,"var":"bookInfo","text":"label","styleSkin":"comp/label.png","height":26,"fontSize":20,"color":"#ffffff"},
+            "nodeParent":1,
+            "label":"Label(bookInfo)",
+            "isDirectory":false,
+            "isAniNode":true,
+            "hasChild":false,
+            "compId":5,
             "child":[
                 ]
         }],

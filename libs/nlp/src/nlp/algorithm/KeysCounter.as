@@ -9,6 +9,10 @@ package nlp.algorithm
 		public var _dic:Object = {};
 		public static const CountKey:String = "_@_Count";
 		public static const TypeKey:String = "_@_Type";
+		public static function create():KeysCounter
+		{
+			return new KeysCounter();
+		}
 		public function KeysCounter() 
 		{
 			_dic[CountKey] = 0;
@@ -76,6 +80,8 @@ package nlp.algorithm
 			if (!tDic) return 0;
 			return tDic[CountKey];
 		}
+		
+		
 		public function addKey(...args):void
 		{
 			var i:int, len:int;

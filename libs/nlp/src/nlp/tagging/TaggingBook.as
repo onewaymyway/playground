@@ -31,7 +31,7 @@ package nlp.tagging
 			return rst;
 		
 		}
-		public static function cutStr2Words(str:String,tagWords:Array=null):Array
+		public static function cutStr2Words(str:String,tagWords:Array=null,idDic:IDDicTool=null):Array
 		{
 			var words:Array;
 			words = WordDicParser.I.cut(str);
@@ -41,12 +41,194 @@ package nlp.tagging
 			if(!tagWords)
 			tagWords = [];
 			var tWordPiece:WordPiece;
+			var tWord:TaggingWord;
 			for (i = 0; i < len; i++)
 			{
 				tWordPiece = words[i];
-				tagWords.push(TaggingWord.createByWordPiece(tWordPiece));
+				tWord = TaggingWord.createByWordPiece(tWordPiece);
+				if (idDic)
+				{
+					idDic.addItem(tWord);
+				}
+				tagWords.push(tWord);
 			}
 			return tagWords;
+		}
+		
+		public function findWordIndexInCurLine(word:TaggingWord):int
+		{
+			var lineInfo:Object;
+			lineInfo = getCurLineInfo();
+			var start:int;
+			var end:int;
+			if (!lineInfo)
+			{
+				start = lineInfo.start;
+				end = lineInfo.end;
+			}else
+			{
+				start = 0;
+				end = words.length-1;
+			}
+			
+			return findWordIndexInRange(word, start, end);
+			
+		}
+		
+		public function findWordIndexInRange(word:TaggingWord, start:int=0, end:int=-1):int
+		{
+			var i:int;
+			var tWord:TaggingWord;
+			if (end < 0)
+			{
+				end = words.length - 1;
+			}
+			for (i = start; i <= end; i++)
+			{
+				tWord = words[i];
+				if (tWord.id == word.id)
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
+		
+		public function createWordByStr(str:String):TaggingWord
+		{
+			var rst:TaggingWord;
+			rst = TaggingWord.createByWordStr(str);
+		
+			idWordDic.addItem(rst);
+			return rst;
+		}
+		public function breakWord(word:TaggingWord):Boolean
+		{
+			//debugger;
+			var  tIndex:int;
+			tIndex = findWordIndexInCurLine(word);
+			var wordStr:String;
+			wordStr = word.word;
+			var i:int, len:int;
+			len = wordStr.length;
+			var nWordList:Array;
+			nWordList = [tIndex,1];
+			for (i = 0; i < len; i++)
+			{
+				nWordList.push(createWordByStr(wordStr.charAt(i)));
+			}
+		
+			//debugger;
+			words.splice.apply(words,nWordList);
+			lines = getLines();
+			return false;
+			
+		}
+		
+		
+		public function getWordListByIndex(startIndex:int, endIndex:int):Array
+		{
+			var tWords:Array;
+			tWords = [];
+			var i:int, len:int;
+			for (i = startIndex; i <= endIndex;i++ )
+			{
+				tWords.push(words[i].word);
+			}
+			return tWords;
+		}
+		
+		public function reCutWord(startWord:TaggingWord, endWord:TaggingWord,connectAll:Boolean=false):void
+		{
+			var startIndex:int;
+			var endIndex:int;
+			startIndex = findWordIndexInCurLine(startWord);
+			endIndex = findWordIndexInCurLine(endWord);
+			if (endIndex < startIndex)
+			{
+				var tmp:int;
+				tmp = startIndex;
+				startIndex = endIndex;
+				endIndex = tmp;
+			}
+			
+			var wordStr:String;
+			wordStr = getWordListByIndex(startIndex, endIndex).join("");
+			var nWordList:Array;
+			nWordList = [startIndex, endIndex - startIndex + 1];
+			nWordList = cutStr2Words(wordStr,nWordList,idWordDic);
+			words.splice.apply(words, nWordList);
+			return false;
+		}
+		public function connectWord(startWord:TaggingWord, endWord:TaggingWord,connectAll:Boolean=false):Boolean
+		{
+			var startIndex:int;
+			var endIndex:int;
+			startIndex = findWordIndexInCurLine(startWord);
+			endIndex = findWordIndexInCurLine(endWord);
+			if (endIndex < startIndex)
+			{
+				var tmp:int;
+				tmp = startIndex;
+				startIndex = endIndex;
+				endIndex = tmp;
+			}
+			if (connectAll)
+			{
+				connectWordByWordList(getWordListByIndex(startIndex, endIndex));
+				
+			}else
+			{
+				connectWordByIndex(startIndex, endIndex);
+			}
+			
+			lines = getLines();
+			//debugger;
+			return false;
+		}
+		
+		
+		public function isSame(pos:int, wordList:Array):Boolean
+		{
+			var i:int, len:int;
+			len = wordList.length;
+			var tPos:int;
+			for (i = 0; i < len; i++)
+			{
+				tPos = i + pos;
+				if (!words[tPos] || words[tPos].word != wordList[i]) return false;
+			}
+			return true;
+		}
+		public function connectWordByWordList(wordList:Array,updateLines:Boolean=false):void
+		{
+			var i:int;
+			var wordLen:int;
+			wordLen = wordList.length - 1;
+			for (i = words.length - wordList.length; i >= 0; i--)
+			{
+				if (isSame(i, wordList))
+				{
+					connectWordByIndex(i, i + wordLen);
+				}
+			}
+			if (updateLines)
+			{
+				lines = getLines();
+			}
+		}
+		
+		public function connectWordByIndex(startIndex:int, endIndex:int,updateLines:Boolean=false):void
+		{
+			var tWords:Array;
+			tWords = getWordListByIndex(startIndex,endIndex);
+			var newWord:TaggingWord;
+			newWord = createWordByStr(tWords.join(""));
+			words.splice(startIndex, endIndex - startIndex + 1, newWord);
+			if (updateLines)
+			{
+				lines = getLines();
+			}
 		}
 		public function initByString(str:String):void
 		{
@@ -133,16 +315,23 @@ package nlp.tagging
 		{
 			return index;
 		}
-		public function pre():String
+		public function pre():Object
 		{
 			index--;
 			normalIndex();
 			return getCurLineInfo();
 		}
 		
-		public function next():String
+		public function next():Object
 		{
 			index++;
+			normalIndex();
+			return getCurLineInfo();
+		}
+		
+		public function goto(value:int):Object
+		{
+			index = value;
 			normalIndex();
 			return getCurLineInfo();
 		}
@@ -151,6 +340,12 @@ package nlp.tagging
 		{
 			if (index < 0) index = 0;
 			if (index >= lines.length) index = lines.length - 1;
+		}
+		
+		public function get maxLine():int
+		{
+			if (!lines) return 0;
+			return lines.length-1;
 		}
 		
 		public function initByData(dataO:Object):void

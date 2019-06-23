@@ -15,6 +15,35 @@ package nlp.conll
 			wordList = [];
 		}
 		
+		public function getWordTypeReferToWord(word:ConllWord, referWord:ConllWord):String
+		{
+			var i:int;
+			var tword:ConllWord;
+			if (word.id < referWord.id)
+			{
+				for (i = referWord.id - 1; i > word.id; i--)
+				{
+					tword = getWordByIndex(i);
+					if (tword.head == word.id)
+					{
+						return word.postag + "_" + tword.postag;
+					}
+				}
+			}else
+			{
+				for (i = referWord.id - 1; i > word.id; i++)
+				{
+					tword = getWordByIndex(i);
+					if (tword.head == word.id)
+					{
+						return word.postag + "_" + tword.postag;
+						//return tword.postag + "_"+word.postag;
+					}
+				}
+			}
+			return word.postag;
+			
+		}
 		public function getWordByIndex(index:int):ConllWord
 		{
 			return wordList[index];

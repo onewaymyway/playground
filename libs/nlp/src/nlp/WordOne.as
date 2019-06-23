@@ -72,7 +72,7 @@ package nlp
 				tLine = lines[i];
 				if (tLine.length == 1)
 				{
-					trace("one:",tLine);
+					//trace("one:",tLine);
 				} 
 				if (getKeyStartWords(tLine))
 				{
