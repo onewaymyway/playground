@@ -15533,9 +15533,33 @@ var Laya=window.Laya=(function(window,document){
 			return rst;
 		}
 
-		__proto.breakWord=function(word){
-			var tIndex=0;
-			tIndex=this.findWordIndexInCurLine(word);
+		__proto.breakWord=function(word,all){
+			(all===void 0)&& (all=false);
+			if (all){
+				this.breakWordByWordStr(word.word);
+				}else{
+				this.breakWordByIndex(this.findWordIndexInCurLine(word),true);
+			}
+			return false;
+		}
+
+		__proto.breakWordByWordStr=function(word){
+			var i=0;
+			var tWord;
+			for (i=this.words.length-1;i >=0;i--){
+				tWord=this.words[i];
+				if (tWord.word==word){
+					this.breakWordByIndex(i,false);
+				}
+			}
+			this.updateLines();
+		}
+
+		__proto.breakWordByIndex=function(tIndex,updateLines){
+			(updateLines===void 0)&& (updateLines=false);
+			var word;
+			word=this.words[tIndex];
+			if (!word)return false;
 			var wordStr;
 			wordStr=word.word;
 			var i=0,len=0;
@@ -15546,8 +15570,10 @@ var Laya=window.Laya=(function(window,document){
 				nWordList.push(this.createWordByStr(wordStr.charAt(i)));
 			}
 			this.words.splice.apply(this.words,nWordList);
-			this.lines=this.getLines();
-			return false;
+			if (updateLines){
+				this.lines=this.getLines();
+			}
+			return true;
 		}
 
 		__proto.getWordListByIndex=function(startIndex,endIndex){
@@ -15663,6 +15689,10 @@ var Laya=window.Laya=(function(window,document){
 		__proto.initLines=function(){
 			this.lines=this.getLines();
 			this.index=0;
+		}
+
+		__proto.updateLines=function(){
+			this.lines=this.getLines();
 		}
 
 		__proto.getLines=function(){
@@ -32931,7 +32961,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(BookReaderUI.uiView);
 		}
 
-		BookReaderUI.uiView={"type":"View","props":{"width":600,"runtime":"view.nlpplatform.BookReader","height":400},"child":[{"type":"WordListViewer","props":{"var":"wordView","top":0,"runtime":"view.nlpplatform.WordListViewer","right":0,"left":150,"bottom":0}},{"type":"Label","props":{"y":16,"x":16,"width":136,"var":"bookInfo","text":"书籍信息","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"}},{"type":"Box","props":{"y":99,"x":16,"width":128,"var":"buttonBox","height":287},"child":[{"type":"Button","props":{"skin":"comp/button.png","name":"清空选择","label":"清空选择"}},{"type":"Button","props":{"y":34,"x":1,"skin":"comp/button.png","name":"创建关系","label":"创建关系"}},{"type":"Button","props":{"y":67,"x":1,"skin":"comp/button.png","name":"重建关系","label":"重建关系"}},{"type":"Button","props":{"y":101,"x":2,"skin":"comp/button.png","name":"打散","label":"打散"}},{"type":"Button","props":{"y":138,"x":2,"skin":"comp/button.png","name":"合词","label":"合词"}},{"type":"Button","props":{"y":170,"x":1,"skin":"comp/button.png","name":"全文合词","label":"全文合词"}},{"type":"Button","props":{"y":203,"x":2,"skin":"comp/button.png","name":"重新分词","label":"重新分词"}}]},{"type":"TextInput","props":{"y":69,"x":16,"width":69,"var":"pageNum","text":"0","skin":"comp/input_22.png","height":22,"color":"#ffffff"}},{"type":"Button","props":{"y":67,"x":94,"width":34,"var":"go","skin":"comp/button.png","label":"go","height":24}}]};
+		BookReaderUI.uiView={"type":"View","props":{"width":600,"runtime":"view.nlpplatform.BookReader","height":400},"child":[{"type":"WordListViewer","props":{"var":"wordView","top":0,"runtime":"view.nlpplatform.WordListViewer","right":0,"left":150,"bottom":0}},{"type":"Label","props":{"y":16,"x":16,"width":136,"var":"bookInfo","text":"书籍信息","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"}},{"type":"Box","props":{"y":99,"x":16,"width":128,"var":"buttonBox","height":287},"child":[{"type":"Button","props":{"y":0,"x":0,"skin":"comp/button.png","name":"清空选择","label":"清空选择"}},{"type":"Button","props":{"y":34,"x":0,"skin":"comp/button.png","name":"创建关系","label":"创建关系"}},{"type":"Button","props":{"y":67,"x":0,"skin":"comp/button.png","name":"重建关系","label":"重建关系"}},{"type":"Button","props":{"y":101,"x":0,"skin":"comp/button.png","name":"打散","label":"打散"}},{"type":"Button","props":{"y":168,"x":0,"skin":"comp/button.png","name":"合词","label":"合词"}},{"type":"Button","props":{"y":200,"x":0,"skin":"comp/button.png","name":"全文合词","label":"全文合词"}},{"type":"Button","props":{"y":233,"x":0,"skin":"comp/button.png","name":"重新分词","label":"重新分词"}},{"type":"Button","props":{"y":133,"x":0,"skin":"comp/button.png","name":"全文打散","label":"全文打散"}}]},{"type":"TextInput","props":{"y":69,"x":16,"width":69,"var":"pageNum","text":"0","skin":"comp/input_22.png","height":22,"color":"#ffffff"}},{"type":"Button","props":{"y":67,"x":94,"width":34,"var":"go","skin":"comp/button.png","label":"go","height":24}}]};
 		return BookReaderUI;
 	})(View)
 
@@ -33914,6 +33944,18 @@ var Laya=window.Laya=(function(window,document){
 					this.book.breakWord(word.dataO);
 					this.wordView.showLine();
 					break ;
+				case "合词":
+					if (BookReaderState.startWord&&BookReaderState.endWord){
+						/*no*/this.success=this.book.connectWord(BookReaderState.startWord.dataO,BookReaderState.endWord.dataO);
+						this.wordView.showLine();
+					}
+					break ;
+				case "全文合词":
+					if (BookReaderState.startWord&&BookReaderState.endWord){
+						/*no*/this.success=this.book.connectWord(BookReaderState.startWord.dataO,BookReaderState.endWord.dataO,true);
+						this.wordView.showLine();
+					}
+					break ;
 				}
 		}
 
@@ -33933,6 +33975,12 @@ var Laya=window.Laya=(function(window,document){
 				case "打散":
 					if (BookReaderState.startWord){
 						success=this.book.breakWord(BookReaderState.startWord.dataO);
+						this.wordView.showLine();
+					}
+					break ;
+				case "全文打散":
+					if (BookReaderState.startWord){
+						success=this.book.breakWord(BookReaderState.startWord.dataO,true);
 						this.wordView.showLine();
 					}
 					break ;
@@ -34061,7 +34109,7 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.onRightClick=function(){
 			var menu;
-			menu=ContextMenu.createMenuByArray(["打散","属性"]);
+			menu=ContextMenu.createMenuByArray(["打散","合词","全文合词","属性"]);
 			menu.on("select",this,this.onMenuSelect);
 			menu.show();
 		}
@@ -34072,6 +34120,12 @@ var Laya=window.Laya=(function(window,document){
 			switch(label){
 				case "打散":
 					EventTools.sendEventOnTree(this,"wordevent",["打散",this]);
+					break ;
+				case "合词":
+					EventTools.sendEventOnTree(this,"wordevent",["合词",this]);
+					break ;
+				case "全文合词":
+					EventTools.sendEventOnTree(this,"wordevent",["全文合词",this]);
 					break ;
 				case "属性":
 					WordProp.showWordProp(this);
@@ -34295,4 +34349,6 @@ var Laya=window.Laya=(function(window,document){
 3 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 4 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 5 file:///E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/conll/ConllTreeScoreUtils.as (56):warning:tye This variable is not defined.
+6 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/view/nlpplatform/BookReader.as (72):warning:success This variable is not defined.
+7 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/view/nlpplatform/BookReader.as (79):warning:success This variable is not defined.
 */

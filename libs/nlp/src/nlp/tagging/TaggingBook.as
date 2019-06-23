@@ -103,11 +103,40 @@ package nlp.tagging
 			idWordDic.addItem(rst);
 			return rst;
 		}
-		public function breakWord(word:TaggingWord):Boolean
+		public function breakWord(word:TaggingWord,all:Boolean=false):Boolean
 		{
 			//debugger;
-			var  tIndex:int;
-			tIndex = findWordIndexInCurLine(word);
+			if (all)
+			{
+				breakWordByWordStr(word.word);
+			}else
+			{
+				breakWordByIndex(findWordIndexInCurLine(word), true);
+			}
+
+			return false;
+			
+		}
+		
+		public function breakWordByWordStr(word:String):void
+		{
+			var i:int;
+			var tWord:TaggingWord;
+			for (i = words.length - 1; i >= 0; i--)
+			{
+				tWord = words[i];
+				if (tWord.word == word)
+				{
+					breakWordByIndex(i, false);
+				}
+			}
+			updateLines();
+		}
+		public function breakWordByIndex(tIndex:int,updateLines:Boolean=false):Boolean
+		{
+			var word:TaggingWord;
+			word = words[tIndex];
+			if (!word) return false;
 			var wordStr:String;
 			wordStr = word.word;
 			var i:int, len:int;
@@ -120,10 +149,12 @@ package nlp.tagging
 			}
 		
 			//debugger;
-			words.splice.apply(words,nWordList);
-			lines = getLines();
-			return false;
-			
+			words.splice.apply(words, nWordList);
+			if (updateLines)
+			{
+				lines = getLines();
+			}
+			return true;
 		}
 		
 		
@@ -263,6 +294,11 @@ package nlp.tagging
 		{
 			lines = getLines();
 			index = 0;
+		}
+		
+		public function updateLines():void
+		{
+			lines = getLines();
 		}
 		public function getLines():Array
 		{

@@ -52,7 +52,7 @@ package view.nlpplatform
 		private function onRightClick():void
 		{
 			var menu:ContextMenu;
-			menu = ContextMenu.createMenuByArray(["打散", "属性"]);
+			menu = ContextMenu.createMenuByArray(["打散", "合词", "全文合词", "属性"]);
 			menu.on(Event.SELECT, this, onMenuSelect);
 			menu.show();
 		}
@@ -65,6 +65,12 @@ package view.nlpplatform
 			{
 				case "打散":
 					EventTools.sendEventOnTree(this, "wordevent",["打散",this]);
+					break;
+				case "合词":
+					EventTools.sendEventOnTree(this, "wordevent",["合词",this]);
+					break;
+				case "全文合词":
+					EventTools.sendEventOnTree(this, "wordevent",["全文合词",this]);
 					break;
 				case "属性":
 					WordProp.showWordProp(this);

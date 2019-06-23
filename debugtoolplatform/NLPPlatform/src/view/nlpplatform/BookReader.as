@@ -67,6 +67,20 @@ package view.nlpplatform
 					book.breakWord(word.dataO);
 					wordView.showLine();
 					break;
+				case "合词":
+					if (BookReaderState.startWord&&BookReaderState.endWord)
+					{
+						success = book.connectWord(BookReaderState.startWord.dataO, BookReaderState.endWord.dataO);
+						wordView.showLine();
+					}
+					break;
+				case "全文合词":
+					if (BookReaderState.startWord&&BookReaderState.endWord)
+					{
+						success = book.connectWord(BookReaderState.startWord.dataO, BookReaderState.endWord.dataO,true);
+						wordView.showLine();
+					}
+					break;
 			}
 		}
 		private function onBtnClick(e:Event):void
@@ -88,6 +102,13 @@ package view.nlpplatform
 					if (BookReaderState.startWord)
 					{
 						success = book.breakWord(BookReaderState.startWord.dataO);
+						wordView.showLine();
+					}
+					break;
+				case "全文打散":
+					if (BookReaderState.startWord)
+					{
+						success = book.breakWord(BookReaderState.startWord.dataO,true);
 						wordView.showLine();
 					}
 					break;

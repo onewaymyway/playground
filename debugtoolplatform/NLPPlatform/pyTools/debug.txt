@@ -12,6 +12,8 @@ Project configuration:E:\onewaymyway\codes\playground\playground\debugtoolplatfo
 1,2.00,,0,read class message
 2,46.82,E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/wordmap/SimpleWordMap.as,55,
 2,46.82,E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/wordmap/SimpleWordMap.as,56,
+7,50.42,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/view/nlpplatform/BookReader.as,72,success This variable is not defined.
+7,50.42,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/view/nlpplatform/BookReader.as,79,success This variable is not defined.
 7,83.04,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/electrontools/drags/DragEvent.as,84,SystemSetting.assetsPath This variable is not defined.
 7,83.56,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/ListBase.as,60,_getOneCell This variable is not defined.
 7,83.56,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/ListBase.as,87,_createItems This variable is not defined.
@@ -31,7 +33,7 @@ Project configuration:E:\onewaymyway\codes\playground\playground\debugtoolplatfo
 7,88.87,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonlayout/relationmap/RelationMapItemBase.as,64,_childNodes This variable is not defined.
 7,89.58,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commontools/NestScrollControl.as,59,ScrollBarSwitch.createSwitch This variable is not defined.
 1,89.95,,0,Disable Flash3D E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/NLPPlatform.as
-12,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.js,1047762,
+12,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.js,1049844,
 11,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.html,798,
 ******************************************************************************
 Error or warning message:NLPPlatform.max.js
@@ -40,5 +42,7 @@ Error or warning message:NLPPlatform.max.js
 3 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 4 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 5 file:///E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/conll/ConllTreeScoreUtils.as (56):warning:tye This variable is not defined.
+6 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/view/nlpplatform/BookReader.as (72):warning:success This variable is not defined.
+7 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/view/nlpplatform/BookReader.as (79):warning:success This variable is not defined.
 ******************************************************************************
 14,89.95,,0,

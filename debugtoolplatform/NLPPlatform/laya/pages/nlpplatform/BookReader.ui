@@ -1,8 +1,8 @@
 {
     "x":0,
     "type":"View",
-    "selectedBox":1,
-    "selecteID":5,
+    "selectedBox":9,
+    "selecteID":16,
     "props":{"width":600,"sceneColor":"#000000","runtime":"view.nlpplatform.BookReader","height":400},
     "nodeParent":-1,
     "label":"View",
@@ -54,7 +54,7 @@
                 {
                     "x":30,
                     "type":"Button",
-                    "props":{"skin":"comp/button.png","name":"清空选择","label":"清空选择"},
+                    "props":{"y":0,"x":0,"skin":"comp/button.png","name":"清空选择","label":"清空选择"},
                     "nodeParent":9,
                     "label":"Button(清空选择)",
                     "isDirectory":false,
@@ -67,7 +67,7 @@
                 {
                     "x":30,
                     "type":"Button",
-                    "props":{"y":34,"x":1,"skin":"comp/button.png","name":"创建关系","label":"创建关系"},
+                    "props":{"y":34,"x":0,"skin":"comp/button.png","name":"创建关系","label":"创建关系"},
                     "nodeParent":9,
                     "label":"Button(创建关系)",
                     "isDirectory":false,
@@ -80,7 +80,7 @@
                 {
                     "x":30,
                     "type":"Button",
-                    "props":{"y":67,"x":1,"skin":"comp/button.png","name":"重建关系","label":"重建关系"},
+                    "props":{"y":67,"x":0,"skin":"comp/button.png","name":"重建关系","label":"重建关系"},
                     "nodeParent":9,
                     "label":"Button(重建关系)",
                     "isDirectory":false,
@@ -93,7 +93,7 @@
                 {
                     "x":30,
                     "type":"Button",
-                    "props":{"y":101,"x":2,"skin":"comp/button.png","name":"打散","label":"打散"},
+                    "props":{"y":101,"x":0,"skin":"comp/button.png","name":"打散","label":"打散"},
                     "nodeParent":9,
                     "label":"Button(打散)",
                     "isDirectory":false,
@@ -106,7 +106,7 @@
                 {
                     "x":30,
                     "type":"Button",
-                    "props":{"y":138,"x":2,"skin":"comp/button.png","name":"合词","label":"合词"},
+                    "props":{"y":168,"x":0,"skin":"comp/button.png","name":"合词","label":"合词"},
                     "nodeParent":9,
                     "label":"Button(合词)",
                     "isDirectory":false,
@@ -119,7 +119,7 @@
                 {
                     "x":30,
                     "type":"Button",
-                    "props":{"y":170,"x":1,"skin":"comp/button.png","name":"全文合词","label":"全文合词"},
+                    "props":{"y":200,"x":0,"skin":"comp/button.png","name":"全文合词","label":"全文合词"},
                     "nodeParent":9,
                     "label":"Button(全文合词)",
                     "isDirectory":false,
@@ -132,13 +132,26 @@
                 {
                     "x":30,
                     "type":"Button",
-                    "props":{"y":203,"x":2,"skin":"comp/button.png","name":"重新分词","label":"重新分词"},
+                    "props":{"y":233,"x":0,"skin":"comp/button.png","name":"重新分词","label":"重新分词"},
                     "nodeParent":9,
                     "label":"Button(重新分词)",
                     "isDirectory":false,
                     "isAniNode":true,
                     "hasChild":false,
                     "compId":13,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Button",
+                    "props":{"y":133,"x":0,"skin":"comp/button.png","name":"全文打散","label":"全文打散"},
+                    "nodeParent":9,
+                    "label":"Button(全文打散)",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":16,
                     "child":[
                         ]
                 }]
