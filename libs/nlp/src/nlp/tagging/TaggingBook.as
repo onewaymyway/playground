@@ -28,6 +28,7 @@ package nlp.tagging
 			var rst:Object;
 			rst = {};
 			rst.words = wList;
+			rst.index = index;
 			return rst;
 		
 		}
@@ -365,6 +366,8 @@ package nlp.tagging
 			words = wordList;
 			idWordDic.initByItems(words);
 			initLines();
+			this.index = dataO.index || 0;
+			normalIndex();
 		}
 		
 	}

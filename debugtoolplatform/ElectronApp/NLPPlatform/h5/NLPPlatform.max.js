@@ -15490,6 +15490,7 @@ var Laya=window.Laya=(function(window,document){
 			var rst;
 			rst={};
 			rst.words=wList;
+			rst.index=this.index;
 			return rst;
 		}
 
@@ -15733,6 +15734,8 @@ var Laya=window.Laya=(function(window,document){
 			this.words=wordList;
 			this.idWordDic.initByItems(this.words);
 			this.initLines();
+			this.index=dataO.index || 0;
+			this.normalIndex();
 		}
 
 		__getset(0,__proto,'line',function(){
@@ -32914,6 +32917,8 @@ var Laya=window.Laya=(function(window,document){
 			this.wordView=null;
 			this.bookInfo=null;
 			this.buttonBox=null;
+			this.pageNum=null;
+			this.go=null;
 			BookReaderUI.__super.call(this);
 		}
 
@@ -32926,7 +32931,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(BookReaderUI.uiView);
 		}
 
-		BookReaderUI.uiView={"type":"View","props":{"width":600,"runtime":"view.nlpplatform.BookReader","height":400},"child":[{"type":"WordListViewer","props":{"var":"wordView","top":0,"runtime":"view.nlpplatform.WordListViewer","right":0,"left":150,"bottom":0}},{"type":"Label","props":{"y":16,"x":16,"width":120,"var":"bookInfo","text":"书籍信息","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"}},{"type":"Box","props":{"y":93,"x":16,"width":128,"var":"buttonBox","height":287},"child":[{"type":"Button","props":{"skin":"comp/button.png","name":"清空选择","label":"清空选择"}},{"type":"Button","props":{"y":34,"x":1,"skin":"comp/button.png","name":"创建关系","label":"创建关系"}},{"type":"Button","props":{"y":67,"x":1,"skin":"comp/button.png","name":"重建关系","label":"重建关系"}},{"type":"Button","props":{"y":101,"x":2,"skin":"comp/button.png","name":"打散","label":"打散"}},{"type":"Button","props":{"y":138,"x":2,"skin":"comp/button.png","name":"合词","label":"合词"}},{"type":"Button","props":{"y":170,"x":1,"skin":"comp/button.png","name":"全文合词","label":"全文合词"}},{"type":"Button","props":{"y":203,"x":2,"skin":"comp/button.png","name":"重新分词","label":"重新分词"}}]}]};
+		BookReaderUI.uiView={"type":"View","props":{"width":600,"runtime":"view.nlpplatform.BookReader","height":400},"child":[{"type":"WordListViewer","props":{"var":"wordView","top":0,"runtime":"view.nlpplatform.WordListViewer","right":0,"left":150,"bottom":0}},{"type":"Label","props":{"y":16,"x":16,"width":136,"var":"bookInfo","text":"书籍信息","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"}},{"type":"Box","props":{"y":99,"x":16,"width":128,"var":"buttonBox","height":287},"child":[{"type":"Button","props":{"skin":"comp/button.png","name":"清空选择","label":"清空选择"}},{"type":"Button","props":{"y":34,"x":1,"skin":"comp/button.png","name":"创建关系","label":"创建关系"}},{"type":"Button","props":{"y":67,"x":1,"skin":"comp/button.png","name":"重建关系","label":"重建关系"}},{"type":"Button","props":{"y":101,"x":2,"skin":"comp/button.png","name":"打散","label":"打散"}},{"type":"Button","props":{"y":138,"x":2,"skin":"comp/button.png","name":"合词","label":"合词"}},{"type":"Button","props":{"y":170,"x":1,"skin":"comp/button.png","name":"全文合词","label":"全文合词"}},{"type":"Button","props":{"y":203,"x":2,"skin":"comp/button.png","name":"重新分词","label":"重新分词"}}]},{"type":"TextInput","props":{"y":69,"x":16,"width":69,"var":"pageNum","text":"0","skin":"comp/input_22.png","height":22,"color":"#ffffff"}},{"type":"Button","props":{"y":67,"x":94,"width":34,"var":"go","skin":"comp/button.png","label":"go","height":24}}]};
 		return BookReaderUI;
 	})(View)
 
@@ -33877,12 +33882,19 @@ var Laya=window.Laya=(function(window,document){
 			this.on("LEFT",this,this.onGesture,["LEFT"]);
 			this.on("RIGHT",this,this.onGesture,["RIGHT"]);
 			this.wordView.on("ShowWords",this,this.onShowWord);
+			this.go.on("click",this,this.onGo);
 		}
 
 		__class(BookReader,'view.nlpplatform.BookReader',_super);
 		var __proto=BookReader.prototype;
+		__proto.onGo=function(){
+			var tPage=0;
+			tPage=parseInt(this.pageNum.text)|| 0;
+			this.wordView.goTo(tPage);
+		}
+
 		__proto.onShowWord=function(){
-			this.bookInfo.text="("+this.wordView.book.index+"/"+this.wordView.book.maxLine+")";
+			this.bookInfo.text=this.wordView.book.index+"/"+this.wordView.book.maxLine+"("+((this.wordView.book.index /this.wordView.book.maxLine)*100).toFixed(1)+"%)"+"\n"+"词:"+this.wordView.book.words.length;
 		}
 
 		__proto.onGesture=function(type){
@@ -34136,7 +34148,13 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.setBook=function(book){
 			this.book=book;
-			book.line=0;
+			if(!book.index)
+				book.line=0;
+			this.showLine();
+		}
+
+		__proto.goTo=function(index){
+			this.book.goto(index);
 			this.showLine();
 		}
 

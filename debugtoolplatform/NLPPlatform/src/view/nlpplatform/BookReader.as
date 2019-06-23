@@ -31,11 +31,19 @@ package view.nlpplatform
 			this.on(SimpleGesture.LEFT, this, onGesture, [SimpleGesture.LEFT]);
 			this.on(SimpleGesture.RIGHT, this, onGesture, [SimpleGesture.RIGHT]);
 			wordView.on(WordListViewer.ShowWords, this, onShowWord);
+			
+			go.on(Event.CLICK, this, onGo);
 		}
 		
+		private function onGo():void
+		{
+			var tPage:int;
+			tPage = parseInt(pageNum.text) || 0;
+			wordView.goTo(tPage);
+		}
 		private function onShowWord():void
 		{
-			bookInfo.text = "(" + wordView.book.index + "/" + wordView.book.maxLine+")"+"\n"+"词:"+wordView.book.words.length;
+			bookInfo.text = wordView.book.index + "/" + wordView.book.maxLine+"(" + ((wordView.book.index /wordView.book.maxLine)*100).toFixed(1)+"%)"+"\n"+"词:"+wordView.book.words.length;
 		}
 		
 		private function onGesture(type:String):void

@@ -47,7 +47,14 @@ package view.nlpplatform
 		public function setBook(book:TaggingBook):void
 		{
 			this.book = book;
+			if(!book.index)
 			book.line = 0;
+			showLine();
+		}
+		
+		public function goTo(index:int):void
+		{
+			book.goto(index);
 			showLine();
 		}
 		
