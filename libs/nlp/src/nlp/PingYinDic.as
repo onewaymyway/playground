@@ -69,7 +69,8 @@ package nlp {
 		public static var DebugDic:Object;
 		public static var EnglishCharDic:Object = { };
 		public static var NumCharDic:Object = { };
-		
+		public static var NumCharDicCN:Object = { };
+		public static var transDic:Object = {};
 		public static function isNumChar(char:String):Boolean
 		{
 			return NumCharDic[char];
@@ -100,6 +101,26 @@ package nlp {
 			for (i = 0; i < 10; i++)
 			{
 				NumCharDic[i] = true;
+			}
+			start = "０".charCodeAt(0);
+			len = "９".charCodeAt(0);
+			for (i = start; i <= len; i++)
+			{
+				NumCharDic[String.fromCharCode(i)] = true;
+				transDic[String.fromCharCode(i)] = (i - start) + "";
+			}
+			
+			var numCN0:String = "一二三四五六七八九十百千万亿兆";
+			var numCN1:String = "壹贰叁肆伍陆柒捌玖拾佰仟";
+			len = numCN0.length;
+			for (i = 0; i < len; i++)
+			{
+				NumCharDicCN[numCN0.charAt(i)] = true;
+			}
+			len = numCN1.length;
+			for (i = 0; i < len; i++)
+			{
+				transDic[numCN1.charAt(i)] = numCN0.charAt(i);
 			}
 		}
 		inits();

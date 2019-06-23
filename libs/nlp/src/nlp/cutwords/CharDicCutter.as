@@ -1,5 +1,6 @@
 package nlp.cutwords 
 {
+	import nlp.PingYinDic;
 	/**
 	 * ...
 	 * @author ww
@@ -59,13 +60,14 @@ package nlp.cutwords
 			start = tPos;
 			var end:int;
 			end = tPos;
+			tChar=str.charAt(tPiece.end);
 			while (charDic[tChar])
 			{
 				tPiece.end = tPiece.end+1;
 				if (tPiece.end >= str.length) break;
 				tChar = str.charAt(tPiece.end);
 			}
-			tPiece.word = str.substring(tPiece.start, tPiece.end);
+			tPiece.word = adptWordByTrans(str.substring(tPiece.start, tPiece.end));
 			tPiece.type = tCutConfig.type;
 			return adptWordPiece(tPiece);
 		}
@@ -97,11 +99,43 @@ package nlp.cutwords
 				if (start<0) break;
 				tChar = str.charAt(start);
 			}
-			tPiece.word = str.substring(tPiece.start, tPiece.end);
+			tPiece.word = adptWordByTrans(str.substring(tPiece.start, tPiece.end));
 			tPiece.type = tCutConfig.type;
 			return adptWordPiece(tPiece);
 		}
 		
+		private static function hasTransInWOrd(word:String):Boolean
+		{
+			var i:int, len:int;
+			len = word.length;
+			var tWord:String;
+			for (i = 0; i < len; i++)
+			{
+				tWord = word.charAt(i);
+				if (PingYinDic.transDic[tWord])
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+		private static function adptWordByTrans(word:String):String
+		{
+			var words:Array;
+			words = word.split("");
+			var i:int, len:int;
+			len = words.length;
+			var tWord:String;
+			for (i = 0; i < len; i++)
+			{
+				tWord = words[i];
+				if (PingYinDic.transDic[tWord])
+				{
+					 words[i] = PingYinDic.transDic[tWord];
+				}
+			}
+			return words.join("");
+		}
 		
 	}
 

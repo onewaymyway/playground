@@ -35,7 +35,7 @@ package view.nlpplatform
 		
 		private function onShowWord():void
 		{
-			bookInfo.text = "(" + wordView.book.index + "/" + wordView.book.maxLine+")";
+			bookInfo.text = "(" + wordView.book.index + "/" + wordView.book.maxLine+")"+"\n"+"词:"+wordView.book.words.length;
 		}
 		
 		private function onGesture(type:String):void

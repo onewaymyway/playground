@@ -12355,11 +12355,29 @@ var Laya=window.Laya=(function(window,document){
 			for (i=0;i < 10;i++){
 				PingYinDic.NumCharDic[i]=true;
 			}
+			start="０".charCodeAt(0);
+			len="９".charCodeAt(0);
+			for (i=start;i <=len;i++){
+				PingYinDic.NumCharDic[String.fromCharCode(i)]=true;
+				PingYinDic.transDic[String.fromCharCode(i)]=(i-start)+"";
+			};
+			var numCN0="一二三四五六七八九十百千万亿兆";
+			var numCN1="壹贰叁肆伍陆柒捌玖拾佰仟";
+			len=numCN0.length;
+			for (i=0;i < len;i++){
+				PingYinDic.NumCharDicCN[numCN0.charAt(i)]=true;
+			}
+			len=numCN1.length;
+			for (i=0;i < len;i++){
+				PingYinDic.transDic[numCN1.charAt(i)]=numCN0.charAt(i);
+			}
 		}
 
 		PingYinDic.DebugDic=null
 		PingYinDic.EnglishCharDic={};
 		PingYinDic.NumCharDic={};
+		PingYinDic.NumCharDicCN={};
+		PingYinDic.transDic={};
 		__static(PingYinDic,
 		['DebugChars',function(){return this.DebugChars=["’"];}
 		]);
@@ -12768,12 +12786,13 @@ var Laya=window.Laya=(function(window,document){
 			start=tPos;
 			var end=0;
 			end=tPos;
+			tChar=str.charAt(tPiece.end);
 			while (charDic[tChar]){
 				tPiece.end=tPiece.end+1;
 				if (tPiece.end >=str.length)break ;
 				tChar=str.charAt(tPiece.end);
 			}
-			tPiece.word=str.substring(tPiece.start,tPiece.end);
+			tPiece.word=CharDicCutter.adptWordByTrans(str.substring(tPiece.start,tPiece.end));
 			tPiece.type=tCutConfig.type;
 			return this.adptWordPiece(tPiece);
 		}
@@ -12800,9 +12819,37 @@ var Laya=window.Laya=(function(window,document){
 				if (start<0)break ;
 				tChar=str.charAt(start);
 			}
-			tPiece.word=str.substring(tPiece.start,tPiece.end);
+			tPiece.word=CharDicCutter.adptWordByTrans(str.substring(tPiece.start,tPiece.end));
 			tPiece.type=tCutConfig.type;
 			return this.adptWordPiece(tPiece);
+		}
+
+		CharDicCutter.hasTransInWOrd=function(word){
+			var i=0,len=0;
+			len=word.length;
+			var tWord;
+			for (i=0;i < len;i++){
+				tWord=word.charAt(i);
+				if (PingYinDic.transDic[tWord]){
+					return true;
+				}
+			}
+			return false;
+		}
+
+		CharDicCutter.adptWordByTrans=function(word){
+			var words;
+			words=word.split("");
+			var i=0,len=0;
+			len=words.length;
+			var tWord;
+			for (i=0;i < len;i++){
+				tWord=words[i];
+				if (PingYinDic.transDic[tWord]){
+					words[i]=PingYinDic.transDic[tWord];
+				}
+			}
+			return words.join("");
 		}
 
 		return CharDicCutter;
@@ -12827,6 +12874,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.init=function(){
 			this.charDicCutter=new CharDicCutter();
 			this.charDicCutter.addCutDic("NUMBER",PingYinDic.NumCharDic);
+			this.charDicCutter.addCutDic("NUMBERCN",PingYinDic.NumCharDicCN);
 			this.charDicCutter.addCutDic("ENG",PingYinDic.EnglishCharDic);
 		}
 
@@ -12945,6 +12993,13 @@ var Laya=window.Laya=(function(window,document){
 			return piece;
 		}
 
+		__proto.getLongerWordPiece=function(wordA,wordB){
+			if (!wordA)return wordB;
+			if (!wordB)return wordA;
+			if (wordB.word.length > wordA.word.length)return wordB;
+			return wordA;
+		}
+
 		__proto.findWordPiece=function(word){
 			var wordPiece;
 			wordPiece=this.findMaxWord(word,0);
@@ -12959,8 +13014,8 @@ var Laya=window.Laya=(function(window,document){
 		__proto.findMaxWord=function(str,pos){
 			(pos===void 0)&& (pos=0);
 			var tPiece;
-			tPiece=this.charDicCutter.findMaxWord(str,pos);
-			if (tPiece)return tPiece;
+			var dicPiece;
+			dicPiece=this.charDicCutter.findMaxWord(str,pos);
 			var tchar;
 			tchar=str.charAt(pos);
 			var tTrieNode;
@@ -12971,7 +13026,7 @@ var Laya=window.Laya=(function(window,document){
 			if (!tTrieNode){
 				tPiece.word=tchar;
 				tPiece.type="new";
-				return this.adptPiece(tPiece);
+				return this.getLongerWordPiece(dicPiece,this.adptPiece(tPiece));
 			}
 			if (tTrieNode.isWord()){
 				tPiece.end=pos+1;
@@ -12997,7 +13052,7 @@ var Laya=window.Laya=(function(window,document){
 					tPiece.wordRef=tTrieNode.word;
 				}
 			}
-			return this.adptPiece(tPiece);
+			return this.getLongerWordPiece(dicPiece,this.adptPiece(tPiece));
 		}
 
 		__proto.findMaxWordR=function(str,pos){
@@ -13006,8 +13061,8 @@ var Laya=window.Laya=(function(window,document){
 				pos=str.length-1;
 			};
 			var tPiece;
-			tPiece=this.charDicCutter.findMaxWordR(str,pos);
-			if (tPiece)return tPiece;
+			var dicPiece;
+			dicPiece=this.charDicCutter.findMaxWordR(str,pos);
 			var tchar;
 			tchar=str.charAt(pos);
 			var tTrieNode;
@@ -13018,7 +13073,7 @@ var Laya=window.Laya=(function(window,document){
 			if (!tTrieNode){
 				tPiece.word=tchar;
 				tPiece.type="new";
-				return this.adptPiece(tPiece);
+				return this.getLongerWordPiece(dicPiece,this.adptPiece(tPiece));
 			}
 			if (tTrieNode.isWord()){
 				tPiece.end=pos+1;
@@ -13045,7 +13100,7 @@ var Laya=window.Laya=(function(window,document){
 					tPiece.wordRef=tTrieNode.word;
 				}
 			}
-			return this.adptPiece(tPiece);
+			return this.getLongerWordPiece(dicPiece,this.adptPiece(tPiece));
 		}
 
 		return WordCutter;
@@ -15650,6 +15705,12 @@ var Laya=window.Laya=(function(window,document){
 
 		__proto.next=function(){
 			this.index++;
+			this.normalIndex();
+			return this.getCurLineInfo();
+		}
+
+		__proto.goto=function(value){
+			this.index=value;
 			this.normalIndex();
 			return this.getCurLineInfo();
 		}
@@ -32865,7 +32926,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(BookReaderUI.uiView);
 		}
 
-		BookReaderUI.uiView={"type":"View","props":{"width":600,"runtime":"view.nlpplatform.BookReader","height":400},"child":[{"type":"WordListViewer","props":{"var":"wordView","top":0,"runtime":"view.nlpplatform.WordListViewer","right":0,"left":150,"bottom":0}},{"type":"Label","props":{"y":16,"x":16,"width":120,"var":"bookInfo","text":"label","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"}},{"type":"Box","props":{"y":93,"x":16,"width":128,"var":"buttonBox","height":287},"child":[{"type":"Button","props":{"skin":"comp/button.png","name":"清空选择","label":"清空选择"}},{"type":"Button","props":{"y":34,"x":1,"skin":"comp/button.png","name":"创建关系","label":"创建关系"}},{"type":"Button","props":{"y":67,"x":1,"skin":"comp/button.png","name":"重建关系","label":"重建关系"}},{"type":"Button","props":{"y":101,"x":2,"skin":"comp/button.png","name":"打散","label":"打散"}},{"type":"Button","props":{"y":138,"x":2,"skin":"comp/button.png","name":"合词","label":"合词"}},{"type":"Button","props":{"y":170,"x":1,"skin":"comp/button.png","name":"全文合词","label":"全文合词"}},{"type":"Button","props":{"y":203,"x":2,"skin":"comp/button.png","name":"重新分词","label":"重新分词"}}]}]};
+		BookReaderUI.uiView={"type":"View","props":{"width":600,"runtime":"view.nlpplatform.BookReader","height":400},"child":[{"type":"WordListViewer","props":{"var":"wordView","top":0,"runtime":"view.nlpplatform.WordListViewer","right":0,"left":150,"bottom":0}},{"type":"Label","props":{"y":16,"x":16,"width":120,"var":"bookInfo","text":"书籍信息","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"}},{"type":"Box","props":{"y":93,"x":16,"width":128,"var":"buttonBox","height":287},"child":[{"type":"Button","props":{"skin":"comp/button.png","name":"清空选择","label":"清空选择"}},{"type":"Button","props":{"y":34,"x":1,"skin":"comp/button.png","name":"创建关系","label":"创建关系"}},{"type":"Button","props":{"y":67,"x":1,"skin":"comp/button.png","name":"重建关系","label":"重建关系"}},{"type":"Button","props":{"y":101,"x":2,"skin":"comp/button.png","name":"打散","label":"打散"}},{"type":"Button","props":{"y":138,"x":2,"skin":"comp/button.png","name":"合词","label":"合词"}},{"type":"Button","props":{"y":170,"x":1,"skin":"comp/button.png","name":"全文合词","label":"全文合词"}},{"type":"Button","props":{"y":203,"x":2,"skin":"comp/button.png","name":"重新分词","label":"重新分词"}}]}]};
 		return BookReaderUI;
 	})(View)
 
@@ -32888,7 +32949,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(PlatformMainUI.uiView);
 		}
 
-		PlatformMainUI.uiView={"type":"View","props":{"width":600,"height":400},"child":[{"type":"Button","props":{"y":9,"x":9,"var":"openBtn","skin":"comp/button.png","label":"打开"}},{"type":"BookReader","props":{"var":"bookReader","top":40,"runtime":"view.nlpplatform.BookReader","right":5,"left":5,"bottom":5}},{"type":"Button","props":{"y":9,"x":110,"var":"saveBtn","skin":"comp/button.png","label":"保存"}},{"type":"Label","props":{"y":12,"x":205,"width":383,"var":"bookInfo","text":"label","styleSkin":"comp/label.png","height":26,"fontSize":20,"color":"#ffffff"}}]};
+		PlatformMainUI.uiView={"type":"View","props":{"width":600,"height":400},"child":[{"type":"Button","props":{"y":9,"x":9,"var":"openBtn","skin":"comp/button.png","label":"打开"}},{"type":"BookReader","props":{"var":"bookReader","top":40,"runtime":"view.nlpplatform.BookReader","right":5,"left":5,"bottom":5}},{"type":"Button","props":{"y":9,"x":110,"var":"saveBtn","skin":"comp/button.png","label":"保存"}},{"type":"Label","props":{"y":12,"x":205,"width":383,"var":"bookInfo","text":"文件名","styleSkin":"comp/label.png","height":26,"fontSize":20,"color":"#ffffff"}}]};
 		return PlatformMainUI;
 	})(View)
 

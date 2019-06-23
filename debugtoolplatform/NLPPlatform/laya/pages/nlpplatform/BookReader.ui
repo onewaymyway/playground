@@ -29,7 +29,7 @@
         {
             "x":15,
             "type":"Label",
-            "props":{"y":16,"x":16,"width":120,"var":"bookInfo","text":"label","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"},
+            "props":{"y":16,"x":16,"width":120,"var":"bookInfo","text":"书籍信息","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"},
             "nodeParent":1,
             "label":"Label(bookInfo)",
             "isDirectory":false,

@@ -24,6 +24,7 @@ package nlp.cutwords
 		{
 			charDicCutter = new CharDicCutter();
 			charDicCutter.addCutDic("NUMBER", PingYinDic.NumCharDic);
+			charDicCutter.addCutDic("NUMBERCN", PingYinDic.NumCharDicCN);
 			charDicCutter.addCutDic("ENG", PingYinDic.EnglishCharDic);
 		}
 		
@@ -167,7 +168,13 @@ package nlp.cutwords
 			
 			return piece;
 		}
-		
+		public function getLongerWordPiece(wordA:WordPiece, wordB:WordPiece):WordPiece
+		{
+			if (!wordA) return  wordB;
+			if (!wordB) return wordA;
+			if (wordB.word.length > wordA.word.length) return wordB;
+			return wordA;
+		}
 		public function findWordPiece(word:String):WordPiece
 		{
 			var wordPiece:WordPiece;
@@ -184,9 +191,9 @@ package nlp.cutwords
 		{
 			
 			var tPiece:WordPiece;
-			
-			tPiece = charDicCutter.findMaxWord(str, pos);
-			if (tPiece) return tPiece;
+			var dicPiece:WordPiece;
+			dicPiece = charDicCutter.findMaxWord(str, pos);
+			//if (tPiece) return tPiece;
 			var tchar:String;
 			tchar = str.charAt(pos);
 			var tTrieNode:TrieNode;
@@ -201,7 +208,7 @@ package nlp.cutwords
 				tPiece.word = tchar;
 				tPiece.type = "new";
 				
-				return adptPiece(tPiece);
+				return getLongerWordPiece(dicPiece,adptPiece(tPiece));
 			} 
 			
 			//tPiece
@@ -235,7 +242,7 @@ package nlp.cutwords
 				}
 			}
 			
-			return adptPiece(tPiece);
+			return getLongerWordPiece(dicPiece,adptPiece(tPiece));
 		}
 		
 		public function findMaxWordR(str:String, pos:int = -2):WordPiece
@@ -246,9 +253,9 @@ package nlp.cutwords
 			}
 			
 			var tPiece:WordPiece;
-			
-			tPiece = charDicCutter.findMaxWordR(str, pos);
-			if (tPiece) return tPiece;
+			var dicPiece:WordPiece;
+			dicPiece = charDicCutter.findMaxWordR(str, pos);
+			//if (tPiece) return tPiece;
 			
 			var tchar:String;
 			tchar = str.charAt(pos);
@@ -264,7 +271,7 @@ package nlp.cutwords
 				tPiece.word = tchar;
 				tPiece.type = "new";
 				
-				return adptPiece(tPiece);
+				return getLongerWordPiece(dicPiece,adptPiece(tPiece));
 			} 
 			
 			//tPiece
@@ -301,7 +308,7 @@ package nlp.cutwords
 			}
 			
 			
-			return adptPiece(tPiece);
+			return getLongerWordPiece(dicPiece,adptPiece(tPiece));
 		}
 		
 		

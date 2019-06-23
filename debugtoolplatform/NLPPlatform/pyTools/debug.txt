@@ -31,7 +31,7 @@ Project configuration:E:\onewaymyway\codes\playground\playground\debugtoolplatfo
 7,88.87,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commonlayout/relationmap/RelationMapItemBase.as,64,_childNodes This variable is not defined.
 7,89.58,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commontools/NestScrollControl.as,59,ScrollBarSwitch.createSwitch This variable is not defined.
 1,89.95,,0,Disable Flash3D E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/NLPPlatform.as
-12,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.js,1045188,
+12,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.js,1046992,
 11,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.html,798,
 ******************************************************************************
 Error or warning message:NLPPlatform.max.js
