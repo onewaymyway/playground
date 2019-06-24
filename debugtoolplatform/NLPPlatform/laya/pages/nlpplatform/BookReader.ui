@@ -2,7 +2,7 @@
     "x":0,
     "type":"View",
     "selectedBox":9,
-    "selecteID":16,
+    "selecteID":17,
     "props":{"width":600,"sceneColor":"#000000","runtime":"view.nlpplatform.BookReader","height":400},
     "nodeParent":-1,
     "label":"View",
@@ -152,6 +152,19 @@
                     "isAniNode":true,
                     "hasChild":false,
                     "compId":16,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Button",
+                    "props":{"y":267,"x":0,"skin":"comp/button.png","name":"删除句中空格","label":"删除句中空格"},
+                    "nodeParent":9,
+                    "label":"Button(删除句中空格)",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":17,
                     "child":[
                         ]
                 }]

@@ -15509,6 +15509,31 @@ var Laya=window.Laya=(function(window,document){
 			return this.findWordIndexInRange(word,start,end);
 		}
 
+		__proto.isNoUseEmpyt=function(i){
+			var tword;
+			tword=this.words[i];
+			if (!tword)return false;
+			if (tword.type !="空格")return false;
+			tword=this.words[i-1];
+			if (!tword)return false;
+			if (tword.type=="空格" || tword.type=="标点符号")return false;
+			tword=this.words[i+1];
+			if (!tword)return false;
+			if (tword.type=="空格" || tword.type=="标点符号")return false;
+			return true;
+		}
+
+		__proto.removeNoUseEmpty=function(){
+			var i=0;
+			for (i=this.words.length-1;i >=0;i--){
+				if (this.isNoUseEmpyt(i)){
+					this.words.splice(i,1);
+				}
+			}
+			this.updateLines();
+			return false;
+		}
+
 		__proto.findWordIndexInRange=function(word,start,end){
 			(start===void 0)&& (start=0);
 			(end===void 0)&& (end=-1);
@@ -32961,7 +32986,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(BookReaderUI.uiView);
 		}
 
-		BookReaderUI.uiView={"type":"View","props":{"width":600,"runtime":"view.nlpplatform.BookReader","height":400},"child":[{"type":"WordListViewer","props":{"var":"wordView","top":0,"runtime":"view.nlpplatform.WordListViewer","right":0,"left":150,"bottom":0}},{"type":"Label","props":{"y":16,"x":16,"width":136,"var":"bookInfo","text":"书籍信息","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"}},{"type":"Box","props":{"y":99,"x":16,"width":128,"var":"buttonBox","height":287},"child":[{"type":"Button","props":{"y":0,"x":0,"skin":"comp/button.png","name":"清空选择","label":"清空选择"}},{"type":"Button","props":{"y":34,"x":0,"skin":"comp/button.png","name":"创建关系","label":"创建关系"}},{"type":"Button","props":{"y":67,"x":0,"skin":"comp/button.png","name":"重建关系","label":"重建关系"}},{"type":"Button","props":{"y":101,"x":0,"skin":"comp/button.png","name":"打散","label":"打散"}},{"type":"Button","props":{"y":168,"x":0,"skin":"comp/button.png","name":"合词","label":"合词"}},{"type":"Button","props":{"y":200,"x":0,"skin":"comp/button.png","name":"全文合词","label":"全文合词"}},{"type":"Button","props":{"y":233,"x":0,"skin":"comp/button.png","name":"重新分词","label":"重新分词"}},{"type":"Button","props":{"y":133,"x":0,"skin":"comp/button.png","name":"全文打散","label":"全文打散"}}]},{"type":"TextInput","props":{"y":69,"x":16,"width":69,"var":"pageNum","text":"0","skin":"comp/input_22.png","height":22,"color":"#ffffff"}},{"type":"Button","props":{"y":67,"x":94,"width":34,"var":"go","skin":"comp/button.png","label":"go","height":24}}]};
+		BookReaderUI.uiView={"type":"View","props":{"width":600,"runtime":"view.nlpplatform.BookReader","height":400},"child":[{"type":"WordListViewer","props":{"var":"wordView","top":0,"runtime":"view.nlpplatform.WordListViewer","right":0,"left":150,"bottom":0}},{"type":"Label","props":{"y":16,"x":16,"width":136,"var":"bookInfo","text":"书籍信息","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"}},{"type":"Box","props":{"y":99,"x":16,"width":128,"var":"buttonBox","height":287},"child":[{"type":"Button","props":{"y":0,"x":0,"skin":"comp/button.png","name":"清空选择","label":"清空选择"}},{"type":"Button","props":{"y":34,"x":0,"skin":"comp/button.png","name":"创建关系","label":"创建关系"}},{"type":"Button","props":{"y":67,"x":0,"skin":"comp/button.png","name":"重建关系","label":"重建关系"}},{"type":"Button","props":{"y":101,"x":0,"skin":"comp/button.png","name":"打散","label":"打散"}},{"type":"Button","props":{"y":168,"x":0,"skin":"comp/button.png","name":"合词","label":"合词"}},{"type":"Button","props":{"y":200,"x":0,"skin":"comp/button.png","name":"全文合词","label":"全文合词"}},{"type":"Button","props":{"y":233,"x":0,"skin":"comp/button.png","name":"重新分词","label":"重新分词"}},{"type":"Button","props":{"y":133,"x":0,"skin":"comp/button.png","name":"全文打散","label":"全文打散"}},{"type":"Button","props":{"y":267,"x":0,"skin":"comp/button.png","name":"删除句中空格","label":"删除句中空格"}}]},{"type":"TextInput","props":{"y":69,"x":16,"width":69,"var":"pageNum","text":"0","skin":"comp/input_22.png","height":22,"color":"#ffffff"}},{"type":"Button","props":{"y":67,"x":94,"width":34,"var":"go","skin":"comp/button.png","label":"go","height":24}}]};
 		return BookReaderUI;
 	})(View)
 
@@ -34001,6 +34026,10 @@ var Laya=window.Laya=(function(window,document){
 						success=this.book.reCutWord(BookReaderState.startWord.dataO,BookReaderState.endWord.dataO,false);
 						this.wordView.showLine();
 					}
+					break ;
+				case "删除句中空格":
+					success=this.book.removeNoUseEmpty();
+					this.wordView.showLine();
 					break ;
 				}
 		}

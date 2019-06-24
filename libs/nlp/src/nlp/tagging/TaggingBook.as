@@ -76,6 +76,35 @@ package nlp.tagging
 			
 		}
 		
+		public function isNoUseEmpyt(i:int):Boolean
+		{
+			var tword:TaggingWord;
+			tword = words[i];
+			if (!tword) return false;
+			if (tword.type != "空格") return false;
+			tword = words[i - 1];
+			
+			if (!tword) return false;
+			if (tword.type == "空格" || tword.type == "标点符号") return false;
+			tword = words[i + 1];
+			if (!tword) return false;
+			if (tword.type == "空格" || tword.type == "标点符号") return false;
+			return true;
+		}
+		public function removeNoUseEmpty():Boolean
+		{
+			var i:int;
+			for (i = words.length - 1; i >= 0; i--)
+			{
+				if (isNoUseEmpyt(i))
+				{
+					words.splice(i, 1);
+				}
+			}
+			updateLines();
+			return false;
+		}
+		
 		public function findWordIndexInRange(word:TaggingWord, start:int=0, end:int=-1):int
 		{
 			var i:int;

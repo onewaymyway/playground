@@ -133,6 +133,12 @@ package view.nlpplatform
 						wordView.showLine();
 					}
 					break;
+				case "删除句中空格":
+					
+					success = book.removeNoUseEmpty();
+					wordView.showLine();
+					
+					break;
 					
 			}
 		}
