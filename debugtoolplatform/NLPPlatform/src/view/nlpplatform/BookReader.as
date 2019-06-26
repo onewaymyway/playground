@@ -132,6 +132,12 @@ package view.nlpplatform
 						success = book.reCutWord(BookReaderState.startWord.dataO, BookReaderState.endWord.dataO,false);
 						wordView.showLine();
 					}
+				case "广播标注":
+					if (BookReaderState.startWord)
+					{
+						success = book.copyWordPropByWord(BookReaderState.startWord.dataO, BookReaderState.endWord.dataO,false);
+						wordView.showLine();
+					}
 					break;
 				case "删除句中空格":
 					

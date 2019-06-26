@@ -62,7 +62,7 @@ package nlp.tagging
 			lineInfo = getCurLineInfo();
 			var start:int;
 			var end:int;
-			if (!lineInfo)
+			if (lineInfo)
 			{
 				start = lineInfo.start;
 				end = lineInfo.end;
@@ -187,15 +187,32 @@ package nlp.tagging
 		}
 		
 		
-		public function getWordListByIndex(startIndex:int, endIndex:int):Array
+		public function getWordListByIndex(startIndex:int, endIndex:int,onlyWord:Boolean=true):Array
 		{
 			var tWords:Array;
 			tWords = [];
 			var i:int, len:int;
-			for (i = startIndex; i <= endIndex;i++ )
+			if (startIndex > endIndex)
 			{
-				tWords.push(words[i].word);
+				var temp:int;
+				temp = startIndex;
+				startIndex = endIndex;
+				endIndex = temp;
 			}
+			if (onlyWord)
+			{
+				for (i = startIndex; i <= endIndex;i++ )
+				{
+					tWords.push(words[i].word);
+				}
+			}else
+			{
+				for (i = startIndex; i <= endIndex;i++ )
+				{
+					tWords.push(words[i]);
+				}
+			}
+			
 			return tWords;
 		}
 		
@@ -261,6 +278,63 @@ package nlp.tagging
 			}
 			return true;
 		}
+		
+		public function isSameWW(pos:int, wordList:Array):Boolean
+		{
+			var i:int, len:int;
+			len = wordList.length;
+			var tPos:int;
+			for (i = 0; i < len; i++)
+			{
+				tPos = i + pos;
+				if (!words[tPos] || words[tPos].word != wordList[i].word) return false;
+			}
+			return true;
+		}
+		
+		public function copyWordPropByWord(startWord:TaggingWord, endWord:TaggingWord):void
+		{
+			if (!startWord) return;
+			if (!endWord)
+			{
+				copyWordPropByWordList(getWordListByIndex(findWordIndexInRange(startWord), findWordIndexInCurLine(startWord),false));
+			}else
+			{
+				copyWordPropByWordList(getWordListByIndex(findWordIndexInRange(startWord), findWordIndexInCurLine(endWord),false));
+			}
+		}
+		
+		public function copyWordPropByWordList(wordList:Array):void
+		{
+			var i:int;
+			var wordLen:int;
+			wordLen = wordList.length - 1;
+			for (i = words.length - wordList.length; i >= 0; i--)
+			{
+				if (isSameWW(i, wordList))
+				{
+					copyWordPropByIndex(i, i + wordLen,wordList);
+				}
+			}
+		}
+		
+		public function copyWordPropByIndex(startIndex:int, endIndex:int,wordList:Array,updateLines:Boolean=false):void
+		{
+			var i:int, len:int;
+			len = wordList.length;
+			var tWord:TaggingWord;
+			var sWord:TaggingWord;
+			for (i = 0; i < len; i++)
+			{
+				tWord = words[startIndex + i];
+				sWord = wordList[i];
+				if (tWord && sWord)
+				{
+					tWord.type = sWord.type;
+				}
+			}
+		}
+		
 		public function connectWordByWordList(wordList:Array,updateLines:Boolean=false):void
 		{
 			var i:int;

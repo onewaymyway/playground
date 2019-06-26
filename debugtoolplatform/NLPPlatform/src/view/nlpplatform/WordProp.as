@@ -1,7 +1,10 @@
 package view.nlpplatform 
 {
+	import commontools.EventTools;
 	import laya.events.Event;
 	import nlp.WordDicParser;
+	import nlp.dictools.TypeDefine;
+	import nlp.tagging.TaggingWord;
 	import ui.nlpplatform.WordPropUI;
 	
 	/**
@@ -21,10 +24,11 @@ package view.nlpplatform
 			sureBtn.on(Event.CLICK, this, onAction, ["sure"]);
 			selectMeaningBtn.on(Event.CLICK, this, onAction, ["selectMeaning"]);
 			closeBtn.on(Event.CLICK, this, onAction, ["close"]);
+			wordType.labels = TypeDefine.SelectTypeList.join(",");
 		}
 		
-		public var _dataO:Object;
-		public var wordO:Object;
+		public var _dataO:WordViewer;
+		public var wordO:TaggingWord;
 		public function setData(dataO:Object):void
 		{
 			_dataO = dataO;
@@ -44,17 +48,24 @@ package view.nlpplatform
 			I.popup();
 		}
 		
+		private function saveInfo():void
+		{
+			wordO.type = wordType.selectedLabel;
+			EventTools.sendEventOnTree(_dataO, "wordchanged");
+		}
 		private function onAction(type:String):void
 		{
 			//debugger;
 			switch(type)
 			{
 				case "sure":
+					saveInfo();
 					this.close();
 					break;
 				case "selectMeaning":
 					break;
 				case "close":
+					saveInfo();
 					this.close();
 					break;
 			}

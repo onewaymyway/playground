@@ -31,6 +31,7 @@ package nlp.dictools
 			if (TypeDesDic[type]) return true;
 			return false;
 		}
+		public static const SelectTypeList:Array = ["形容词","副词","人名","姓","名","地名","名词","动词","成语"];
 		public static const TypeDesDic:Object = {
 			"a":"形容词",
 			"ad":"副形词",

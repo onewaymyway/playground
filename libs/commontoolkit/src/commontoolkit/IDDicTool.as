@@ -54,11 +54,22 @@ package commontoolkit
 			for (i = 0; i < len; i++)
 			{
 				tID = items[i][idKey] || 0;
+				if (tID)
+				{
+					if (!idDic[tID])
+					{
+						idDic[tID] = items[i];
+					}else
+					{
+						items[i][idKey] = 0;
+					}
+				}
 				if (tID > tMax)
 				{
 					tMax = tID;
 				}
 			}
+			tMax++;
 			var tItem:Object;
 			for (i = 0; i < len; i++)
 			{

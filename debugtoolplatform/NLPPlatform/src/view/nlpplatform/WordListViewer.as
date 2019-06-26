@@ -20,8 +20,18 @@ package view.nlpplatform
 			layouter = new WordLayout();
 			container.on(Event.RESIZE, this, freshUI);
 			idWordDic = new IDDicTool();
+			this.on("wordchanged", this, onEvent, ["wordchanged"]);
 		}
 		
+		private function onEvent(type:String):void
+		{
+			switch(type)
+			{
+				case "wordchanged":
+					showLine();
+					break;
+			}
+		}
 		private var wList:Array;
 		private var wordItemList:Array;
 		private var idWordDic:IDDicTool;
