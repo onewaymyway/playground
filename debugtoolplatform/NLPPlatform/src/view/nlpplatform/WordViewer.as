@@ -1,6 +1,7 @@
 package view.nlpplatform 
 {
 	import commontools.EventTools;
+	import extendui.events.LongPress;
 	import laya.debug.uicomps.ContextMenu;
 	import laya.display.Sprite;
 	import laya.events.Event;
@@ -18,6 +19,8 @@ package view.nlpplatform
 		
 		public function WordViewer() 
 		{
+			LongPress.setTargetLongPressEnabled(this);
+			this.on(LongPress.LongPressEvent, this, onRightClick);
 			this.on(Event.RIGHT_CLICK, this, onRightClick);
 			this.on(Event.CLICK, this, onMouseDown);
 		}

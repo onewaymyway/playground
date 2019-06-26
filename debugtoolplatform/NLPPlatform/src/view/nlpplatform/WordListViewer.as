@@ -19,6 +19,8 @@ package view.nlpplatform
 		{
 			layouter = new WordLayout();
 			container.on(Event.RESIZE, this, freshUI);
+			container.vScrollBar.autoHide = true;
+			container.vScrollBar.touchScrollEnable = true;
 			idWordDic = new IDDicTool();
 			this.on("wordchanged", this, onEvent, ["wordchanged"]);
 		}

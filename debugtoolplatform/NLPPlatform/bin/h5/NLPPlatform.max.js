@@ -10969,6 +10969,59 @@ var Laya=window.Laya=(function(window,document){
 
 
 	/**
+	*...
+	*@author ww
+	*/
+	//class extendui.events.LongPress
+	var LongPress=(function(){
+		function LongPress(){
+			this._preTime=NaN;
+			this.timeLimit=600;
+			this._target=null;
+			this._isDown=false;
+		}
+
+		__class(LongPress,'extendui.events.LongPress');
+		var __proto=LongPress.prototype;
+		__proto.onMouseDown=function(){
+			this._preTime=Browser.now();
+			this._isDown=true;
+		}
+
+		__proto.onMouseOut=function(){
+			this._isDown=false;
+		}
+
+		__proto.onMouseUp=function(){
+			if (!this._isDown)return;
+			if (Browser.now()-this._preTime>this.timeLimit){
+				this._target.event("LongPressEvent");
+			}
+			this._isDown=false;
+		}
+
+		__getset(0,__proto,'target',null,function(value){
+			this._target=value;
+			this._target.on("mousedown",this,this.onMouseDown);
+			this._target.on("mouseup",this,this.onMouseUp);
+			this._target.on("mouseout",this,this.onMouseOut);
+		});
+
+		LongPress.setTargetLongPressEnabled=function(target){
+			if (target["__longPress"])return;
+			var lp;
+			lp=new LongPress();
+			lp.target=target;
+			target["__longPress"]=lp;
+		}
+
+		LongPress.LongPressEvent="LongPressEvent";
+		LongPress.LongPressSign="__longPress";
+		return LongPress;
+	})()
+
+
+	/**
 	*本地程序调用封装
 	*@author ww
 	*@version 1.0
@@ -33092,7 +33145,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(BookReaderUI.uiView);
 		}
 
-		BookReaderUI.uiView={"type":"View","props":{"width":600,"runtime":"view.nlpplatform.BookReader","height":800},"child":[{"type":"WordListViewer","props":{"var":"wordView","top":0,"runtime":"view.nlpplatform.WordListViewer","right":0,"left":150,"bottom":0}},{"type":"Label","props":{"y":16,"x":16,"width":136,"var":"bookInfo","text":"书籍信息","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"}},{"type":"Box","props":{"x":16,"width":128,"var":"buttonBox","top":100,"bottom":40},"child":[{"type":"Button","props":{"y":0,"x":0,"skin":"comp/button.png","name":"清空选择","label":"清空选择"}},{"type":"Button","props":{"y":34,"x":0,"skin":"comp/button.png","name":"创建关系","label":"创建关系"}},{"type":"Button","props":{"y":67,"x":0,"skin":"comp/button.png","name":"重建关系","label":"重建关系"}},{"type":"Button","props":{"y":101,"x":0,"skin":"comp/button.png","name":"打散","label":"打散"}},{"type":"Button","props":{"y":168,"x":0,"skin":"comp/button.png","name":"合词","label":"合词"}},{"type":"Button","props":{"y":200,"x":0,"skin":"comp/button.png","name":"全文合词","label":"全文合词"}},{"type":"Button","props":{"y":233,"x":0,"skin":"comp/button.png","name":"重新分词","label":"重新分词"}},{"type":"Button","props":{"y":133,"x":0,"skin":"comp/button.png","name":"全文打散","label":"全文打散"}},{"type":"Button","props":{"y":267,"x":0,"skin":"comp/button.png","name":"删除句中空格","label":"删除句中空格"}},{"type":"Button","props":{"y":304,"x":0,"skin":"comp/button.png","name":"广播标注","label":"广播标注"}}]},{"type":"TextInput","props":{"y":69,"x":16,"width":69,"var":"pageNum","text":"0","skin":"comp/input_22.png","height":22,"color":"#ffffff"}},{"type":"Button","props":{"y":67,"x":94,"width":34,"var":"go","skin":"comp/button.png","label":"go","height":24}}]};
+		BookReaderUI.uiView={"type":"View","props":{"width":600,"runtime":"view.nlpplatform.BookReader","height":800},"child":[{"type":"WordListViewer","props":{"var":"wordView","top":0,"runtime":"view.nlpplatform.WordListViewer","right":0,"left":150,"bottom":0}},{"type":"Label","props":{"y":16,"x":16,"width":136,"var":"bookInfo","text":"书籍信息","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"}},{"type":"Panel","props":{"x":16,"width":128,"var":"buttonBox","vScrollBarSkin":"comp/vscroll.png","top":100,"bottom":40},"child":[{"type":"Button","props":{"y":0,"x":0,"skin":"comp/button.png","name":"清空选择","label":"清空选择"}},{"type":"Button","props":{"y":34,"x":0,"skin":"comp/button.png","name":"创建关系","label":"创建关系"}},{"type":"Button","props":{"y":67,"x":0,"skin":"comp/button.png","name":"重建关系","label":"重建关系"}},{"type":"Button","props":{"y":101,"x":0,"skin":"comp/button.png","name":"打散","label":"打散"}},{"type":"Button","props":{"y":168,"x":0,"skin":"comp/button.png","name":"合词","label":"合词"}},{"type":"Button","props":{"y":200,"x":0,"skin":"comp/button.png","name":"全文合词","label":"全文合词"}},{"type":"Button","props":{"y":233,"x":0,"skin":"comp/button.png","name":"重新分词","label":"重新分词"}},{"type":"Button","props":{"y":133,"x":0,"skin":"comp/button.png","name":"全文打散","label":"全文打散"}},{"type":"Button","props":{"y":267,"x":0,"skin":"comp/button.png","name":"删除句中空格","label":"删除句中空格"}},{"type":"Button","props":{"y":304,"x":0,"skin":"comp/button.png","name":"广播标注","label":"广播标注"}}]},{"type":"TextInput","props":{"y":69,"x":16,"width":69,"var":"pageNum","text":"0","skin":"comp/input_22.png","height":22,"color":"#ffffff"}},{"type":"Button","props":{"y":67,"x":94,"width":34,"var":"go","skin":"comp/button.png","label":"go","height":24}}]};
 		return BookReaderUI;
 	})(View)
 
@@ -33155,7 +33208,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(WordListViewerUI.uiView);
 		}
 
-		WordListViewerUI.uiView={"type":"View","props":{"width":600,"height":400},"child":[{"type":"Box","props":{"var":"container","top":5,"right":5,"left":5,"bottom":5}}]};
+		WordListViewerUI.uiView={"type":"View","props":{"width":600,"height":400},"child":[{"type":"Panel","props":{"var":"container","vScrollBarSkin":"comp/vscroll.png","top":5,"right":5,"left":5,"bottom":5}}]};
 		return WordListViewerUI;
 	})(View)
 
@@ -34036,6 +34089,8 @@ var Laya=window.Laya=(function(window,document){
 			BookReader.__super.call(this);
 			Laya.stage.on("keydown",this,this.onKeyDown);
 			this.buttonBox.on("click",this,this.onBtnClick);
+			this.buttonBox.vScrollBar.autoHide=true;
+			this.buttonBox.vScrollBar.touchScrollEnable=true;
 			this.on("wordevent",this,this.onWordEvent);
 			this.gesture=new SimpleGesture();
 			this.gesture.setTarget(this);
@@ -34233,6 +34288,8 @@ var Laya=window.Laya=(function(window,document){
 			this.dataO=null;
 			this.id=0;
 			WordViewer.__super.call(this);
+			LongPress.setTargetLongPressEnabled(this);
+			this.on("LongPressEvent",this,this.onRightClick);
 			this.on("rightclick",this,this.onRightClick);
 			this.on("click",this,this.onMouseDown);
 		}
@@ -34320,6 +34377,8 @@ var Laya=window.Laya=(function(window,document){
 			WordListViewer.__super.call(this);
 			this.layouter=new WordLayout();
 			this.container.on("resize",this,this.freshUI);
+			this.container.vScrollBar.autoHide=true;
+			this.container.vScrollBar.touchScrollEnable=true;
 			this.idWordDic=new IDDicTool();
 			this.on("wordchanged",this,this.onEvent,["wordchanged"]);
 		}
@@ -34506,6 +34565,6 @@ var Laya=window.Laya=(function(window,document){
 3 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 4 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
 5 file:///E:/onewaymyway/codes/playground/playground/libs/nlp/src/nlp/conll/ConllTreeScoreUtils.as (56):warning:tye This variable is not defined.
-6 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/view/nlpplatform/BookReader.as (72):warning:success This variable is not defined.
-7 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/view/nlpplatform/BookReader.as (79):warning:success This variable is not defined.
+6 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/view/nlpplatform/BookReader.as (74):warning:success This variable is not defined.
+7 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/view/nlpplatform/BookReader.as (81):warning:success This variable is not defined.
 */

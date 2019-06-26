@@ -24,6 +24,8 @@ package view.nlpplatform
 		{
 			Laya.stage.on(Event.KEY_DOWN, this, onKeyDown);
 			buttonBox.on(Event.CLICK, this, onBtnClick);
+			buttonBox.vScrollBar.autoHide = true;
+			buttonBox.vScrollBar.touchScrollEnable = true;
 			this.on("wordevent", this, onWordEvent);
 			gesture = new SimpleGesture();
 			gesture.setTarget(this);
