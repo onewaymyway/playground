@@ -1,5 +1,6 @@
 package  
 {
+	import commontools.AdptRoot;
 	import electrontools.drags.SystemDragOverManager;
 	import laya.debug.uicomps.ContextMenu;
 	import laya.debug.uicomps.ContextMenuItem;
@@ -77,7 +78,7 @@ package
 			var mainUI:PlatformMain;
 			mainUI = new PlatformMain();
 			mainUI.left = mainUI.right = mainUI.top = mainUI.bottom = 0;
-			Laya.stage.addChild(mainUI);
+			AdptRoot.I.container.addChild(mainUI);
 		}
 	}
 
