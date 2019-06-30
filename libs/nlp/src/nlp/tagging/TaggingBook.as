@@ -304,6 +304,33 @@ package nlp.tagging
 			}
 		}
 		
+		public function deleteWords(startWord:TaggingWord, endWord:TaggingWord):void
+		{
+			if (!startWord) return;
+			if (!endWord)
+			{
+				deleteWordsByIndex(findWordIndexInRange(startWord), findWordIndexInCurLine(startWord));
+			}else
+			{
+				deleteWordsByIndex(findWordIndexInRange(startWord), findWordIndexInCurLine(endWord));
+			}
+			updateLines();
+		}
+		
+		public function deleteWordsByIndex(startIndex:int, endIndex:int):void
+		{
+			if (endIndex < startIndex)
+			{
+				var tmp:int;
+				tmp = startIndex;
+				startIndex = endIndex;
+				endIndex = tmp;
+			}
+			var len:int;
+			len = endIndex - startIndex + 1;
+			words.splice(startIndex, len);
+		}
+		
 		public function copyWordPropByWordList(wordList:Array):void
 		{
 			var i:int;

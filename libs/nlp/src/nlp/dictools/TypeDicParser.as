@@ -119,7 +119,9 @@ package nlp.dictools
 		{
 			this.addType([":", "/", ".", "。"], ["punk"], ["标点"]);
 			this.addType(["\t"], ["TAB"], ["TAB"]);
-			this.addType([" ","　"], ["EMPTY"], ["空格"]);
+			this.addType([" ", "　"], ["EMPTY"], ["空格"]);
+			this.addType(["\n"], ["\\n"], ["换行"]);
+			this.addType(["\r"], ["\\r"], ["回车"]);
 		}
 	}
 

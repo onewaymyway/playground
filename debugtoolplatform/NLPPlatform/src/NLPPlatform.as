@@ -78,7 +78,8 @@ package
 			var mainUI:PlatformMain;
 			mainUI = new PlatformMain();
 			mainUI.left = mainUI.right = mainUI.top = mainUI.bottom = 0;
-			AdptRoot.I.container.addChild(mainUI);
+			//AdptRoot.I.container.addChild(mainUI);
+			Laya.stage.addChild(mainUI);
 		}
 	}
 

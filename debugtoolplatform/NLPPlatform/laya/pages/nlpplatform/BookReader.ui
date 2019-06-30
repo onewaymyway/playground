@@ -1,8 +1,8 @@
 {
     "x":0,
     "type":"View",
-    "selectedBox":1,
-    "selecteID":9,
+    "selectedBox":9,
+    "selecteID":19,
     "props":{"width":600,"sceneColor":"#000000","runtime":"view.nlpplatform.BookReader","height":800},
     "nodeParent":-1,
     "label":"View",
@@ -178,6 +178,19 @@
                     "isAniNode":true,
                     "hasChild":false,
                     "compId":18,
+                    "child":[
+                        ]
+                },
+                {
+                    "x":30,
+                    "type":"Button",
+                    "props":{"y":338,"x":0,"skin":"comp/button.png","name":"删除","label":"删除"},
+                    "nodeParent":9,
+                    "label":"Button(删除)",
+                    "isDirectory":false,
+                    "isAniNode":true,
+                    "hasChild":false,
+                    "compId":19,
                     "child":[
                         ]
                 }]

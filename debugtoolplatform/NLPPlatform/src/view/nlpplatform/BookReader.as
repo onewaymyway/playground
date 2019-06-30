@@ -137,7 +137,14 @@ package view.nlpplatform
 				case "广播标注":
 					if (BookReaderState.startWord)
 					{
-						success = book.copyWordPropByWord(BookReaderState.startWord.dataO, BookReaderState.endWord.dataO,false);
+						if (BookReaderState.endWord)
+						{
+							success = book.copyWordPropByWord(BookReaderState.startWord.dataO, BookReaderState.endWord.dataO,false);
+						}else
+						{
+							success = book.copyWordPropByWord(BookReaderState.startWord.dataO, null,false);
+						}
+						
 						wordView.showLine();
 					}
 					break;
@@ -146,6 +153,20 @@ package view.nlpplatform
 					success = book.removeNoUseEmpty();
 					wordView.showLine();
 					
+					break;
+				case "删除":
+					if (BookReaderState.startWord)
+					{
+						if (BookReaderState.endWord)
+						{
+							success = book.deleteWords(BookReaderState.startWord.dataO, BookReaderState.endWord.dataO,false);
+						}else
+						{
+							success = book.deleteWords(BookReaderState.startWord.dataO, null,false);
+						}
+						//success = book.deleteWords(BookReaderState.startWord.dataO, BookReaderState.endWord.dataO,false);
+						wordView.showLine();
+					}
 					break;
 					
 			}

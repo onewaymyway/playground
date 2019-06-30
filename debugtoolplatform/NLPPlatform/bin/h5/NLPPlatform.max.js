@@ -449,7 +449,7 @@ var Laya=window.Laya=(function(window,document){
 			var mainUI;
 			mainUI=new PlatformMain();
 			mainUI.left=mainUI.right=mainUI.top=mainUI.bottom=0;
-			AdptRoot.I.container.addChild(mainUI);
+			Laya.stage.addChild(mainUI);
 		}
 
 		return NLPPlatform;
@@ -13188,7 +13188,7 @@ var Laya=window.Laya=(function(window,document){
 
 		TypeDefine.TypeListCH=null
 		__static(TypeDefine,
-		['SelectTypeList',function(){return this.SelectTypeList=["形容词","副词","人名","姓","名","地名","名词","动词","成语"];},'TypeDesDic',function(){return this.TypeDesDic={
+		['SelectTypeList',function(){return this.SelectTypeList=["形容词","副词","人名","姓","名","地名","名词","动词","成语","中文数量"];},'TypeDesDic',function(){return this.TypeDesDic={
 				"a":"形容词",
 				"ad":"副形词",
 				"ag":"形容词性语素",
@@ -13449,6 +13449,8 @@ var Laya=window.Laya=(function(window,document){
 			this.addType([":","/",".","。"],["punk"],["标点"]);
 			this.addType(["\t"],["TAB"],["TAB"]);
 			this.addType([" ","　"],["EMPTY"],["空格"]);
+			this.addType(["\n"],["\\n"],["换行"]);
+			this.addType(["\r"],["\\r"],["回车"]);
 		}
 
 		TypeDicParser.Tab="	";
@@ -15748,6 +15750,28 @@ var Laya=window.Laya=(function(window,document){
 				}else{
 				this.copyWordPropByWordList(this.getWordListByIndex(this.findWordIndexInRange(startWord),this.findWordIndexInCurLine(endWord),false));
 			}
+		}
+
+		__proto.deleteWords=function(startWord,endWord){
+			if (!startWord)return;
+			if (!endWord){
+				this.deleteWordsByIndex(this.findWordIndexInRange(startWord),this.findWordIndexInCurLine(startWord));
+				}else{
+				this.deleteWordsByIndex(this.findWordIndexInRange(startWord),this.findWordIndexInCurLine(endWord));
+			}
+			this.updateLines();
+		}
+
+		__proto.deleteWordsByIndex=function(startIndex,endIndex){
+			if (endIndex < startIndex){
+				var tmp=0;
+				tmp=startIndex;
+				startIndex=endIndex;
+				endIndex=tmp;
+			};
+			var len=0;
+			len=endIndex-startIndex+1;
+			this.words.splice(startIndex,len);
 		}
 
 		__proto.copyWordPropByWordList=function(wordList){
@@ -33145,7 +33169,7 @@ var Laya=window.Laya=(function(window,document){
 			this.createView(BookReaderUI.uiView);
 		}
 
-		BookReaderUI.uiView={"type":"View","props":{"width":600,"runtime":"view.nlpplatform.BookReader","height":800},"child":[{"type":"WordListViewer","props":{"var":"wordView","top":0,"runtime":"view.nlpplatform.WordListViewer","right":0,"left":150,"bottom":0}},{"type":"Label","props":{"y":16,"x":16,"width":136,"var":"bookInfo","text":"书籍信息","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"}},{"type":"Panel","props":{"x":16,"width":128,"var":"buttonBox","vScrollBarSkin":"comp/vscroll.png","top":100,"bottom":40},"child":[{"type":"Button","props":{"y":0,"x":0,"skin":"comp/button.png","name":"清空选择","label":"清空选择"}},{"type":"Button","props":{"y":34,"x":0,"skin":"comp/button.png","name":"创建关系","label":"创建关系"}},{"type":"Button","props":{"y":67,"x":0,"skin":"comp/button.png","name":"重建关系","label":"重建关系"}},{"type":"Button","props":{"y":101,"x":0,"skin":"comp/button.png","name":"打散","label":"打散"}},{"type":"Button","props":{"y":168,"x":0,"skin":"comp/button.png","name":"合词","label":"合词"}},{"type":"Button","props":{"y":200,"x":0,"skin":"comp/button.png","name":"全文合词","label":"全文合词"}},{"type":"Button","props":{"y":233,"x":0,"skin":"comp/button.png","name":"重新分词","label":"重新分词"}},{"type":"Button","props":{"y":133,"x":0,"skin":"comp/button.png","name":"全文打散","label":"全文打散"}},{"type":"Button","props":{"y":267,"x":0,"skin":"comp/button.png","name":"删除句中空格","label":"删除句中空格"}},{"type":"Button","props":{"y":304,"x":0,"skin":"comp/button.png","name":"广播标注","label":"广播标注"}}]},{"type":"TextInput","props":{"y":69,"x":16,"width":69,"var":"pageNum","text":"0","skin":"comp/input_22.png","height":22,"color":"#ffffff"}},{"type":"Button","props":{"y":67,"x":94,"width":34,"var":"go","skin":"comp/button.png","label":"go","height":24}}]};
+		BookReaderUI.uiView={"type":"View","props":{"width":600,"runtime":"view.nlpplatform.BookReader","height":800},"child":[{"type":"WordListViewer","props":{"var":"wordView","top":0,"runtime":"view.nlpplatform.WordListViewer","right":0,"left":150,"bottom":0}},{"type":"Label","props":{"y":16,"x":16,"width":136,"var":"bookInfo","text":"书籍信息","styleSkin":"comp/label.png","height":53,"fontSize":20,"color":"#ffffff"}},{"type":"Panel","props":{"x":16,"width":128,"var":"buttonBox","vScrollBarSkin":"comp/vscroll.png","top":100,"bottom":40},"child":[{"type":"Button","props":{"y":0,"x":0,"skin":"comp/button.png","name":"清空选择","label":"清空选择"}},{"type":"Button","props":{"y":34,"x":0,"skin":"comp/button.png","name":"创建关系","label":"创建关系"}},{"type":"Button","props":{"y":67,"x":0,"skin":"comp/button.png","name":"重建关系","label":"重建关系"}},{"type":"Button","props":{"y":101,"x":0,"skin":"comp/button.png","name":"打散","label":"打散"}},{"type":"Button","props":{"y":168,"x":0,"skin":"comp/button.png","name":"合词","label":"合词"}},{"type":"Button","props":{"y":200,"x":0,"skin":"comp/button.png","name":"全文合词","label":"全文合词"}},{"type":"Button","props":{"y":233,"x":0,"skin":"comp/button.png","name":"重新分词","label":"重新分词"}},{"type":"Button","props":{"y":133,"x":0,"skin":"comp/button.png","name":"全文打散","label":"全文打散"}},{"type":"Button","props":{"y":267,"x":0,"skin":"comp/button.png","name":"删除句中空格","label":"删除句中空格"}},{"type":"Button","props":{"y":304,"x":0,"skin":"comp/button.png","name":"广播标注","label":"广播标注"}},{"type":"Button","props":{"y":338,"x":0,"skin":"comp/button.png","name":"删除","label":"删除"}}]},{"type":"TextInput","props":{"y":69,"x":16,"width":69,"var":"pageNum","text":"0","skin":"comp/input_22.png","height":22,"color":"#ffffff"}},{"type":"Button","props":{"y":67,"x":94,"width":34,"var":"go","skin":"comp/button.png","label":"go","height":24}}]};
 		return BookReaderUI;
 	})(View)
 
@@ -34189,13 +34213,27 @@ var Laya=window.Laya=(function(window,document){
 					}
 				case "广播标注":
 					if (BookReaderState.startWord){
-						success=this.book.copyWordPropByWord(BookReaderState.startWord.dataO,BookReaderState.endWord.dataO,false);
+						if (BookReaderState.endWord){
+							success=this.book.copyWordPropByWord(BookReaderState.startWord.dataO,BookReaderState.endWord.dataO,false);
+							}else{
+							success=this.book.copyWordPropByWord(BookReaderState.startWord.dataO,null,false);
+						}
 						this.wordView.showLine();
 					}
 					break ;
 				case "删除句中空格":
 					success=this.book.removeNoUseEmpty();
 					this.wordView.showLine();
+					break ;
+				case "删除":
+					if (BookReaderState.startWord){
+						if (BookReaderState.endWord){
+							success=this.book.deleteWords(BookReaderState.startWord.dataO,BookReaderState.endWord.dataO,false);
+							}else{
+							success=this.book.deleteWords(BookReaderState.startWord.dataO,null,false);
+						}
+						this.wordView.showLine();
+					}
 					break ;
 				}
 		}
