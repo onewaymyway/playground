@@ -9,12 +9,12 @@ package nlp.tagging
 	 */
 	public class TaggingWord 
 	{
-		public static const KEYS:Array = ["word","type","meaning","relations","id"];
+		public static const KEYS:Array = ["word","type","meaning","relations","id","head","deprel"];
 		public var word:String;
 		public var type:String;
 		public var meaning:String;
 		public var relations:Array = [];
-		public var head:int;
+		public var head:int=0;
 		public var deprel:String;
 		public var id:int;
 		public function TaggingWord() 

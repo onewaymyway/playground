@@ -155,7 +155,7 @@ package view.nlpplatform
 				midy = startY + Math.abs(startX-endX)*0.3;
 			}else
 			{
-				midy = (startY + endY) * 0.5;
+				midy = Math.max(startY,endY) + Math.abs(startX-endX)*0.3;
 			}
 			container.graphics.drawCurves(0, 0, [startX, startY, midX, midy, endX, endY], "#ff0000");
 			container.graphics.fillText(startWord.dataO.deprel + "", midX, midy, null, "#ff0000", "center");

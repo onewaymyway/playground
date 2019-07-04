@@ -15540,7 +15540,7 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		__static(TaggingWord,
-		['KEYS',function(){return this.KEYS=["word","type","meaning","relations","id"];}
+		['KEYS',function(){return this.KEYS=["word","type","meaning","relations","id","head","deprel"];}
 		]);
 		return TaggingWord;
 	})()
@@ -34611,7 +34611,7 @@ var Laya=window.Laya=(function(window,document){
 			if (startY==endY){
 				midy=startY+Math.abs(startX-endX)*0.3;
 				}else{
-				midy=(startY+endY)*0.5;
+				midy=Math.max(startY,endY)+Math.abs(startX-endX)*0.3;
 			}
 			this.container.graphics.drawCurves(0,0,[startX,startY,midX,midy,endX,endY],"#ff0000");
 			this.container.graphics.fillText(startWord.dataO.deprel+"",midX,midy,null,"#ff0000","center");
