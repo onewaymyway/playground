@@ -1,7 +1,10 @@
 package nlp.tagging 
 {
 	import commontoolkit.IDDicTool;
+	import nlp.NLP;
 	import nlp.WordDicParser;
+	import nlp.conll.ConllTree;
+	import nlp.conll.ConllWord;
 	import nlp.cutwords.WordPiece;
 	/**
 	 * ...
@@ -56,6 +59,48 @@ package nlp.tagging
 			return tagWords;
 		}
 		
+		public function buildWordRelation(startWord:TaggingWord, endWord:TaggingWord):void
+		{
+			if (!startWord || !endWord) return;
+			buildWordRelationByIndex(findWordIndexInCurLine(startWord),findWordIndexInCurLine(endWord));
+		}
+		public function buildWordRelationByIndex(startIndex:int, endIndex:int):void
+		{
+			if (startIndex > endIndex)
+			{
+				var temp:int;
+				temp = startIndex;
+				startIndex = endIndex;
+				endIndex = temp;
+			}
+			var  wordList:Array;
+			wordList = getWordListByIndex(startIndex, endIndex, false);
+			var conTree:ConllTree;
+			conTree = NLP.contreeBuilder.buildTaggingWordsToTree(wordList, false);
+			trace("conTree:", conTree);
+			debugger;
+			var conWords:Array;
+			conWords = conTree.wordList;
+			var i:int, len:int;
+			len = conWords.length;
+			var tConWord:ConllWord;
+			var tTagingWord:TaggingWord;
+			var dependWord:TaggingWord;
+			for (i = 0; i < len; i++)
+			{
+				tConWord = conWords[i];
+				if (tConWord.head)
+				{
+					tTagingWord = wordList[i];
+					dependWord = wordList[tConWord.head];
+					if (dependWord)
+					{
+						tTagingWord.head = dependWord.id;
+						tTagingWord.deprel = tConWord.deprel;
+					}
+				}
+			}
+		}
 		public function findWordIndexInCurLine(word:TaggingWord):int
 		{
 			var lineInfo:Object;

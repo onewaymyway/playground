@@ -18,6 +18,8 @@ package view.nlpplatform
 		public function WordListViewer() 
 		{
 			layouter = new WordLayout();
+			layouter.spaceY = 30;
+			layouter.startY = 30;
 			container.on(Event.RESIZE, this, freshUI);
 			container.vScrollBar.autoHide = true;
 			container.vScrollBar.touchScrollEnable = true;
@@ -113,8 +115,51 @@ package view.nlpplatform
 		{
 			if (!wordItemList) return;
 			layouter.layout(wordItemList, container.width, container.height);
+			drawRelations();
 		}
-		
+		private function drawRelations():void
+		{
+			container.graphics.clear();
+			var i:int, len:int;
+			len = wordItemList.length;
+			var tWord:WordViewer;
+			var headWord:WordViewer;
+			for (i = 0; i < len; i++)
+			{
+				tWord = wordItemList[i];
+				if (tWord.dataO.head)
+				{
+					headWord = idWordDic.getItem(tWord.dataO.head);
+					if (headWord)
+					{
+						drawRelation(tWord, headWord);
+					}
+				}
+			}
+		}
+		private function drawRelation(startWord:WordViewer, endWord:WordViewer):void
+		{
+			var startX:Number;
+			var startY:Number;
+			var endX:Number;
+			var endY:Number;
+			startX = startWord.getCenterX();
+			startY = startWord.getCenterY();
+			endX = endWord.getCenterX();
+			endY = endWord.getCenterY();
+			var midX:Number;
+			var midy:Number;
+			midX = (startX + endX) * 0.5;
+			if (startY == endY)
+			{
+				midy = startY + Math.abs(startX-endX)*0.3;
+			}else
+			{
+				midy = (startY + endY) * 0.5;
+			}
+			container.graphics.drawCurves(0, 0, [startX, startY, midX, midy, endX, endY], "#ff0000");
+			container.graphics.fillText(startWord.dataO.deprel + "", midX, midy, null, "#ff0000", "center");
+		}
 	}
 
 }

@@ -5,6 +5,7 @@ package nlp.conll
 	import nlp.WordUtils;
 	import nlp.algorithm.datastruct.AutoTensor;
 	import nlp.cutwords.WordPiece;
+	import nlp.tagging.TaggingWord;
 	/**
 	 * ...
 	 * @author ww
@@ -41,6 +42,28 @@ package nlp.conll
 				wordList.push(tConllWord);
 			}
 			return buildConllTree(wordList,useDP);
+		}
+		public function buildTaggingWordsToTree(wordList:Array, useDP:Boolean = false):ConllTree
+		{
+			var words:Array;
+			words = [];
+			var i:int, len:int;
+			len = wordList.length;
+			var tWord:TaggingWord;
+			var tConllWord:ConllWord;
+			for (i = 0; i < len; i++)
+			{
+				tWord = wordList[i];
+				tConllWord = new ConllWord();
+				tConllWord.id = i;
+				tConllWord.form = tWord.word;
+				tConllWord.word = tWord.word;
+				tConllWord.postag = tWord.type;
+				tConllWord.refers = [];
+				tConllWord.head =-1;
+				words.push(tConllWord);
+			}
+			return buildConllTree(words,useDP);
 		}
 		public function scoreRelation(wordA:ConllWord, wordB:ConllWord, type:int,tree:ConllTree):void
 		{

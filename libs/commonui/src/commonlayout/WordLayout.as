@@ -9,6 +9,7 @@ package commonlayout
 	{
 		public var spaceX:Number = 2;
 		public var spaceY:Number = 2;
+		public var startY:Number = 2;
 		public var border:Number = 2;
 		public function WordLayout() 
 		{
@@ -24,7 +25,7 @@ package commonlayout
 			width = width - border;
 			height = height - border;
 			tX = border;
-			tY = border;
+			tY = startY;
 			
 			var tItem:Sprite;
 			var tHeight:Number;

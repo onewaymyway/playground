@@ -104,6 +104,16 @@ package view.nlpplatform
 			
 		}
 		
+		public function getCenterX():Number
+		{
+			return this.x + this.width * 0.5;
+		}
+		
+		public function getCenterY():Number
+		{
+			return this.y + this.height * 0.5;
+		}
+		
 		
 		
 	}

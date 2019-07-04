@@ -35,7 +35,7 @@ Project configuration:E:\onewaymyway\codes\playground\playground\debugtoolplatfo
 7,89.81,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commontools/MultiTouchManager.as,61,MouseManager.instance.mouseX This variable is not defined.
 7,89.81,E:/onewaymyway/codes/playground/playground/libs/commonui/src/commontools/MultiTouchManager.as,61,MouseManager.instance.mouseY This variable is not defined.
 1,89.95,,0,Disable Flash3D E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/src/NLPPlatform.as
-12,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.js,1057289,
+12,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.js,1060732,
 11,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/NLPPlatform/bin/h5/NLPPlatform.max.html,798,
 ******************************************************************************
 Error or warning message:NLPPlatform.max.js

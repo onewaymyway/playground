@@ -13,7 +13,9 @@ package nlp.tagging
 		public var word:String;
 		public var type:String;
 		public var meaning:String;
-		public var relations:Array=[];
+		public var relations:Array = [];
+		public var head:int;
+		public var deprel:String;
 		public var id:int;
 		public function TaggingWord() 
 		{

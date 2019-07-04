@@ -421,6 +421,9 @@ var Laya=window.Laya=(function(window,document){
 			loadList=[{"url":"res/atlas/comp.json","type":"atlas"}];
 			loadList.push({url:"data/CoreNatureDictionary.txt",type:"text" });
 			loadList.push({url:"data/中文字典1.txt",type:"text" });
+			loadList.push({url:"data/text.train.conll",type:"text" });
+			loadList.push({url:"data/news.train.conll",type:"text" });
+			loadList.push({url:"data/conlldes.txt",type:"text" });
 			Laya.loader.load(loadList,new Handler(this,this.test));
 			Laya.stage.graphics.fillText("loading",10,10,null,"#ff0000",null);
 		}
@@ -445,6 +448,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.test=function(){
 			console.log("AppPath:",FileTools.appPath);
 			NLP.initWordCutter("data/中文字典1.txt","data/CoreNatureDictionary.txt");
+			NLP.initConllTreeParser("data/conlldes.txt",["data/text.train.conll","data/news.train.conll"]);
 			Laya.stage.graphics.fillText("ready",10,10,null,"#ff0000",null);
 			var mainUI;
 			mainUI=new PlatformMain();
@@ -15026,6 +15030,28 @@ var Laya=window.Laya=(function(window,document){
 			return this.buildConllTree(wordList,useDP);
 		}
 
+		__proto.buildTaggingWordsToTree=function(wordList,useDP){
+			(useDP===void 0)&& (useDP=false);
+			var words;
+			words=[];
+			var i=0,len=0;
+			len=wordList.length;
+			var tWord;
+			var tConllWord;
+			for (i=0;i < len;i++){
+				tWord=wordList[i];
+				tConllWord=new ConllWord();
+				tConllWord.id=i;
+				tConllWord.form=tWord.word;
+				tConllWord.word=tWord.word;
+				tConllWord.postag=tWord.type;
+				tConllWord.refers=[];
+				tConllWord.head=-1;
+				words.push(tConllWord);
+			}
+			return this.buildConllTree(words,useDP);
+		}
+
 		__proto.scoreRelation=function(wordA,wordB,type,tree){
 			return this.treeAnalyseer.scoreUtils.getScore(wordA,wordB,tree);
 		}
@@ -15484,6 +15510,8 @@ var Laya=window.Laya=(function(window,document){
 			this.type=null;
 			this.meaning=null;
 			this.relations=[];
+			this.head=0;
+			this.deprel=null;
 			this.id=0;
 		}
 
@@ -15547,6 +15575,44 @@ var Laya=window.Laya=(function(window,document){
 			rst.words=wList;
 			rst.index=this.index;
 			return rst;
+		}
+
+		__proto.buildWordRelation=function(startWord,endWord){
+			if (!startWord || !endWord)return;
+			this.buildWordRelationByIndex(this.findWordIndexInCurLine(startWord),this.findWordIndexInCurLine(endWord));
+		}
+
+		__proto.buildWordRelationByIndex=function(startIndex,endIndex){
+			if (startIndex > endIndex){
+				var temp=0;
+				temp=startIndex;
+				startIndex=endIndex;
+				endIndex=temp;
+			};
+			var wordList;
+			wordList=this.getWordListByIndex(startIndex,endIndex,false);
+			var conTree;
+			conTree=NLP.contreeBuilder.buildTaggingWordsToTree(wordList,false);
+			console.log("conTree:",conTree);
+			debugger;
+			var conWords;
+			conWords=conTree.wordList;
+			var i=0,len=0;
+			len=conWords.length;
+			var tConWord;
+			var tTagingWord;
+			var dependWord;
+			for (i=0;i < len;i++){
+				tConWord=conWords[i];
+				if (tConWord.head){
+					tTagingWord=wordList[i];
+					dependWord=wordList[tConWord.head];
+					if (dependWord){
+						tTagingWord.head=dependWord.id;
+						tTagingWord.deprel=tConWord.deprel;
+					}
+				}
+			}
 		}
 
 		__proto.findWordIndexInCurLine=function(word){
@@ -15975,6 +16041,7 @@ var Laya=window.Laya=(function(window,document){
 		function WordLayout(){
 			this.spaceX=2;
 			this.spaceY=2;
+			this.startY=2;
 			this.border=2;
 		}
 
@@ -15987,7 +16054,7 @@ var Laya=window.Laya=(function(window,document){
 			width=width-this.border;
 			height=height-this.border;
 			tX=this.border;
-			tY=this.border;
+			tY=this.startY;
 			var tItem;
 			var tHeight=NaN;
 			for (i=0;i < len;i++){
@@ -34181,6 +34248,10 @@ var Laya=window.Laya=(function(window,document){
 				case "创建关系":
 					break ;
 				case "重建关系":
+					if (BookReaderState.startWord&&BookReaderState.endWord){
+						success=this.book.buildWordRelation(BookReaderState.startWord.dataO,BookReaderState.endWord.dataO);
+						this.wordView.showLine();
+					}
 					break ;
 				case "打散":
 					if (BookReaderState.startWord){
@@ -34384,6 +34455,14 @@ var Laya=window.Laya=(function(window,document){
 			this.id=dataO.id;
 		}
 
+		__proto.getCenterX=function(){
+			return this.x+this.width *0.5;
+		}
+
+		__proto.getCenterY=function(){
+			return this.y+this.height *0.5;
+		}
+
 		__getset(0,__proto,'isSelected',function(){
 			return this._isSelect;
 			},function(value){
@@ -34414,6 +34493,8 @@ var Laya=window.Laya=(function(window,document){
 			this.book=null;
 			WordListViewer.__super.call(this);
 			this.layouter=new WordLayout();
+			this.layouter.spaceY=30;
+			this.layouter.startY=30;
 			this.container.on("resize",this,this.freshUI);
 			this.container.vScrollBar.autoHide=true;
 			this.container.vScrollBar.touchScrollEnable=true;
@@ -34495,6 +34576,45 @@ var Laya=window.Laya=(function(window,document){
 		__proto.freshUI=function(){
 			if (!this.wordItemList)return;
 			this.layouter.layout(this.wordItemList,this.container.width,this.container.height);
+			this.drawRelations();
+		}
+
+		__proto.drawRelations=function(){
+			this.container.graphics.clear();
+			var i=0,len=0;
+			len=this.wordItemList.length;
+			var tWord;
+			var headWord;
+			for (i=0;i < len;i++){
+				tWord=this.wordItemList[i];
+				if (tWord.dataO.head){
+					headWord=this.idWordDic.getItem(tWord.dataO.head);
+					if (headWord){
+						this.drawRelation(tWord,headWord);
+					}
+				}
+			}
+		}
+
+		__proto.drawRelation=function(startWord,endWord){
+			var startX=NaN;
+			var startY=NaN;
+			var endX=NaN;
+			var endY=NaN;
+			startX=startWord.getCenterX();
+			startY=startWord.getCenterY();
+			endX=endWord.getCenterX();
+			endY=endWord.getCenterY();
+			var midX=NaN;
+			var midy=NaN;
+			midX=(startX+endX)*0.5;
+			if (startY==endY){
+				midy=startY+Math.abs(startX-endX)*0.3;
+				}else{
+				midy=(startY+endY)*0.5;
+			}
+			this.container.graphics.drawCurves(0,0,[startX,startY,midX,midy,endX,endY],"#ff0000");
+			this.container.graphics.fillText(startWord.dataO.deprel+"",midX,midy,null,"#ff0000","center");
 		}
 
 		WordListViewer.ShowWords="ShowWords";

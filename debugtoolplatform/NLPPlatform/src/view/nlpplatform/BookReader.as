@@ -99,6 +99,11 @@ package view.nlpplatform
 				case "创建关系":
 					break;
 				case "重建关系":
+					if (BookReaderState.startWord&&BookReaderState.endWord)
+					{
+						success = book.buildWordRelation(BookReaderState.startWord.dataO, BookReaderState.endWord.dataO);
+						wordView.showLine();
+					}
 					break;
 				case "打散":
 					if (BookReaderState.startWord)

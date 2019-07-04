@@ -42,7 +42,10 @@ package
 			var loadList:Array;
 			loadList = [{"url":"res/atlas/comp.json", "type":Loader.ATLAS}];
 			loadList.push({url:"data/CoreNatureDictionary.txt", type:Loader.TEXT });
-			loadList.push({url:"data/中文字典1.txt",type:Loader.TEXT });
+			loadList.push({url:"data/中文字典1.txt", type:Loader.TEXT });
+			loadList.push({url:"data/text.train.conll", type:Loader.TEXT });
+			loadList.push({url:"data/news.train.conll", type:Loader.TEXT });
+			loadList.push( { url:"data/conlldes.txt", type:Loader.TEXT } );
 			Laya.loader.load(loadList, new Handler(this, test));
 			Laya.stage.graphics.fillText("loading", 10, 10, null, "#ff0000",null);
 		}
@@ -72,7 +75,8 @@ package
 		private function test():void
 		{
 			trace("AppPath:", FileTools.appPath);
-			NLP.initWordCutter("data/中文字典1.txt","data/CoreNatureDictionary.txt");
+			NLP.initWordCutter("data/中文字典1.txt", "data/CoreNatureDictionary.txt");
+			NLP.initConllTreeParser("data/conlldes.txt", ["data/text.train.conll","data/news.train.conll"]);
 			Laya.stage.graphics.fillText("ready", 10, 10, null, "#ff0000", null);
 			
 			var mainUI:PlatformMain;
