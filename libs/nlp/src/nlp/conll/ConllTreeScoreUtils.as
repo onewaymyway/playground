@@ -10,6 +10,7 @@ package nlp.conll
 	{
 
 		public var rootCounter:KeysCounter;
+		public var _relationTypeList:KeysCounter;
 		
 		private var _workList:Array;
 		private var _workList2:Array;
@@ -40,6 +41,12 @@ package nlp.conll
 			_workList.push([KeysCounter.create(), [1, 1], 0.0001]);
 			
 			
+			_relationTypeList = [];
+			_relationTypeList.push([KeysCounter.create(), [2, 2], 1]);
+			_relationTypeList.push([KeysCounter.create(), [1, 2], 0.01]);
+			_relationTypeList.push([KeysCounter.create(), [2, 1], 0.01]);
+			_relationTypeList.push([KeysCounter.create(), [1, 1], 0.0001]);
+			
 			//_workList2.push([KeysCounter.create(), [2, 2], 1]);
 			//_workList2.push([KeysCounter.create(), [1, 2], 0.01]);
 			//_workList2.push([KeysCounter.create(), [2, 1], 0.01]);
@@ -58,7 +65,7 @@ package nlp.conll
 				
 			}else
 			{
-				if (tye > 0)
+				if (type > 0)
 				{
 					type = 3;
 				}else
@@ -127,6 +134,15 @@ package nlp.conll
 				tArr = tGroupArr[1];
 				tCounter.addKey(getAdptWordKey(endWord,tArr[0],startWord), getAdptWordKey(startWord,tArr[1],endWord), type);
 			}
+			
+			len = _relationTypeList.length;
+			for (i = 0; i < len; i++)
+			{
+				tGroupArr = _relationTypeList[i];
+				tCounter = tGroupArr[0];
+				tArr = tGroupArr[1];
+				tCounter.addKey(getAdptWordKey(endWord,tArr[0],startWord), getAdptWordKey(startWord,tArr[1],endWord), startWord.deprel);
+			}
 		}
 		
 		public function addRoot(startWord:ConllWord):void
@@ -142,6 +158,31 @@ package nlp.conll
 			rst += rootCounter.getKeyLogNum(startWord.postag) * 0.01;
 			return rst;
 		}
+		
+		public function getRelationType(startWord:ConllWord, endWord:ConllWord):String
+		{
+			var i:int, len:int;
+			len = _relationTypeList.length;
+			var tCounter:KeysCounter;
+			var tArr:Array;
+			var tGroupArr:Array;
+			
+			var tType:String;
+			for (i = 0; i < len; i++)
+			{
+				tGroupArr = _relationTypeList[i];
+				tCounter = tGroupArr[0];
+				tArr = tGroupArr[1];
+				tType = tCounter.getMaxKey(getAdptWordKey(endWord, tArr[0], startWord), getAdptWordKey(startWord, tArr[1], endWord));
+				if (tType)
+				{
+					debugger;
+					return tType;
+				}
+			}
+			return null;
+		}
+		
 		public function getScore(startWord:ConllWord, endWord:ConllWord,tree:ConllTree):Number
 		{
 			this.conllTree = tree;

@@ -59,10 +59,23 @@ package nlp.tagging
 			return tagWords;
 		}
 		
+		public function deleteRelation(startWord:TaggingWord):void
+		{
+			startWord.head =-1;
+		}
+		public function createRelation(startWord:TaggingWord, endWord:TaggingWord):void
+		{
+			startWord.head = endWord.id;
+		}
+		
 		public function buildWordRelation(startWord:TaggingWord, endWord:TaggingWord):void
 		{
 			if (!startWord || !endWord) return;
 			buildWordRelationByIndex(findWordIndexInCurLine(startWord),findWordIndexInCurLine(endWord));
+		}
+		public function buildWordRelationByRange(startIndex:int, endIndex:int):void
+		{
+			
 		}
 		public function buildWordRelationByIndex(startIndex:int, endIndex:int):void
 		{
@@ -89,7 +102,7 @@ package nlp.tagging
 			for (i = 0; i < len; i++)
 			{
 				tConWord = conWords[i];
-				if (tConWord.head)
+				if (tConWord.head>=0)
 				{
 					tTagingWord = wordList[i];
 					dependWord = wordList[tConWord.head];

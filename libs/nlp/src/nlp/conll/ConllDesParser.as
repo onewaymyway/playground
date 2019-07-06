@@ -24,12 +24,14 @@ package nlp.conll
 			return false;
 		}
 		public var desDic:Object;
+		public var typeList:Array = [];
 		public static const KeyList:Array = ["desCN","type","desEN","detail"];
 		public function parseLine(line:String):Object
 		{
 			var data:Object;
 			data = WordUtils.arr2keyObj(line.split("\t"), KeyList);
 			desDic[data.type] = data;
+			typeList.push(data.desCN);
 			return data;
 			
 		}

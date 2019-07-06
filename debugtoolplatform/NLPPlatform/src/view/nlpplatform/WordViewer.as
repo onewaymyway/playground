@@ -114,6 +114,11 @@ package view.nlpplatform
 			return this.y + this.height * 0.5;
 		}
 		
+		public function getBottomY():Number
+		{
+			return this.y + this.height;
+		}
+		
 		
 		
 	}

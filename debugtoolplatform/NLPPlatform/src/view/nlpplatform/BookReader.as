@@ -97,6 +97,18 @@ package view.nlpplatform
 					BookReaderState.clearSelect();
 					break;
 				case "创建关系":
+					if (BookReaderState.startWord&&BookReaderState.endWord)
+					{
+						success = book.createRelation(BookReaderState.startWord.dataO, BookReaderState.endWord.dataO);
+						wordView.showLine();
+					}else
+					{
+						if (BookReaderState.startWord)
+						{
+							success = book.deleteRelation(BookReaderState.startWord.dataO);
+							wordView.showLine();
+						}
+					}
 					break;
 				case "重建关系":
 					if (BookReaderState.startWord&&BookReaderState.endWord)

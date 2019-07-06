@@ -2,8 +2,11 @@ package view.nlpplatform
 {
 	import commonlayout.WordLayout;
 	import commontoolkit.IDDicTool;
+	import laya.display.Sprite;
 	import laya.events.Event;
+	import laya.ui.Box;
 	import laya.utils.Pool;
+	import nlp.conll.ConllDesParser;
 	import nlp.tagging.TaggingBook;
 	import ui.nlpplatform.WordListViewerUI;
 	
@@ -15,14 +18,16 @@ package view.nlpplatform
 	{
 		public static const ShowWords:String = "ShowWords";
 		public var layouter:WordLayout;
+		private var lineBox:Sprite;
 		public function WordListViewer() 
 		{
 			layouter = new WordLayout();
-			layouter.spaceY = 30;
-			layouter.startY = 30;
+			layouter.spaceY = 100;
+			layouter.startY = 100;
 			container.on(Event.RESIZE, this, freshUI);
 			container.vScrollBar.autoHide = true;
 			container.vScrollBar.touchScrollEnable = true;
+			lineBox = container.content;
 			idWordDic = new IDDicTool();
 			this.on("wordchanged", this, onEvent, ["wordchanged"]);
 		}
@@ -119,7 +124,7 @@ package view.nlpplatform
 		}
 		private function drawRelations():void
 		{
-			container.graphics.clear();
+			lineBox.graphics.clear();
 			var i:int, len:int;
 			len = wordItemList.length;
 			var tWord:WordViewer;
@@ -144,21 +149,32 @@ package view.nlpplatform
 			var endX:Number;
 			var endY:Number;
 			startX = startWord.getCenterX();
-			startY = startWord.getCenterY();
+			startY = startWord.getBottomY();
 			endX = endWord.getCenterX();
-			endY = endWord.getCenterY();
+			endY = endWord.getBottomY();
 			var midX:Number;
 			var midy:Number;
 			midX = (startX + endX) * 0.5;
 			if (startY == endY)
 			{
-				midy = startY + Math.abs(startX-endX)*0.3;
+				midy = startY + Math.abs(startX-endX)*0.2;
 			}else
 			{
-				midy = Math.max(startY,endY) + Math.abs(startX-endX)*0.3;
+				midy = Math.max(startY,endY) + Math.abs(startX-endX)*0.2;
 			}
-			container.graphics.drawCurves(0, 0, [startX, startY, midX, midy, endX, endY], "#ff0000");
-			container.graphics.fillText(startWord.dataO.deprel + "", midX, midy, null, "#ff0000", "center");
+			lineBox.graphics.drawCurves(0, 0, [startX, startY, startX, midy, midX, midy], "#00ffff");
+			lineBox.graphics.drawCurves(0, 0, [midX, midy, endX, midy, endX, endY], "#ff0000");
+			var arrrowL:Number;
+			if (endX < midX)
+			{
+				arrrowL = 30;
+			}else
+			{
+				arrrowL =-30;
+			}
+			lineBox.graphics.drawLine(midX, midy, midX + arrrowL, midy, "#ffff00");
+			//container.graphics.drawCurves(0, 0, [startX, startY, midX, midy, endX, endY], "#ff0000");
+			lineBox.graphics.fillText(ConllDesParser.getCNType(startWord.dataO.deprel) + "", midX, midy, null, "#ff0000", "center");
 		}
 	}
 

@@ -135,7 +135,8 @@ package nlp.conll
 				{
 					tSelectWord.head = tSelectRWord.id;
 					wList.splice(tSelectIndex, 1);
-					tSelectWord.deprel = "ds"+tSelectScore.toFixed(3);
+					tSelectWord.deprel = "ds" + tSelectScore.toFixed(3);
+					tSelectWord.deprel = treeAnalyseer.scoreUtils.getRelationType(tSelectWord,tSelectRWord);
 				}
 			}
 			
