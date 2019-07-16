@@ -10184,10 +10184,17 @@ var Laya=window.Laya=(function(window,document){
 			this.spaceY=2;
 			this.startY=2;
 			this.border=2;
+			this.newLineSignDic={".":true,"!":true,"。":true,"！":true};
+			this.getWordFun=null;
 		}
 
 		__class(WordLayout,'commonlayout.WordLayout');
 		var __proto=WordLayout.prototype;
+		__proto.isNewLineItem=function(item){
+			if (this.getWordFun==null)return false;
+			return this.newLineSignDic[this.getWordFun(item)];
+		}
+
 		__proto.layout=function(items,width,height){
 			var i=0,len=0;
 			len=items.length;
@@ -10208,6 +10215,11 @@ var Laya=window.Laya=(function(window,document){
 					tItem.x=this.spaceX;
 					tItem.y=tY;
 					tX=tItem.width+this.spaceX;
+					}else{
+					if (this.isNewLineItem(tItem)){
+						tY+=tItem.height+this.spaceY;
+						tX=this.spaceX;
+					}
 				}
 			}
 		}
@@ -13086,6 +13098,7 @@ var Laya=window.Laya=(function(window,document){
 			switch(id){
 				case 1:
 					rst=WordUtils.getAdptWordType(word);
+					if (rst=="unknow")rst="n";
 					break ;
 				case 2:
 					rst=word.form;

@@ -84,7 +84,8 @@ package nlp.conll
 			switch(id)
 			{
 				case 1:
-					rst= WordUtils.getAdptWordType(word);
+					rst = WordUtils.getAdptWordType(word);
+					if (rst == "unknow") rst = "n";
 					break;
 				case 2:
 					rst = word.form;

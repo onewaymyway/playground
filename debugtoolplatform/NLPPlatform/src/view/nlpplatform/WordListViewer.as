@@ -24,6 +24,7 @@ package view.nlpplatform
 			layouter = new WordLayout();
 			layouter.spaceY = 100;
 			layouter.startY = 100;
+			layouter.getWordFun = WordViewer.getWordByWordViewer;
 			container.on(Event.RESIZE, this, freshUI);
 			container.vScrollBar.autoHide = true;
 			container.vScrollBar.touchScrollEnable = true;

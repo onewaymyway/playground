@@ -1,60 +1,56 @@
-1,0.00,,0,Project command:D:\codes\playground.git\trunk\debugtoolplatform\deskplatform\DeskPlatform.as3proj;iflash=false;chromerun=false;outlaya=true
-Project configuration:D:\codes\playground.git\trunk\debugtoolplatform\deskplatform\DeskPlatform.as3proj.
+1,0.00,,0,Project command:E:\onewaymyway\codes\playground\playground\debugtoolplatform\deskplatform\DeskPlatform.as3proj;iflash=false;chromerun=false;outlaya=true
+Project configuration:E:\onewaymyway\codes\playground\playground\debugtoolplatform\deskplatform\DeskPlatform.as3proj.
 1,0.00,,0,outlaya=true includeFlash=false 
 1,0.00,,0,output file:DeskPlatform
-1,0.00,,0,output path:D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/
-1,0.00,,0,Main Class:D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/DeskPlatform.as
-1,0.00,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src,0,Collect
-1,0.00,D:/codes/playground.git/trunk/libs/laya/src,0,Collect
-1,0.00,D:/codes/playground.git/trunk/libs/nodetools/src,0,Collect
+1,0.00,,0,output path:E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/bin/h5/
+1,0.00,,0,Main Class:E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/DeskPlatform.as
+1,0.00,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src,0,Collect
+1,0.00,E:/onewaymyway/codes/playground/playground/libs/laya/src,0,Collect
+1,0.00,E:/onewaymyway/codes/playground/playground/libs/nodetools/src,0,Collect
 1,2.00,,0,read class message
-7,50.92,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/EditZone.as,338,ViewTab This variable is not defined.
-7,51.48,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,274,IDEVars.disableTabDrag This variable is not defined.
-7,51.48,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,473,UIPanel. This variable is not defined.
-7,51.53,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1158,CompPanel.instance This variable is not defined.
-7,51.53,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1164,PropPanel.instance This variable is not defined.
-7,51.53,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1171,DisplayTreePanel.instance This variable is not defined.
-7,51.63,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as,28,HtmlSprite. This variable is not defined.
-7,51.63,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as,69,SkinDefines.LayoutTabDragIcon This variable is not defined.
-7,51.78,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/managers/EditRenderManager.as,35,TypeManager.getExtension This variable is not defined.
-7,53.31,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as,43,Sys.lang This variable is not defined.
-7,53.31,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as,49,Sys.lang This variable is not defined.
-7,53.36,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as,682,compType This variable is not defined.
-7,88.06,D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/drags/DragEvent.as,84,SystemSetting.assetsPath This variable is not defined.
-7,88.68,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as,60,_getOneCell This variable is not defined.
-7,88.68,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as,87,_createItems This variable is not defined.
-7,88.78,D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/NodeTree.as,49,_treeData This variable is not defined.
-7,89.34,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as,225,XMLElement This variable is not defined.
-7,89.34,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as,237,XMLElement This variable is not defined.
-7,89.39,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
-7,89.39,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
-7,89.75,D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/NodeJSTools.as,37,Sys.mParseFloat This variable is not defined.
-1,89.95,,0,Disable Flash3D D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/DeskPlatform.as
-12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.js,182931,
-12,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/laya.js,1335196,
-11,89.95,D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.html,799,
+7,50.91,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/editzone/EditZone.as,340,ViewTab This variable is not defined.
+7,51.42,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,274,IDEVars.disableTabDrag This variable is not defined.
+7,51.42,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as,473,UIPanel. This variable is not defined.
+7,51.47,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1158,CompPanel.instance This variable is not defined.
+7,51.47,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1164,PropPanel.instance This variable is not defined.
+7,51.47,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as,1171,DisplayTreePanel.instance This variable is not defined.
+7,51.57,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as,28,HtmlSprite. This variable is not defined.
+7,51.57,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as,69,SkinDefines.LayoutTabDragIcon This variable is not defined.
+7,51.92,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/managers/EditRenderManager.as,35,TypeManager.getExtension This variable is not defined.
+7,53.24,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/view/ResPanel.as,682,compType This variable is not defined.
+7,87.87,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/electrontools/drags/DragEvent.as,84,SystemSetting.assetsPath This variable is not defined.
+7,88.43,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/ListBase.as,60,_getOneCell This variable is not defined.
+7,88.43,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/ListBase.as,87,_createItems This variable is not defined.
+7,88.53,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/NodeTree.as,49,_treeData This variable is not defined.
+7,89.19,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileManager.as,225,XMLElement This variable is not defined.
+7,89.19,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileManager.as,237,XMLElement This variable is not defined.
+7,89.24,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
+7,89.24,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as,82,Browser.window.location.href This variable is not defined.
+7,89.65,E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/NodeJSTools.as,37,Sys.mParseFloat This variable is not defined.
+1,89.95,,0,Disable Flash3D E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/DeskPlatform.as
+12,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.js,183110,
+12,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/bin/h5/laya.js,1337470,
+11,89.95,E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/bin/h5/DeskPlatform.max.html,799,
 ******************************************************************************
 Error or warning message:DeskPlatform.max.js
-1 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as (1158):warning:CompPanel.instance This variable is not defined.
-2 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as (1164):warning:PropPanel.instance This variable is not defined.
-3 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as (1171):warning:DisplayTreePanel.instance This variable is not defined.
-4 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/managers/EditRenderManager.as (35):warning:TypeManager.getExtension This variable is not defined.
-5 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as (225):warning:XMLElement This variable is not defined.
-6 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
-7 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
-8 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
-9 file:///D:/codes/playground.git/trunk/libs/nodetools/src/nodetools/NodeJSTools.as (37):warning:Sys.mParseFloat This variable is not defined.
-10 file:///D:/codes/playground.git/trunk/libs/nodetools/src/electrontools/drags/DragEvent.as (84):warning:SystemSetting.assetsPath This variable is not defined.
-11 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as (60):warning:_getOneCell This variable is not defined.
-12 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/ListBase.as (87):warning:_createItems This variable is not defined.
-13 file:///D:/codes/playground.git/trunk/libs/nodetools/src/extendui/ui/NodeTree.as (49):warning:_treeData This variable is not defined.
-14 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (274):warning:IDEVars.disableTabDrag This variable is not defined.
-15 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (473):warning:UIPanel. This variable is not defined.
-16 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (28):warning:HtmlSprite. This variable is not defined.
-17 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (69):warning:SkinDefines.LayoutTabDragIcon This variable is not defined.
-18 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/platform/editzone/EditZone.as (338):warning:ViewTab This variable is not defined.
-19 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/ResPanel.as (682):warning:compType This variable is not defined.
-20 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (43):warning:Sys.lang This variable is not defined.
-21 file:///D:/codes/playground.git/trunk/debugtoolplatform/deskplatform/src/view/RenameRes.as (49):warning:Sys.lang This variable is not defined.
+1 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as (1158):warning:CompPanel.instance This variable is not defined.
+2 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as (1164):warning:PropPanel.instance This variable is not defined.
+3 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/layout/LayoutRecManager.as (1171):warning:DisplayTreePanel.instance This variable is not defined.
+4 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/managers/EditRenderManager.as (35):warning:TypeManager.getExtension This variable is not defined.
+5 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileManager.as (225):warning:XMLElement This variable is not defined.
+6 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileManager.as (237):warning:XMLElement This variable is not defined.
+7 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+8 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/devices/FileTools.as (82):warning:Browser.window.location.href This variable is not defined.
+9 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/nodetools/NodeJSTools.as (37):warning:Sys.mParseFloat This variable is not defined.
+10 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/electrontools/drags/DragEvent.as (84):warning:SystemSetting.assetsPath This variable is not defined.
+11 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/ListBase.as (60):warning:_getOneCell This variable is not defined.
+12 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/ListBase.as (87):warning:_createItems This variable is not defined.
+13 file:///E:/onewaymyway/codes/playground/playground/libs/nodetools/src/extendui/ui/NodeTree.as (49):warning:_treeData This variable is not defined.
+14 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (274):warning:IDEVars.disableTabDrag This variable is not defined.
+15 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/layout/LayoutRec.as (473):warning:UIPanel. This variable is not defined.
+16 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (28):warning:HtmlSprite. This variable is not defined.
+17 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/layout/LayoutTab.as (69):warning:SkinDefines.LayoutTabDragIcon This variable is not defined.
+18 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/platform/editzone/EditZone.as (340):warning:ViewTab This variable is not defined.
+19 file:///E:/onewaymyway/codes/playground/playground/debugtoolplatform/deskplatform/src/view/ResPanel.as (682):warning:compType This variable is not defined.
 ******************************************************************************
 14,89.95,,0,

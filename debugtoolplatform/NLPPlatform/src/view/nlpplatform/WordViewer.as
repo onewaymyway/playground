@@ -17,6 +17,11 @@ package view.nlpplatform
 	public class WordViewer extends WordViewerUI 
 	{
 		
+		public static function getWordByWordViewer(wordViewer:WordViewer):String
+		{
+			return wordViewer.dataO.word;
+		}
+		
 		public function WordViewer() 
 		{
 			LongPress.setTargetLongPressEnabled(this);

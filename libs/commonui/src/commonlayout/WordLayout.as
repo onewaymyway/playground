@@ -11,9 +11,17 @@ package commonlayout
 		public var spaceY:Number = 2;
 		public var startY:Number = 2;
 		public var border:Number = 2;
+		public var newLineSignDic:Object = {".":true, "!":true, "。":true, "！":true};
+		public var getWordFun:Function;
 		public function WordLayout() 
 		{
 			
+		}
+		
+		public function isNewLineItem(item:Object):Boolean
+		{
+			if (getWordFun == null) return false;
+			return newLineSignDic[getWordFun(item)];
 		}
 		
 		public function layout(items:Array, width:Number, height:Number):void
@@ -43,7 +51,17 @@ package commonlayout
 					tItem.y = tY;
 					tX = tItem.width + spaceX;
 					
+				}else
+				{
+					if (isNewLineItem(tItem))
+					{
+						tY += tItem.height + spaceY;
+						tX = spaceX;
+						
+					}
 				}
+				
+				
 				
 			}
 		}

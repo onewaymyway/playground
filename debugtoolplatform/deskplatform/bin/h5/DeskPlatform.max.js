@@ -76,85 +76,6 @@
 
 
 	/**
-	*...
-	*@author ww
-	*/
-	//class DeskPlatform
-	var DeskPlatform=(function(){
-		function DeskPlatform(){
-			Laya.init(800,600);
-			Laya.stage.scaleMode="full";
-			Laya.stage.bgColor="#ffffff";
-			UIConfig.touchScrollEnable=false;
-			Styles.buttonLabelColors=["#ffffff","#32cc6b","#ff0000","#C0C0C0"];
-			View.regComponent("TreeEx",TreeEx);
-			View.regComponent("Tab",TabEx);
-			View.regComponent("List",ListBase$1);
-			View.regComponent("Tree",TreeBase$1);
-			View.regComponent("ListEx",ListEx);
-			this.init();
-			DialogHook.I.hookDialog();
-			CanvasSprite.parentNode=Browser.container;
-			var resList;
-			resList=[ {"url":"res/atlas/comp.json","type":"atlas" }];
-			resList.push({"url":"res/atlas/view.json","type":"atlas" });
-			resList.push({"url":"res/atlas/play.json","type":"atlas"});
-			Laya.loader.load(resList,new Handler(this,this.test));
-		}
-
-		__class(DeskPlatform,'DeskPlatform');
-		var __proto=DeskPlatform.prototype;
-		__proto.init=function(){
-			Device.Buffer=Buffer;
-			Device.init();
-			SystemSetting.isCMDVer=false;
-			OSInfo.init();
-			FileTools.init2();
-			CMDShell.init();
-			PythonTools.PythonFolder=FileTools.getAppPath("pythontools")+"/";
-			Paths$1.tempPath=FileTools.getAppPath("tempdata")+"/";
-			Paths$1.dataPath=FileTools.getAppPath("data")+"/";
-			SystemDragOverManager.init();
-			ContextMenu$1.init();
-			SystemSetting.appPath=FileTools.appPath;
-		}
-
-		__proto.test=function(){
-			console.log("AppPath:",FileTools.appPath);
-			this.initApp();
-			return;
-			this.testResPanel();
-			return;
-			var mainView;
-			mainView=new MainView();
-			mainView.left=mainView.right=mainView.top=mainView.bottom=5;
-			Laya.stage.addChild(mainView);
-		}
-
-		__proto.testResPanel=function(){
-			SystemSetting.assetsPath="D:/codes/playground.git/trunk/debugtoolplatform/deskplatform";
-			ResPanel.instance.init(SystemSetting.assetsPath);
-			ResPanel.instance.top=0;
-			ResPanel.instance.bottom=0;
-			Laya.stage.addChild(ResPanel.instance);
-		}
-
-		__proto.initApp=function(){
-			EditRenderManager.init();
-			NoticeRouter.init();
-			CursorManager.init();
-			SystemSetting.assetsPath=FileManager.getAppPath("files");;
-			ResPanel.instance.init(SystemSetting.assetsPath);
-			LayerManager.init();
-			LayoutRecManager.init();
-			LayoutRecManager.createDefault();
-		}
-
-		return DeskPlatform;
-	})()
-
-
-	/**
 	*
 	*@author ww
 	*@version 1.0
@@ -1802,6 +1723,213 @@
 
 
 	/**
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-12-25 上午10:19:18
+	*/
+	//class platform.managers.LayerManager
+	var LayerManager=(function(){
+		function LayerManager(){}
+		__class(LayerManager,'platform.managers.LayerManager');
+		LayerManager.init=function(){
+			LayerManager.stage=new Box();
+			LayerManager.stage.mouseEnabled=true;
+			Laya.stage.addChild(LayerManager.stage);
+			LayerManager.onStage();
+			Laya.stage.on("resize",null,LayerManager.onStage);
+		}
+
+		LayerManager.onStage=function(){
+			if (Browser.pixelRatio !=1){
+				Laya.stage._width=Browser.clientWidth;
+				Laya.stage._height=Browser.clientHeight;
+				Laya.stage.scale(Browser.pixelRatio,Browser.pixelRatio);
+			}
+			LayerManager.stage.width=Laya.stage._width>900?Laya.stage._width:900;
+			LayerManager.stage.height=Laya.stage._height>700?Laya.stage._height:700;
+			LayerManager.stage.height-=1;
+			LayerManager.stage.width+=2;
+		}
+
+		LayerManager.stage=null
+		LayerManager.minWidth=900;
+		LayerManager.minHeight=700;
+		return LayerManager;
+	})()
+
+
+	/**
+	*本类集中初始化各个模块监听的消息
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-10-26 上午10:39:45
+	*/
+	//class platform.managers.NoticeRouter
+	var NoticeRouter=(function(){
+		function NoticeRouter(){}
+		__class(NoticeRouter,'platform.managers.NoticeRouter');
+		NoticeRouter.init=function(){
+			NoticeRouter._initsList=[];
+			NoticeRouter._initsList.push(ResPanel.instance);
+			NoticeRouter._initsList.push(EditZone.instance);
+			NoticeRouter._initsList.push(AddDirectory.instance);
+			NoticeRouter._initsList.push(AddResCommomDialog.instance);
+			var i=0,len=NoticeRouter._initsList.length;
+			for (i=0;i < len;i++){
+				NoticeRouter._initsList[i].initListener();
+			}
+		}
+
+		NoticeRouter._initsList=null
+		return NoticeRouter;
+	})()
+
+
+	/**
+	*状态管理类
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2015-10-22 下午7:45:51
+	*/
+	//class platform.managers.StateManager
+	var StateManager=(function(){
+		function StateManager(){}
+		__class(StateManager,'platform.managers.StateManager');
+		StateManager.has=function(sign){
+			return StateManager._stateDic.hasOwnProperty(sign);
+		}
+
+		StateManager.getState=function(sign){
+			if(!StateManager._stateDic[sign])StateManager._stateDic[sign]=new State();
+			return StateManager._stateDic[sign];
+		}
+
+		StateManager.updateState=function(sign,data){
+			StateManager.setChangeState(sign,StateManager.has(sign));
+			StateManager.getState(sign).addE(data);
+		}
+
+		StateManager.removeState=function(sign){
+			delete StateManager._stateDic[sign];
+			delete StateManager._changeDic[sign];
+		}
+
+		StateManager.renameState=function(sign,newSign){
+			if(StateManager._stateDic[sign]){
+				StateManager._stateDic[newSign]=StateManager._stateDic[sign];
+				delete StateManager._stateDic[sign];
+			}
+			if(StateManager._changeDic[sign]){
+				StateManager._changeDic[newSign]=StateManager._changeDic[sign];
+				delete StateManager._changeDic[sign];
+			}
+		}
+
+		StateManager.hasChange=function(sign){
+			return StateManager._changeDic[sign];
+		}
+
+		StateManager.setChangeState=function(sign,changed){
+			StateManager._changeDic[sign]=changed;
+		}
+
+		StateManager._stateDic={};
+		StateManager._changeDic={};
+		return StateManager;
+	})()
+
+
+	/**
+	*历史状态管理类
+	*@author ww
+	*/
+	//class platform.managers.state.State
+	var State=(function(){
+		function State(){
+			this._stateList=[];
+			this._tI=-1;
+		}
+
+		__class(State,'platform.managers.state.State');
+		var __proto=State.prototype;
+		/**
+		*添加状态 ，直接使用传入的状态值
+		*@param data
+		*
+		*/
+		__proto.add=function(data){
+			this.traceState();
+			if(this._tI!=this._stateList.length-1){
+				this._stateList.length=this._tI+1;
+			}
+			this._stateList.push(data);
+			if(this._stateList.length>150){
+				this._stateList.shift();
+			}
+			this._tI=this._stateList.length-1;
+			this.traceState();
+		}
+
+		__proto.getLastCache=function(){
+			if(this._stateList.length>1){
+				return this._stateList[this._stateList.length-2];
+			}
+			return null;
+		}
+
+		__proto.traceState=function(){}
+		/**
+		*添加状态 ，会拷贝一个副本数据存入
+		*@param data
+		*
+		*/
+		__proto.addE=function(data){
+			this.add(ObjectTools.copyObj(data));
+		}
+
+		/**
+		*获取当前状态
+		*@return
+		*
+		*/
+		__proto.now=function(){
+			return ObjectTools.copyObj(this._stateList[this._tI]);
+		}
+
+		/**
+		*向后回退
+		*@return
+		*
+		*/
+		__proto.back=function(){
+			if(this._tI<=0)return null;
+			this._tI--;
+			this.traceState();
+			return this.now();
+		}
+
+		/**
+		*向前重做
+		*@return
+		*
+		*/
+		__proto.forward=function(){
+			if(this._tI>=this._stateList.length-1)return null;
+			this._tI++;
+			this.traceState();
+			return this.now();
+		}
+
+		State.MaxLen=150;
+		return State;
+	})()
+
+
+	/**
 	*编辑区渲染器管理器
 	*@author ww
 	*@version 1.0
@@ -1923,286 +2051,59 @@
 	*@author ww
 	*@version 1.0
 	*
-	*@created 2015-12-25 上午10:19:18
+	*@created 2015-11-16 下午1:26:53
 	*/
-	//class platform.managers.LayerManager
-	var LayerManager=(function(){
-		function LayerManager(){}
-		__class(LayerManager,'platform.managers.LayerManager');
-		LayerManager.init=function(){
-			LayerManager.stage=new Box();
-			LayerManager.stage.mouseEnabled=true;
-			Laya.stage.addChild(LayerManager.stage);
-			LayerManager.onStage();
-			Laya.stage.on("resize",null,LayerManager.onStage);
-		}
-
-		LayerManager.onStage=function(){
-			if (Browser.pixelRatio !=1){
-				Laya.stage._width=Browser.clientWidth;
-				Laya.stage._height=Browser.clientHeight;
-				Laya.stage.scale(Browser.pixelRatio,Browser.pixelRatio);
-			}
-			LayerManager.stage.width=Laya.stage._width>900?Laya.stage._width:900;
-			LayerManager.stage.height=Laya.stage._height>700?Laya.stage._height:700;
-			LayerManager.stage.height-=1;
-			LayerManager.stage.width+=2;
-		}
-
-		LayerManager.stage=null
-		LayerManager.minWidth=900;
-		LayerManager.minHeight=700;
-		return LayerManager;
+	//class platform.tools.Notices
+	var Notices=(function(){
+		function Notices(){}
+		__class(Notices,'platform.tools.Notices');
+		Notices.RENDER_INITED="RenderInited";
+		Notices.DROP_RENDER="DROP_RENDER";
+		Notices.OPEN_PLUGIN="OPEN_PLUGIN";
+		return Notices;
 	})()
 
 
-	/**
-	*本类集中初始化各个模块监听的消息
-	*@author ww
-	*@version 1.0
-	*
-	*@created 2015-10-26 上午10:39:45
-	*/
-	//class platform.managers.NoticeRouter
-	var NoticeRouter=(function(){
-		function NoticeRouter(){}
-		__class(NoticeRouter,'platform.managers.NoticeRouter');
-		NoticeRouter.init=function(){
-			NoticeRouter._initsList=[];
-			NoticeRouter._initsList.push(ResPanel.instance);
-			NoticeRouter._initsList.push(EditZone.instance);
-			NoticeRouter._initsList.push(AddDirectory.instance);
-			NoticeRouter._initsList.push(AddResCommomDialog.instance);
-			var i=0,len=NoticeRouter._initsList.length;
-			for (i=0;i < len;i++){
-				NoticeRouter._initsList[i].initListener();
+	/**对象工具集*/
+	//class platform.tools.ObjectUtils
+	var ObjectUtils=(function(){
+		function ObjectUtils(){};
+		__class(ObjectUtils,'platform.tools.ObjectUtils');
+		ObjectUtils.addFilter=function(target,filter){
+			var filters=target.filters || [];
+			filters.push(filter);
+			target.filters=filters;
+		}
+
+		ObjectUtils.clearFilter=function(target,filterType){
+			var filters=target.filters;
+			if (filters !=null && filters.length > 0){
+				for (var i=filters.length-1;i >-1;i--){
+					var filter=filters[i];
+					if (Laya.__typeof(filter,filterType)){
+						filters.splice(i,1);
+					}
+				}
+				target.filters=filters;
 			}
 		}
 
-		NoticeRouter._initsList=null
-		return NoticeRouter;
-	})()
-
-
-	/**
-	*历史状态管理类
-	*@author ww
-	*/
-	//class platform.managers.state.State
-	var State=(function(){
-		function State(){
-			this._stateList=[];
-			this._tI=-1;
+		ObjectUtils.getTextField=function(format,text){
+			(text===void 0)&& (text="Test");
+			ObjectUtils._tf.align="left";
+			ObjectUtils._tf.text=text;
+			return ObjectUtils._tf;
 		}
 
-		__class(State,'platform.managers.state.State');
-		var __proto=State.prototype;
-		/**
-		*添加状态 ，直接使用传入的状态值
-		*@param data
-		*
-		*/
-		__proto.add=function(data){
-			this.traceState();
-			if(this._tI!=this._stateList.length-1){
-				this._stateList.length=this._tI+1;
-			}
-			this._stateList.push(data);
-			if(this._stateList.length>150){
-				this._stateList.shift();
-			}
-			this._tI=this._stateList.length-1;
-			this.traceState();
+		ObjectUtils.measureTextWidth=function(format,text){
+			(text===void 0)&& (text="Test");
+			return ObjectUtils.getTextField(format,text).width;
 		}
 
-		__proto.getLastCache=function(){
-			if(this._stateList.length>1){
-				return this._stateList[this._stateList.length-2];
-			}
-			return null;
-		}
-
-		__proto.traceState=function(){}
-		/**
-		*添加状态 ，会拷贝一个副本数据存入
-		*@param data
-		*
-		*/
-		__proto.addE=function(data){
-			this.add(ObjectTools.copyObj(data));
-		}
-
-		/**
-		*获取当前状态
-		*@return
-		*
-		*/
-		__proto.now=function(){
-			return ObjectTools.copyObj(this._stateList[this._tI]);
-		}
-
-		/**
-		*向后回退
-		*@return
-		*
-		*/
-		__proto.back=function(){
-			if(this._tI<=0)return null;
-			this._tI--;
-			this.traceState();
-			return this.now();
-		}
-
-		/**
-		*向前重做
-		*@return
-		*
-		*/
-		__proto.forward=function(){
-			if(this._tI>=this._stateList.length-1)return null;
-			this._tI++;
-			this.traceState();
-			return this.now();
-		}
-
-		State.MaxLen=150;
-		return State;
-	})()
-
-
-	/**
-	*状态管理类
-	*@author ww
-	*@version 1.0
-	*
-	*@created 2015-10-22 下午7:45:51
-	*/
-	//class platform.managers.StateManager
-	var StateManager=(function(){
-		function StateManager(){}
-		__class(StateManager,'platform.managers.StateManager');
-		StateManager.has=function(sign){
-			return StateManager._stateDic.hasOwnProperty(sign);
-		}
-
-		StateManager.getState=function(sign){
-			if(!StateManager._stateDic[sign])StateManager._stateDic[sign]=new State();
-			return StateManager._stateDic[sign];
-		}
-
-		StateManager.updateState=function(sign,data){
-			StateManager.setChangeState(sign,StateManager.has(sign));
-			StateManager.getState(sign).addE(data);
-		}
-
-		StateManager.removeState=function(sign){
-			delete StateManager._stateDic[sign];
-			delete StateManager._changeDic[sign];
-		}
-
-		StateManager.renameState=function(sign,newSign){
-			if(StateManager._stateDic[sign]){
-				StateManager._stateDic[newSign]=StateManager._stateDic[sign];
-				delete StateManager._stateDic[sign];
-			}
-			if(StateManager._changeDic[sign]){
-				StateManager._changeDic[newSign]=StateManager._changeDic[sign];
-				delete StateManager._changeDic[sign];
-			}
-		}
-
-		StateManager.hasChange=function(sign){
-			return StateManager._changeDic[sign];
-		}
-
-		StateManager.setChangeState=function(sign,changed){
-			StateManager._changeDic[sign]=changed;
-		}
-
-		StateManager._stateDic={};
-		StateManager._changeDic={};
-		return StateManager;
-	})()
-
-
-	/**
-	*
-	*@author ww
-	*@version 1.0
-	*
-	*@created 2016-8-10 下午4:21:23
-	*/
-	//class platform.rendercanvas.HtmlZIndexManager
-	var HtmlZIndexManager$1=(function(){
-		function HtmlZIndexManager(){}
-		__class(HtmlZIndexManager,'platform.rendercanvas.HtmlZIndexManager',null,'HtmlZIndexManager$1');
-		HtmlZIndexManager.init=function(){
-			Laya.stage.on("mousedown",null,HtmlZIndexManager.onMouseDown);
-			Laya.stage.on("mouseup",null,HtmlZIndexManager.onMouseUp);
-		}
-
-		HtmlZIndexManager.onMouseDown=function(){
-			HtmlZIndexManager.isMouseDown=true;
-			HtmlZIndexManager.prePos.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
-			HtmlZIndexManager.isDrag=false;
-			Laya.stage.on("mousemove",null,HtmlZIndexManager.onMouseMove);
-		}
-
-		HtmlZIndexManager.onMouseMove=function(){
-			if(Math.abs(HtmlZIndexManager.prePos.x-Laya.stage.mouseX)+Math.abs(HtmlZIndexManager.prePos.y-Laya.stage.mouseY)>5){
-				Notice.notify("DisableOverlays");
-				HtmlZIndexManager.setHtmlEnable(false);
-				HtmlZIndexManager.isDrag=true;
-				Laya.stage.off("mousemove",null,HtmlZIndexManager.onMouseMove);
-			}
-		}
-
-		HtmlZIndexManager.onMouseUp=function(){
-			HtmlZIndexManager.isMouseDown=false;
-			Laya.stage.off("mousemove",null,HtmlZIndexManager.onMouseMove);
-			if(!HtmlZIndexManager.preValue){
-				Notice.notify("EnableOverlays");
-				HtmlZIndexManager.setHtmlEnable(true);
-			}
-			HtmlZIndexManager.isDrag=false;
-		}
-
-		HtmlZIndexManager.setHtmlEnable=function(enable){
-			HtmlZIndexManager.preValue=enable;
-			var i=0,len=0;
-			len=HtmlZIndexManager.htmlList.length;
-			for(i=0;i<len;i++){
-				if(HtmlZIndexManager.htmlList[i].disableAutoControl)continue ;
-				JSTools.setMouseEnable(HtmlZIndexManager.htmlList[i],enable);
-			}
-		}
-
-		HtmlZIndexManager.addHtml=function(html){
-			if(!html)return;
-			if(!HtmlZIndexManager.htmlList.indexOf(html)>=0){
-				HtmlZIndexManager.htmlList.push(html);
-			}
-		}
-
-		HtmlZIndexManager.removeHtml=function(html){
-			if(!html)return;
-			var index=0;
-			index=HtmlZIndexManager.htmlList.indexOf(html);
-			if(index>=0){
-				HtmlZIndexManager.htmlList.splice(index,1);
-			}
-		}
-
-		HtmlZIndexManager.DisableOverlays="DisableOverlays";
-		HtmlZIndexManager.EnableOverlays="EnableOverlays";
-		HtmlZIndexManager.isDrag=false;
-		HtmlZIndexManager.isMouseDown=false;
-		HtmlZIndexManager.preValue=true;
-		HtmlZIndexManager.htmlList=[];
-		__static(HtmlZIndexManager,
-		['prePos',function(){return this.prePos=new Point();}
+		__static(ObjectUtils,
+		['_tf',function(){return this._tf=new TextField();}
 		]);
-		return HtmlZIndexManager;
+		return ObjectUtils;
 	})()
 
 
@@ -2258,63 +2159,52 @@
 
 
 	/**
-	*
-	*@author ww
-	*@version 1.0
-	*
-	*@created 2015-11-16 下午1:26:53
+	*...
+	*@author WW
 	*/
-	//class platform.tools.Notices
-	var Notices=(function(){
-		function Notices(){}
-		__class(Notices,'platform.tools.Notices');
-		Notices.RENDER_INITED="RenderInited";
-		Notices.DROP_RENDER="DROP_RENDER";
-		Notices.OPEN_PLUGIN="OPEN_PLUGIN";
-		return Notices;
-	})()
-
-
-	/**对象工具集*/
-	//class platform.tools.ObjectUtils
-	var ObjectUtils=(function(){
-		function ObjectUtils(){};
-		__class(ObjectUtils,'platform.tools.ObjectUtils');
-		ObjectUtils.addFilter=function(target,filter){
-			var filters=target.filters || [];
-			filters.push(filter);
-			target.filters=filters;
+	//class viewRender.EditorRenderBase
+	var EditorRenderBase=(function(){
+		function EditorRenderBase(){
+			this.initFuns();
 		}
 
-		ObjectUtils.clearFilter=function(target,filterType){
-			var filters=target.filters;
-			if (filters !=null && filters.length > 0){
-				for (var i=filters.length-1;i >-1;i--){
-					var filter=filters[i];
-					if (Laya.__typeof(filter,filterType)){
-						filters.splice(i,1);
-					}
-				}
-				target.filters=filters;
-			}
+		__class(EditorRenderBase,'viewRender.EditorRenderBase');
+		var __proto=EditorRenderBase.prototype;
+		__proto.initFuns=function(){
+			Browser.window.renderBinds={};
+			Browser.window.renderBinds.setData=Utils.bind(this.setData,this);
+			Browser.window.renderBinds.updateData=Utils.bind(this.updateData,this);
+			Browser.window.renderBinds.clearRender=Utils.bind(this.clearRender,this);
+			Browser.window.renderBinds.sizeRender=Utils.bind(this.sizeRender,this);
+			Browser.window.renderBinds.posRender=Utils.bind(this.posRender,this);
+			Browser.window.renderBinds.getRenderData=Utils.bind(this.getRenderData,this);
+			Browser.window.renderBinds.getStage=Utils.bind(this.getStage,this);
+			Browser.window.renderBinds.setNotice=Utils.bind(this.setNotice,this);
+			Browser.window.renderBinds.firstInit=Utils.bind(this.firstInit,this);
+			Browser.window.renderBinds.setPagePath=Utils.bind(this.setPagePath,this);
 		}
 
-		ObjectUtils.getTextField=function(format,text){
-			(text===void 0)&& (text="Test");
-			ObjectUtils._tf.align="left";
-			ObjectUtils._tf.text=text;
-			return ObjectUtils._tf;
+		__proto.setPagePath=function(pagePath){}
+		__proto.getRenderData=function(){
+			return null;
 		}
 
-		ObjectUtils.measureTextWidth=function(format,text){
-			(text===void 0)&& (text="Test");
-			return ObjectUtils.getTextField(format,text).width;
+		__proto.setData=function(data){}
+		__proto.updateData=function(data){}
+		__proto.clearRender=function(){}
+		__proto.sizeRender=function(width,height){}
+		__proto.posRender=function(x,y){}
+		__proto.getStage=function(){
+			return Laya.stage;
 		}
 
-		__static(ObjectUtils,
-		['_tf',function(){return this._tf=new TextField();}
-		]);
-		return ObjectUtils;
+		__proto.setNotice=function(notice){
+			Notice.I=notice;
+			Notice.notify("RenderInited");
+		}
+
+		__proto.firstInit=function(complete,param){}
+		return EditorRenderBase;
 	})()
 
 
@@ -2596,52 +2486,162 @@
 
 
 	/**
-	*...
-	*@author WW
+	*
+	*@author ww
+	*@version 1.0
+	*
+	*@created 2016-8-10 下午4:21:23
 	*/
-	//class viewRender.EditorRenderBase
-	var EditorRenderBase=(function(){
-		function EditorRenderBase(){
-			this.initFuns();
+	//class platform.rendercanvas.HtmlZIndexManager
+	var HtmlZIndexManager$1=(function(){
+		function HtmlZIndexManager(){}
+		__class(HtmlZIndexManager,'platform.rendercanvas.HtmlZIndexManager',null,'HtmlZIndexManager$1');
+		HtmlZIndexManager.init=function(){
+			Laya.stage.on("mousedown",null,HtmlZIndexManager.onMouseDown);
+			Laya.stage.on("mouseup",null,HtmlZIndexManager.onMouseUp);
 		}
 
-		__class(EditorRenderBase,'viewRender.EditorRenderBase');
-		var __proto=EditorRenderBase.prototype;
-		__proto.initFuns=function(){
-			Browser.window.renderBinds={};
-			Browser.window.renderBinds.setData=Utils.bind(this.setData,this);
-			Browser.window.renderBinds.updateData=Utils.bind(this.updateData,this);
-			Browser.window.renderBinds.clearRender=Utils.bind(this.clearRender,this);
-			Browser.window.renderBinds.sizeRender=Utils.bind(this.sizeRender,this);
-			Browser.window.renderBinds.posRender=Utils.bind(this.posRender,this);
-			Browser.window.renderBinds.getRenderData=Utils.bind(this.getRenderData,this);
-			Browser.window.renderBinds.getStage=Utils.bind(this.getStage,this);
-			Browser.window.renderBinds.setNotice=Utils.bind(this.setNotice,this);
-			Browser.window.renderBinds.firstInit=Utils.bind(this.firstInit,this);
-			Browser.window.renderBinds.setPagePath=Utils.bind(this.setPagePath,this);
+		HtmlZIndexManager.onMouseDown=function(){
+			HtmlZIndexManager.isMouseDown=true;
+			HtmlZIndexManager.prePos.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
+			HtmlZIndexManager.isDrag=false;
+			Laya.stage.on("mousemove",null,HtmlZIndexManager.onMouseMove);
 		}
 
-		__proto.setPagePath=function(pagePath){}
-		__proto.getRenderData=function(){
-			return null;
+		HtmlZIndexManager.onMouseMove=function(){
+			if(Math.abs(HtmlZIndexManager.prePos.x-Laya.stage.mouseX)+Math.abs(HtmlZIndexManager.prePos.y-Laya.stage.mouseY)>5){
+				Notice.notify("DisableOverlays");
+				HtmlZIndexManager.setHtmlEnable(false);
+				HtmlZIndexManager.isDrag=true;
+				Laya.stage.off("mousemove",null,HtmlZIndexManager.onMouseMove);
+			}
 		}
 
-		__proto.setData=function(data){}
-		__proto.updateData=function(data){}
-		__proto.clearRender=function(){}
-		__proto.sizeRender=function(width,height){}
-		__proto.posRender=function(x,y){}
-		__proto.getStage=function(){
-			return Laya.stage;
+		HtmlZIndexManager.onMouseUp=function(){
+			HtmlZIndexManager.isMouseDown=false;
+			Laya.stage.off("mousemove",null,HtmlZIndexManager.onMouseMove);
+			if(!HtmlZIndexManager.preValue){
+				Notice.notify("EnableOverlays");
+				HtmlZIndexManager.setHtmlEnable(true);
+			}
+			HtmlZIndexManager.isDrag=false;
 		}
 
-		__proto.setNotice=function(notice){
-			Notice.I=notice;
-			Notice.notify("RenderInited");
+		HtmlZIndexManager.setHtmlEnable=function(enable){
+			HtmlZIndexManager.preValue=enable;
+			var i=0,len=0;
+			len=HtmlZIndexManager.htmlList.length;
+			for(i=0;i<len;i++){
+				if(HtmlZIndexManager.htmlList[i].disableAutoControl)continue ;
+				JSTools.setMouseEnable(HtmlZIndexManager.htmlList[i],enable);
+			}
 		}
 
-		__proto.firstInit=function(complete,param){}
-		return EditorRenderBase;
+		HtmlZIndexManager.addHtml=function(html){
+			if(!html)return;
+			if(!HtmlZIndexManager.htmlList.indexOf(html)>=0){
+				HtmlZIndexManager.htmlList.push(html);
+			}
+		}
+
+		HtmlZIndexManager.removeHtml=function(html){
+			if(!html)return;
+			var index=0;
+			index=HtmlZIndexManager.htmlList.indexOf(html);
+			if(index>=0){
+				HtmlZIndexManager.htmlList.splice(index,1);
+			}
+		}
+
+		HtmlZIndexManager.DisableOverlays="DisableOverlays";
+		HtmlZIndexManager.EnableOverlays="EnableOverlays";
+		HtmlZIndexManager.isDrag=false;
+		HtmlZIndexManager.isMouseDown=false;
+		HtmlZIndexManager.preValue=true;
+		HtmlZIndexManager.htmlList=[];
+		__static(HtmlZIndexManager,
+		['prePos',function(){return this.prePos=new Point();}
+		]);
+		return HtmlZIndexManager;
+	})()
+
+
+	/**
+	*...
+	*@author ww
+	*/
+	//class DeskPlatform
+	var DeskPlatform=(function(){
+		function DeskPlatform(){
+			Laya.init(800,600);
+			Laya.stage.scaleMode="full";
+			Laya.stage.bgColor="#ffffff";
+			UIConfig.touchScrollEnable=false;
+			Styles.buttonLabelColors=["#ffffff","#32cc6b","#ff0000","#C0C0C0"];
+			View.regComponent("TreeEx",TreeEx);
+			View.regComponent("Tab",TabEx);
+			View.regComponent("List",ListBase$1);
+			View.regComponent("Tree",TreeBase$1);
+			View.regComponent("ListEx",ListEx);
+			this.init();
+			DialogHook.I.hookDialog();
+			CanvasSprite.parentNode=Browser.container;
+			var resList;
+			resList=[ {"url":"res/atlas/comp.json","type":"atlas" }];
+			resList.push({"url":"res/atlas/view.json","type":"atlas" });
+			resList.push({"url":"res/atlas/play.json","type":"atlas"});
+			Laya.loader.load(resList,new Handler(this,this.test));
+		}
+
+		__class(DeskPlatform,'DeskPlatform');
+		var __proto=DeskPlatform.prototype;
+		__proto.init=function(){
+			Device.Buffer=Buffer;
+			Device.init();
+			SystemSetting.isCMDVer=false;
+			OSInfo.init();
+			FileTools.init2();
+			CMDShell.init();
+			PythonTools.PythonFolder=FileTools.getAppPath("pythontools")+"/";
+			Paths$1.tempPath=FileTools.getAppPath("tempdata")+"/";
+			Paths$1.dataPath=FileTools.getAppPath("data")+"/";
+			SystemDragOverManager.init();
+			ContextMenu$1.init();
+			SystemSetting.appPath=FileTools.appPath;
+		}
+
+		__proto.test=function(){
+			console.log("AppPath:",FileTools.appPath);
+			this.initApp();
+			return;
+			this.testResPanel();
+			return;
+			var mainView;
+			mainView=new MainView();
+			mainView.left=mainView.right=mainView.top=mainView.bottom=5;
+			Laya.stage.addChild(mainView);
+		}
+
+		__proto.testResPanel=function(){
+			SystemSetting.assetsPath="D:/codes/playground.git/trunk/debugtoolplatform/deskplatform";
+			ResPanel.instance.init(SystemSetting.assetsPath);
+			ResPanel.instance.top=0;
+			ResPanel.instance.bottom=0;
+			Laya.stage.addChild(ResPanel.instance);
+		}
+
+		__proto.initApp=function(){
+			EditRenderManager.init();
+			NoticeRouter.init();
+			CursorManager.init();
+			SystemSetting.assetsPath=FileManager.getAppPath("files");;
+			ResPanel.instance.init(SystemSetting.assetsPath);
+			LayerManager.init();
+			LayoutRecManager.init();
+			LayoutRecManager.createDefault();
+		}
+
+		return DeskPlatform;
 	})()
 
 
@@ -3867,6 +3867,31 @@
 
 
 	/**
+	*可拖动布局框的基类
+	*@author ww
+	*/
+	//class platform.layout.DragView extends laya.ui.View
+	var DragView=(function(_super){
+		function DragView(){
+			this.minWidth=50;
+			this.minHeight=50;
+			this.defaultWidth=100;
+			this.defaultHeight=100;
+			this.title="";
+			this.helpUrl="";
+			this.canClose=true;
+			this.canMix=true;
+			this.freeSize=false;
+			this.layoutTab=null;
+			DragView.__super.call(this);
+		}
+
+		__class(DragView,'platform.layout.DragView',_super);
+		return DragView;
+	})(View)
+
+
+	/**
 	*
 	*@author ww
 	*@version 1.0
@@ -3900,31 +3925,6 @@
 		IFrameSprite._I=null
 		return IFrameSprite;
 	})(HtmlSprite)
-
-
-	/**
-	*可拖动布局框的基类
-	*@author ww
-	*/
-	//class platform.layout.DragView extends laya.ui.View
-	var DragView=(function(_super){
-		function DragView(){
-			this.minWidth=50;
-			this.minHeight=50;
-			this.defaultWidth=100;
-			this.defaultHeight=100;
-			this.title="";
-			this.helpUrl="";
-			this.canClose=true;
-			this.canMix=true;
-			this.freeSize=false;
-			this.layoutTab=null;
-			DragView.__super.call(this);
-		}
-
-		__class(DragView,'platform.layout.DragView',_super);
-		return DragView;
-	})(View)
 
 
 	//class ui.layout.LayoutRecUI extends laya.ui.View
